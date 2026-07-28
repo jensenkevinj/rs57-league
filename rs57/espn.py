@@ -193,6 +193,13 @@ def keeper_pick_ids(draft_detail: Mapping[str, Any]) -> frozenset[int]:
     ESPN flags these on the draft pick itself, which is how ``kept_prior_year`` gets derived
     from data instead of from the old script's hand-maintained list of names. That list is
     what under-charged James Cook $5 when ESPN started returning ``James Cook III``.
+
+    **This set includes prospects.** ``draftSettings.keeperCount`` is 4 — three keepers plus a
+    prospect — and ESPN marks all four the same way, with nothing on the pick to say which slot
+    it filled. A prospect keep must not be taxed, so the prospects have to be subtracted from
+    this set by the caller; see ``build_season``'s ``prior_prospect_ids``. Taxing them is not a
+    hypothetical: it charged Tyjae Spears $5 he did not owe, and the ratchet would have carried
+    that forward every season after.
     """
     return frozenset(
         pick["playerId"] for pick in draft_detail.get("picks") or [] if pick.get("keeper")
@@ -292,6 +299,7 @@ def build_season(
     client: EspnClient,
     *,
     prior_keeper_ids: Iterable[int] = (),
+    prior_prospect_ids: Iterable[int] | None = None,
     faab_bids: Mapping[int, int] | None = None,
     managers: Mapping[int, str] | None = None,
 ) -> SyncedSeason:
@@ -301,6 +309,12 @@ def build_season(
     player still holds the tax this season unless he was dropped in between. A drop shows up
     as an ``ADD`` acquisition — a trade does not, which is exactly the asymmetry ``CLAUDE.md``
     calls out: the tax follows the player across a trade and dies on a drop.
+
+    ``prior_prospect_ids`` are the players last season's keepers list holds who were kept in the
+    **PROSPECT** slot. They are subtracted, because a prospect keep never sets the tax flag —
+    and ESPN cannot tell you which of its four keeper picks was the prospect. Pass ``None``
+    (the default) only when that is genuinely unknown; the season then carries a warning rather
+    than quietly taxing players who may owe nothing.
 
     ``faab_bids`` cross-checks every waiver add's base against the money actually bid for him.
     Drafted players get this for free — ``check_base_continuity`` and the auction record cover
@@ -323,7 +337,9 @@ def build_season(
     drafted = bool(draft_detail.get("drafted"))
     field_name = base_salary_field(drafted)
     pro_teams = client.fetch_pro_teams()
-    prior_keepers = frozenset(prior_keeper_ids)
+    # A prospect keep is in ESPN's keeper set but owes no tax, so it comes back out.
+    prospects = frozenset(prior_prospect_ids or ())
+    prior_keepers = frozenset(prior_keeper_ids) - prospects
     deadline = _epoch_ms((settings.get("tradeSettings") or {}).get("deadlineDate"))
 
     franchises: list[FranchiseName] = []
@@ -412,6 +428,14 @@ def build_season(
         warnings.append(
             "no prior-season keeper picks supplied, so kept_prior_year is False for every "
             "player and nobody is taxed — pass last season's draft detail"
+        )
+    elif prior_prospect_ids is None:
+        taxed = sum(entry.kept_prior_year for entry in roster)
+        warnings.append(
+            f"prospect keeps were not supplied, and ESPN's draft flag does not distinguish "
+            f"them from keeper slots — up to one player per team among the {taxed} taxed may "
+            f"be a prospect owing no $5 tax. Pass prior_prospect_ids from last season's "
+            f"keeper claims"
         )
     if faab_bids is None:
         warnings.append(

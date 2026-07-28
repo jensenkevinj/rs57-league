@@ -16,6 +16,7 @@ ratchet into a player's price permanently.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,7 +32,25 @@ from rs57.espn import (
 )
 from rs57.models import dump_json
 
-DERIVED = Path(__file__).resolve().parent.parent / "data" / "derived"
+DATA = Path(__file__).resolve().parent.parent / "data"
+DERIVED = DATA / "derived"
+PROSPECTS = DATA / "manual" / "prospects.json"
+
+
+def prior_prospect_ids(season: int, path: Path = PROSPECTS) -> set[int] | None:
+    """Players kept in the PROSPECT slot in ``season``, read from ``data/manual/``.
+
+    Read-only: ``data/manual/`` is the human-owned store and the Action must never write it.
+
+    Returns ``None`` when the file has nothing for that season, which is not the same as an
+    empty list — ``None`` means "unknown, warn about it", ``[]`` means "checked, there were
+    none". Collapsing the two would let an unrecorded prospect be taxed silently.
+    """
+    if not path.exists():
+        return None
+    seasons = json.loads(path.read_text(encoding="utf-8")).get("seasons") or {}
+    found = seasons.get(str(season))
+    return set(found) if found is not None else None
 
 
 def season_document(season: SyncedSeason) -> dict[str, Any]:
@@ -94,7 +113,12 @@ def sync_season(year: int, *, out_dir: Path = DERIVED, write: bool = True) -> Sy
     except EspnError:
         faab = None
 
-    season = build_season(client, prior_keeper_ids=prior_keepers, faab_bids=faab)
+    season = build_season(
+        client,
+        prior_keeper_ids=prior_keepers,
+        prior_prospect_ids=prior_prospect_ids(year - 1),
+        faab_bids=faab,
+    )
 
     if write:
         out_dir.mkdir(parents=True, exist_ok=True)

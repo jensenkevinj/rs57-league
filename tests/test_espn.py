@@ -270,6 +270,71 @@ def test_a_drop_clears_the_tax(doc_2025, doc_2026):
     assert re_added.base_salary == 0
 
 
+TYJAE_SPEARS = 4428557
+"""Kept in the PROSPECT slot in 2025 (`Purdy Good at Fantasy`, P_Sal $3), per the workbook's
+Fee Allocations tab. ESPN's draft record flags him `keeper: True` exactly like a K1/K2/K3."""
+
+
+def test_a_prospect_keep_is_not_taxed(doc_2025):
+    """`CLAUDE.md`: a prospect keep never sets the tax flag.
+
+    ESPN's `keeperCount` is 4 — three keepers plus a prospect — and the draft pick carries no
+    slot, so the keeper flag alone over-taxes every prospect. This was a real $5 error on
+    Tyjae Spears, caught by the workbook diff, and the ratchet would have carried it forward
+    for good.
+    """
+    picks = keeper_pick_ids(doc_2025["draft"])
+    assert TYJAE_SPEARS in picks, "ESPN does flag the prospect as a keeper"
+
+    taxed = build_season(ReplayClient(2026), prior_keeper_ids=picks)
+    assert next(e for e in taxed.roster if e.espn_player_id == TYJAE_SPEARS).kept_prior_year
+
+    fixed = build_season(
+        ReplayClient(2026), prior_keeper_ids=picks, prior_prospect_ids={TYJAE_SPEARS}
+    )
+    entry = next(e for e in fixed.roster if e.espn_player_id == TYJAE_SPEARS)
+    assert entry.kept_prior_year is False
+    assert entry.base_salary == 3  # keeps his base; only the tax goes away
+
+
+def test_unknown_prospects_warn_rather_than_silently_taxing(doc_2025):
+    """Never let a REVIEW item pass silently as if it had been checked."""
+    picks = keeper_pick_ids(doc_2025["draft"])
+    unknown = build_season(ReplayClient(2026), prior_keeper_ids=picks)
+    assert any("prospect keeps were not supplied" in w for w in unknown.warnings)
+
+    known = build_season(
+        ReplayClient(2026), prior_keeper_ids=picks, prior_prospect_ids={TYJAE_SPEARS}
+    )
+    assert not any("prospect" in w for w in known.warnings)
+
+
+def test_matches_the_workbook_keeper_column(doc_2025):
+    """The 30 players the `Keepers` tab marks Kept=TRUE, with the prospect excluded.
+
+    This is the Phase 1 acceptance check. It found the prospect bug above, which is why the
+    workbook diff was not the redundant formality it looked like.
+    """
+    season = build_season(
+        ReplayClient(2026),
+        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        prior_prospect_ids={TYJAE_SPEARS},
+    )
+    names = {p.espn_player_id: p.name for p in season.players}
+    taxed = {names[e.espn_player_id] for e in season.roster if e.kept_prior_year}
+    workbook = {
+        "Bucky Irving", "Puka Nacua", "Saquon Barkley", "Nico Collins", "Justin Jefferson",
+        "Jaxon Smith-Njigba", "James Cook III", "Rashee Rice", "Xavier Worthy", "Malik Nabers",
+        "Ja'Marr Chase", "Drake London", "Michael Pittman Jr.", "CeeDee Lamb", "Tee Higgins",
+        "Brock Bowers", "Brian Thomas Jr.", "Jahmyr Gibbs", "Mike Evans", "Chuba Hubbard",
+        "Trey McBride", "Chase Brown", "Ladd McConkey", "Jonathan Taylor", "Terry McLaurin",
+        "Sam LaPorta", "Amon-Ra St. Brown", "A.J. Brown", "De'Von Achane",
+    }
+    # Jayden Daniels is Kept=TRUE in the workbook but was dropped after the sheet was last
+    # written, so he is on nobody's roster now. A stale snapshot, not a disagreement.
+    assert taxed == workbook
+
+
 def test_no_prior_keepers_warns_rather_than_silently_untaxing():
     season = build_season(ReplayClient(2026), prior_keeper_ids=())
     assert not any(e.kept_prior_year for e in season.roster)

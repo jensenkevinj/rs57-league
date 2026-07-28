@@ -7,7 +7,10 @@ tracking, and league history. NOT live scoring — that stays on ESPN.
 - Python throughout. JSON files in data/ are the store — no database.
 - Nightly GitHub Action writes data/derived/ and site/. Local admin tool writes
   data/manual/. NO FILE HAS TWO WRITERS. Never make the Action touch manual/,
-  and never commit derived/ or site/ from the laptop.
+  and never commit derived/ or site/ from the laptop. Locally use
+  `python -m rs57.sync --year <yr> --dry-run`, which reports without writing.
+- ESPN reads need no credentials — public league, historical seasons included.
+  `rs57/espn.py` does the I/O; `keeper_rules.py` must never import it.
 - data/history/ is written once per completed season, then frozen.
 - Serialize with `dump_json()` from rs57.models — sort_keys=True, stable ordering,
   trailing newline. Diffs must stay readable.
@@ -41,6 +44,12 @@ for $5 in 2025 → $10 in 2026. ESPN reports his current base as $5.
 
 `check_base_continuity()` audits this: a kept player's base must equal last season's computed
 salary unless an override explains it.
+
+**Which ESPN field is the base depends on whether that season has drafted** — `keeperValue`
+before the auction, `keeperValueFuture` after, decided by `draftDetail.drafted`. Getting this
+wrong does not fail loudly; it silently reprices the whole league and compounds every year.
+Settled against the auction record in `docs/espn-field-semantics.md` — read it before touching
+anything that sets `base_salary`.
 
 ### The $5 tax
 - Waived on a **drop**, NOT on a **trade** — it follows the player across trades, because it

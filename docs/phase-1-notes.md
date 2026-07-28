@@ -145,13 +145,27 @@ aside — that tab is a direct dump of ESPN, so unlike Phase 0's fixtures it is 
 Phase 0's acceptance criterion had to be rewritten because the `Fee Allocations` tabs turned out
 to be live VLOOKUPs rather than records. The `Keepers` tab does not have that problem.
 
-### Status 2026-07-28: closed on stronger evidence, tab diff *not* run
+### Status 2026-07-28: tab diff RUN, and it found a real bug
 
-Kevin's call, and a defensible one — but recorded plainly so nobody later mistakes it for a
-check that passed.
+It was first closed without running the diff, on the argument that ESPN's own auction and FAAB
+records were stronger evidence than a sheet dumped from the same source. **That argument was
+wrong**, and the record of why is worth keeping.
 
-The row-for-row tab comparison **was never performed.** What was verified instead is more
-direct than the tab, which is only a dump of the same ESPN source:
+The workbook was then read directly (it is reachable — see "Reading the workbook" below) and
+the diff produced a genuine defect: **Tyjae Spears was being taxed $5 he did not owe.** He was
+kept in the PROSPECT slot in 2025, and `draftSettings.keeperCount` is 4 — three keepers plus a
+prospect — with ESPN marking all four `keeper: True` and nothing on the pick saying which slot
+it filled. Every ESPN-only check agreed with itself and missed it, because ESPN does not hold
+the distinction at all. Only the workbook's `Fee Allocations` tab records the slot.
+
+The lesson generalises: **cross-checks against the same source cannot find what that source
+does not know.** The tab was not redundant; it was the only independent witness for slot.
+
+Fixed by `build_season(prior_prospect_ids=...)`, fed from `data/manual/prospects.json`, with a
+loud warning when prospects are unknown rather than a silent tax. Locked by
+`test_a_prospect_keep_is_not_taxed` and `test_matches_the_workbook_keeper_column`.
+
+What the ESPN-side checks did confirm, and still stand:
 
 - **Drafted players' bases** against the 2025 auction record (`picks[].bidAmount`) — the two
   agree, and every row that does not is a drop-and-re-add whose base correctly reset.
@@ -175,6 +189,25 @@ That makes every roster entry independently witnessed:
 | `trade` | 8 | original auction or FAAB price — 8/8, and a trade does not reprice |
 | | **188** | |
 
-So the tab diff is genuinely redundant rather than merely skipped. If something does surface
-later, suspect the manual overrides first — they are the only salaries ESPN is *expected* to
-report wrongly, and the sync deliberately leaves them to `effective_base_salary`.
+### Reading the workbook
+
+It is reachable through the Drive tooling, by id — `Keepers` is
+`1ypljsxlVVRE1PzZqmfYufCFXu_l9J8hCw-rnl571r8Y`. No export step, no local OAuth token, and no
+need to ask for a CSV. An earlier session assumed otherwise and waived the acceptance check on
+that assumption; don't repeat it.
+
+Two things to know before diffing against it:
+
+- **Roster membership will not match, and that is expected.** The tab is a snapshot from
+  whenever the old script last ran (acquisition dates stop at Nov 19), while ESPN's roster
+  endpoint always returns the *current* roster. Cooking Rice alone differs by seven players.
+  Compare `Base` and `Kept` for players present in both; do not compare row counts.
+- **Jayden Daniels is `Kept=TRUE` in the tab and on nobody's roster now.** Dropped after the
+  sheet was written. Not a disagreement.
+
+The workbook also holds the `Manually Changed Salaries` tab, which currently lists three
+un-reverted overrides (Saquon Barkley $71, Jaxon Smith-Njigba $19, Jonathan Taylor $32). These
+are **not** loaded yet — `data/manual/` has no overrides file, so `effective_base_salary` has
+nothing to apply and `check_override_balance` has nothing to audit. Wiring them in is
+outstanding work; the sync correctly leaves ESPN's distorted value in `base_salary` and defers
+to the engine, so nothing is wrong today, but the true salaries are not yet represented.
