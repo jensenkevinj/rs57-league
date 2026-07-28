@@ -7,6 +7,16 @@
     "Every expected value here is a literal. Do not compute it from a formula in a test."
   ],
 
+  "_reviewed": {
+    "by": "commissioner",
+    "on": "2026-07-28",
+    "confirmed": [
+      "A keeper fee sticks to the base permanently — it is paid again every season the player is kept, not once.",
+      "Zero keepers owes $0. The rules doc only enumerates 1/2/3.",
+      "Every sheet-anchored value below matches the commissioner's own reading of the workbook."
+    ]
+  },
+
   "chains": [
     {
       "case": "multi-year keep, no fees ever",
@@ -43,8 +53,8 @@
     {
       "case": "prospect keep does not tax the following year",
       "player": "Quentin Johnston",
-      "expects_ratchet": false,
-      "why": "Kept as a 2024 prospect at $12. In 2025 he shows Kept=FALSE and is absent from the kept_last_year list, so no tax follows. Same pattern as Tyjae Spears.",
+      "expects_ratchet": true,
+      "why": "Kept as a 2024 prospect at $12. In 2025 he shows Kept=FALSE and is absent from the kept_last_year list, so no tax follows — same pattern as Tyjae Spears. NOTE: the 2025 link is hypothetical. Belichick's Spy kept ARSB/McLaurin/LaPorta + Braelon Allen that year, so Johnston was rostered but not claimed. The $12 base is real and is what he would have cost.",
       "links": [
         {"season": 2024, "base": 12, "fee": 0, "kept_prior": false, "slot": "PROSPECT", "expected": 12},
         {"season": 2025, "base": 12, "fee": 0, "kept_prior": false, "slot": "K3", "expected": 12}
