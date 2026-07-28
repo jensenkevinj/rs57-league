@@ -413,8 +413,10 @@ re-added by the same team. Better to surface those before code rests on a guess.
 
 ## 13. Corrections
 
-Two things in this document turned out to be wrong. Found during Phase 0 and recorded here so
-nobody re-derives them. `CLAUDE.md` is authoritative where the two disagree.
+Things in this document that turned out to be wrong, recorded here so nobody re-derives them.
+Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+
+### Found during Phase 0
 
 **§9 is wrong about `Manually Changed Salaries`.** It is not "commissioner overrides where ESPN
 reports the wrong acquisition value." Managers trade draft cash; ESPN has no native support, so
@@ -437,6 +439,50 @@ current roster, so they recompute today's base against old declared fees — the
 `K*_kept` flags are the *2025* keep flags. Phase 0 is instead verified against a hand-built
 fixture table reviewed by the commissioner, plus an end-to-end diff of all 12 teams' current
 numbers.
+
+### Found during Phase 1
+
+Full detail in `docs/espn-field-semantics.md` and `docs/phase-1-notes.md`.
+
+**§5 and §9 are wrong that ESPN auth is a risk. No credentials are needed anywhere.** The
+league is public and every endpoint the pipeline uses answers unauthenticated — settings,
+rosters, the draft record, the FAAB transaction log, and historical seasons back to 2019. There
+is no cookie to expire, so the headline risk in §5 and §9 does not apply to any read path.
+`EspnClient.from_env` still reads `ESPN_S2`/`SWID` if ESPN ever tightens up.
+
+Two failures *look* like auth and are not. `view=mTransactions2` returns `200 OK` with the
+`transactions` array silently **missing** unless you pass a `scoringPeriodId`. And the
+`leagueHistory/{id}?seasonId=…` route 404s for every season, while
+`seasons/{year}/segments/0/leagues/{id}` serves the same league fine — use the per-season path
+for the history backfill.
+
+**§9's "check the current `espn-api` release" and §10's "written fresh against the current
+`espn-api`" were not followed, deliberately.** The package (0.46.0, actively maintained) models
+none of the fields this pipeline runs on: zero references to `keeperValue`,
+`keeperValueFuture`, or `acquisitionDate`, and its `Player` keeps no raw payload to reach past
+the wrapper. Its strengths are box scores, standings and power rankings — the *scoring* side,
+which §1 puts out of scope. Phase 1 uses stdlib `urllib` against four endpoints and adds no
+dependency. **Worth revisiting at Phase 2**, where the scoring side is the whole job.
+
+**§9's payout list is incomplete, and the amounts are not constants.** It stops at "champion,
+2nd, 3rd, most points, survivor, positional studs, and weekly high scores" and omits
+**`Unlucky`, $20 every season** — the highest score that still lost its matchup, awarded once
+per season, not weekly. Amounts also move between seasons (2023 paid Survivor $50 and weekly
+high scores $9.29, a one-off from the 18-week change; the league is back on whole dollars).
+Positional studs are a **single best week**, not a season total. Build from
+`docs/phase-2-notes.md`, not from §9.
+
+**§10's Phase 1 acceptance criterion *is* reachable, and skipping it would have shipped a
+bug.** The `Keepers` workbook reads directly through the Drive tooling by id — an earlier
+session assumed otherwise and waived the check on that assumption. Running it found a $5 error:
+a prospect keep was being taxed. `draftSettings.keeperCount` is 4 — three keepers plus a
+prospect — and ESPN marks all four picks `keeper: True` with nothing recording which slot each
+filled, so **ESPN alone cannot tell a keeper from a prospect.** Every ESPN-side cross-check
+agreed and missed it. A check against one source cannot find what that source does not know.
+
+One caveat when diffing: the tab is a snapshot from whenever the old script last ran, while
+ESPN returns the *current* roster, so **membership will not match and should not be compared**.
+Compare `Base` and `Kept` for players present in both.
 
 Confirmed and unchanged: the $5 tax survives a trade and is cleared only by a drop; a drop and
 re-add is a full reset; a prospect keep never sets the tax flag; repeat prospect claims are
