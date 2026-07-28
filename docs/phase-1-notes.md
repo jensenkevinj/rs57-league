@@ -3,6 +3,12 @@
 Written at the end of Phase 0. Everything here is context a fresh session cannot recover from
 the repo alone. Read `CLAUDE.md` first; it holds the rules. This holds the open questions.
 
+> **RESOLVED 2026-07-28 — see [espn-field-semantics.md](espn-field-semantics.md).** Read
+> `keeperValue` before a season's draft and `keeperValueFuture` after; `draftDetail.drafted`
+> decides. The section below is kept as the record of what was open and why. Its three test
+> players turned out not to discriminate — all three read the same under either field. The
+> 2025 auction record (`bidAmount`) is what settled it.
+
 ## The one that matters: which ESPN field is the base?
 
 `RosterEntry.base_salary` is **what the player cost his manager this season**. The whole keeper
@@ -35,6 +41,18 @@ Whichever field produces those is the one. `check_base_continuity()` in `keeper_
 long-term guard: once `data/history/` has prior-season claims, it fails loudly if the field
 drifts.
 
+Also resolved along the way, and now derived from data instead of guessed:
+
+- **`kept_prior_year`** comes from the previous season's draft picks, which carry a `keeper`
+  flag (`view=mDraftDetail`). This retires the old script's hand-maintained list of *names* —
+  the thing that under-charged James Cook. A player kept into last season's auction stays
+  taxed unless he is back via `ADD`, which is a drop's fingerprint; `TRADE` keeps the tax, as
+  the rules require.
+- **`acquisitionType`** emits only `DRAFT`, `ADD` and `TRADE`. The `WAIVER`/`FAAB` spellings
+  the note below asks about do not appear, and ESPN does not say which an `ADD` was.
+- **The trade deadline** is on `settings.tradeSettings.deadlineDate` (epoch ms), so the
+  prospect rule does not need it hand-entered.
+
 ## The league is public — you may not need cookies at all
 
 ```
@@ -50,6 +68,14 @@ Verify before designing around it, and note the likely exception: historical sea
 `leagueHistory` endpoints are where auth usually starts mattering. If cookies do turn out to be
 needed, every rule in `CLAUDE.md` about never logging them still stands — Action logs on a
 public repo are public.
+
+> **CONFIRMED 2026-07-28 — no credentials are needed anywhere,** including historical seasons
+> and the FAAB transaction log. Details in [espn-field-semantics.md](espn-field-semantics.md).
+> Two things that *look* like auth failures and are not: `mTransactions2` returns `200` with
+> the array missing unless you pass `scoringPeriodId`, and the `leagueHistory` path 404s while
+> the per-season `seasons/{year}` path serves the same data back to 2019. Use the per-season
+> path for the history backfill. `EspnClient.from_env` reads `ESPN_S2`/`SWID` if they are ever
+> required.
 
 ## The old script is a thinner spec than the plan doc expects
 
@@ -118,3 +144,37 @@ aside — that tab is a direct dump of ESPN, so unlike Phase 0's fixtures it is 
 
 Phase 0's acceptance criterion had to be rewritten because the `Fee Allocations` tabs turned out
 to be live VLOOKUPs rather than records. The `Keepers` tab does not have that problem.
+
+### Status 2026-07-28: closed on stronger evidence, tab diff *not* run
+
+Kevin's call, and a defensible one — but recorded plainly so nobody later mistakes it for a
+check that passed.
+
+The row-for-row tab comparison **was never performed.** What was verified instead is more
+direct than the tab, which is only a dump of the same ESPN source:
+
+- **Drafted players' bases** against the 2025 auction record (`picks[].bidAmount`) — the two
+  agree, and every row that does not is a drop-and-re-add whose base correctly reset.
+- **All 80 waiver bases** against the FAAB transaction log — 80/80, no mismatches. Re-checked
+  on every sync, so a future drift shows up as `waiver_base_mismatches`.
+- **`kept_prior_year`** against ESPN's own draft keeper flags, then cross-checked against the
+  old script's hand list: 28 agree, and all 3 divergences are the sync being right (James Cook
+  III, Tyjae Spears, a stale Jayden Daniels).
+
+**Franchise assignment, the one thing the checks above could not confirm,** was then closed
+separately against the draft record's `picks[].teamId` — a source independent of the per-team
+`mRoster` reads the sync uses. All 100 players still held via `DRAFT` sit on the franchise that
+drafted them: **0 mismatches.**
+
+That makes every roster entry independently witnessed:
+
+| Source | n | Confirmed against |
+|---|---|---|
+| `draft` | 100 | auction `bidAmount` **and** `teamId` — 100/100 on both |
+| `waiver` | 80 | FAAB transaction log — 80/80 |
+| `trade` | 8 | original auction or FAAB price — 8/8, and a trade does not reprice |
+| | **188** | |
+
+So the tab diff is genuinely redundant rather than merely skipped. If something does surface
+later, suspect the manual overrides first — they are the only salaries ESPN is *expected* to
+report wrongly, and the sync deliberately leaves them to `effective_base_salary`.

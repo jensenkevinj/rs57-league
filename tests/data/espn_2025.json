@@ -1,0 +1,4162 @@
+{
+ "draft": {
+  "drafted": true,
+  "picks": [
+   {
+    "bidAmount": 21,
+    "keeper": true,
+    "playerId": 3045147
+   },
+   {
+    "bidAmount": 7,
+    "keeper": true,
+    "playerId": 4596448
+   },
+   {
+    "bidAmount": 5,
+    "keeper": true,
+    "playerId": 4426515
+   },
+   {
+    "bidAmount": 68,
+    "keeper": true,
+    "playerId": 3929630
+   },
+   {
+    "bidAmount": 12,
+    "keeper": true,
+    "playerId": 4258173
+   },
+   {
+    "bidAmount": 30,
+    "keeper": true,
+    "playerId": 4262921
+   },
+   {
+    "bidAmount": 18,
+    "keeper": true,
+    "playerId": 4430878
+   },
+   {
+    "bidAmount": 42,
+    "keeper": true,
+    "playerId": 4379399
+   },
+   {
+    "bidAmount": 20,
+    "keeper": true,
+    "playerId": 4428331
+   },
+   {
+    "bidAmount": 10,
+    "keeper": true,
+    "playerId": 4426348
+   },
+   {
+    "bidAmount": 29,
+    "keeper": true,
+    "playerId": 4683062
+   },
+   {
+    "bidAmount": 28,
+    "keeper": true,
+    "playerId": 4595348
+   },
+   {
+    "bidAmount": 40,
+    "keeper": true,
+    "playerId": 4362628
+   },
+   {
+    "bidAmount": 24,
+    "keeper": true,
+    "playerId": 4426502
+   },
+   {
+    "bidAmount": 30,
+    "keeper": true,
+    "playerId": 4035687
+   },
+   {
+    "bidAmount": 39,
+    "keeper": true,
+    "playerId": 4241389
+   },
+   {
+    "bidAmount": 16,
+    "keeper": true,
+    "playerId": 4432773
+   },
+   {
+    "bidAmount": 28,
+    "keeper": true,
+    "playerId": 4239993
+   },
+   {
+    "bidAmount": 18,
+    "keeper": true,
+    "playerId": 4432665
+   },
+   {
+    "bidAmount": 45,
+    "keeper": true,
+    "playerId": 4429795
+   },
+   {
+    "bidAmount": 29,
+    "keeper": true,
+    "playerId": 16737
+   },
+   {
+    "bidAmount": 17,
+    "keeper": true,
+    "playerId": 4241416
+   },
+   {
+    "bidAmount": 22,
+    "keeper": true,
+    "playerId": 4361307
+   },
+   {
+    "bidAmount": 8,
+    "keeper": true,
+    "playerId": 4362238
+   },
+   {
+    "bidAmount": 3,
+    "keeper": true,
+    "playerId": 4428557
+   },
+   {
+    "bidAmount": 10,
+    "keeper": true,
+    "playerId": 4612826
+   },
+   {
+    "bidAmount": 33,
+    "keeper": true,
+    "playerId": 4242335
+   },
+   {
+    "bidAmount": 36,
+    "keeper": true,
+    "playerId": 3121422
+   },
+   {
+    "bidAmount": 6,
+    "keeper": true,
+    "playerId": 4430027
+   },
+   {
+    "bidAmount": 1,
+    "keeper": true,
+    "playerId": 4685247
+   },
+   {
+    "bidAmount": 30,
+    "keeper": true,
+    "playerId": 4374302
+   },
+   {
+    "bidAmount": 25,
+    "keeper": true,
+    "playerId": 4047646
+   },
+   {
+    "bidAmount": 23,
+    "keeper": true,
+    "playerId": 4429160
+   },
+   {
+    "bidAmount": 66,
+    "keeper": false,
+    "playerId": 4430807
+   },
+   {
+    "bidAmount": 28,
+    "keeper": false,
+    "playerId": 3918298
+   },
+   {
+    "bidAmount": 62,
+    "keeper": false,
+    "playerId": 3117251
+   },
+   {
+    "bidAmount": 61,
+    "keeper": false,
+    "playerId": 4890973
+   },
+   {
+    "bidAmount": 52,
+    "keeper": false,
+    "playerId": 3043078
+   },
+   {
+    "bidAmount": 27,
+    "keeper": false,
+    "playerId": 16800
+   },
+   {
+    "bidAmount": 28,
+    "keeper": false,
+    "playerId": 4430737
+   },
+   {
+    "bidAmount": 25,
+    "keeper": false,
+    "playerId": 4569618
+   },
+   {
+    "bidAmount": 44,
+    "keeper": false,
+    "playerId": 4685382
+   },
+   {
+    "bidAmount": 27,
+    "keeper": false,
+    "playerId": 4567048
+   },
+   {
+    "bidAmount": 30,
+    "keeper": false,
+    "playerId": 3116406
+   },
+   {
+    "bidAmount": 58,
+    "keeper": false,
+    "playerId": 4047365
+   },
+   {
+    "bidAmount": 28,
+    "keeper": false,
+    "playerId": 4432708
+   },
+   {
+    "bidAmount": 13,
+    "keeper": false,
+    "playerId": 4036133
+   },
+   {
+    "bidAmount": 45,
+    "keeper": false,
+    "playerId": 4432710
+   },
+   {
+    "bidAmount": 25,
+    "keeper": false,
+    "playerId": 4040715
+   },
+   {
+    "bidAmount": 16,
+    "keeper": false,
+    "playerId": 4241985
+   },
+   {
+    "bidAmount": 27,
+    "keeper": false,
+    "playerId": 3916387
+   },
+   {
+    "bidAmount": 30,
+    "keeper": false,
+    "playerId": 4047650
+   },
+   {
+    "bidAmount": 21,
+    "keeper": false,
+    "playerId": 4259545
+   },
+   {
+    "bidAmount": 30,
+    "keeper": false,
+    "playerId": 4427366
+   },
+   {
+    "bidAmount": 25,
+    "keeper": false,
+    "playerId": 3040151
+   },
+   {
+    "bidAmount": 27,
+    "keeper": false,
+    "playerId": 4685472
+   },
+   {
+    "bidAmount": 34,
+    "keeper": false,
+    "playerId": 3925357
+   },
+   {
+    "bidAmount": 20,
+    "keeper": false,
+    "playerId": 4429615
+   },
+   {
+    "bidAmount": 23,
+    "keeper": false,
+    "playerId": 3915416
+   },
+   {
+    "bidAmount": 13,
+    "keeper": false,
+    "playerId": 4701936
+   },
+   {
+    "bidAmount": 13,
+    "keeper": false,
+    "playerId": 4685415
+   },
+   {
+    "bidAmount": 24,
+    "keeper": false,
+    "playerId": 3128429
+   },
+   {
+    "bidAmount": 28,
+    "keeper": false,
+    "playerId": 4426388
+   },
+   {
+    "bidAmount": 15,
+    "keeper": false,
+    "playerId": 3042519
+   },
+   {
+    "bidAmount": 20,
+    "keeper": false,
+    "playerId": 4372016
+   },
+   {
+    "bidAmount": 22,
+    "keeper": false,
+    "playerId": 3916148
+   },
+   {
+    "bidAmount": 15,
+    "keeper": false,
+    "playerId": 4361529
+   },
+   {
+    "bidAmount": 20,
+    "keeper": false,
+    "playerId": 3054850
+   },
+   {
+    "bidAmount": 21,
+    "keeper": false,
+    "playerId": 4241478
+   },
+   {
+    "bidAmount": 17,
+    "keeper": false,
+    "playerId": 4241463
+   },
+   {
+    "bidAmount": 17,
+    "keeper": false,
+    "playerId": 3915511
+   },
+   {
+    "bidAmount": 27,
+    "keeper": false,
+    "playerId": 4426354
+   },
+   {
+    "bidAmount": 9,
+    "keeper": false,
+    "playerId": 3052587
+   },
+   {
+    "bidAmount": 15,
+    "keeper": false,
+    "playerId": 4035538
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 3139477
+   },
+   {
+    "bidAmount": 16,
+    "keeper": false,
+    "playerId": 4361370
+   },
+   {
+    "bidAmount": 20,
+    "keeper": false,
+    "playerId": 4431299
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": -16007
+   },
+   {
+    "bidAmount": 19,
+    "keeper": false,
+    "playerId": 4568490
+   },
+   {
+    "bidAmount": 9,
+    "keeper": false,
+    "playerId": 4575131
+   },
+   {
+    "bidAmount": 10,
+    "keeper": false,
+    "playerId": 3916433
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 15847
+   },
+   {
+    "bidAmount": 10,
+    "keeper": false,
+    "playerId": 3068267
+   },
+   {
+    "bidAmount": 16,
+    "keeper": false,
+    "playerId": 4428209
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 3123076
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": -16023
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16033
+   },
+   {
+    "bidAmount": 6,
+    "keeper": false,
+    "playerId": 4569987
+   },
+   {
+    "bidAmount": 10,
+    "keeper": false,
+    "playerId": 2976212
+   },
+   {
+    "bidAmount": 20,
+    "keeper": false,
+    "playerId": 4567750
+   },
+   {
+    "bidAmount": 14,
+    "keeper": false,
+    "playerId": 4360516
+   },
+   {
+    "bidAmount": 11,
+    "keeper": false,
+    "playerId": 4819231
+   },
+   {
+    "bidAmount": 7,
+    "keeper": false,
+    "playerId": 4361579
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 3116365
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4569173
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 4431459
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 3917315
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 3046779
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 3051876
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 4696981
+   },
+   {
+    "bidAmount": 8,
+    "keeper": false,
+    "playerId": 4360569
+   },
+   {
+    "bidAmount": 8,
+    "keeper": false,
+    "playerId": 4685702
+   },
+   {
+    "bidAmount": 19,
+    "keeper": false,
+    "playerId": 3126486
+   },
+   {
+    "bidAmount": 9,
+    "keeper": false,
+    "playerId": 4426338
+   },
+   {
+    "bidAmount": 6,
+    "keeper": false,
+    "playerId": 2577417
+   },
+   {
+    "bidAmount": 6,
+    "keeper": false,
+    "playerId": 4373678
+   },
+   {
+    "bidAmount": 6,
+    "keeper": false,
+    "playerId": 3116385
+   },
+   {
+    "bidAmount": 9,
+    "keeper": false,
+    "playerId": 4572680
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 4429205
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4239996
+   },
+   {
+    "bidAmount": 8,
+    "keeper": false,
+    "playerId": 3128720
+   },
+   {
+    "bidAmount": 19,
+    "keeper": false,
+    "playerId": 4635008
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4429275
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4429013
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 4362249
+   },
+   {
+    "bidAmount": 6,
+    "keeper": false,
+    "playerId": 2977187
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": -16008
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 3116165
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 4372019
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4362887
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 15818
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4426385
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4431611
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4361741
+   },
+   {
+    "bidAmount": 14,
+    "keeper": false,
+    "playerId": 4688813
+   },
+   {
+    "bidAmount": 5,
+    "keeper": false,
+    "playerId": 4877706
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 4685279
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4038941
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": -16021
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 3886598
+   },
+   {
+    "bidAmount": 4,
+    "keeper": false,
+    "playerId": 4882093
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4241474
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": -16016
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4697815
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4241457
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4723086
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4040655
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4430034
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4695883
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16009
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4032473
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16002
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4711533
+   },
+   {
+    "bidAmount": 3,
+    "keeper": false,
+    "playerId": 4373626
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4242355
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4385690
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4429501
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4596334
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16025
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4360438
+   },
+   {
+    "bidAmount": 2,
+    "keeper": false,
+    "playerId": 4369863
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 3895856
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4036378
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4360635
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4686612
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4429096
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16034
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4686472
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4248528
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4569587
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 3059915
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4431545
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 3121023
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4426386
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4685278
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 15795
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16022
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4431452
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4241372
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4360939
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4433970
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 3046439
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 5123663
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4432762
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4432577
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16017
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4243331
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": -16027
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 16460
+   },
+   {
+    "bidAmount": 1,
+    "keeper": false,
+    "playerId": 4695193
+   }
+  ]
+ },
+ "league": {
+  "seasonId": 2025,
+  "settings": {
+   "draftSettings": {
+    "auctionBudget": 200,
+    "keeperCount": 4,
+    "type": "AUCTION"
+   },
+   "isPublic": true,
+   "name": "Rebuilding Since 1957",
+   "size": 12,
+   "tradeSettings": {
+    "deadlineDate": 1764176400000
+   }
+  },
+  "teams": [
+   {
+    "abbrev": "KEV",
+    "id": 1,
+    "name": "Fake News"
+   },
+   {
+    "abbrev": "KURT",
+    "id": 2,
+    "name": "100yd Reverse Hurdles"
+   },
+   {
+    "abbrev": "AJ",
+    "id": 3,
+    "name": "Jaxian McJigberson"
+   },
+   {
+    "abbrev": "CINC",
+    "id": 4,
+    "name": "Cooking Rice"
+   },
+   {
+    "abbrev": "GRC",
+    "id": 5,
+    "name": "The Infirmary"
+   },
+   {
+    "abbrev": "CDD",
+    "id": 6,
+    "name": "CeeDee Drive"
+   },
+   {
+    "abbrev": "WELB",
+    "id": 7,
+    "name": "Aiyukiddinme? I'm Odunze here"
+   },
+   {
+    "abbrev": "CHRO",
+    "id": 8,
+    "name": "Calling Audibles"
+   },
+   {
+    "abbrev": "PGF",
+    "id": 9,
+    "name": "Purdy Good at Fantasy"
+   },
+   {
+    "abbrev": "MSTY",
+    "id": 10,
+    "name": "Bijan's Mustard"
+   },
+   {
+    "abbrev": "Yogi",
+    "id": 11,
+    "name": "Belichick's  Spy"
+   },
+   {
+    "abbrev": "JZ",
+    "id": 12,
+    "name": "Too Much Moxie"
+   }
+  ]
+ },
+ "pro_teams": {
+  "0": "FA",
+  "1": "Atl",
+  "10": "Ten",
+  "11": "Ind",
+  "12": "KC",
+  "13": "LV",
+  "14": "LAR",
+  "15": "Mia",
+  "16": "Min",
+  "17": "NE",
+  "18": "NO",
+  "19": "NYG",
+  "2": "Buf",
+  "20": "NYJ",
+  "21": "Phi",
+  "22": "Ari",
+  "23": "Pit",
+  "24": "LAC",
+  "25": "SF",
+  "26": "Sea",
+  "27": "TB",
+  "28": "Wsh",
+  "29": "Car",
+  "3": "Chi",
+  "30": "Jax",
+  "33": "Bal",
+  "34": "Hou",
+  "4": "Cin",
+  "5": "Cle",
+  "6": "Dal",
+  "7": "Den",
+  "8": "Det",
+  "9": "GB"
+ },
+ "rosters": {
+  "1": {
+   "teams": [
+    {
+     "id": 1,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 4596448,
+        "playerPoolEntry": {
+         "id": 4596448,
+         "keeperValue": 7,
+         "keeperValueFuture": 7,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Bucky Irving",
+          "id": 4596448,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 16800,
+        "playerPoolEntry": {
+         "id": 16800,
+         "keeperValue": 41,
+         "keeperValueFuture": 27,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Davante Adams",
+          "id": 16800,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4429615,
+        "playerPoolEntry": {
+         "id": 4429615,
+         "keeperValue": 15,
+         "keeperValueFuture": 20,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Zay Flowers",
+          "id": 4429615,
+          "proTeamId": 33
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4372016,
+        "playerPoolEntry": {
+         "id": 4372016,
+         "keeperValue": 31,
+         "keeperValueFuture": 20,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jaylen Waddle",
+          "id": 4372016,
+          "proTeamId": 15
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4035538,
+        "playerPoolEntry": {
+         "id": 4035538,
+         "keeperValue": 19,
+         "keeperValueFuture": 15,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "David Montgomery",
+          "id": 4035538,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 15847,
+        "playerPoolEntry": {
+         "id": 15847,
+         "keeperValue": 29,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Travis Kelce",
+          "id": 15847,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4429205,
+        "playerPoolEntry": {
+         "id": 4429205,
+         "keeperValue": 6,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jordan Addison",
+          "id": 4429205,
+          "proTeamId": 16
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 15818,
+        "playerPoolEntry": {
+         "id": 15818,
+         "keeperValue": 0,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Keenan Allen",
+          "id": 15818,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761206031157,
+        "acquisitionType": "ADD",
+        "playerId": 5083076,
+        "playerPoolEntry": {
+         "id": 5083076,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Harold Fannin Jr.",
+          "id": 5083076,
+          "proTeamId": 5
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761233694863,
+        "acquisitionType": "ADD",
+        "playerId": 4883647,
+        "playerPoolEntry": {
+         "id": 4883647,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Elic Ayomanor",
+          "id": 4883647,
+          "proTeamId": 10
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761723488945,
+        "acquisitionType": "ADD",
+        "playerId": 4360516,
+        "playerPoolEntry": {
+         "id": 4360516,
+         "keeperValue": 0,
+         "keeperValueFuture": 79,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Tyrone Tracy Jr.",
+          "id": 4360516,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761744874567,
+        "acquisitionType": "ADD",
+        "playerId": -16033,
+        "playerPoolEntry": {
+         "id": -16033,
+         "keeperValue": 2,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Ravens D/ST",
+          "id": -16033,
+          "proTeamId": 33
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140032,
+        "acquisitionType": "ADD",
+        "playerId": 4567096,
+        "playerPoolEntry": {
+         "id": 4567096,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "John Metchie III",
+          "id": 4567096,
+          "proTeamId": 20
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764176218219,
+        "acquisitionType": "ADD",
+        "playerId": 4608810,
+        "playerPoolEntry": {
+         "id": 4608810,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tez Johnson",
+          "id": 4608810,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766701601063,
+        "acquisitionType": "ADD",
+        "playerId": 4038941,
+        "playerPoolEntry": {
+         "id": 4038941,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Justin Herbert",
+          "id": 4038941,
+          "proTeamId": 24
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "10": {
+   "teams": [
+    {
+     "id": 10,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4242335,
+        "playerPoolEntry": {
+         "id": 4242335,
+         "keeperValue": 33,
+         "keeperValueFuture": 33,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jonathan Taylor",
+          "id": 4242335,
+          "proTeamId": 11
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4430807,
+        "playerPoolEntry": {
+         "id": 4430807,
+         "keeperValue": 68,
+         "keeperValueFuture": 66,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Bijan Robinson",
+          "id": 4430807,
+          "proTeamId": 1
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4685472,
+        "playerPoolEntry": {
+         "id": 4685472,
+         "keeperValue": 0,
+         "keeperValueFuture": 27,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tetairoa McMillan",
+          "id": 4685472,
+          "proTeamId": 29
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4426338,
+        "playerPoolEntry": {
+         "id": 4426338,
+         "keeperValue": 2,
+         "keeperValueFuture": 9,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Bo Nix",
+          "id": 4426338,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4373626,
+        "playerPoolEntry": {
+         "id": 4373626,
+         "keeperValue": 3,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Tyler Allgeier",
+          "id": 4373626,
+          "proTeamId": 1
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4385690,
+        "playerPoolEntry": {
+         "id": 4385690,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Dalton Kincaid",
+          "id": 4385690,
+          "proTeamId": 2
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3121023,
+        "playerPoolEntry": {
+         "id": 3121023,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Dallas Goedert",
+          "id": 3121023,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1757620503455,
+        "acquisitionType": "ADD",
+        "playerId": 4431452,
+        "playerPoolEntry": {
+         "id": 4431452,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Drake Maye",
+          "id": 4431452,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761783225450,
+        "acquisitionType": "TRADE",
+        "playerId": 4038815,
+        "playerPoolEntry": {
+         "id": 4038815,
+         "keeperValue": 3,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Rico Dowdle",
+          "id": 4038815,
+          "proTeamId": 29
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763870394391,
+        "acquisitionType": "ADD",
+        "playerId": 4427728,
+        "playerPoolEntry": {
+         "id": 4427728,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Bam Knight",
+          "id": 4427728,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4431280,
+        "playerPoolEntry": {
+         "id": 4431280,
+         "keeperValue": 0,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Troy Franklin",
+          "id": 4431280,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4242355,
+        "playerPoolEntry": {
+         "id": 4242355,
+         "keeperValue": 4,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Jake Ferguson",
+          "id": 4242355,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4426388,
+        "playerPoolEntry": {
+         "id": 4426388,
+         "keeperValue": 9,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jameson Williams",
+          "id": 4426388,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4035687,
+        "playerPoolEntry": {
+         "id": 4035687,
+         "keeperValue": 30,
+         "keeperValueFuture": 30,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Michael Pittman Jr.",
+          "id": 4035687,
+          "proTeamId": 11
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766084184976,
+        "acquisitionType": "ADD",
+        "playerId": -16004,
+        "playerPoolEntry": {
+         "id": -16004,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Bengals D/ST",
+          "id": -16004,
+          "proTeamId": 4
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "11": {
+   "teams": [
+    {
+     "id": 11,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3121422,
+        "playerPoolEntry": {
+         "id": 3121422,
+         "keeperValue": 36,
+         "keeperValueFuture": 36,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Terry McLaurin",
+          "id": 3121422,
+          "proTeamId": 28
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4430027,
+        "playerPoolEntry": {
+         "id": 4430027,
+         "keeperValue": 6,
+         "keeperValueFuture": 6,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Sam LaPorta",
+          "id": 4430027,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4374302,
+        "playerPoolEntry": {
+         "id": 4374302,
+         "keeperValue": 30,
+         "keeperValueFuture": 30,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Amon-Ra St. Brown",
+          "id": 4374302,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4432710,
+        "playerPoolEntry": {
+         "id": 4432710,
+         "keeperValue": 0,
+         "keeperValueFuture": 45,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "TreVeyon Henderson",
+          "id": 4432710,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4427366,
+        "playerPoolEntry": {
+         "id": 4427366,
+         "keeperValue": 26,
+         "keeperValueFuture": 30,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Breece Hall",
+          "id": 4427366,
+          "proTeamId": 20
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3052587,
+        "playerPoolEntry": {
+         "id": 3052587,
+         "keeperValue": 5,
+         "keeperValueFuture": 9,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Baker Mayfield",
+          "id": 3052587,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4361579,
+        "playerPoolEntry": {
+         "id": 4361579,
+         "keeperValue": 13,
+         "keeperValueFuture": 7,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Javonte Williams",
+          "id": 4361579,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4685702,
+        "playerPoolEntry": {
+         "id": 4685702,
+         "keeperValue": 0,
+         "keeperValueFuture": 8,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Quinshon Judkins",
+          "id": 4685702,
+          "proTeamId": 5
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 2577417,
+        "playerPoolEntry": {
+         "id": 2577417,
+         "keeperValue": 0,
+         "keeperValueFuture": 6,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Dak Prescott",
+          "id": 2577417,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4248528,
+        "playerPoolEntry": {
+         "id": 4248528,
+         "keeperValue": 2,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Christian Watson",
+          "id": 4248528,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1757489666662,
+        "acquisitionType": "ADD",
+        "playerId": 4429025,
+        "playerPoolEntry": {
+         "id": 4429025,
+         "keeperValue": 4,
+         "keeperValueFuture": 12,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Quentin Johnston",
+          "id": 4429025,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761120112021,
+        "acquisitionType": "ADD",
+        "playerId": 4595342,
+        "playerPoolEntry": {
+         "id": 4595342,
+         "keeperValue": 0,
+         "keeperValueFuture": 10,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Oronde Gadsden",
+          "id": 4595342,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762993529675,
+        "acquisitionType": "ADD",
+        "playerId": 4597500,
+        "playerPoolEntry": {
+         "id": 4597500,
+         "keeperValue": 8,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Adonai Mitchell",
+          "id": 4597500,
+          "proTeamId": 20
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140032,
+        "acquisitionType": "ADD",
+        "playerId": -16030,
+        "playerPoolEntry": {
+         "id": -16030,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Jaguars D/ST",
+          "id": -16030,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764146417689,
+        "acquisitionType": "ADD",
+        "playerId": 4430539,
+        "playerPoolEntry": {
+         "id": 4430539,
+         "keeperValue": 15,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Brenton Strange",
+          "id": 4430539,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765354107646,
+        "acquisitionType": "ADD",
+        "playerId": 4360438,
+        "playerPoolEntry": {
+         "id": 4360438,
+         "keeperValue": 24,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Brandon Aiyuk",
+          "id": 4360438,
+          "proTeamId": 25
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "12": {
+   "teams": [
+    {
+     "id": 12,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4047646,
+        "playerPoolEntry": {
+         "id": 4047646,
+         "keeperValue": 25,
+         "keeperValueFuture": 25,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "A.J. Brown",
+          "id": 4047646,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4429160,
+        "playerPoolEntry": {
+         "id": 4429160,
+         "keeperValue": 23,
+         "keeperValueFuture": 23,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "De'Von Achane",
+          "id": 4429160,
+          "proTeamId": 15
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3043078,
+        "playerPoolEntry": {
+         "id": 3043078,
+         "keeperValue": 48,
+         "keeperValueFuture": 52,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Derrick Henry",
+          "id": 3043078,
+          "proTeamId": 33
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4685415,
+        "playerPoolEntry": {
+         "id": 4685415,
+         "keeperValue": 0,
+         "keeperValueFuture": 13,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Travis Hunter",
+          "id": 4685415,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4569173,
+        "playerPoolEntry": {
+         "id": 4569173,
+         "keeperValue": 21,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Rhamondre Stevenson",
+          "id": 4569173,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4431459,
+        "playerPoolEntry": {
+         "id": 4431459,
+         "keeperValue": 0,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Tyler Warren",
+          "id": 4431459,
+          "proTeamId": 11
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765354107645,
+        "acquisitionType": "ADD",
+        "playerId": 4682745,
+        "playerPoolEntry": {
+         "id": 4682745,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jaylen Wright",
+          "id": 4682745,
+          "proTeamId": 15
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765962006392,
+        "acquisitionType": "ADD",
+        "playerId": 2578570,
+        "playerPoolEntry": {
+         "id": 2578570,
+         "keeperValue": 0,
+         "keeperValueFuture": 6,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Jacoby Brissett",
+          "id": 2578570,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765991095658,
+        "acquisitionType": "ADD",
+        "playerId": 4362478,
+        "playerPoolEntry": {
+         "id": 4362478,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Emari Demercado",
+          "id": 4362478,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766081314818,
+        "acquisitionType": "ADD",
+        "playerId": 4569682,
+        "playerPoolEntry": {
+         "id": 4569682,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Audric Estime",
+          "id": 4569682,
+          "proTeamId": 18
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766565473739,
+        "acquisitionType": "ADD",
+        "playerId": -16023,
+        "playerPoolEntry": {
+         "id": -16023,
+         "keeperValue": 1,
+         "keeperValueFuture": 12,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Steelers D/ST",
+          "id": -16023,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766565473740,
+        "acquisitionType": "ADD",
+        "playerId": 4426385,
+        "playerPoolEntry": {
+         "id": 4426385,
+         "keeperValue": 0,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Zach Charbonnet",
+          "id": 4426385,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766585718943,
+        "acquisitionType": "ADD",
+        "playerId": 5081397,
+        "playerPoolEntry": {
+         "id": 5081397,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Dylan Sampson",
+          "id": 5081397,
+          "proTeamId": 5
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766586143569,
+        "acquisitionType": "ADD",
+        "playerId": 4432620,
+        "playerPoolEntry": {
+         "id": 4432620,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Parker Washington",
+          "id": 4432620,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766854596415,
+        "acquisitionType": "ADD",
+        "playerId": 4688813,
+        "playerPoolEntry": {
+         "id": 4688813,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Josh Downs",
+          "id": 4688813,
+          "proTeamId": 11
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766943790699,
+        "acquisitionType": "ADD",
+        "playerId": 4710855,
+        "playerPoolEntry": {
+         "id": 4710855,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Konata Mumpfield",
+          "id": 4710855,
+          "proTeamId": 14
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "2": {
+   "teams": [
+    {
+     "id": 2,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 4426515,
+        "playerPoolEntry": {
+         "id": 4426515,
+         "keeperValue": 5,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Puka Nacua",
+          "id": 4426515,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 3929630,
+        "playerPoolEntry": {
+         "id": 3929630,
+         "keeperValue": 68,
+         "keeperValueFuture": 68,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Saquon Barkley",
+          "id": 3929630,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 4258173,
+        "playerPoolEntry": {
+         "id": 4258173,
+         "keeperValue": 12,
+         "keeperValueFuture": 12,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Nico Collins",
+          "id": 4258173,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4047365,
+        "playerPoolEntry": {
+         "id": 4047365,
+         "keeperValue": 33,
+         "keeperValueFuture": 58,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Josh Jacobs",
+          "id": 4047365,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241478,
+        "playerPoolEntry": {
+         "id": 4241478,
+         "keeperValue": 27,
+         "keeperValueFuture": 21,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "DeVonta Smith",
+          "id": 4241478,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4373678,
+        "playerPoolEntry": {
+         "id": 4373678,
+         "keeperValue": 1,
+         "keeperValueFuture": 6,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Khalil Shakir",
+          "id": 4373678,
+          "proTeamId": 2
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4431611,
+        "playerPoolEntry": {
+         "id": 4431611,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Caleb Williams",
+          "id": 4431611,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1759306291708,
+        "acquisitionType": "ADD",
+        "playerId": -16021,
+        "playerPoolEntry": {
+         "id": -16021,
+         "keeperValue": 0,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Eagles D/ST",
+          "id": -16021,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1759909605689,
+        "acquisitionType": "ADD",
+        "playerId": 4608686,
+        "playerPoolEntry": {
+         "id": 4608686,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kyle Monangai",
+          "id": 4608686,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1759909605690,
+        "acquisitionType": "ADD",
+        "playerId": 4429148,
+        "playerPoolEntry": {
+         "id": 4429148,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Theo Johnson",
+          "id": 4429148,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762934787660,
+        "acquisitionType": "ADD",
+        "playerId": 3915511,
+        "playerPoolEntry": {
+         "id": 3915511,
+         "keeperValue": 5,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Joe Burrow",
+          "id": 3915511,
+          "proTeamId": 4
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762982151573,
+        "acquisitionType": "ADD",
+        "playerId": 4685278,
+        "playerPoolEntry": {
+         "id": 4685278,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Luther Burden III",
+          "id": 4685278,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140027,
+        "acquisitionType": "ADD",
+        "playerId": 4887558,
+        "playerPoolEntry": {
+         "id": 4887558,
+         "keeperValue": 0,
+         "keeperValueFuture": 21,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Emanuel Wilson",
+          "id": 4887558,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764146417688,
+        "acquisitionType": "ADD",
+        "playerId": 4362249,
+        "playerPoolEntry": {
+         "id": 4362249,
+         "keeperValue": 3,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jayden Reed",
+          "id": 4362249,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764753987488,
+        "acquisitionType": "ADD",
+        "playerId": 3116365,
+        "playerPoolEntry": {
+         "id": 3116365,
+         "keeperValue": 20,
+         "keeperValueFuture": 33,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Mark Andrews",
+          "id": 3116365,
+          "proTeamId": 33
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "3": {
+   "teams": [
+    {
+     "id": 3,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 4262921,
+        "playerPoolEntry": {
+         "id": 4262921,
+         "keeperValue": 30,
+         "keeperValueFuture": 30,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Justin Jefferson",
+          "id": 4262921,
+          "proTeamId": 16
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182581,
+        "acquisitionType": "DRAFT",
+        "playerId": 4430878,
+        "playerPoolEntry": {
+         "id": 4430878,
+         "keeperValue": 18,
+         "keeperValueFuture": 18,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jaxon Smith-Njigba",
+          "id": 4430878,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3117251,
+        "playerPoolEntry": {
+         "id": 3117251,
+         "keeperValue": 71,
+         "keeperValueFuture": 62,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Christian McCaffrey",
+          "id": 3117251,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4361529,
+        "playerPoolEntry": {
+         "id": 4361529,
+         "keeperValue": 16,
+         "keeperValueFuture": 15,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Isiah Pacheco",
+          "id": 4361529,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4361370,
+        "playerPoolEntry": {
+         "id": 4361370,
+         "keeperValue": 18,
+         "keeperValueFuture": 16,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Chris Olave",
+          "id": 4361370,
+          "proTeamId": 18
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": -16007,
+        "playerPoolEntry": {
+         "id": -16007,
+         "keeperValue": 6,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Broncos D/ST",
+          "id": -16007,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3126486,
+        "playerPoolEntry": {
+         "id": 3126486,
+         "keeperValue": 32,
+         "keeperValueFuture": 19,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Deebo Samuel",
+          "id": 3126486,
+          "proTeamId": 28
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4572680,
+        "playerPoolEntry": {
+         "id": 4572680,
+         "keeperValue": 2,
+         "keeperValueFuture": 9,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Tucker Kraft",
+          "id": 4572680,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241474,
+        "playerPoolEntry": {
+         "id": 4241474,
+         "keeperValue": 14,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Brian Robinson Jr.",
+          "id": 4241474,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756883147034,
+        "acquisitionType": "ADD",
+        "playerId": 4429059,
+        "playerPoolEntry": {
+         "id": 4429059,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Woody Marks",
+          "id": 4429059,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762329828424,
+        "acquisitionType": "ADD",
+        "playerId": 4723086,
+        "playerPoolEntry": {
+         "id": 4723086,
+         "keeperValue": 0,
+         "keeperValueFuture": 7,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Colston Loveland",
+          "id": 4723086,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140028,
+        "acquisitionType": "ADD",
+        "playerId": 4361741,
+        "playerPoolEntry": {
+         "id": 4361741,
+         "keeperValue": 2,
+         "keeperValueFuture": 9,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Brock Purdy",
+          "id": 4361741,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140030,
+        "acquisitionType": "ADD",
+        "playerId": 4360761,
+        "playerPoolEntry": {
+         "id": 4360761,
+         "keeperValue": 0,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Michael Wilson",
+          "id": 4360761,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766343899653,
+        "acquisitionType": "ADD",
+        "playerId": 4429939,
+        "playerPoolEntry": {
+         "id": 4429939,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jawhar Jordan",
+          "id": 4429939,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766681649475,
+        "acquisitionType": "ADD",
+        "playerId": 4575131,
+        "playerPoolEntry": {
+         "id": 4575131,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jacory Croskey-Merritt",
+          "id": 4575131,
+          "proTeamId": 28
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766938623320,
+        "acquisitionType": "ADD",
+        "playerId": 4613202,
+        "playerPoolEntry": {
+         "id": 4613202,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Kyle Williams",
+          "id": 4613202,
+          "proTeamId": 17
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "4": {
+   "teams": [
+    {
+     "id": 4,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4379399,
+        "playerPoolEntry": {
+         "id": 4379399,
+         "keeperValue": 42,
+         "keeperValueFuture": 42,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "James Cook III",
+          "id": 4379399,
+          "proTeamId": 2
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4428331,
+        "playerPoolEntry": {
+         "id": 4428331,
+         "keeperValue": 20,
+         "keeperValueFuture": 20,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Rashee Rice",
+          "id": 4428331,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4430737,
+        "playerPoolEntry": {
+         "id": 4430737,
+         "keeperValue": 28,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kyren Williams",
+          "id": 4430737,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3915416,
+        "playerPoolEntry": {
+         "id": 3915416,
+         "keeperValue": 27,
+         "keeperValueFuture": 23,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "DJ Moore",
+          "id": 3915416,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4568490,
+        "playerPoolEntry": {
+         "id": 4568490,
+         "keeperValue": 0,
+         "keeperValueFuture": 19,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "RJ Harvey",
+          "id": 4568490,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4567750,
+        "playerPoolEntry": {
+         "id": 4567750,
+         "keeperValue": 0,
+         "keeperValueFuture": 20,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Emeka Egbuka",
+          "id": 4567750,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3116165,
+        "playerPoolEntry": {
+         "id": 3116165,
+         "keeperValue": 12,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Chris Godwin Jr.",
+          "id": 3116165,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1760149985380,
+        "acquisitionType": "ADD",
+        "playerId": -16014,
+        "playerPoolEntry": {
+         "id": -16014,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Rams D/ST",
+          "id": -16014,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761139980920,
+        "acquisitionType": "ADD",
+        "playerId": 4360248,
+        "playerPoolEntry": {
+         "id": 4360248,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Kyle Pitts Sr.",
+          "id": 4360248,
+          "proTeamId": 1
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764753987491,
+        "acquisitionType": "ADD",
+        "playerId": 2576925,
+        "playerPoolEntry": {
+         "id": 2576925,
+         "keeperValue": 0,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Darren Waller",
+          "id": 2576925,
+          "proTeamId": 15
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765354107644,
+        "acquisitionType": "ADD",
+        "playerId": -16008,
+        "playerPoolEntry": {
+         "id": -16008,
+         "keeperValue": 0,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Lions D/ST",
+          "id": -16008,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765962006387,
+        "acquisitionType": "ADD",
+        "playerId": 4240657,
+        "playerPoolEntry": {
+         "id": 4240657,
+         "keeperValue": 0,
+         "keeperValueFuture": 21,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Michael Carter",
+          "id": 4240657,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766693449603,
+        "acquisitionType": "ADD",
+        "playerId": 15864,
+        "playerPoolEntry": {
+         "id": 15864,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Geno Smith",
+          "id": 15864,
+          "proTeamId": 13
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766860483689,
+        "acquisitionType": "ADD",
+        "playerId": 4242512,
+        "playerPoolEntry": {
+         "id": 4242512,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Malik Willis",
+          "id": 4242512,
+          "proTeamId": 9
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766944851243,
+        "acquisitionType": "ADD",
+        "playerId": 3045523,
+        "playerPoolEntry": {
+         "id": 3045523,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Kendrick Bourne",
+          "id": 3045523,
+          "proTeamId": 25
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "5": {
+   "teams": [
+    {
+     "id": 5,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4683062,
+        "playerPoolEntry": {
+         "id": 4683062,
+         "keeperValue": 29,
+         "keeperValueFuture": 29,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Xavier Worthy",
+          "id": 4683062,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4595348,
+        "playerPoolEntry": {
+         "id": 4595348,
+         "keeperValue": 28,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Malik Nabers",
+          "id": 4595348,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4362628,
+        "playerPoolEntry": {
+         "id": 4362628,
+         "keeperValue": 40,
+         "keeperValueFuture": 40,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Ja'Marr Chase",
+          "id": 4362628,
+          "proTeamId": 4
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4685382,
+        "playerPoolEntry": {
+         "id": 4685382,
+         "keeperValue": 0,
+         "keeperValueFuture": 44,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Omarion Hampton",
+          "id": 4685382,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3116406,
+        "playerPoolEntry": {
+         "id": 3116406,
+         "keeperValue": 60,
+         "keeperValueFuture": 30,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tyreek Hill",
+          "id": 3116406,
+          "proTeamId": 0
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3059915,
+        "playerPoolEntry": {
+         "id": 3059915,
+         "keeperValue": 2,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kareem Hunt",
+          "id": 3059915,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3046439,
+        "playerPoolEntry": {
+         "id": 3046439,
+         "keeperValue": 10,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Hunter Henry",
+          "id": 3046439,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": -16017,
+        "playerPoolEntry": {
+         "id": -16017,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Patriots D/ST",
+          "id": -16017,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1759073983927,
+        "acquisitionType": "ADD",
+        "playerId": 4689114,
+        "playerPoolEntry": {
+         "id": 4689114,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Jaxson Dart",
+          "id": 4689114,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762711473286,
+        "acquisitionType": "ADD",
+        "playerId": 4371733,
+        "playerPoolEntry": {
+         "id": 4371733,
+         "keeperValue": 5,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kenneth Gainwell",
+          "id": 4371733,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762711554692,
+        "acquisitionType": "ADD",
+        "playerId": 4686612,
+        "playerPoolEntry": {
+         "id": 4686612,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tre' Harris",
+          "id": 4686612,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763684631539,
+        "acquisitionType": "ADD",
+        "playerId": 4431268,
+        "playerPoolEntry": {
+         "id": 4431268,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Chimere Dike",
+          "id": 4431268,
+          "proTeamId": 10
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764169914992,
+        "acquisitionType": "ADD",
+        "playerId": 4432762,
+        "playerPoolEntry": {
+         "id": 4432762,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Shedeur Sanders",
+          "id": 4432762,
+          "proTeamId": 5
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764169981144,
+        "acquisitionType": "ADD",
+        "playerId": 4360310,
+        "playerPoolEntry": {
+         "id": 4360310,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Trevor Lawrence",
+          "id": 4360310,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764753987493,
+        "acquisitionType": "ADD",
+        "playerId": 16460,
+        "playerPoolEntry": {
+         "id": 16460,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Adam Thielen",
+          "id": 16460,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765135998319,
+        "acquisitionType": "ADD",
+        "playerId": 4242557,
+        "playerPoolEntry": {
+         "id": 4242557,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Colby Parkinson",
+          "id": 4242557,
+          "proTeamId": 14
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "6": {
+   "teams": [
+    {
+     "id": 6,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4426502,
+        "playerPoolEntry": {
+         "id": 4426502,
+         "keeperValue": 24,
+         "keeperValueFuture": 24,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Drake London",
+          "id": 4426502,
+          "proTeamId": 1
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241389,
+        "playerPoolEntry": {
+         "id": 4241389,
+         "keeperValue": 39,
+         "keeperValueFuture": 39,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "CeeDee Lamb",
+          "id": 4241389,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4567048,
+        "playerPoolEntry": {
+         "id": 4567048,
+         "keeperValue": 33,
+         "keeperValueFuture": 27,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kenneth Walker III",
+          "id": 4567048,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4036133,
+        "playerPoolEntry": {
+         "id": 4036133,
+         "keeperValue": 9,
+         "keeperValueFuture": 13,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "T.J. Hockenson",
+          "id": 4036133,
+          "proTeamId": 16
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241985,
+        "playerPoolEntry": {
+         "id": 4241985,
+         "keeperValue": 8,
+         "keeperValueFuture": 16,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "J.K. Dobbins",
+          "id": 4241985,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3916433,
+        "playerPoolEntry": {
+         "id": 3916433,
+         "keeperValue": 3,
+         "keeperValueFuture": 10,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jakobi Meyers",
+          "id": 3916433,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4697815,
+        "playerPoolEntry": {
+         "id": 4697815,
+         "keeperValue": 29,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Rachaad White",
+          "id": 4697815,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1759909605687,
+        "acquisitionType": "ADD",
+        "playerId": 4430968,
+        "playerPoolEntry": {
+         "id": 4430968,
+         "keeperValue": 19,
+         "keeperValueFuture": 9,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Kimani Vidal",
+          "id": 4430968,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761120112026,
+        "acquisitionType": "ADD",
+        "playerId": 8439,
+        "playerPoolEntry": {
+         "id": 8439,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Aaron Rodgers",
+          "id": 8439,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761780702092,
+        "acquisitionType": "ADD",
+        "playerId": 12483,
+        "playerPoolEntry": {
+         "id": 12483,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Matthew Stafford",
+          "id": 12483,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4569987,
+        "playerPoolEntry": {
+         "id": 4569987,
+         "keeperValue": 10,
+         "keeperValueFuture": 6,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jaylen Warren",
+          "id": 4569987,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764122543090,
+        "acquisitionType": "TRADE",
+        "playerId": 4612826,
+        "playerPoolEntry": {
+         "id": 4612826,
+         "keeperValue": 10,
+         "keeperValueFuture": 10,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Ladd McConkey",
+          "id": 4612826,
+          "proTeamId": 24
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764263807569,
+        "acquisitionType": "ADD",
+        "playerId": 3117256,
+        "playerPoolEntry": {
+         "id": 3117256,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Dalton Schultz",
+          "id": 3117256,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764263834810,
+        "acquisitionType": "ADD",
+        "playerId": 4596334,
+        "playerPoolEntry": {
+         "id": 4596334,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Keaton Mitchell",
+          "id": 4596334,
+          "proTeamId": 33
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765368616042,
+        "acquisitionType": "ADD",
+        "playerId": -16006,
+        "playerPoolEntry": {
+         "id": -16006,
+         "keeperValue": 3,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Cowboys D/ST",
+          "id": -16006,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765499655717,
+        "acquisitionType": "ADD",
+        "playerId": 3916945,
+        "playerPoolEntry": {
+         "id": 3916945,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Darius Slayton",
+          "id": 3916945,
+          "proTeamId": 19
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "7": {
+   "teams": [
+    {
+     "id": 7,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4239993,
+        "playerPoolEntry": {
+         "id": 4239993,
+         "keeperValue": 28,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tee Higgins",
+          "id": 4239993,
+          "proTeamId": 4
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4432665,
+        "playerPoolEntry": {
+         "id": 4432665,
+         "keeperValue": 18,
+         "keeperValueFuture": 18,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Brock Bowers",
+          "id": 4432665,
+          "proTeamId": 13
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4890973,
+        "playerPoolEntry": {
+         "id": 4890973,
+         "keeperValue": 0,
+         "keeperValueFuture": 61,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Ashton Jeanty",
+          "id": 4890973,
+          "proTeamId": 13
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4040715,
+        "playerPoolEntry": {
+         "id": 4040715,
+         "keeperValue": 21,
+         "keeperValueFuture": 25,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Jalen Hurts",
+          "id": 4040715,
+          "proTeamId": 21
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3916148,
+        "playerPoolEntry": {
+         "id": 3916148,
+         "keeperValue": 16,
+         "keeperValueFuture": 22,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Tony Pollard",
+          "id": 3916148,
+          "proTeamId": 10
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241463,
+        "playerPoolEntry": {
+         "id": 4241463,
+         "keeperValue": 0,
+         "keeperValueFuture": 17,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jerry Jeudy",
+          "id": 4241463,
+          "proTeamId": 5
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4040655,
+        "playerPoolEntry": {
+         "id": 4040655,
+         "keeperValue": 8,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Darnell Mooney",
+          "id": 4040655,
+          "proTeamId": 1
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4032473,
+        "playerPoolEntry": {
+         "id": 4032473,
+         "keeperValue": 2,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Rashid Shaheed",
+          "id": 4032473,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4360939,
+        "playerPoolEntry": {
+         "id": 4360939,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Rashod Bateman",
+          "id": 4360939,
+          "proTeamId": 33
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1760528543623,
+        "acquisitionType": "ADD",
+        "playerId": 4243389,
+        "playerPoolEntry": {
+         "id": 4243389,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Calvin Austin III",
+          "id": 4243389,
+          "proTeamId": 23
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761783225450,
+        "acquisitionType": "TRADE",
+        "playerId": 4432773,
+        "playerPoolEntry": {
+         "id": 4432773,
+         "keeperValue": 16,
+         "keeperValueFuture": 16,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Brian Thomas Jr.",
+          "id": 4432773,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761783718884,
+        "acquisitionType": "ADD",
+        "playerId": 4429096,
+        "playerPoolEntry": {
+         "id": 4429096,
+         "keeperValue": 3,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Blake Corum",
+          "id": 4429096,
+          "proTeamId": 14
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1761783912923,
+        "acquisitionType": "ADD",
+        "playerId": 2977187,
+        "playerPoolEntry": {
+         "id": 2977187,
+         "keeperValue": 25,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Cooper Kupp",
+          "id": 2977187,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1762090077230,
+        "acquisitionType": "ADD",
+        "playerId": 3046779,
+        "playerPoolEntry": {
+         "id": 3046779,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Jared Goff",
+          "id": 3046779,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765465347858,
+        "acquisitionType": "ADD",
+        "playerId": -16019,
+        "playerPoolEntry": {
+         "id": -16019,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Giants D/ST",
+          "id": -16019,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766608669313,
+        "acquisitionType": "ADD",
+        "playerId": 2468609,
+        "playerPoolEntry": {
+         "id": 2468609,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Taysom Hill",
+          "id": 2468609,
+          "proTeamId": 18
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "8": {
+   "teams": [
+    {
+     "id": 8,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4429795,
+        "playerPoolEntry": {
+         "id": 4429795,
+         "keeperValue": 45,
+         "keeperValueFuture": 45,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Jahmyr Gibbs",
+          "id": 4429795,
+          "proTeamId": 8
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 16737,
+        "playerPoolEntry": {
+         "id": 16737,
+         "keeperValue": 29,
+         "keeperValueFuture": 29,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Mike Evans",
+          "id": 16737,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4241416,
+        "playerPoolEntry": {
+         "id": 4241416,
+         "keeperValue": 17,
+         "keeperValueFuture": 17,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Chuba Hubbard",
+          "id": 4241416,
+          "proTeamId": 29
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4569618,
+        "playerPoolEntry": {
+         "id": 4569618,
+         "keeperValue": 17,
+         "keeperValueFuture": 25,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Garrett Wilson",
+          "id": 4569618,
+          "proTeamId": 20
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4432708,
+        "playerPoolEntry": {
+         "id": 4432708,
+         "keeperValue": 37,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Marvin Harrison Jr.",
+          "id": 4432708,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3040151,
+        "playerPoolEntry": {
+         "id": 3040151,
+         "keeperValue": 14,
+         "keeperValueFuture": 25,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "George Kittle",
+          "id": 3040151,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3042519,
+        "playerPoolEntry": {
+         "id": 3042519,
+         "keeperValue": 20,
+         "keeperValueFuture": 15,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Aaron Jones Sr.",
+          "id": 3042519,
+          "proTeamId": 16
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3139477,
+        "playerPoolEntry": {
+         "id": 3139477,
+         "keeperValue": 17,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Patrick Mahomes",
+          "id": 3139477,
+          "proTeamId": 12
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4429275,
+        "playerPoolEntry": {
+         "id": 4429275,
+         "keeperValue": 0,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Trey Benson",
+          "id": 4429275,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3886598,
+        "playerPoolEntry": {
+         "id": 3886598,
+         "keeperValue": 5,
+         "keeperValueFuture": 4,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jauan Jennings",
+          "id": 3886598,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4569587,
+        "playerPoolEntry": {
+         "id": 4569587,
+         "keeperValue": 0,
+         "keeperValueFuture": 1,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Wan'Dale Robinson",
+          "id": 4569587,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1757553110082,
+        "acquisitionType": "ADD",
+        "playerId": 3929645,
+        "playerPoolEntry": {
+         "id": 3929645,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Juwan Johnson",
+          "id": 3929645,
+          "proTeamId": 18
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1760277192721,
+        "acquisitionType": "ADD",
+        "playerId": 2976592,
+        "playerPoolEntry": {
+         "id": 2976592,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Sterling Shepard",
+          "id": 2976592,
+          "proTeamId": 27
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1764367722152,
+        "acquisitionType": "ADD",
+        "playerId": 4428718,
+        "playerPoolEntry": {
+         "id": 4428718,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Tre Tucker",
+          "id": 4428718,
+          "proTeamId": 13
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765140070031,
+        "acquisitionType": "ADD",
+        "playerId": 4600981,
+        "playerPoolEntry": {
+         "id": 4600981,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Pat Bryant",
+          "id": 4600981,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1765542123381,
+        "acquisitionType": "ADD",
+        "playerId": -16024,
+        "playerPoolEntry": {
+         "id": -16024,
+         "keeperValue": 1,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Chargers D/ST",
+          "id": -16024,
+          "proTeamId": 24
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "9": {
+   "teams": [
+    {
+     "id": 9,
+     "roster": {
+      "entries": [
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4361307,
+        "playerPoolEntry": {
+         "id": 4361307,
+         "keeperValue": 22,
+         "keeperValueFuture": 22,
+         "player": {
+          "defaultPositionId": 4,
+          "fullName": "Trey McBride",
+          "id": 4361307,
+          "proTeamId": 22
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4362238,
+        "playerPoolEntry": {
+         "id": 4362238,
+         "keeperValue": 8,
+         "keeperValueFuture": 8,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Chase Brown",
+          "id": 4362238,
+          "proTeamId": 4
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4428557,
+        "playerPoolEntry": {
+         "id": 4428557,
+         "keeperValue": 3,
+         "keeperValueFuture": 3,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Tyjae Spears",
+          "id": 4428557,
+          "proTeamId": 10
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3918298,
+        "playerPoolEntry": {
+         "id": 3918298,
+         "keeperValue": 23,
+         "keeperValueFuture": 28,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Josh Allen",
+          "id": 3918298,
+          "proTeamId": 2
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4259545,
+        "playerPoolEntry": {
+         "id": 4259545,
+         "keeperValue": 28,
+         "keeperValueFuture": 21,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "D'Andre Swift",
+          "id": 4259545,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 3128429,
+        "playerPoolEntry": {
+         "id": 3128429,
+         "keeperValue": 10,
+         "keeperValueFuture": 24,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Courtland Sutton",
+          "id": 3128429,
+          "proTeamId": 7
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4426354,
+        "playerPoolEntry": {
+         "id": 4426354,
+         "keeperValue": 26,
+         "keeperValueFuture": 27,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "George Pickens",
+          "id": 4426354,
+          "proTeamId": 6
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4431299,
+        "playerPoolEntry": {
+         "id": 4431299,
+         "keeperValue": 15,
+         "keeperValueFuture": 20,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Rome Odunze",
+          "id": 4431299,
+          "proTeamId": 3
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 2976212,
+        "playerPoolEntry": {
+         "id": 2976212,
+         "keeperValue": 0,
+         "keeperValueFuture": 10,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Stefon Diggs",
+          "id": 2976212,
+          "proTeamId": 17
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4696981,
+        "playerPoolEntry": {
+         "id": 4696981,
+         "keeperValue": 0,
+         "keeperValueFuture": 5,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Cam Skattebo",
+          "id": 4696981,
+          "proTeamId": 19
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756781182582,
+        "acquisitionType": "DRAFT",
+        "playerId": 4239996,
+        "playerPoolEntry": {
+         "id": 4239996,
+         "keeperValue": 1,
+         "keeperValueFuture": 2,
+         "player": {
+          "defaultPositionId": 2,
+          "fullName": "Travis Etienne Jr.",
+          "id": 4239996,
+          "proTeamId": 30
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1756958381308,
+        "acquisitionType": "ADD",
+        "playerId": -16026,
+        "playerPoolEntry": {
+         "id": -16026,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Seahawks D/ST",
+          "id": -16026,
+          "proTeamId": 26
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1760512462455,
+        "acquisitionType": "ADD",
+        "playerId": -16034,
+        "playerPoolEntry": {
+         "id": -16034,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 16,
+          "fullName": "Texans D/ST",
+          "id": -16034,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1763543140028,
+        "acquisitionType": "ADD",
+        "playerId": 4877706,
+        "playerPoolEntry": {
+         "id": 4877706,
+         "keeperValue": 0,
+         "keeperValueFuture": 8,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Jayden Higgins",
+          "id": 4877706,
+          "proTeamId": 34
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766132819876,
+        "acquisitionType": "ADD",
+        "playerId": 4428209,
+        "playerPoolEntry": {
+         "id": 4428209,
+         "keeperValue": 0,
+         "keeperValueFuture": 7,
+         "player": {
+          "defaultPositionId": 3,
+          "fullName": "Ricky Pearsall",
+          "id": 4428209,
+          "proTeamId": 25
+         }
+        }
+       },
+       {
+        "acquisitionDate": 1766608596760,
+        "acquisitionType": "ADD",
+        "playerId": 4360689,
+        "playerPoolEntry": {
+         "id": 4360689,
+         "keeperValue": 0,
+         "keeperValueFuture": 0,
+         "player": {
+          "defaultPositionId": 1,
+          "fullName": "Tyler Shough",
+          "id": 4360689,
+          "proTeamId": 18
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  }
+ }
+}

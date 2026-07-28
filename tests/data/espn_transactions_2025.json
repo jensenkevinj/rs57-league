@@ -1,0 +1,11104 @@
+[
+ {
+  "bidAmount": 0,
+  "id": "cc520763-38ce-4ddf-abee-119ecd71dadc",
+  "items": [],
+  "proposedDate": 1756674858552,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2f7abe69-05df-406a-8f1e-1c1dd40ebcf3",
+  "items": [
+   {
+    "playerId": -16010,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756674879844,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "01c418c8-9e9a-4597-9f67-99d28aed75d5",
+  "items": [
+   {
+    "playerId": -16015,
+    "type": "DROP"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   },
+   {
+    "playerId": 4567048,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756649117361,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "542310cc-8a7f-43c2-84e9-015db8ad2daf",
+  "items": [
+   {
+    "playerId": 3127292,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756674844508,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8706403a-9985-41bc-87f0-60705284d6ce",
+  "items": [],
+  "proposedDate": 1756649127054,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 17,
+  "id": "ea139422-a316-4056-a245-6d47a13bff35",
+  "items": [
+   {
+    "playerId": 4241416,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "0f03b044-f9c8-43cb-915d-b3348987a720",
+  "items": [
+   {
+    "playerId": 4596448,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a685ceaa-333d-4b1c-8e49-11732a43b7fb",
+  "items": [
+   {
+    "playerId": 4432775,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756909268576,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "92765a79-b9d8-480f-855b-3c538801f459",
+  "items": [
+   {
+    "playerId": -16021,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "e5cc4298-3281-453c-87b8-713df8e54338",
+  "items": [
+   {
+    "playerId": -16017,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 62,
+  "id": "bb12d49d-e8e3-4ac1-8f93-80c2bc9a0ae1",
+  "items": [
+   {
+    "playerId": 3117251,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 33,
+  "id": "2e631d0f-0b77-4813-8583-7a91c14f42ec",
+  "items": [
+   {
+    "playerId": 4242335,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 14,
+  "id": "0c9817a7-650f-479c-9382-d0501b5d2c88",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "a6f3097e-53df-4df3-b41a-728f38ad3915",
+  "items": [
+   {
+    "playerId": 4429275,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "3edca2c5-db0d-4ab3-98e9-f68ed4173462",
+  "items": [
+   {
+    "playerId": 3123076,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "48a7c37e-1f71-48dd-98ac-17bf28953f46",
+  "items": [
+   {
+    "playerId": 3121023,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "374de142-50e7-43cd-afe0-c6560c2be317",
+  "items": [
+   {
+    "playerId": 4047650,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 27,
+  "id": "208a9d6d-f14f-434a-96b6-17a9baecd2c9",
+  "items": [
+   {
+    "playerId": 4426354,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "4237f1df-3246-417f-af37-6e5e6190f683",
+  "items": [
+   {
+    "playerId": 4711533,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 21,
+  "id": "c53a68ca-80fc-469f-8cd8-78c5276a614d",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 17,
+  "id": "1446db55-898b-4c52-8b81-84b403dda6f2",
+  "items": [
+   {
+    "playerId": 3915511,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "59c3743f-1ace-4be7-931e-9a74ac380e3b",
+  "items": [
+   {
+    "playerId": 4429205,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "35e38c93-398a-4808-9f0b-d0df619a3a18",
+  "items": [
+   {
+    "playerId": 4431545,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c8a62c96-1a12-414e-b86f-2f0b29c24c68",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431545,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756838594053,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "1b233239-b9e5-41e1-995a-7d636c11518a",
+  "items": [
+   {
+    "playerId": 4372016,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "133a7ff8-f5c7-48f2-858e-432e935875b6",
+  "items": [
+   {
+    "playerId": 4428331,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "198991cc-faba-44c1-afa9-02553b257846",
+  "items": [
+   {
+    "playerId": -16027,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 13,
+  "id": "41197d24-9177-4b7f-9026-020d6b4d8ae0",
+  "items": [
+   {
+    "playerId": 4701936,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "3179d793-7aa3-4e8f-9bea-f6bd7f195930",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 24,
+  "id": "c19d39fe-2d33-4f55-bda8-aeb06d37dd97",
+  "items": [
+   {
+    "playerId": 4426502,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "0deedc9c-5250-4db9-9d4e-5b820086fb6a",
+  "items": [
+   {
+    "playerId": 4685702,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "49509b85-7085-43f2-9c17-63f713cd6e46",
+  "items": [
+   {
+    "playerId": 4036378,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "cb7d0a14-d198-4ef9-8ab4-fd356085fbb4",
+  "items": [
+   {
+    "playerId": 4686472,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 36,
+  "id": "25168075-652c-4fbb-8607-42b6a68c776b",
+  "items": [
+   {
+    "playerId": 3121422,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "7b06bc07-d23f-4886-8231-d5aac714929a",
+  "items": [
+   {
+    "playerId": 4696981,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "51f3fd48-5093-4736-8988-2d774f5fce1e",
+  "items": [
+   {
+    "playerId": 4685278,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "b0f8831e-de31-4a11-a717-37557a029d31",
+  "items": [
+   {
+    "playerId": -16033,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "daf65565-f5ec-495b-9c37-86c546dd87ac",
+  "items": [
+   {
+    "playerId": 4372019,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "c944c129-2714-4d91-83c8-c684296cc268",
+  "items": [
+   {
+    "playerId": 4433970,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "2833e32b-c30c-4847-b160-626f152f6fb8",
+  "items": [
+   {
+    "playerId": 4596334,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "4c38eb12-0056-414d-a4a9-ea5569fa3d02",
+  "items": [
+   {
+    "playerId": 4361741,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "50ec5440-9a4d-4acd-b83d-75b3fc1e2d75",
+  "items": [
+   {
+    "playerId": 4686612,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "736b58bb-7ab3-4e4a-a301-8a5a032f5deb",
+  "items": [
+   {
+    "playerId": 4882093,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 27,
+  "id": "0dff7ae8-d6bb-4591-abaa-7d7efa9779c0",
+  "items": [
+   {
+    "playerId": 4567048,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 16,
+  "id": "3b4b3dc5-948e-4fc6-bc48-29c7dc5338e2",
+  "items": [
+   {
+    "playerId": 4428209,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "5fa8a6ed-66b9-4bf6-98e5-2d453b60f634",
+  "items": [
+   {
+    "playerId": 4373678,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 58,
+  "id": "d04dae31-97b9-412c-b2d7-90e6f79de77b",
+  "items": [
+   {
+    "playerId": 4047365,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 44,
+  "id": "bd1288c2-3bc0-4c46-ac73-bb32323711d3",
+  "items": [
+   {
+    "playerId": 4685382,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "b801625c-929b-4bf9-8be5-72e7291ab0f1",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "e2d7da20-3a88-4e91-a773-c588f0ff721e",
+  "items": [
+   {
+    "playerId": 4374302,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d53eb9f2-91ef-45f3-8631-f2dfcebcd547",
+  "items": [
+   {
+    "playerId": 4427095,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "5aa0dc1b-d243-4d2b-98d5-2de3782cab07",
+  "items": [
+   {
+    "playerId": 4431459,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "3b88ea94-f36a-47a9-8aff-f176903a71b5",
+  "items": [
+   {
+    "playerId": 2977187,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "aaa5a7fb-adb4-47ac-a8ac-ad668afac3af",
+  "items": [
+   {
+    "playerId": 16460,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 19,
+  "id": "6983d909-6e72-4fcd-8bd9-7202f6bcd492",
+  "items": [
+   {
+    "playerId": 4635008,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3ad83eea-0b78-470d-8258-173f85c9f507",
+  "items": [
+   {
+    "playerId": 4360248,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360635,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756838905782,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "cd81b93e-a833-4684-9515-980ad872c38d",
+  "items": [
+   {
+    "playerId": 4032473,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 16,
+  "id": "8ee02edd-fe53-46eb-9352-1ac906d17816",
+  "items": [
+   {
+    "playerId": 4432773,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "726eccfc-c024-4195-8c0e-fab7a741d92b",
+  "items": [
+   {
+    "playerId": 4685350,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431545,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756840093004,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 27,
+  "id": "53fde8bb-9c6d-4ee6-ba6f-47bf766a0a92",
+  "items": [
+   {
+    "playerId": 16800,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6d08e163-e9fd-4265-8370-68e1eb4acfaf",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "3be85f21-eebb-46da-bead-befd78ff6400",
+  "items": [
+   {
+    "playerId": 4385690,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "f080fe0d-cea7-4b49-85b1-c50ee40e10ec",
+  "items": [
+   {
+    "playerId": 4047646,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "85ee6d65-84a1-4210-b158-a51f606986ec",
+  "items": [
+   {
+    "playerId": 3051876,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c2d3ebf0-7dca-4ede-959d-d761f639358e",
+  "items": [
+   {
+    "playerId": 4360238,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4036378,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757009653176,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "d8fd3bfe-f24c-4e36-8c33-589bc97f6da8",
+  "items": [
+   {
+    "playerId": 4038941,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "6fb3d57e-61c6-4e21-b860-66010f05f677",
+  "items": [
+   {
+    "playerId": 4360939,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "d8895771-356e-495b-bb10-2b180d26ebdb",
+  "items": [
+   {
+    "playerId": 3068267,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "291f3a59-e31b-43d3-81b6-5722431fb760",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 19,
+  "id": "43bf530c-6ff7-4743-8235-f67e6e25d062",
+  "items": [
+   {
+    "playerId": 3126486,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "7022aa90-29b4-4296-9a2b-ada6ef1f721e",
+  "items": [
+   {
+    "playerId": 3128720,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "7d4e3a55-15b6-4506-a2a7-dbe1b01a66d8",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "fc5dc33f-4f59-4e98-9741-4776c94a01ce",
+  "items": [
+   {
+    "playerId": 2577417,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 52,
+  "id": "a82abb04-d870-4a55-9a22-d79d4be7da47",
+  "items": [
+   {
+    "playerId": 3043078,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "b9035d06-4f16-4e04-a9e1-65afe4c34b8c",
+  "items": [
+   {
+    "playerId": 4430027,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "7b67360c-6023-4760-a15b-82cfebf47377",
+  "items": [
+   {
+    "playerId": 4360635,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "684cb264-cbcf-410b-a63a-fe37977166a0",
+  "items": [
+   {
+    "playerId": 4808766,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360635,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "41d16444-132b-40e7-8c5f-570b700b6839",
+  "items": [
+   {
+    "playerId": 3116365,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 27,
+  "id": "5f095d90-758c-4fbb-973f-f77dad9b134e",
+  "items": [
+   {
+    "playerId": 3916387,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "6c41ddb4-d74f-43e7-826f-3ad9f3d65b2a",
+  "items": [
+   {
+    "playerId": 4243331,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "abdf74da-2c93-4ea5-91a9-79b67cada143",
+  "items": [
+   {
+    "playerId": 3917315,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4c790a9e-552b-4f8a-a85b-38996cbf9314",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756958381284,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 23,
+  "id": "d653bf84-6010-4e41-b3ce-a06927fae1f5",
+  "items": [
+   {
+    "playerId": 4429160,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "5903ca58-de1c-4d61-a593-61a3d7c9ef1e",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6a2aea02-8aca-4475-9a89-72d6c9ec3e62",
+  "items": [
+   {
+    "playerId": 4360310,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4038941,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757105523661,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b40709a0-eab9-4c41-87fe-a178b572a283",
+  "items": [
+   {
+    "playerId": 4429059,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "21566e37-2dd5-4d43-a8b7-e56d9c8d478b",
+  "items": [
+   {
+    "playerId": 4360438,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "14cce1a7-d1f2-4819-b5f8-b320e4d27eff",
+  "items": [
+   {
+    "playerId": 4695883,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "e5ba6c4c-0b92-452a-b8e0-435ae2ea7057",
+  "items": [
+   {
+    "playerId": 4426388,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "b0d633c6-0c14-400c-b221-a5b2a461c9b4",
+  "items": [
+   {
+    "playerId": 3046779,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "2cb920af-f12e-4c44-818a-4a7d523846fd",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "aae76730-5ad0-4985-8332-bef862f8c48e",
+  "items": [
+   {
+    "playerId": 4248528,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "e018bc65-4e3b-46de-9ccf-7a910154e523",
+  "items": [
+   {
+    "playerId": 4426385,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "081eb198-a37e-45c9-8493-046bda73d6ee",
+  "items": [
+   {
+    "playerId": 4040715,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d74a15fd-94c2-47f1-ae70-ca4302bf2d56",
+  "items": [
+   {
+    "playerId": 4372561,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695193,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757039430976,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "762b26d6-8f52-46a4-b4a7-6414a22654db",
+  "items": [
+   {
+    "playerId": 4567750,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "42443aed-0a97-46ff-9a2e-0519e8cbd78d",
+  "items": [
+   {
+    "playerId": 15847,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "680c0a8c-101f-454e-9f85-39b8d6853334",
+  "items": [
+   {
+    "playerId": 4429615,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 68,
+  "id": "7e1bc35e-08cc-44e4-bd09-e452aaea7698",
+  "items": [
+   {
+    "playerId": 3929630,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "12e02d37-5926-4d60-bc24-7288a7777ade",
+  "items": [
+   {
+    "playerId": 3139477,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "d47aacc4-15df-4160-b6ab-085e9d185b7a",
+  "items": [
+   {
+    "playerId": 4569173,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "f324b9e3-0f28-4664-8f8c-cfcd5f1f044d",
+  "items": [
+   {
+    "playerId": 4035687,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "cba8b44b-782c-4491-acb5-6e526e58639f",
+  "items": [
+   {
+    "playerId": 4369863,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "52c030d4-5925-4ac6-81c4-42a6e186886e",
+  "items": [
+   {
+    "playerId": 3040151,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "97d0e376-12cd-47c5-8161-39ed5bd60b95",
+  "items": [
+   {
+    "playerId": -16007,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "a15e08c8-d1b5-43d7-b01b-22666e43889a",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "57447844-8d8b-4037-a355-880407a2c817",
+  "items": [
+   {
+    "playerId": 4685279,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "eaa1f4cf-904b-4d4e-902d-235ad7510229",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "544c81d8-c0cd-467c-9a90-9cebec8c1abc",
+  "items": [
+   {
+    "playerId": 4242355,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "03879846-a2fa-4519-a800-2a58b4078e0c",
+  "items": [
+   {
+    "playerId": -16016,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "50c03368-920b-404a-afdc-e1b83b540cde",
+  "items": [
+   {
+    "playerId": 4595348,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "00cde55f-9bba-441b-94ba-b7c1e04c918d",
+  "items": [
+   {
+    "playerId": 4695193,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3be1c01f-f195-4f73-9973-5f712780d50f",
+  "items": [
+   {
+    "playerId": 4688380,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756920059811,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "17d29a6b-4f12-4059-9330-7ba6a06257b5",
+  "items": [
+   {
+    "playerId": 4431452,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 39,
+  "id": "2a0f2055-5aca-4c0d-a017-4a3c45c7e7c3",
+  "items": [
+   {
+    "playerId": 4241389,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "887ce726-2920-4eae-b621-f768832ce609",
+  "items": [
+   {
+    "playerId": 4426386,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 45,
+  "id": "2c768063-6187-4789-94a8-fdf9f6f2fa50",
+  "items": [
+   {
+    "playerId": 4429795,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "91ab71f0-f35f-492e-90ad-d261de62520c",
+  "items": [
+   {
+    "playerId": 4723086,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 40,
+  "id": "ca9b214c-54f4-4315-98bd-f5c718a1196f",
+  "items": [
+   {
+    "playerId": 4362628,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "01e82d5a-c4e6-4ffe-b673-f94d7aa189a6",
+  "items": [
+   {
+    "playerId": 3116406,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 15,
+  "id": "af11192c-44ce-428c-a29d-b2971c4c7a96",
+  "items": [
+   {
+    "playerId": 3042519,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "75c992de-8992-488d-b521-b2a4101bdef1",
+  "items": [
+   {
+    "playerId": 3059915,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "38f45d64-4a31-4264-a936-225d13217009",
+  "items": [
+   {
+    "playerId": 4569587,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "9d8b414b-f6a2-41b1-9f72-e99c94dac443",
+  "items": [
+   {
+    "playerId": 4239993,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 45,
+  "id": "75e4b698-1a3e-45de-9a6b-c12d5761f333",
+  "items": [
+   {
+    "playerId": 4432710,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "bf5d5b48-0f11-44f7-bdc1-70097e9e9276",
+  "items": [
+   {
+    "playerId": 4373626,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "43a0ebe8-aac9-416d-ac0e-8e0fb4404504",
+  "items": [
+   {
+    "playerId": 3895856,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "f6a2bad2-5a86-4b09-95bc-dcc3f0891edb",
+  "items": [
+   {
+    "playerId": 4429501,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "11db63c4-075c-4360-8719-3245853c17ff",
+  "items": [
+   {
+    "playerId": 4362887,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "e6723439-6c9f-4d11-b0d4-0565e128d9e2",
+  "items": [
+   {
+    "playerId": 4361579,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "977d0af7-b991-403d-ba39-bfcfe462ac0e",
+  "items": [
+   {
+    "playerId": 4685247,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 66,
+  "id": "a568fe23-dd65-4724-b2e3-196cc82381eb",
+  "items": [
+   {
+    "playerId": 4430807,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "43f8b569-7d9e-4204-8a34-8a7ec090c895",
+  "items": [
+   {
+    "playerId": 4572680,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 29,
+  "id": "3d1a4ec7-7492-4771-89f9-743e211b9453",
+  "items": [
+   {
+    "playerId": 16737,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 42,
+  "id": "61cc27a9-c539-4a23-9e96-1f39351f817d",
+  "items": [
+   {
+    "playerId": 4379399,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "b2e09d17-4f7e-4a1d-8d1d-68a375b7d656",
+  "items": [
+   {
+    "playerId": 4258173,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "6a448470-94a4-424e-98d9-c986dcbf3af7",
+  "items": [
+   {
+    "playerId": 4360569,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 29,
+  "id": "60fd94a0-f7fa-4c09-b9d0-81eaff1a2955",
+  "items": [
+   {
+    "playerId": 4683062,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 21,
+  "id": "9cab4f3f-e35d-4d39-80f6-4875407219b3",
+  "items": [
+   {
+    "playerId": 4241478,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "9856d6e1-307d-41e7-b8d8-4b50326f4109",
+  "items": [
+   {
+    "playerId": 4569987,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b48b3d8d-e703-4af3-ad37-3b685cfbac83",
+  "items": [
+   {
+    "playerId": 4242433,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 1,
+  "id": "a54554df-5508-4c36-954d-c341d2a05dd3",
+  "items": [
+   {
+    "playerId": 4432762,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "006b2089-7f8e-4574-91d6-b7a677c8a462",
+  "items": [
+   {
+    "playerId": 4431611,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "abe43405-4c2e-4c42-a9c9-f1c5ea5ec314",
+  "items": [
+   {
+    "playerId": -16025,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 16,
+  "id": "c22cac5d-5b70-4c86-8a7f-49423c3dc848",
+  "items": [
+   {
+    "playerId": 4361370,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 61,
+  "id": "5030cbad-58e7-41cc-a417-ba6003c9f5dc",
+  "items": [
+   {
+    "playerId": 4890973,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "a61cf4ba-5dc7-4c24-ae09-035db620a1f7",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 15,
+  "id": "6c8b7826-140b-42b0-9279-9eca8268d3dd",
+  "items": [
+   {
+    "playerId": 4361529,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 13,
+  "id": "ab7c6978-3f2b-4e11-8ad7-e671096ad516",
+  "items": [
+   {
+    "playerId": 4036133,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "aa77ec7b-faba-49be-9c9a-5e476e3a1b13",
+  "items": [
+   {
+    "playerId": 4241474,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 15,
+  "id": "94b4080b-b575-4b8b-9ca1-4d7332d210b8",
+  "items": [
+   {
+    "playerId": 4035538,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "95a1fb03-e3b2-4a10-bf95-3a14b62d4d6f",
+  "items": [
+   {
+    "playerId": 4429096,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "acf9aa40-d3b7-4e6e-a9dd-7d248e9b7203",
+  "items": [
+   {
+    "playerId": 5123663,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "20d521cd-088a-469f-a3e3-2be1630cbfe7",
+  "items": [
+   {
+    "playerId": 4241457,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 18,
+  "id": "3581a8c3-30d9-4e97-b26c-65ae4163af43",
+  "items": [
+   {
+    "playerId": 4432665,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "1193869f-eadf-4e51-b8d2-de2c1d64f7f2",
+  "items": [
+   {
+    "playerId": 4569618,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 19,
+  "id": "68620044-4dde-4a1e-ab9a-bbae5c788893",
+  "items": [
+   {
+    "playerId": 4568490,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4616d585-6b91-4c56-b5c7-f85fb9b4318e",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "552efd21-c442-4941-9b97-8fd859b8ade9",
+  "items": [
+   {
+    "playerId": 4429121,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431452,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756912206324,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 17,
+  "id": "8de99e68-8615-49fa-be99-e2a22720f07b",
+  "items": [
+   {
+    "playerId": 4241463,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 22,
+  "id": "3874a6db-1431-4d63-94c6-754a637856fa",
+  "items": [
+   {
+    "playerId": 4361307,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "f6990311-5be6-4382-bbf7-5ac36a8be34a",
+  "items": [
+   {
+    "playerId": 15818,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "b1e86cc3-1705-49c2-8373-04d0c3b4f6e3",
+  "items": [
+   {
+    "playerId": 3054850,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 27,
+  "id": "89e2e085-a324-46a1-b687-09564a0f5c39",
+  "items": [
+   {
+    "playerId": 4685472,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "e4a0bb8f-965d-4c6f-a782-2e83d9d365a9",
+  "items": [
+   {
+    "playerId": 4426515,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "2427bab6-d915-4ae6-a0c8-79f106c0e998",
+  "items": [
+   {
+    "playerId": 4426348,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 24,
+  "id": "10ba4269-587c-4274-bb2e-fa21c1080b3d",
+  "items": [
+   {
+    "playerId": 3128429,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "28fa47b5-c51f-42e6-97c4-d65a67569b62",
+  "items": [
+   {
+    "playerId": 4427366,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "7c9033c1-ae05-4a95-aba6-6524c78894c0",
+  "items": [
+   {
+    "playerId": 4362249,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "5b9fd2e6-7218-46d8-851f-b15313a94370",
+  "items": [
+   {
+    "playerId": 3116385,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "7a0af1fa-74fe-4151-8d9f-e6ea51eb52f1",
+  "items": [
+   {
+    "playerId": 3046439,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "1b22d6e3-96a2-4bbf-990f-d24d88b9be3b",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 23,
+  "id": "a6fd403f-9b94-437e-ae7f-4a141f4478dc",
+  "items": [
+   {
+    "playerId": 3915416,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "31c0dde9-de95-4843-a106-9f652f0df0b4",
+  "items": [
+   {
+    "playerId": 3916433,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "336c7b4b-619c-4f77-a105-a8091f79cefc",
+  "items": [
+   {
+    "playerId": 4430034,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "300e702f-b98b-4c19-82cb-226c12d135ec",
+  "items": [
+   {
+    "playerId": -16022,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "4ccd1a3c-93a8-42a7-946d-db5b5c5313b9",
+  "items": [
+   {
+    "playerId": 4426338,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 30,
+  "id": "ba20af1d-57e0-478e-bf51-ef17651f1644",
+  "items": [
+   {
+    "playerId": 4262921,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "5c066759-602c-4bc5-b159-0594e846b71c",
+  "items": [
+   {
+    "playerId": 4430737,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "21e89e09-4c2d-47e7-aee8-82e4cec3b6d4",
+  "items": [
+   {
+    "playerId": 4697815,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "82632c8c-b006-473b-be6a-5bb8af9801ba",
+  "items": [
+   {
+    "playerId": -16023,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "8edd2c1b-a3f5-4196-8e30-6214f483a447",
+  "items": [
+   {
+    "playerId": 3052587,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "12e19ff8-dc2d-4276-b9a4-de795b87c346",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756781235571,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 34,
+  "id": "6d53115b-b678-415a-8347-146897b2bfcb",
+  "items": [
+   {
+    "playerId": 3925357,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "30df8c77-21e8-4a75-b118-50a0df52bce3",
+  "items": [
+   {
+    "playerId": 3918298,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 22,
+  "id": "27d93624-3230-4d7f-8a3c-b1ca3a34c126",
+  "items": [
+   {
+    "playerId": 3916148,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 14,
+  "id": "e844981d-e4f7-487f-8778-39658dfe0284",
+  "items": [
+   {
+    "playerId": 4688813,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 11,
+  "id": "5eec03c9-c470-4c46-96aa-5073fc65a6f2",
+  "items": [
+   {
+    "playerId": 4819231,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 18,
+  "id": "dc334224-fc65-4e81-8e4b-8a6fc6f29e00",
+  "items": [
+   {
+    "playerId": 4430878,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 16,
+  "id": "64806ea2-fc9b-4884-99ce-15013b7cc221",
+  "items": [
+   {
+    "playerId": 4241985,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ca1f0a62-53a7-40db-8b8f-adbd03c43cb5",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4241372,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756783245319,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "4880d523-c9f6-4a25-b9d5-15518ec56d10",
+  "items": [
+   {
+    "playerId": 3886598,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 28,
+  "id": "0b2955d3-1afd-457d-91c5-fdc287f954d3",
+  "items": [
+   {
+    "playerId": 4432708,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "e284bf07-5767-437d-847a-3eda94b59edc",
+  "items": [
+   {
+    "playerId": 4241372,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1848cb11-c3b4-4cc2-b361-232cd4c0c5bf",
+  "items": [
+   {
+    "playerId": 4429023,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431545,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1756883147004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 21,
+  "id": "e26d893e-6019-48b7-8cf9-772fe3e52aad",
+  "items": [
+   {
+    "playerId": 3045147,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182581,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2bc0ac1c-d2a4-4182-933d-0da80520b42d",
+  "items": [
+   {
+    "playerId": -16028,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16002,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757028366987,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "d9f79dc1-3b68-4c09-8fe7-709c642ead1e",
+  "items": [
+   {
+    "playerId": 3116165,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "5ca2c399-fb5a-4274-904c-ab8f6ea202e7",
+  "items": [
+   {
+    "playerId": 4040655,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "6ca61cce-f1b4-4d8d-a4eb-7dd45162f396",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "0ccf71a3-7ea8-41b8-be03-dd0077d6f8d0",
+  "items": [
+   {
+    "playerId": 4428557,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "209c9540-a5ca-479a-961e-643500228ec5",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a2749e73-5ef8-44e4-ba1a-9d46beeb02c2",
+  "items": [
+   {
+    "playerId": 4600981,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1756909515478,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "1e00c9f8-132b-49b3-94b2-9547e8b82569",
+  "items": [
+   {
+    "playerId": 15795,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "3921984e-b7b1-4fa4-ba31-5765d45ce01e",
+  "items": [
+   {
+    "playerId": 4612826,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 13,
+  "id": "ef5af6eb-b7e4-4d64-b61a-1a268a8a6cc9",
+  "items": [
+   {
+    "playerId": 4685415,
+    "type": "DRAFT"
+   }
+  ],
+  "proposedDate": 1756781182582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3d4396a6-7e0d-49ca-9d06-9c1b4dc104a2",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685278,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 2,
+  "id": "8c410f51-6334-4d8a-a332-41d9cb73aa80",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429059,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "550489f6-d739-4e78-bf05-124ed7b747d5",
+  "items": [
+   {
+    "playerId": 4883647,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c5b6a077-863a-469d-85f4-1a0638404910",
+  "items": [
+   {
+    "playerId": 4429025,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4688380,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 9,
+  "id": "24b1ed2a-f0eb-4328-a7be-21956c9b2497",
+  "items": [
+   {
+    "playerId": 4429025,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4600981,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "18ec76a9-2daf-44b6-90ee-7f23f909890a",
+  "items": [
+   {
+    "playerId": 4431452,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360310,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757461419570,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "297533da-09c7-45b0-9d84-0976022dad49",
+  "items": [
+   {
+    "playerId": 4360248,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d7659ff3-1d9c-41f5-a5bf-1456dbda0f43",
+  "items": [
+   {
+    "playerId": 4241372,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4241478,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757379077989,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "06f9c2bb-e643-4800-9398-49666cac11fb",
+  "items": [
+   {
+    "playerId": 3054212,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432762,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757794034839,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "071a9166-7ff6-4310-b68e-061c3dbd413f",
+  "items": [
+   {
+    "playerId": 4429025,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15795,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d7f33c0a-2052-4228-a875-52127385257f",
+  "items": [
+   {
+    "playerId": 4429086,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3054212,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757852026861,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8402f0b1-c46f-4043-9686-e5a9cafcea97",
+  "items": [
+   {
+    "playerId": 4431452,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757470798927,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3f6192b6-d768-4c9f-89fd-bb82723550cd",
+  "items": [
+   {
+    "playerId": 4431452,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360310,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "28d02832-afca-4a07-83d9-136a19cdc002",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "adbef852-9af1-45f8-a38f-9ddeda5a9da5",
+  "items": [
+   {
+    "playerId": -16014,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 11,
+  "id": "ed1c9f17-fd6b-4487-810a-c68ea78b87ea",
+  "items": [
+   {
+    "playerId": 4429025,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4430034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "bd907a32-44b7-40c1-b2b5-0b4cd598b189",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4600981,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 11,
+  "id": "28833146-39a9-4ec5-94e6-f3325f351754",
+  "items": [
+   {
+    "playerId": 4430539,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4596334,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9c230d82-a42d-401e-9d9d-f4a60c1f4100",
+  "items": [
+   {
+    "playerId": 4883647,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4600981,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2bd09155-028e-4a18-a744-52386caf0794",
+  "items": [
+   {
+    "playerId": -16006,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16028,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757604349256,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1827e081-fe06-4a9a-a6fc-c7776460be8a",
+  "items": [
+   {
+    "playerId": 4431452,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361741,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757620503422,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "db438d26-e0d3-4ad2-9b46-3a27d5938127",
+  "items": [
+   {
+    "playerId": 4372019,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4241372,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757262868322,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "b4ad3cd6-c2fe-44b2-93a2-6affd696cdce",
+  "items": [
+   {
+    "playerId": 4430539,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 17,
+  "id": "abbc82bf-7a6f-4986-9650-79a8f5ee505c",
+  "items": [
+   {
+    "playerId": 4038941,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360310,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "830a8613-b42b-4a53-afc1-7f0b8084f014",
+  "items": [
+   {
+    "playerId": 4361050,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685278,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "990e0f10-42fb-45e4-8a8b-a1d84b680c00",
+  "items": [
+   {
+    "playerId": 3929645,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1757553110047,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "4146e9fd-a7de-413e-9a9e-26db69770a09",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "a1ccc63b-5f4c-4eef-a6a8-de57f8d88f90",
+  "items": [
+   {
+    "playerId": 4429025,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686612,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "afd05dfb-6e4c-4a4e-9ec2-9e80e9d5a98e",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4688380,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e1ec7598-9b87-4ef8-beba-a7843d14d0ad",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16021,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ab236f73-57b3-435c-aa4d-b9df459288cc",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757336475144,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "a93ffc92-849d-405e-a4f5-a9ac8a8e3091",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686612,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1757489666323,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a7142a69-c4f3-4765-9a0c-9b8afafa6e7f",
+  "items": [
+   {
+    "playerId": 4372019,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4047365,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757262865362,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8e4d989c-88ed-4a87-a679-de6c90327f4f",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16006,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "1e13c412-5e52-49da-8628-7235c6ab40ab",
+  "items": [
+   {
+    "playerId": -16011,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16014,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "34ef652d-7291-4e0e-bef6-656792836d49",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362249,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "9f92df81-eeb7-4ef8-902b-d7926b329eeb",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4819231,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9874a3df-504e-49c4-a044-7b3171421d68",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4372019,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758266065981,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1bb9b7df-4e28-433d-97a1-e09231740ea4",
+  "items": [
+   {
+    "playerId": 4608686,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4371733,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758123263989,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "67e69d4a-6d0a-413d-8040-71ce6e144f0c",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16025,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "5e75120a-20d2-405f-8437-d0706a549707",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432775,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "34b79473-8c34-4532-a323-2c1b75662706",
+  "items": [
+   {
+    "playerId": 4036378,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4372019,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758039208196,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cc5da4a0-4e8b-48da-9682-43bdfd208c69",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5fb420e7-3783-40ff-95b8-058f311a4b8f",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758191711071,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "095bb4a3-a1ed-41d3-9e41-a27582224e11",
+  "items": [
+   {
+    "playerId": 14163,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3915511,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758468407942,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a3b25e0b-28cf-4d28-bd34-426afa40b23d",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1758320840509,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b7eee650-aa5a-4ac2-923b-1c5eab6d6a41",
+  "items": [
+   {
+    "playerId": 2976592,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4430034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758368987002,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9b2c6acb-db5a-4241-83bc-c553bc68c90f",
+  "items": [
+   {
+    "playerId": 4360248,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758165078763,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "32facf76-bbc0-4770-b1b4-6066407a3383",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16025,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c2f7d144-69c3-40e2-a45b-7db86abf4ad7",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16025,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f2d640f0-ee54-4956-9a0e-20c84f6c2437",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757418110038,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "5d68b67b-4510-47e4-8c20-782c7e5df1f3",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3068267,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6d93a29e-a21d-485e-a092-45be87115a36",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4819231,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758069902533,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "f9ade263-c7a3-4793-8d0a-80918ee3eb03",
+  "items": [
+   {
+    "playerId": 4036378,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3068267,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "e23358de-713b-4b8d-b4f9-0c575d9654e5",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4877706,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "830c30b9-e16a-4f41-bd0f-16540c9fe2e3",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3068267,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "d63e0be4-8179-4277-acee-af14995e1f89",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 5,
+  "id": "e3397fa7-f629-4918-918f-6bfb0721cc11",
+  "items": [
+   {
+    "playerId": 4036378,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3046779,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "bde95593-3e1b-4df6-8e47-647eeafd3fd3",
+  "items": [
+   {
+    "playerId": 4599739,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685279,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758237003529,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "02ff0fb5-0535-49eb-bf48-336b35b4af79",
+  "items": [
+   {
+    "playerId": 4361577,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1758472038338,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "5e6caa43-8b1c-434e-9ccf-d41d27752991",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4723086,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758093219876,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8428b44e-0260-4150-af8a-470a45c6005b",
+  "items": [
+   {
+    "playerId": 4689114,
+    "type": "ADD"
+   },
+   {
+    "playerId": 14163,
+    "type": "DROP"
+   },
+   {
+    "playerId": 4360238,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759073983889,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "478d03be-998b-4031-9641-8e556421e4a8",
+  "items": [
+   {
+    "playerId": -16003,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16012,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758852692700,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "20961ace-8a01-47c4-b110-55266e776e6a",
+  "items": [
+   {
+    "playerId": 4243389,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3123076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4091a241-6805-4daf-98ba-cfcabb53c959",
+  "items": [
+   {
+    "playerId": 3045147,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758639577178,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "70100808-d5f4-4bf5-8843-553b21df51f5",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758715198987,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "1738c40e-989c-4012-ab5c-8b58bf2c259c",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16001,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6db9434c-1d6b-47e4-a4e9-788856fd0f8a",
+  "items": [],
+  "proposedDate": 1758830607341,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b709cf5e-9b67-47af-9cf9-ebcfacb1b974",
+  "items": [
+   {
+    "playerId": 4819231,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1758721567582,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9ec4f3d6-3058-49f8-a895-ba4d72c5de41",
+  "items": [
+   {
+    "playerId": 4045163,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d5d7976d-3fa4-4034-91cc-ccdb4fe49909",
+  "items": [
+   {
+    "playerId": -16021,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16001,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d374103e-044b-4919-b642-cd1282a47de5",
+  "items": [
+   {
+    "playerId": 4372561,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759074012115,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "df81bfd2-944a-403b-9208-c2d69062ddf7",
+  "items": [
+   {
+    "playerId": 4038815,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "67bddac8-75f1-4705-b33f-19d2b964d6cc",
+  "items": [
+   {
+    "playerId": 4257364,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "809d1c4c-cae6-4759-aa4f-6478422bdba7",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4599739,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759064939918,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c6875c85-1fe6-4090-a2ee-ab945dfd325c",
+  "items": [],
+  "proposedDate": 1758835885770,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "966b4cea-6ce7-44d8-94a2-284daad4d719",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757506391222,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a4f9a7a0-4618-48a0-a517-c1746ee3cd8f",
+  "items": [
+   {
+    "playerId": 4362619,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0caab5fa-f1b9-4563-aadb-565a918049ef",
+  "items": [
+   {
+    "playerId": 4428718,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "df056569-2860-4ab6-96f4-934317bcc213",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16001,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3e476cb9-b6c8-454a-9536-5a84785f49a2",
+  "items": [
+   {
+    "playerId": 4367567,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "86bd01d5-256a-444b-a839-5b14c9e1d6a4",
+  "items": [
+   {
+    "playerId": 4362478,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5123663,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758770308061,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c3c2642a-dcf3-4fc8-aeee-7bdd3bd6397c",
+  "items": [
+   {
+    "playerId": 15864,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758991652670,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 22,
+  "id": "949f0c1b-d379-41d5-955d-82b620003da2",
+  "items": [
+   {
+    "playerId": 4428718,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3123076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "558fd38c-8373-4192-97e7-c04aa3a8d585",
+  "items": [
+   {
+    "playerId": 4428718,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3051876,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "9c44d0df-d9ae-4bdf-b559-031777e3bde3",
+  "items": [
+   {
+    "playerId": 4597703,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f4a228ef-3e6c-46cc-8d8f-31d35b374c2a",
+  "items": [
+   {
+    "playerId": 4362478,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1758700944697,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8c63e1b9-89a7-43fc-869f-5230120d322a",
+  "items": [
+   {
+    "playerId": 4569603,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4597703,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759269348375,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "78c8d5e2-7395-4b6a-adf7-fc771587f746",
+  "items": [
+   {
+    "playerId": -16019,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429501,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759319863848,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1185c7c1-6bc7-4626-83f8-7a7369e24afd",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757418068474,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c0a4d8f6-2bd7-4a05-8614-d9e9118cd6e2",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759385031322,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b2973e83-6614-42ef-afed-67184697fdfd",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429086,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759662750820,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1f21d56a-8b2d-4ed7-8881-222514a62434",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758642629955,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "e1431714-dfb2-4cf6-be9c-8af7c4d0b2ae",
+  "items": [
+   {
+    "playerId": -16021,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 3,
+  "id": "cb34901e-8921-472e-b17f-2d0a063b8553",
+  "items": [
+   {
+    "playerId": 4569603,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4241372,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "dba12e51-93ab-4b27-a56c-7ec32bbcc755",
+  "items": [
+   {
+    "playerId": 4599739,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759504310863,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4e69cb7e-d5e8-4025-901f-28f901664bd1",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757506381362,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c2daee7a-a304-4af8-b516-ad12a925c498",
+  "items": [
+   {
+    "playerId": 4686472,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759447276453,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b756c3da-1ec5-4c20-b848-7d6eb9fed52b",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4371733,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759368199114,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "49b16978-3e99-44c5-8cb5-4ff1d06e5427",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759122745041,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "714077e5-6aef-4a76-8bca-1957ad609258",
+  "items": [
+   {
+    "playerId": 4047365,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4045163,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759090096645,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "edac08c1-2a3b-4376-be67-dfbbba783cab",
+  "items": [
+   {
+    "playerId": 4249417,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759621732744,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b7373e33-b652-4375-9bc4-2630b5a21cd7",
+  "items": [
+   {
+    "playerId": 4038815,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759319767690,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cfd949c1-b176-4bdf-85ee-7e4ac36ed694",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876200855,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f1f87906-4bdd-4d7f-91d9-31f79617490f",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757708781405,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "36253ffa-a159-40f1-89c9-75c335595cb5",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361050,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1d5bcad8-5d11-4ff4-8986-d13393ab4b9b",
+  "items": [
+   {
+    "playerId": 4808839,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427095,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759460998857,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "7b66cd8d-803e-48c5-a4b5-3ae700b89df9",
+  "items": [
+   {
+    "playerId": -16021,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16033,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f54346ad-ce89-4ddb-ba42-1d3c1dfef63e",
+  "items": [
+   {
+    "playerId": 4362921,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4597703,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f71855d0-95f9-4703-8407-ebd9e977fd37",
+  "items": [
+   {
+    "playerId": 4429121,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759447227040,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "2552c010-f426-40b4-8901-ef751f998e84",
+  "items": [
+   {
+    "playerId": 2576925,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3051876,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c508fe5d-4173-4ac8-83da-399f84d512e0",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876211579,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e9da33e1-98c2-4136-adc7-58f03cc43ce7",
+  "items": [
+   {
+    "playerId": 3120348,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759669794891,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e4186854-f2c1-485f-9ece-6056f5aed4c9",
+  "items": [
+   {
+    "playerId": 4569603,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4597703,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2d3ef729-8fd7-4dc9-b925-07f5aed560a6",
+  "items": [
+   {
+    "playerId": 15864,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4426348,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976592,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759504205649,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0bd08a02-7059-4107-b1bc-34b39da51e19",
+  "items": [
+   {
+    "playerId": 4240657,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432775,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759323030473,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "adfbd54a-4857-4094-ab86-514d7063ac99",
+  "items": [
+   {
+    "playerId": 4360294,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759622589089,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e3428dd1-8b18-4644-9737-6163c9b77f01",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758517899925,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c5ea2053-d5b3-41d9-b420-5c7ed4b2d2f5",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759475575639,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "40c79c5e-0db5-4aef-a06d-9be6d6fa69f8",
+  "items": [
+   {
+    "playerId": 4695404,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4371733,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759498661684,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "6a907149-537c-45de-bcb8-3b135bfda977",
+  "items": [
+   {
+    "playerId": 2576925,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4723086,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759563399254,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c8d64eec-dea5-4924-b622-d68d08d96612",
+  "items": [
+   {
+    "playerId": 4685350,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759622541257,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "4beda234-a09a-42d8-b5ff-e9818935d369",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0d1cab21-b87f-48fe-a5c8-7ce1c79d48c0",
+  "items": [
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4241478,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759090082512,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3f6b2a67-17a0-4982-9ea1-496868a5ec9e",
+  "items": [
+   {
+    "playerId": 4241372,
+    "type": "ADD"
+   },
+   {
+    "playerId": 2576925,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759446873973,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2ad40e2c-0771-43e3-b3b1-dca181004806",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758079629059,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "7d01da65-e702-47a0-86f8-f4147549a8d7",
+  "items": [
+   {
+    "playerId": -16030,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "eda9bb24-eacb-48b3-8dff-6baf75846465",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758517891588,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "047a9130-a432-4870-bed0-bd8d56d5d9c1",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429501,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "360ba067-b25a-4427-9c0a-05d7fd07a880",
+  "items": [
+   {
+    "playerId": 4038441,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695404,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759622005519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9a83f4e2-34c4-40d1-b67c-e4ceb000e28b",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4599739,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759330875762,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "09bf4a3f-bc37-4b4a-ab25-a66b937e8593",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   },
+   {
+    "playerId": 12483,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759434794781,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "223f59ee-0c88-4e91-a5cf-72e681c65be1",
+  "items": [
+   {
+    "playerId": 4426338,
+    "type": "TRADE"
+   },
+   {
+    "playerId": 4569987,
+    "type": "TRADE"
+   },
+   {
+    "playerId": 4428718,
+    "type": "TRADE"
+   },
+   {
+    "playerId": 4362628,
+    "type": "TRADE"
+   }
+  ],
+  "proposedDate": 1759623265914,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b21b1cf9-d19c-43b1-81fd-103fa78c57cd",
+  "items": [
+   {
+    "playerId": 3116385,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759448089216,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ddecc21c-62e1-43c0-b4ea-3356100520c9",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759122757656,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "deef6eda-c082-4e04-8cbc-d5a8f3b12eb3",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4431611,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759090089705,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "dff11b6e-3501-4702-a0a0-5d8faf730d60",
+  "items": [
+   {
+    "playerId": 15864,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759504215953,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ab9bd6e2-0d42-4c90-b6e6-ff0ce41ac97a",
+  "items": [
+   {
+    "playerId": 4599739,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361050,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c6b1f8ba-ae4f-452d-b4e3-f5e4c1ec604b",
+  "items": [
+   {
+    "playerId": 12483,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4819231,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ebe7e523-c8d5-47e3-bff3-83fab455bee9",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16003,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759449350360,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ff414577-6a21-4eb8-8fe6-5bfd5dcbd20b",
+  "items": [
+   {
+    "playerId": 4038441,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4243331,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759680014156,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "ac071ce1-c3d2-452e-871e-a346ec46ff7d",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4608686,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759475575639,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c243a8a4-b9e3-48b6-8012-4c2a6454c5b3",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4241457,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "11eb975d-2b07-4993-984b-f6fc87577610",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "e669cabd-6548-49e7-8629-e870ad4bda9c",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4241372,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8a4ee5f7-c7f9-4405-b779-b6f6c6266b09",
+  "items": [
+   {
+    "playerId": 4819231,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3120348,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759718904103,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "d5885e7d-4c84-496e-a6bb-83c9457bb16b",
+  "items": [
+   {
+    "playerId": -16030,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16033,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6d9f1b68-28df-4e88-bb21-901802a181ce",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876232798,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a17a33e9-7002-44f4-a437-b5d695c99db3",
+  "items": [
+   {
+    "playerId": 3676833,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4597703,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759274109954,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d93cbec9-c694-4654-8d93-d0932f6e04c7",
+  "items": [
+   {
+    "playerId": 3051876,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4045163,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759427000258,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "399cae0e-f9a6-48d8-b282-dad966fba535",
+  "items": [
+   {
+    "playerId": -16011,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16034,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6e5bfcc0-53d9-4fa9-ac93-6ed0b1748526",
+  "items": [
+   {
+    "playerId": 2977187,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759090080011,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "0c7e3b43-7fff-402e-860e-f5503ca5f8da",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4597703,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759306291643,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4f4e9a71-3a2a-43c0-9bfa-ee7efdeac8d5",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4038441,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759671614894,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2d029b01-ef77-4919-8b89-2b6a243add23",
+  "items": [
+   {
+    "playerId": 12483,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1760124511658,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 51,
+  "id": "a2d95857-8b8f-4340-9c85-a67f7abbec10",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fddd4438-82c6-4e0c-94a1-40bedaa86ee8",
+  "items": [
+   {
+    "playerId": 4433970,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760096131350,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "663bfe85-d890-4404-803c-acb07a6618f3",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 5,
+  "id": "e0ffa6df-c131-4ebb-a660-622c6dcd20f8",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1716f760-1e87-4e35-914a-cd6bf4f7a9c8",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4572680,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759756463839,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "34f6aed2-6113-41aa-985d-a54c4dbdbcf9",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4819231,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "778fcdae-6188-4936-a9ec-99053424c792",
+  "items": [
+   {
+    "playerId": 4259147,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1759930105198,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "52a2f95d-a486-411d-a12b-7fdf705e7537",
+  "items": [
+   {
+    "playerId": -16019,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759845655291,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fb4ff72f-9de5-4808-9118-7b2acc754159",
+  "items": [
+   {
+    "playerId": 4608686,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362478,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8a1fd6dc-593f-44e1-9b54-88b7549617b7",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759161054214,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8a014de3-6d7c-4207-8330-b49fe38424dd",
+  "items": [
+   {
+    "playerId": 4262921,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759756458229,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e21234b1-dbf5-4050-8562-25c316af21eb",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "320cd2ef-1a08-4766-bd7b-e7ba96f043d5",
+  "items": [
+   {
+    "playerId": 3045523,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759937821536,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3abeecad-473e-437b-9d43-14277251c6a2",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759774607490,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ecd46d92-0ada-42bd-9f2f-38eff1232723",
+  "items": [
+   {
+    "playerId": 4429059,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361529,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759756469527,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6f719303-5bfa-49ba-a474-8f2b5f80eb7c",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759887606467,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "71ff9e90-986c-43a3-a1b0-803d5e4e55b0",
+  "items": [
+   {
+    "playerId": 2976592,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1760277192674,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9795ad12-6ac1-452e-a8a3-d846e695dff2",
+  "items": [
+   {
+    "playerId": 4362887,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4036378,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759756444236,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "3dca60bb-747b-4695-96bc-d4e43897861a",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362478,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "addd438a-ac3f-4ed8-9527-930868cd3bb8",
+  "items": [
+   {
+    "playerId": 4596602,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759927939928,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b75ea072-00ef-42af-abba-8cbe7317f12d",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16012,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760040868154,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "42135b92-d5b1-4c76-9302-88c3ce7f712d",
+  "items": [
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759421069115,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "320927d3-c5fe-42a6-b57d-2ba4790fed3e",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759161063147,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "50c45709-3814-4032-9cfc-a0d9d9d6b344",
+  "items": [],
+  "proposedDate": 1759930288104,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 15,
+  "id": "61d10715-55f8-491e-a60e-4a0f051769d9",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 7,
+  "id": "f290420b-9bd7-42da-a475-6357f154df56",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2bea7bab-85c2-4fc8-8bbe-1529203054c6",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759774611982,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2b87a034-82b1-4232-9100-9342cc5826d0",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759625414289,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a5517123-42b4-4a79-a835-e21fa14c0387",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759972637812,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "3489cfdf-da6e-4ffd-af58-29647dea0ec5",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4819231,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "3f6ff9dc-dbc2-40e5-a881-019648e24244",
+  "items": [
+   {
+    "playerId": 4808766,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3051876,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e3e657e1-0890-41a0-b177-04648eec244d",
+  "items": [
+   {
+    "playerId": -16014,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16005,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760149985343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f08ca45c-59af-4a7e-8a22-148a7dc26954",
+  "items": [
+   {
+    "playerId": 3123076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4426386,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760226135864,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "841eebc0-cfb0-4777-8735-830ae9dcd782",
+  "items": [
+   {
+    "playerId": 4430968,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3917315,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e03e8685-ad80-443b-b212-bbe0323822f0",
+  "items": [
+   {
+    "playerId": 4241457,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759831773538,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f8eb3328-f332-46c1-9789-4cef3fa8b68b",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759345057976,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d02fc027-b27e-4206-a2c5-d3a4a80f056e",
+  "items": [
+   {
+    "playerId": 4427728,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4711533,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760283880608,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "8bc8aa62-23f6-42df-b823-211f9733d2ff",
+  "items": [
+   {
+    "playerId": 4372071,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360248,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5b657107-5d3a-4f81-8503-9567f8998ce2",
+  "items": [
+   {
+    "playerId": 4429148,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5083076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "63366310-3f60-4f65-830e-aae76e7e7371",
+  "items": [
+   {
+    "playerId": 4259147,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5083076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1759909605587,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2ad776fb-835f-49a4-b5c6-650f8fad2f1d",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760464466348,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1d777e41-702b-4238-bbb3-8989e7b018f8",
+  "items": [
+   {
+    "playerId": 12483,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3917315,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760720798645,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8407078a-7145-482b-a19a-03cbd4708e3f",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3895856,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760841618938,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "71314810-90ac-4c30-a80b-a7cb47771d86",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   },
+   {
+    "playerId": 12483,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760569981604,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "bab3b201-8c2c-4842-8c6b-b86cf94c27e9",
+  "items": [
+   {
+    "playerId": 3045523,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4262921,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760359560913,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8604c64a-4ebf-446a-8a28-a4495e63f5a8",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760470171419,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4be832b3-bce6-4d61-b20c-39610913b90c",
+  "items": [
+   {
+    "playerId": 4243389,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760528543592,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "81c06c64-4b55-47ba-be0e-4b937d2539e9",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4596602,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fcce5ecf-0aa7-4bb1-a9c2-eba62d23c713",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16016,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760539386739,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "17154812-b204-4de4-9d7c-e83b52dbcf2b",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4596602,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4123dde3-7dd2-4cfb-95d0-3638db6b5f92",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760664952992,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1223626e-3bcd-4a10-aed9-61dbb01af90b",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760470172244,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "21b7ddd4-e43e-48fc-a4e2-21b7eb777c02",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360248,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a4d6d53a-6d91-486e-9d2d-47bcf8f2668a",
+  "items": [
+   {
+    "playerId": 3917315,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431280,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "324ad123-3013-492a-8ea0-11d29c584ea5",
+  "items": [
+   {
+    "playerId": 4685278,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1760658471248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "61fab896-23c6-4cff-b6c8-0aa9809d7ae5",
+  "items": [
+   {
+    "playerId": 4372019,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685350,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760665003815,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5fb25e87-8ae6-41ac-ac4e-49ea0b80cc3b",
+  "items": [
+   {
+    "playerId": 4426948,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4259147,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760889284690,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "61b65d38-3f37-48b0-a984-f82a9c059fe3",
+  "items": [
+   {
+    "playerId": 4569382,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760470172984,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5fd8fbcc-71d3-462f-962d-3d3f4bf43b0f",
+  "items": [
+   {
+    "playerId": 4608810,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4241372,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760557634845,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "bee190a1-86c8-4947-a624-40be6b62b198",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cb3fc5f3-b292-46b9-acff-13c8a49840f9",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16016,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760512462406,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f6bce239-1f45-4684-aebb-c5e6fee55a3e",
+  "items": [
+   {
+    "playerId": -16029,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16002,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1760528443636,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "008733ff-fc52-4610-95d5-b21cb65c9314",
+  "items": [
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758642693740,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e94b2401-4653-41fd-bf32-3ba828c6f2a3",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4883647,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761502033199,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ec6c9f68-3ab3-41f1-87f2-e0ad29cfc359",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "20d96339-fe01-4660-ab19-97e2ff1d3651",
+  "items": [
+   {
+    "playerId": 4695883,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4240657,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761206031102,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "30ca0598-3a9f-44cf-b920-372d73f7ec6b",
+  "items": [
+   {
+    "playerId": 4360294,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761232420448,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "233d7bd6-b7c5-4fd5-959b-e021931551a8",
+  "items": [
+   {
+    "playerId": 4243331,
+    "type": "ADD"
+   },
+   {
+    "playerId": 12483,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761139935429,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f7ddb7c6-d48d-47c1-89af-534d6db18785",
+  "items": [
+   {
+    "playerId": 4430878,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3045523,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760922148553,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "09d8a6a1-04e7-49ed-9454-e08fd005ddae",
+  "items": [
+   {
+    "playerId": 3116389,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761232483811,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0769f4ad-acc9-4638-b09f-07506e14fa74",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3045523,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6f666145-7dc7-413e-a013-6186e1014bb5",
+  "items": [
+   {
+    "playerId": 4047365,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760907776725,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "43c08544-c104-45ba-a9b6-2ba56e5cad11",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760626799050,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "99c6514f-7a28-4d09-afe2-250c3a25920c",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876276793,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "99303f36-2393-4c44-8d53-a2089dfa0ad0",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362887,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "051d741b-5d08-4c52-8e81-8e9d2dc1d099",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4249417,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "23ed42bf-b52e-453b-b360-66e4a00ed8a0",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362887,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761097883702,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9762db58-9071-4ea3-abf2-51b99691cf31",
+  "items": [
+   {
+    "playerId": 4243331,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c5c743f3-fd97-4557-92a5-add10a30a512",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876271509,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "33c64674-3a55-4382-87c6-7a1105f7f5a4",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "ADD"
+   },
+   {
+    "playerId": 2977187,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "1e46fbe7-778b-4b69-b4ea-bb62c88b3f2e",
+  "items": [
+   {
+    "playerId": 4695404,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "98fe9c4a-e702-4b26-8753-13497e9fcd1c",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4887558,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761097904707,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "904f9093-cbad-44f3-ab98-6e13bbfa175e",
+  "items": [
+   {
+    "playerId": 4685279,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761268911004,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "48226cc0-ed12-4c01-af36-c665d8353b06",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761144389511,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "967c6902-009f-438d-9fa6-665316cb01e9",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "11b43de9-d357-4f59-a646-34a89f67f777",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761161475763,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fd9ff89e-90c1-4306-af3b-c537e5dec587",
+  "items": [
+   {
+    "playerId": 4695883,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761083647535,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f37f832a-8329-449d-a095-0758f3b6aeb2",
+  "items": [
+   {
+    "playerId": 4599739,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761268879627,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4be6ad17-96f2-4286-b881-f99bb60aeec8",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758642701407,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "c62ac4f3-a75b-4ffc-9867-17188a34f702",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5083076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "63febbde-0e62-4daf-8a29-15136c6692e7",
+  "items": [
+   {
+    "playerId": 4586312,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4569603,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761342778052,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "ba38a1ca-36b7-475d-b531-82c74764d32e",
+  "items": [
+   {
+    "playerId": 4431280,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 8,
+  "id": "785d485e-178a-4079-9eff-6adf20e08495",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3045523,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8397b35d-7c4e-47fd-9b76-d8419882a2f0",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760626782313,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "35312553-4ecd-493b-a2b9-b51667e17f6b",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761312588578,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c7f62a55-ca75-457f-bf47-ff36389d7c64",
+  "items": [
+   {
+    "playerId": -16004,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4430539,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761140211302,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fb187cbf-4945-4eff-935b-513621c5fe7f",
+  "items": [
+   {
+    "playerId": 8439,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3046779,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "f9cc7200-4c1c-4e97-b550-d59e2aea7956",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4883647,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "92d09206-7fe0-498e-999d-d164e5dbaed0",
+  "items": [
+   {
+    "playerId": 4360078,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cb75034d-5833-4906-8571-641a8f32e41c",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761336285556,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "933d87fa-9c5b-4f04-ac77-0c9f21956eb6",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8f4ae980-4dd9-40d1-b450-b5c608efcfe7",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4887558,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761098074767,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "adf9fece-8b29-426f-997f-3ddb907ae1de",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360516,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761409436496,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "70c37d36-d72b-42bb-887d-50ad61fb470e",
+  "items": [
+   {
+    "playerId": 4429096,
+    "type": "DROP"
+   },
+   {
+    "playerId": 3123076,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761485044151,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c962ab45-c6e6-44a3-9f6c-6c443e6c56c2",
+  "items": [
+   {
+    "playerId": 4243331,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761075587064,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7bbc545e-1adb-483a-a569-49dc87d8eb37",
+  "items": [
+   {
+    "playerId": 2977187,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760907767572,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "16ea2ac4-2272-458c-866f-4da76968a93d",
+  "items": [
+   {
+    "playerId": 4686422,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761492003304,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0faaba86-7cf7-4999-a2ba-02b58ef9fa66",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685278,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761342570437,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "5a0bb985-b448-4f6f-983e-ff7f5812270c",
+  "items": [
+   {
+    "playerId": 4596602,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4887558,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "045a8560-7458-43eb-a98d-117730914b7f",
+  "items": [
+   {
+    "playerId": 4360078,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3045523,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "577b9e4f-15a7-4ae4-bbda-c509d6f0ad88",
+  "items": [
+   {
+    "playerId": 4360248,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4426948,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761139980884,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "58f84cb1-3dc3-4ae2-bf26-e6fe029c9bdb",
+  "items": [
+   {
+    "playerId": 4595342,
+    "type": "ADD"
+   },
+   {
+    "playerId": 12483,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f9fa69ee-b429-4310-a238-3e3feb3c1786",
+  "items": [
+   {
+    "playerId": -16003,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16029,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761486408632,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "214110b0-897d-4328-abb1-0b5d92114d3e",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761120111957,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 0,
+  "id": "49c769ce-f741-43bc-b3cc-0569d8d1459a",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758642697287,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f41dc095-0193-4e50-b49a-f7d08fed350d",
+  "items": [
+   {
+    "playerId": 4360078,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4883647,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761084926176,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0f5806a6-0d36-4b98-b1b5-1682e9fffb60",
+  "items": [
+   {
+    "playerId": 4682652,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16012,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761269268154,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e7e8f5df-bf45-4453-9119-827a30df0beb",
+  "items": [
+   {
+    "playerId": 4883647,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695883,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761233694828,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "668b18c5-23da-4061-bc98-4d11f8a2f329",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761399790704,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b53801e5-0779-4113-9f38-16e0bdb5ecd4",
+  "items": [
+   {
+    "playerId": 11252,
+    "type": "ADD"
+   },
+   {
+    "playerId": 2576925,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761268757046,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "96f99268-96b1-46ee-8880-c51bc75a0ee7",
+  "items": [
+   {
+    "playerId": 5083076,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761206031102,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "78e2f285-eb8f-4496-8b09-388991924609",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761083616749,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "32900ee1-4ae7-45a4-b905-aa54d4a044cf",
+  "items": [
+   {
+    "playerId": 4431268,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3045523,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9d393d6c-52b5-47c7-9e3f-c50ff37e52fe",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695404,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a1f2e552-1d98-4468-86aa-cf573b8afda3",
+  "items": [
+   {
+    "playerId": 4241478,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4426515,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509015327,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "37d05256-f669-419b-a8a4-3a53fb36b1b2",
+  "items": [
+   {
+    "playerId": 4431611,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3917792,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509006615,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "30eb072d-a49f-49a2-80b0-3a6d422d4592",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761105554472,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f149430b-99b2-4cc7-b6bc-200d8169c0ef",
+  "items": [
+   {
+    "playerId": 2977187,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761783912886,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "48834175-9791-494f-b4d0-aa62a2696a1b",
+  "items": [
+   {
+    "playerId": 3929630,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509012753,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6cf607bd-cc90-4795-a892-5b238b81117a",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4371733,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761894575489,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "9f3a7b44-76d0-48a2-9016-c7a088ae0a09",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4586312,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "97ae31ad-02bf-4fef-8e02-184d39854898",
+  "items": [],
+  "proposedDate": 1761836910412,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d4789997-0bff-4d9e-b86a-32bc45458608",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761105561096,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "56bb4ce2-4b1b-40a5-b0ec-66a1bc049039",
+  "items": [
+   {
+    "playerId": 12483,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4372071,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761780702055,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ed2d526f-9ebd-4a32-8de8-3e59869cae4b",
+  "items": [
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761506084048,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "124bc4ae-090f-495f-965a-1fef7362e7fd",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760391436383,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b8bd4698-ad68-497c-af0b-c9e54f1e9470",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "40ff6bf4-b55a-473d-bf3c-39437ca79b2e",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761105622882,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "10114efc-0e38-4728-93a0-4509cd38e0f7",
+  "items": [
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4429059,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761583946308,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 79,
+  "id": "902afbc4-3a5a-442b-b474-9164c6f7e963",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695404,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "5cc1fd2a-3241-4bb9-8df1-7987254c6589",
+  "items": [
+   {
+    "playerId": 4686422,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761894575489,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 43,
+  "id": "9f89b4d6-d1e6-491a-b736-35a40c1662e2",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4608810,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "38e99fd1-5d45-4e46-880b-f0b5a32bf3eb",
+  "items": [
+   {
+    "playerId": 3045523,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761923817948,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e569470a-3986-41b1-a601-05d4da389a04",
+  "items": [
+   {
+    "playerId": -16030,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "635cc199-87df-4d18-a60c-fc30fa03ba71",
+  "items": [
+   {
+    "playerId": -16013,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4372019,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762109216827,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3af099e7-027b-48e0-b2ab-89d26ff8973a",
+  "items": [
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4430878,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761583939075,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "862932a3-29c3-48aa-8a10-dc33a51a0e5d",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16007,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761583952542,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9b6f5d55-7160-4480-a671-349fdeaa05b9",
+  "items": [
+   {
+    "playerId": 3917315,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4430871,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761782358855,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "69aedee5-86db-4fc6-af00-14eb6844f048",
+  "items": [
+   {
+    "playerId": -16011,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761778990064,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c98fcfbe-a2ba-4e6e-8ae1-869f89b3a261",
+  "items": [
+   {
+    "playerId": 4711533,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4682652,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1705c6b3-f695-4b7e-941c-10eb942ec1d6",
+  "items": [
+   {
+    "playerId": 4808766,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4429148,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509024324,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e72b7bb3-1d5c-42bb-a555-7749b83ffc24",
+  "items": [
+   {
+    "playerId": 11252,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761923685331,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6bc20e51-4265-43ed-a77f-56ab85b52727",
+  "items": [
+   {
+    "playerId": -16011,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16005,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761810260985,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "9da7561e-f492-426c-ab47-2495261679d4",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16001,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 22,
+  "id": "e4e606d2-35a1-407e-8302-58639ee399b9",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4682652,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e1345209-0fb5-48cb-a48c-04b3af94aa10",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761156350570,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0c38fcfa-8d6f-466a-8d86-4ffc83b932af",
+  "items": [
+   {
+    "playerId": -16004,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761923747160,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "83012392-82ad-4b46-948d-7f12131b7f3f",
+  "items": [
+   {
+    "playerId": 3046779,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3917315,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762090077197,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "220192b5-14c5-4588-ad53-444439f10cc5",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a3f8d308-3c56-41ca-8769-1e62772874e2",
+  "items": [
+   {
+    "playerId": 4429096,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761783718852,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 62,
+  "id": "382da9ff-055f-42e5-9403-1c1e0281b832",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686422,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5b0c5d5d-8034-4412-a1ae-11a40fb73325",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761782130725,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "7840c17d-aa9e-429f-8f9c-7696c120a964",
+  "items": [
+   {
+    "playerId": 4431268,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4243331,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c5722bc0-9835-4baf-a7e9-3ef5bb249762",
+  "items": [
+   {
+    "playerId": 4686422,
+    "type": "DROP"
+   },
+   {
+    "playerId": 4877706,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761783225416,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ee3051f2-5a1c-434a-b624-a4d6031d0813",
+  "items": [
+   {
+    "playerId": 4586312,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4258173,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509018123,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "efaeeb7f-0bf6-4f69-8934-bf566779e6c7",
+  "items": [
+   {
+    "playerId": 4695404,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4596602,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761810260985,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5b649bf5-0934-4597-b2f6-f5530b345235",
+  "items": [
+   {
+    "playerId": -16033,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f2d5bc83-13f3-4dc4-8ed1-dfb87a367bc7",
+  "items": [
+   {
+    "playerId": -16033,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16002,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761744874526,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5435850c-832a-4a6f-9b99-e372b6016ee2",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16021,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761509027569,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 31,
+  "id": "f2fea027-3f04-4b5a-b8e8-63f8dc0561ee",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4586312,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "29428c61-7d43-46e4-8760-75dc89b253ed",
+  "items": [
+   {
+    "playerId": -16030,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16023,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8efd6a60-3600-4719-817d-b0699ef8bf9f",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1761750354869,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 41,
+  "id": "54ad0511-c443-48b2-8609-9c73f6ac9411",
+  "items": [
+   {
+    "playerId": 4360516,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4596602,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1761723488712,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 15,
+  "id": "19cde73e-9880-4b81-aad0-0fc9adbe0018",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4608810,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3af6870e-0f48-4cb5-9543-f3f98a004905",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761708845025,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "63098c3f-dda2-4b69-9688-39edefada02c",
+  "items": [
+   {
+    "playerId": 4371733,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3116389,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762711473215,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "537e96a6-a7cb-49a3-9e7d-7e159755c57a",
+  "items": [
+   {
+    "playerId": 4723086,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "54e7ba50-baa9-48e0-a001-0e08e7d91d65",
+  "items": [
+   {
+    "playerId": 4723086,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "18735b26-1e9f-4c7d-8c74-c6aa0bd40627",
+  "items": [
+   {
+    "playerId": 4431611,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3917792,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762132094112,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4b4587b6-dea6-47d7-b0a7-1331d9b6fbd0",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759245617993,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d8c5f8a0-329f-43a3-b1d3-e0ee156e5ac6",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1757708827570,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5ce9c614-ab2c-4346-af92-15352168e5e5",
+  "items": [
+   {
+    "playerId": 3929630,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762132102540,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "454b4f38-2376-4f85-980b-0a3cfd8ddd7a",
+  "items": [
+   {
+    "playerId": 4432620,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "056df778-6510-400e-a131-e6e63fb82616",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d34bc4a9-d825-428b-a725-f926cfdd9295",
+  "items": [
+   {
+    "playerId": 4426354,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876316583,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4e3ca1fc-9e36-4b67-a123-0c75d3899353",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762533961511,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "567124ec-8f29-4975-b2f0-85f9f77473f9",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761708835306,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "27494372-aac8-4b41-804e-7f7d61759ea3",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762726596647,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7fa43012-a1d5-4f51-b2cf-3187e394303a",
+  "items": [
+   {
+    "playerId": 3912547,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762701714033,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "07b27829-3814-4c32-8ac5-d6b396e14d41",
+  "items": [
+   {
+    "playerId": 4427600,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5081397,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762613324234,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "79e09ee5-33e0-4410-9ff7-39365dde5d43",
+  "items": [
+   {
+    "playerId": -16006,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4877706,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1228d6af-1382-4b24-a2c4-cf0079a2a7d6",
+  "items": [
+   {
+    "playerId": 4711533,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762299760762,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b51f8a66-73d7-4d6c-a01e-81ea05aa3d8d",
+  "items": [
+   {
+    "playerId": 4433970,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762354293106,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "0c3e1f84-3ac3-4d80-9eef-80b915506d53",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 3,
+  "id": "8e1b06a3-61da-44b6-b231-9bd955e4028d",
+  "items": [
+   {
+    "playerId": -16005,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "90c0615c-7d6e-489b-bb73-48d79e46f2ec",
+  "items": [
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4241478,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762132122875,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "7e7619f0-7325-4846-baaa-27c1080fb39f",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9cc7fdc9-b313-40fc-8547-67640b746d06",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762300099835,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 11,
+  "id": "7151324c-17a7-4f5f-9f99-c063e109f3e4",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3046779,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "306c7260-3a28-4795-a408-b4c04435e6a1",
+  "items": [
+   {
+    "playerId": -16029,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "d5023cb8-0673-4fcb-923a-8a2fcc7cdecd",
+  "items": [
+   {
+    "playerId": 4723086,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "95b37baa-0141-43e7-a526-78239405c2c5",
+  "items": [
+   {
+    "playerId": 4686612,
+    "type": "ADD"
+   },
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762711554661,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c855d9c1-0218-44e5-b934-572102d7652d",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876297939,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "640213e5-c4fc-4556-b24b-795dfad120b5",
+  "items": [
+   {
+    "playerId": 4602667,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4243331,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "ee259ba4-057f-4118-9026-b98341c36b6e",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 8439,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 5,
+  "id": "72809af7-d689-4afb-b0b2-5bff9d5a4e94",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16003,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762329828248,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "204fe462-4556-446a-894d-666f9e3dae78",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762533971159,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ab3bdfa9-8769-419c-a832-acf48dabc87e",
+  "items": [
+   {
+    "playerId": 4426354,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1756876307765,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "16cc06ef-eed4-4f76-83fb-ddf5b4022047",
+  "items": [
+   {
+    "playerId": 4427728,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763049134241,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6c84162d-21af-4d88-8639-8eb1f742cb76",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4431268,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763026040361,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e6337445-0c44-46fd-851b-3de7d87ba404",
+  "items": [
+   {
+    "playerId": 2991662,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2fbf1307-4a6e-4e2c-97b9-d6c95a5be8a4",
+  "items": [
+   {
+    "playerId": 4433970,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763089812908,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "f9fbc3da-36f6-4ad5-a9aa-907cf9e85d21",
+  "items": [
+   {
+    "playerId": 11252,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4036378,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "52996b3e-b8e4-4901-9226-7c7eff995d58",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16029,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ffe942da-53b6-4a41-a2c6-1dc921063a44",
+  "items": [
+   {
+    "playerId": 4362619,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695404,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762960499553,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "22f4eb78-86ca-4831-9c01-c27855487246",
+  "items": [
+   {
+    "playerId": 4427728,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4429059,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762780646953,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1f6134fb-a276-478c-a364-0d22c00a71a5",
+  "items": [
+   {
+    "playerId": 4361370,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762780639624,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "89aec4f9-e46d-4f3f-b532-f960a8769e03",
+  "items": [
+   {
+    "playerId": 4361370,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4431268,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1762780667143,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 15,
+  "id": "e39571e5-e875-4bf9-9886-d25ef59a3925",
+  "items": [
+   {
+    "playerId": 4608810,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a34249da-d2c9-41a0-8974-8d0241e5dafe",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762920865015,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a0291b35-415a-4868-b64e-782ab8cce6a8",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763143931922,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "d685a9a2-168b-4c64-90db-096d439cfe51",
+  "items": [
+   {
+    "playerId": 4362478,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427728,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "8a0e6ab0-0657-46df-8796-9dedfbb1f2e6",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427600,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3ee5d8d1-100b-40e8-800a-849ef5e3d61e",
+  "items": [
+   {
+    "playerId": -16015,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16002,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762964423823,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "736153c0-49ef-4730-b140-72444d160b49",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16011,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d785984a-b8c8-4fa5-9a99-5b374706b99c",
+  "items": [
+   {
+    "playerId": 4369863,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762878511961,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "62f79609-a040-42f5-8a37-b343353781da",
+  "items": [
+   {
+    "playerId": -16012,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a5c8e5f3-2573-4695-bf1e-f3ac7f74560d",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761708868351,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4af135b0-6e60-49c2-be25-58f9ed2a63b0",
+  "items": [
+   {
+    "playerId": 3915511,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427728,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d12e5dbe-84bb-400b-8b48-5fad01d87b58",
+  "items": [
+   {
+    "playerId": 4036378,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3912547,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763304378971,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "ac018a9c-1eec-45f0-a753-f8871438576a",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4433970,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "886e894e-420b-45cc-959d-b942ce9b07dd",
+  "items": [
+   {
+    "playerId": -16009,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9fd71538-b91d-4a2d-8d5e-015fb87e87ec",
+  "items": [
+   {
+    "playerId": 4685278,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429023,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762982151535,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7d548560-5bd6-4949-aca6-0b14f1b4b513",
+  "items": [
+   {
+    "playerId": -16001,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16030,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9121937c-d85e-4b15-96af-bd62bd8886fd",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4426354,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1759774572735,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1052a78c-2f10-404c-8cf3-8049642a4573",
+  "items": [
+   {
+    "playerId": -16003,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7c8b5e0f-5f9f-4f2c-b8fe-f72b723e9524",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "4eace355-a038-4f83-bbb8-a2f4fc21b49d",
+  "items": [
+   {
+    "playerId": 4608810,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808766,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "63757b65-0111-41d2-a84a-8f28803f582c",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "04001f17-79a0-4d60-8b97-7455ab4d8c29",
+  "items": [
+   {
+    "playerId": 3915511,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0ef163d9-315f-42e9-ad63-34ac932e9c75",
+  "items": [
+   {
+    "playerId": 4597500,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4701936,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762993529641,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "c89996c9-c7d7-4f65-8607-bbcd2444635a",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427728,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 1,
+  "id": "51e1d3d4-c78c-4833-82ac-d9235b615b2e",
+  "items": [
+   {
+    "playerId": 4243331,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1762934787517,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 9,
+  "id": "4e1e738d-ffb8-4cd7-ae16-ea9fba748515",
+  "items": [
+   {
+    "playerId": 4361741,
+    "type": "ADD"
+   },
+   {
+    "playerId": 11252,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "3579bc45-51ed-42f7-9033-773225da2b04",
+  "items": [
+   {
+    "playerId": 4361741,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4243331,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2b65d0ec-6f26-4991-9ddf-f628b4124841",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758163617882,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "64ab616f-c250-42a6-a93b-ee9aba47fe58",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362478,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7077906a-36ea-4200-a645-6f07acffd546",
+  "items": [
+   {
+    "playerId": 4242433,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4608810,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763684793953,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "91e6364b-313d-434d-b09e-f7f4a4dc6d9b",
+  "items": [
+   {
+    "playerId": 4360761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d636acde-813d-40c9-9fd0-6cc2e0baee23",
+  "items": [
+   {
+    "playerId": -16013,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16015,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763605245332,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "81b96a9c-0121-4769-a055-36bf989f4263",
+  "items": [
+   {
+    "playerId": 4361370,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763438989273,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "cc8fbd17-b013-42c7-bcd6-f219cca1c7f9",
+  "items": [
+   {
+    "playerId": 2578570,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4243331,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7c9b5858-9a8f-436b-97c5-e962260c0a86",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16008,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758170673313,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "854a7502-f13e-4e95-ad80-6536ec36037f",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "08bb088e-6b78-4870-b074-d4b1e89f214b",
+  "items": [
+   {
+    "playerId": 4040761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3045523,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763600704751,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1de098c3-2ce4-489d-a4d2-062d29883ee9",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758163608471,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "fb9ff64f-db4e-4fa1-b934-5816d45c324f",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362478,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6e0e2f73-a617-45e4-9c6a-773dfb718535",
+  "items": [
+   {
+    "playerId": 3128429,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758163596841,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 8,
+  "id": "7b83a141-eea1-4b5e-ba87-839afe5a3bf6",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4427728,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6f8514b3-6d5e-4c06-9bb1-86bcaf281929",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758163628244,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d03197d1-8018-4301-b7dd-5e11d7adafd8",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763686437588,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9c71a6a0-ab81-44ad-81fb-93524a56010f",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4431611,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763341243678,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 20,
+  "id": "c9478f8b-986c-492e-b974-943d7ac38249",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4602667,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f824202a-de32-469e-9231-fe4f9e4bbd79",
+  "items": [
+   {
+    "playerId": 3149687,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763729732485,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 10,
+  "id": "36843421-3a67-430f-bbd1-f46591c712ff",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3925357,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_TRADE_RESERVED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6b23d622-0201-4530-b2cd-869671c408c5",
+  "items": [
+   {
+    "playerId": 4368003,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16006,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763565078542,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "58c94507-1b77-4952-82bf-266502c0c5d9",
+  "items": [
+   {
+    "playerId": 3925357,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763565040022,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "23e5b92b-5bf4-4c31-9976-6dccd31ecb67",
+  "items": [
+   {
+    "playerId": -16003,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763487983911,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d516ec4a-7cdb-413c-9c1e-2f9ffe3a3abd",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16027,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763684649470,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "34cba455-0ad6-43bf-8dd6-d451aa7e0b59",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 8439,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "db405fa8-7dcd-4464-a76a-ef7a6192296d",
+  "items": [
+   {
+    "playerId": -16021,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16003,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763341240118,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e068b685-2288-463f-a77c-be1cab5b5fcd",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4602667,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763556541472,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 45,
+  "id": "fbd72bd6-0f1d-4574-977a-5c1b56e48a7e",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3925357,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_TRADE_RESERVED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "147f7431-e930-4856-9ce5-be6080daafef",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3128720,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5443adec-d710-4509-8acd-0e5c02902d55",
+  "items": [
+   {
+    "playerId": 4426354,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1758170635991,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "f60b93b5-3154-457f-8fab-e53391f8fe97",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685247,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f2bc6952-fa55-4757-af75-e22cb933a141",
+  "items": [
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4426515,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763341257473,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "a8f8039a-2e0b-481f-a2c4-9c14af1a13b8",
+  "items": [
+   {
+    "playerId": -16030,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "503f2cb5-0358-427c-8d4c-0097594b77c0",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761604429918,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "44eb4b05-d014-4ffa-8ecb-10209834e99f",
+  "items": [
+   {
+    "playerId": 4567096,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4635008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 21,
+  "id": "2bc2cccd-b521-476d-b531-2836eae38cd9",
+  "items": [
+   {
+    "playerId": 4887558,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "e94c95ca-72a0-4e82-8952-8645dc991e91",
+  "items": [
+   {
+    "playerId": 4360761,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3925357,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_TRADE_RESERVED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "2b713a31-72cf-4849-8c9d-88bf797829aa",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763543139921,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6cdc830b-d9b4-446d-8dc4-9cb25e57b49f",
+  "items": [
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760391471669,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c2a6ae9d-f984-40a1-8143-0a3361bb7f23",
+  "items": [
+   {
+    "playerId": 4427728,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1763870394348,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c22b8be1-cc59-4967-bf8c-aa73b563615e",
+  "items": [
+   {
+    "playerId": 4431268,
+    "type": "ADD"
+   },
+   {
+    "playerId": 16460,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1763684631505,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "911cde76-d8e3-4cf8-a610-3ebfa1a23ba5",
+  "items": [
+   {
+    "playerId": 4432762,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3116365,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764169914901,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 25,
+  "id": "d440b4c4-870e-4231-84b6-6d54e384e424",
+  "items": [
+   {
+    "playerId": 4682652,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429022,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "7b406063-6722-404a-9387-97f7b3900d99",
+  "items": [
+   {
+    "playerId": -16025,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "8cb9f975-ef31-4cf7-80ba-c62ed01993e8",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16008,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c50a95ae-48b6-44c5-a22f-de428a555e74",
+  "items": [
+   {
+    "playerId": 4362249,
+    "type": "ADD"
+   },
+   {
+    "playerId": 2991662,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d3eca3ed-a7e5-4bb7-96f9-0a7c3ad387a6",
+  "items": [
+   {
+    "playerId": 16731,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4242433,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "02f4293a-5cf4-4269-8662-5121c2cf840d",
+  "items": [
+   {
+    "playerId": 4430871,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764517926718,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a145a969-2d8b-4c27-8a0f-428272ecc531",
+  "items": [
+   {
+    "playerId": 4047365,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4887558,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763749522873,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fe22f55e-da65-48a9-bde9-9bd8c9d5758a",
+  "items": [
+   {
+    "playerId": 4426515,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2991662,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763749529574,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6fc62bb7-133f-4d3c-a6a9-c5b14072b4ab",
+  "items": [
+   {
+    "playerId": 3149687,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764263823677,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4fa6b88c-1643-497f-83f5-6aaf025c0eea",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3128429,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764017693173,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "02a42079-b08b-4399-a661-b321c052c4ba",
+  "items": [
+   {
+    "playerId": 3117256,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764263807532,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "49b3f031-edb3-4797-8edb-2861481eba73",
+  "items": [
+   {
+    "playerId": 4373678,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2991662,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764039737859,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4d312236-a12c-4880-b3b8-651018eb8d8b",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763529474441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7932b227-8b20-4455-bd7e-80fdf2cfa2d6",
+  "items": [
+   {
+    "playerId": 4596334,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764263834773,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "df2fb808-4c99-4c8d-a307-8188a0518857",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16001,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764367780929,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ff95f00d-8407-4b30-8a73-314e50b63141",
+  "items": [
+   {
+    "playerId": 4608810,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3128720,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764176218179,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "58403232-f49f-4192-9a18-d0ecded786a0",
+  "items": [
+   {
+    "playerId": 4430539,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3117256,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fdf8bcc3-f8cb-4049-9ad3-8a3f6d3ee30f",
+  "items": [
+   {
+    "playerId": 4428718,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4808839,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764367722108,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "65c63083-3fa0-4661-9b45-037f1bde6788",
+  "items": [
+   {
+    "playerId": 4360310,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4433970,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764169981106,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b49f0d16-c687-44be-b964-1d68524c9712",
+  "items": [
+   {
+    "playerId": 4682652,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3149687,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "683b7ae0-bc17-45f6-b857-9c6f3768084f",
+  "items": [
+   {
+    "playerId": 4682652,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "74d8a3c6-d050-4ed3-b639-80c1c059a789",
+  "items": [
+   {
+    "playerId": 4242540,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764146417519,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cda819e0-6d9b-4e88-9393-9a21c944d220",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764017710879,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7d4b1006-d676-42f7-9591-87b8abbefebd",
+  "items": [
+   {
+    "playerId": 4368003,
+    "type": "DROP"
+   },
+   {
+    "playerId": 4428718,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764122543048,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "2c7b0338-ba26-4a2b-b50a-8dd13f65bbb9",
+  "items": [
+   {
+    "playerId": 2576925,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4685279,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "a896c88c-8fce-42bb-a214-f9ff63fc0fb5",
+  "items": [
+   {
+    "playerId": 3116365,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4723086,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e7e9c193-a5e2-4094-a1bf-502179e9278f",
+  "items": [
+   {
+    "playerId": 4242557,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916945,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765135998276,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a8882f33-bae5-49d2-bcd9-56abeb029531",
+  "items": [
+   {
+    "playerId": 4360761,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3126486,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764608738636,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c1fb82f9-9034-433f-b221-001456abb3dc",
+  "items": [
+   {
+    "playerId": 4429013,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7d143d74-4ef8-45c7-b664-618a7e5f49df",
+  "items": [
+   {
+    "playerId": -16006,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c5ef72ac-8359-4170-9201-95da722c48e4",
+  "items": [
+   {
+    "playerId": 4711533,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764718967059,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "4966e507-9585-4f10-8ce6-37f1f22d0116",
+  "items": [
+   {
+    "playerId": 5123663,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b18e94f8-fc43-4c5f-bc79-7685acce1020",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4877706,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764524803358,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b5823be6-c054-48a1-a4c9-a162f74935c1",
+  "items": [
+   {
+    "playerId": 16460,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4686472,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "adddc828-1b6d-41ff-b772-8dc899ca2bfc",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4688813,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764773663908,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "47e945ce-3015-4974-a451-e57bb24f83ff",
+  "items": [
+   {
+    "playerId": 4711533,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4429013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764797954286,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d1951770-ed04-41b0-afcd-840e0cd297a8",
+  "items": [
+   {
+    "playerId": 4428209,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764718773805,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5257e131-4801-407f-8719-12fec769950b",
+  "items": [
+   {
+    "playerId": 3116365,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764690214364,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e4ec2b79-6259-4da2-9500-964259e44008",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760391481150,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "11ea6843-5e08-4cb2-82a1-7b3b6ab8b138",
+  "items": [
+   {
+    "playerId": 4877706,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764547284006,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0c658b88-4e08-4d7d-a0ac-2da426ff7fff",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361432,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764524781115,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a1fc8d18-69ba-46e8-b48a-e821355f0209",
+  "items": [
+   {
+    "playerId": 4600981,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16024,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765140069990,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1cd1b14c-2546-4a4c-9c66-718390577c47",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3128429,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760391498724,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4bce6f06-2742-4c35-8722-605f5743e0bb",
+  "items": [
+   {
+    "playerId": 4696981,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1760391488029,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "24e0dbce-f2c0-4627-8a55-39f960f51f3f",
+  "items": [
+   {
+    "playerId": 4360761,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4361370,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764608713788,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "517f3b5a-6c9a-4e72-a4a0-f637cd44d270",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761604444271,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "9b4b7005-72a7-4b91-8abe-7efe9ed6bb81",
+  "items": [
+   {
+    "playerId": 3117251,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362619,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764608727072,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 33,
+  "id": "a58bf014-ba35-4004-91eb-2e96aed5db34",
+  "items": [
+   {
+    "playerId": 3116365,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4575131,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "0578dacf-7cfa-409d-8ba0-5a50ee926f27",
+  "items": [
+   {
+    "playerId": 2576925,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4575131,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1cdf52ac-70fe-4123-862a-26b043e57b32",
+  "items": [
+   {
+    "playerId": 4239996,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763567410550,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "cc7f0266-a3df-478b-8802-8656284e2936",
+  "items": [
+   {
+    "playerId": -16028,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16013,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764785348155,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "3cc3f576-25ec-4c38-b9c5-fbfc67a9fb4f",
+  "items": [
+   {
+    "playerId": 5123663,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4575131,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "0e457e7b-3cc3-46e6-9fc7-77cbc9b43e07",
+  "items": [
+   {
+    "playerId": 4432620,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764718779608,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 4,
+  "id": "66d897eb-e16f-4541-a4ec-1e98b107641e",
+  "items": [
+   {
+    "playerId": 3912547,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360438,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1764753987343,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "666b4187-7780-4e96-b96a-feb837d25f97",
+  "items": [
+   {
+    "playerId": 4428209,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16005,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765733167357,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "00ee8ca8-b180-412c-8183-c34b4534f1eb",
+  "items": [
+   {
+    "playerId": 3917792,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765305297889,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4cd0cf33-8e25-4895-96f2-ab12c0ec1b4e",
+  "items": [
+   {
+    "playerId": -16019,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16028,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765465347820,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b283a6c6-fdb0-487f-96a6-96ca0d044090",
+  "items": [
+   {
+    "playerId": 3916945,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4242540,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765499655679,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a282673e-dddd-4d15-a851-406c73390f4f",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1764547306263,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "b0a72517-73f6-45aa-bee3-e4d96dc77e22",
+  "items": [
+   {
+    "playerId": 4432577,
+    "type": "ADD"
+   },
+   {
+    "playerId": 2578570,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 1,
+  "id": "8642d8b7-37aa-4cdf-a39d-5af977041138",
+  "items": [
+   {
+    "playerId": 4682745,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4711533,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "947d6970-19e6-463b-a9ac-c52bfd74d9bc",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1765236211504,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "2114f0f9-f2ca-40b5-9b82-5d9bae19becc",
+  "items": [
+   {
+    "playerId": -16024,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4038441,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765542123334,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7841b793-8870-4d0f-bfb2-9c8868ba5a43",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3116365,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765330108303,
+  "status": "CANCELED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "661947fb-4c97-400f-a4a0-457dabfba984",
+  "items": [
+   {
+    "playerId": -16003,
+    "type": "ADD"
+   },
+   {
+    "playerId": 5123663,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b0891626-c2f3-4176-90df-c193c12fba4b",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761604454668,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "b88bdb89-a531-4e2d-b081-d379d4e26d2d",
+  "items": [
+   {
+    "playerId": 4361050,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361432,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "50d29a0c-f4f3-4a34-b240-c1fece1b2f14",
+  "items": [
+   {
+    "playerId": 4360438,
+    "type": "ADD"
+   },
+   {
+    "playerId": 16731,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "eb2dc4b4-9b82-4e35-90c0-f5671833160a",
+  "items": [
+   {
+    "playerId": -16006,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16009,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765368615998,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 2,
+  "id": "614e757b-f120-4b72-8e9a-e2f2bfa76a43",
+  "items": [
+   {
+    "playerId": -16008,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4882093,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765354107441,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "dbe38f29-fb3d-4cad-85f3-279eb76b6bcb",
+  "items": [
+   {
+    "playerId": -16025,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16007,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1765771135909,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "c9b9d2e6-1082-46af-8c49-91b04a64dc04",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360078,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "759b93d3-1700-4e72-b8d8-689ad553af7b",
+  "items": [
+   {
+    "playerId": 4428209,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361432,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766132819802,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "04e6d5ec-4706-4825-8ba6-5215395e98f5",
+  "items": [
+   {
+    "playerId": -16018,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16012,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "7ee81cb8-dd39-4dcf-b33e-73d7124a65cd",
+  "items": [
+   {
+    "playerId": 4569682,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4426385,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766081314735,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "1a9ba843-a60c-49fe-87c2-8f29de8d96cf",
+  "items": [
+   {
+    "playerId": -16018,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16003,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "162190e1-649f-491f-9f41-59b8b5c7749d",
+  "items": [
+   {
+    "playerId": 4362478,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4428209,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765991095612,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "d6eba66b-86ab-453e-8526-ebf3baa65632",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16033,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 18,
+  "id": "790d8753-6bd6-474e-bf67-5f77ab8d2163",
+  "items": [
+   {
+    "playerId": 4240657,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361529,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e7265824-000f-45e8-a4dc-6208cee5a94e",
+  "items": [
+   {
+    "playerId": 4569609,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361432,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766279903576,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "91fcfaff-34fb-4846-9e86-b61578e42833",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4682652,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766102942221,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 21,
+  "id": "0c139268-3d1a-4576-89fb-c7affd41eddd",
+  "items": [
+   {
+    "playerId": 4240657,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4426348,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "711980d2-418e-4af1-8b7a-4574a4b57ac2",
+  "items": [
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1765820108354,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b1af3164-34b3-4b21-897d-e6b5184f23f7",
+  "items": [
+   {
+    "playerId": 4429939,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766343899609,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "4704d899-76e6-4e6a-b3bc-6958ba18262b",
+  "items": [
+   {
+    "playerId": 4682652,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1765820149204,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 7,
+  "id": "342af0b8-eefc-4438-82e5-0fd84a850d53",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16003,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 16,
+  "id": "68e03da1-af35-4e1b-bf6a-ec743d52fa6e",
+  "items": [
+   {
+    "playerId": 4240657,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4428209,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "FAILED_INVALIDPLAYERSOURCE"
+ },
+ {
+  "bidAmount": 0,
+  "id": "fd11f126-0f6d-439f-97a1-24c2d7f9e133",
+  "items": [
+   {
+    "playerId": -16025,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766343854224,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "1a40deef-f221-4c9b-b2ae-50ff12253769",
+  "items": [
+   {
+    "playerId": 4695883,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361432,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765995142666,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "614a8e53-e5f9-4ae9-9dcc-e76285251197",
+  "items": [
+   {
+    "playerId": 4429022,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360078,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "FAILED_PLAYERALREADYDROPPED"
+ },
+ {
+  "bidAmount": 6,
+  "id": "b3501ada-e9cc-4405-b2ca-bed2383e3d6c",
+  "items": [
+   {
+    "playerId": 2578570,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4432577,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1765962006255,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "43568d86-e245-482c-8c8b-271caa36298a",
+  "items": [
+   {
+    "playerId": -16004,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16023,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766084184933,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e56c4e94-7e72-4204-bf23-b3aedb0d5644",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3054850,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766255462601,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "a98798ec-8fa5-465c-aaa9-fdf033c4175a",
+  "items": [
+   {
+    "playerId": 3116389,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4240603,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766684591122,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "ba9551f7-753b-4541-922b-57150bd7f9fd",
+  "items": [
+   {
+    "playerId": 4432620,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4695883,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766586143529,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e42da71b-0b48-4605-90b1-93bc34a39d5f",
+  "items": [
+   {
+    "playerId": 4360689,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361050,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766608596721,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "b26da71f-a1dc-48ea-92f4-1a6e28233fe1",
+  "items": [
+   {
+    "playerId": 4240603,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4047650,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766585767658,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "6263f244-0a28-4f4f-b22e-c5593c49eabf",
+  "items": [
+   {
+    "playerId": 4575131,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4362619,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766681649436,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "b105c434-3665-4727-bc7a-c06d395745b0",
+  "items": [
+   {
+    "playerId": 4426385,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766565473615,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 3,
+  "id": "b2850438-8ac6-4812-8d13-c1f4ca57078d",
+  "items": [
+   {
+    "playerId": 2991662,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766565473615,
+  "status": "FAILED_ROSTERLIMIT"
+ },
+ {
+  "bidAmount": 0,
+  "id": "82d3e558-c50b-4ce3-aa0e-d350d8ccff3c",
+  "items": [
+   {
+    "playerId": 4710855,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3116389,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766943790652,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "55c5c869-5b87-4625-a31a-56fb696f02cd",
+  "items": [
+   {
+    "playerId": 5081397,
+    "type": "ADD"
+   },
+   {
+    "playerId": -16018,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766585718896,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "5a0c6418-5548-4686-8db2-8acfe9310d3b",
+  "items": [
+   {
+    "playerId": 15864,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4360569,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766693449561,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "8f660b5c-85fe-4d66-992c-d16fe4c7df60",
+  "items": [
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763482817472,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3500b30b-64df-41c7-99b3-0c7066461547",
+  "items": [
+   {
+    "playerId": 4038941,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3916387,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766701601020,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "38f47cd9-4dbe-48eb-b00a-9cf539029be3",
+  "items": [
+   {
+    "playerId": 2468609,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766608669273,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "33aa7367-2d5f-4aa9-9700-ba4817b1ef25",
+  "items": [
+   {
+    "playerId": 4431299,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 3128429,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1766379350260,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3e0e7d60-bfb5-4730-b682-00e5927c1705",
+  "items": [
+   {
+    "playerId": 4613202,
+    "type": "ADD"
+   },
+   {
+    "playerId": 3912547,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766938623278,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "51962b69-b225-4cc7-b824-4f9db4e6a8ef",
+  "items": [
+   {
+    "playerId": 4242512,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4036378,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766860483648,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "e47fd74a-637f-4444-83d9-bd32eaf90431",
+  "items": [
+   {
+    "playerId": 4038941,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766544469440,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f655adc4-253f-46db-9cf1-4269d8258593",
+  "items": [
+   {
+    "playerId": 4259545,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 4362238,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1766379359164,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 5,
+  "id": "30415c64-fa73-4013-8cdf-eaf26d4db9d7",
+  "items": [
+   {
+    "playerId": 4361432,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766565473615,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3e00bb08-ec76-4257-b837-6c7a0ce30330",
+  "items": [
+   {
+    "playerId": -16034,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": -16026,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1761604474759,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "05bf69b2-2b5f-44f6-9231-9a0b75f5189b",
+  "items": [
+   {
+    "playerId": 3045523,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4040761,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766944851195,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "3a617bc2-7d1f-4726-bbfc-deaafbbdb012",
+  "items": [
+   {
+    "playerId": 15835,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766497369352,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "857d391d-7644-41cd-acf8-223c0d02a85b",
+  "items": [
+   {
+    "playerId": 3128429,
+    "type": "LINEUP"
+   },
+   {
+    "playerId": 2976212,
+    "type": "LINEUP"
+   }
+  ],
+  "proposedDate": 1763482825797,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "05b43209-0fca-4e6b-beb6-d44e8bfed227",
+  "items": [
+   {
+    "playerId": 4688813,
+    "type": "ADD"
+   },
+   {
+    "playerId": 4361432,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766854596373,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "afadd1b9-08fa-4bb2-8533-a2966420e2d5",
+  "items": [
+   {
+    "playerId": 4569609,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766544464398,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 0,
+  "id": "f9778d41-f70f-4178-8b8d-1179877ea63d",
+  "items": [
+   {
+    "playerId": -16002,
+    "type": "DROP"
+   }
+  ],
+  "proposedDate": 1766544473733,
+  "status": "EXECUTED"
+ },
+ {
+  "bidAmount": 12,
+  "id": "113d7740-3ce0-4d5e-aca1-49f244d4a573",
+  "items": [
+   {
+    "playerId": -16023,
+    "type": "ADD"
+   }
+  ],
+  "proposedDate": 1766565473615,
+  "status": "EXECUTED"
+ }
+]
