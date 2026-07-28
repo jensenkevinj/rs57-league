@@ -1,0 +1,21 @@
+# Anything identifying about managers. NEVER commit. See CLAUDE.md / plan §5.
+data/private/
+
+# ESPN cookies (espn_s2, SWID) and any other secrets.
+.env
+*.pickle
+credentials.json
+token.pickle
+
+# Local preview output. The nightly Action owns site/ — that IS committed.
+.preview/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# macOS
+.DS_Store
