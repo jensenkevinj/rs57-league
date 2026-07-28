@@ -205,9 +205,29 @@ Two things to know before diffing against it:
 - **Jayden Daniels is `Kept=TRUE` in the tab and on nobody's roster now.** Dropped after the
   sheet was written. Not a disagreement.
 
-The workbook also holds the `Manually Changed Salaries` tab, which currently lists three
-un-reverted overrides (Saquon Barkley $71, Jaxon Smith-Njigba $19, Jonathan Taylor $32). These
-are **not** loaded yet — `data/manual/` has no overrides file, so `effective_base_salary` has
-nothing to apply and `check_override_balance` has nothing to audit. Wiring them in is
-outstanding work; the sync correctly leaves ESPN's distorted value in `base_salary` and defers
-to the engine, so nothing is wrong today, but the true salaries are not yet represented.
+### The three live overrides are the normal state, not a defect
+
+The workbook's `Manually Changed Salaries` tab lists three un-reverted overrides. **This is how
+the league runs** — the commissioner confirmed it on 2026-07-28. ESPN holds the distorted value
+on purpose until he reverts it before the next draft, which is exactly what
+`SalaryOverride.reverted = False` means. Do not "fix" these.
+
+| Player | ESPN base | actual | delta |
+|---|---|---|---|
+| Jonathan Taylor | 33 | 32 | −1 |
+| Jaxon Smith-Njigba | 18 | 19 | +1 |
+| Saquon Barkley | 68 | 71 | **+3** |
+
+They net to **+$3**, which is precisely the unpaired Saquon Barkley row `CLAUDE.md` describes:
+Taylor and Smith-Njigba are a matched draft-cash pair that cancels, and Saquon's +3 is the
+orphan whose counterparty nobody can identify. So `check_override_balance` will pass against
+this exact set once they are loaded, with Saquon flagged `unpaired_ok`.
+
+They are **not** loaded — `data/manual/` has no overrides file — so `effective_base_salary` has
+nothing to apply and those three players carry ESPN's distorted base in `data/derived/`. Left
+that way by decision, not oversight. The sync is doing the right thing: it never bakes an
+override into the base and always defers to the engine.
+
+The ratchet risk `CLAUDE.md` warns about is handled by the commissioner's own process — he
+reverts in ESPN before the auction, so a re-sync after the draft picks up clean values. The
+sync already prints that reminder while a season is undrafted.

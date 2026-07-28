@@ -118,8 +118,18 @@ unused today because `data/history/` is empty.
 
 ## Still open
 
-- **`data/private/` does not exist yet.** Phase 2 needs it for the name mapping; it is
-  gitignored and never imported by the site generator.
+- **`data/private/` is deferred by decision (2026-07-28).** Real names must not enter the repo,
+  and the commissioner would rather revisit the mapping later than build it now. So **do not
+  create it, and do not design Phase 2 around having it.** Build the stats that key on
+  `espn_team_id` alone — weekly high scores, season points, positional studs, survivor,
+  standings — and leave payout *attribution* until the mapping exists. The prize structure and
+  amounts above need no names; only tying a winner to a manager does.
+
+  This still leaves the acceptance criterion reachable. Report each 2025 winner as a
+  **franchise name**, which is already in `data/derived/` and publishable, and let the
+  commissioner check those against the sheet's first names by eye. That is a one-time human
+  step, not a mapping the repo has to hold — and it is the same shape as Phase 1's workbook
+  diff, which is worth actually running this time.
 - **`Season.consolation_winner_id` has no source.** The keeper engine already consumes it for
   the fee waiver, and it is currently unpopulated for every season. Standings data may supply
   it — the consolation bracket is a playoff result, so check `mStandings` before assuming it
