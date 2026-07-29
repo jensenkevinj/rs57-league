@@ -9,6 +9,57 @@ Phase 2 is: weekly high scores, season points, positional studs, survivor, stand
 `validate.py` wired into CI. *Done when* recomputing 2025 reproduces the `RS57` sheet's prize
 winners exactly.
 
+## Opening prompt
+
+Paste this to start Phase 2 in a fresh session.
+
+> I'm building a fantasy football league app. Read `CLAUDE.md` and `docs/phase-2-notes.md`
+> in full, then execute **Phase 2 only**: derived stats + validation.
+>
+> Scope: weekly high scores, season points, positional studs, survivor, Unlucky, and
+> standings, plus `validate.py` wired into CI. Stop there — no site generation, no admin
+> tool, no history backfill.
+>
+> Read `rs57/espn.py` before writing any ESPN code; Phase 1 already settled the endpoints,
+> the auth question, and the field semantics. `docs/espn-field-semantics.md` matters only if
+> you touch `base_salary` — don't, in this phase.
+>
+> Constraints that are not negotiable:
+> - `keeper_rules.py` stays pure. Put new stats in their own module; don't import I/O into it.
+> - The repo and site are PUBLIC. No real manager names, ever. `data/private/` is deferred
+>   by decision — do not create it, and do not design around having it.
+> - Everything keys on `espn_team_id`. Report winners as franchise names, not people.
+> - The nightly Action owns `data/derived/`. Locally use `--dry-run`.
+> - A REVIEW issue must never pass silently as if it had been checked.
+>
+> Done when recomputing 2025 reproduces the `RS57` sheet's prize winners exactly. **Actually
+> run that check** — the sheet is readable directly through the Drive tooling by id, no
+> export needed. Phase 1 waived its equivalent check as "redundant" and that was wrong: it
+> was hiding a real $5 bug, because a cross-check against one source cannot find what that
+> source does not record. Read the Phase 1 entry in `§13 Corrections` of
+> `rs57-league-app-plan.md` before you decide any verification is unnecessary.
+>
+> Before writing any code, tell me anything in the prize rules that's ambiguous or that
+> you'd have to guess at.
+
+That last line is the same one that opened Phase 0, and it earns its place again — several
+prize rules are recorded nowhere, and each one changes what gets built:
+
+- **Survivor's elimination rule.** The sheet records name/week pairs through week 11 but never
+  says what causes elimination. Lowest score that week, presumably.
+- **Ties on a weekly high score** — split the $10, or a tiebreak?
+- **Most Points (Season)** — regular season only, or through the playoffs? The tab header says
+  "Thru: Week 17" while the high scores stop at 14.
+- **`Unlucky`'s window** — weeks 1-14 like the high scores, or all 17?
+- **Positional studs** — the prize appears to follow the manager who *started* him, which
+  decides whether `mBoxscore` lineup slots are needed at all.
+
+Phase 1's opening prompt is not recorded, and deliberately isn't being backfilled — that phase
+is closed and nobody will read it. The transferable part of it was one instruction: *resolve
+the `keeperValue` vs `keeperValueFuture` question first, before writing the sync.* Front-loading
+the single decision everything rests on is what stopped it being settled implicitly, halfway
+through an implementation. For Phase 2 that decision is the ambiguity list above.
+
 ## The `RS57` sheet is readable — and it is an input, not just an acceptance target
 
 `1ez6Hf1-vUIkj4rnuZR09a1Z6qIefzy-A5UkVchNrxh8`, owned by the commissioner. Prize money is

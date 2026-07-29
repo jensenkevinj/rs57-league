@@ -395,7 +395,11 @@ tracking, and league history. NOT live scoring — that stays on ESPN.
 
 ---
 
-## 12. Opening prompt
+## 12. Phase 0 opening prompt
+
+This is Phase 0's kickoff, written before any code existed — not an index of every phase.
+Later phases carry their own opening prompt at the top of their handoff note, next to the
+context that prompt depends on (`docs/phase-2-notes.md`, and so on). Phase 1's is not recorded.
 
 > I'm building a fantasy football league app. Read `PLAN.md` in full, then execute **Phase 0
 > only**: repo scaffold, `.gitignore`, Pydantic models, and `keeper_rules.py` with full pytest
