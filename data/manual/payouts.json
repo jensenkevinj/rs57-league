@@ -1,0 +1,52 @@
+{
+  "_about": [
+    "What each prize paid, by season. Hand-recorded from the RS57 sheet, one tab per season.",
+    "",
+    "Prize money is league-specific and appears NOWHERE in ESPN, so this sheet is the only",
+    "source for it. There is no second witness to fall back on, which is why this file is",
+    "transcribed rather than derived.",
+    "",
+    "Amounts are per-season, NOT constants. 2023 paid Survivor $50 where 2025 pays $40.",
+    "Resist hard-coding a dollar figure anywhere in the code.",
+    "",
+    "Human-owned, like everything in data/manual/. The nightly Action READS this and must",
+    "never write it.",
+    "",
+    "'stud' is per position and pays four times (QB/RB/WR/TE). 'weekly_high' is per week and",
+    "pays once for each of the 14 regular-season weeks. Both totals are checked against the",
+    "sheet's own column footer by stats.award_prizes."
+  ],
+  "_not_recorded": {
+    "2023": [
+      "2023 is deliberately absent. It paid Survivor $50 and each weekly high score $9.29 —",
+      "a one-off from the season the NFL went to 18 weeks and the pot was divided across the",
+      "extra weeks. The league has since gone back to whole dollars.",
+      "$9.29 is not an integer, and all money in this repo is integer dollars, so Payout",
+      "cannot represent it. Widening the model to floats to carry one retired edge case would",
+      "put floats into every salary in the league. 2023 is a backfill problem for a later",
+      "phase; its 2023 stats still compute, it just gets no payout rows."
+    ]
+  },
+  "seasons": {
+    "2024": {
+      "champion": 500,
+      "second": 200,
+      "third": 100,
+      "most_points": 100,
+      "survivor": 40,
+      "stud": 25,
+      "unlucky": 20,
+      "weekly_high": 10
+    },
+    "2025": {
+      "champion": 500,
+      "second": 200,
+      "third": 100,
+      "most_points": 100,
+      "survivor": 40,
+      "stud": 25,
+      "unlucky": 20,
+      "weekly_high": 10
+    }
+  }
+}

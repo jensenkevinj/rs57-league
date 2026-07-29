@@ -1,5 +1,11 @@
 # Phase 2 handoff — derived stats + validation
 
+> **CLOSED 2026-07-28.** Every open question below is resolved; see "Found during Phase 2" in
+> §13 of `rs57-league-app-plan.md` for the answers and `CLAUDE.md` for the prize rules
+> themselves. The acceptance criterion **was run**: 2025 reproduces the `RS57` sheet exactly,
+> and 2024 does too as an independent second check. `data/private/` was not needed and was not
+> created. The section below is kept as the record of what was open and why.
+
 Written at the end of Phase 1. Everything here is context a fresh session cannot recover from
 the repo alone. Read `CLAUDE.md` first; it holds the rules. `docs/espn-field-semantics.md`
 holds the ESPN field semantics Phase 1 settled. This holds what Phase 2 needs and what is

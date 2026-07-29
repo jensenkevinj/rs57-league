@@ -1,0 +1,118 @@
+{
+  "_about": [
+    "The 2025 prize winners exactly as the RS57 sheet records them. Hand-transcribed ground",
+    "truth, the acceptance target for Phase 2.",
+    "",
+    "Prize money is league-specific and appears nowhere in ESPN, so the sheet is the ONLY",
+    "source for who won what. There is no second witness. That is the whole reason this file",
+    "is transcribed rather than generated: a fixture generated from the engine would agree",
+    "with the engine no matter how wrong the engine was.",
+    "",
+    "If a case here disagrees with the engine, that is a bug or an undocumented rule. Chase it",
+    "down; do not adjust the fixture."
+  ],
+
+  "_identity": [
+    "The sheet names winners by FIRST NAME. This repo and the site it generates are PUBLIC,",
+    "so no real name is recorded here — every winner is an espn_team_id, which is what the",
+    "whole codebase keys on.",
+    "",
+    "The first-name -> espn_team_id mapping used to transcribe this was read from ESPN's own",
+    "public league endpoint (members[].firstName joined through teams[].owners), NOT from a",
+    "private file. data/private/ is deferred by decision and was not created. The mapping was",
+    "used once, in session, to check these winners against the sheet; it is deliberately not",
+    "stored anywhere in the repo. Anyone re-verifying can re-read it from ESPN in a minute.",
+    "",
+    "franchise_name is carried alongside the id purely so the commissioner can eyeball this",
+    "table against the sheet. Team names change every season and must never be keyed on."
+  ],
+
+  "_verified": {
+    "on": "2026-07-28",
+    "source": "RS57 sheet, 2025 tab, id 1ez6Hf1-vUIkj4rnuZR09a1Z6qIefzy-A5UkVchNrxh8",
+    "confirmed": [
+      "All 14 weekly high scores, all 4 positional studs (player, week and score), Unlucky,",
+      "Most Points, Survivor, and the three placings reproduce from ESPN exactly.",
+      "The payouts sum to the sheet's own $1,200.00 column footer."
+    ]
+  },
+
+  "season": 2025,
+
+  "franchise_names": {
+    "t1": "Fake News",
+    "t2": "100yd Reverse Hurdles",
+    "t3": "Jaxian McJigberson",
+    "t4": "Cooking Rice",
+    "t5": "The Infirmary",
+    "t6": "CeeDee Drive",
+    "t7": "Aiyukiddinme? I'm Odunze here",
+    "t8": "Calling Audibles",
+    "t9": "Purdy Good at Fantasy",
+    "t10": "Bijan's Mustard",
+    "t11": "Belichick's  Spy",
+    "t12": "Too Much Moxie"
+  },
+
+  "placings": {
+    "1": "t9",
+    "2": "t4",
+    "3": "t12"
+  },
+
+  "most_points": {"manager_id": "t9", "amount": 100},
+
+  "survivor": {
+    "manager_id": "t10",
+    "amount": 40,
+    "_why": [
+      "The sheet records an elimination week per manager and never states the rule. Lowest",
+      "score among the still-alive reproduces all eleven eliminations in exact order, which is",
+      "what settles it."
+    ],
+    "eliminations": {
+      "1": "t5", "2": "t7", "3": "t3", "4": "t1", "5": "t12", "6": "t8",
+      "7": "t6", "8": "t9", "9": "t11", "10": "t4", "11": "t2"
+    }
+  },
+
+  "studs": [
+    {"position": "QB", "manager_id": "t9", "player": "Josh Allen", "week": 11, "points": 42.68, "amount": 25},
+    {"position": "RB", "manager_id": "t8", "player": "Jahmyr Gibbs", "week": 12, "points": 49.9, "amount": 25},
+    {"position": "WR", "manager_id": "t2", "player": "Puka Nacua", "week": 16, "points": 40.5, "amount": 25},
+    {"position": "TE", "manager_id": "t4", "player": "Kyle Pitts Sr.", "week": 15, "points": 40.1, "amount": 25}
+  ],
+  "_studs_note": [
+    "The WR stud is week 16 and the TE stud is week 15 — both PLAYOFF weeks. Positional studs",
+    "run the whole season, unlike the weekly high scores, which stop at week 14."
+  ],
+
+  "unlucky": {
+    "manager_id": "t3", "week": 14, "points": 127.86, "amount": 20,
+    "_why": "Highest score that still LOST its matchup. One prize per season, not one per week."
+  },
+
+  "weekly_high_scores": {
+    "1":  {"manager_id": "t3",  "points": 129.62},
+    "2":  {"manager_id": "t10", "points": 126.0},
+    "3":  {"manager_id": "t1",  "points": 140.02},
+    "4":  {"manager_id": "t9",  "points": 154.06},
+    "5":  {"manager_id": "t10", "points": 135.32},
+    "6":  {"manager_id": "t10", "points": 182.34},
+    "7":  {"manager_id": "t3",  "points": 138.56},
+    "8":  {"manager_id": "t10", "points": 129.68},
+    "9":  {"manager_id": "t7",  "points": 141.36},
+    "10": {"manager_id": "t10", "points": 130.2},
+    "11": {"manager_id": "t9",  "points": 162.18},
+    "12": {"manager_id": "t8",  "points": 144.68},
+    "13": {"manager_id": "t4",  "points": 123.86},
+    "14": {"manager_id": "t9",  "points": 137.04}
+  },
+
+  "totals_by_manager": {
+    "_about": "The sheet's own Totals column. An independent check on the payout rows.",
+    "t3": 40, "t2": 25, "t1": 10, "t4": 235, "t12": 100, "t6": 0,
+    "t10": 90, "t11": 0, "t9": 655, "t8": 35, "t5": 0, "t7": 10
+  },
+  "pot": 1200
+}

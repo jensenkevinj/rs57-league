@@ -20,5 +20,13 @@ jobs:
       - name: Test
         run: pytest -q
 
-      # Phase 2 adds `python -m rs57.validate` here — cross-file reference checks, no
-      # orphans, no duplicate keeper slots, fee sums correct.
+      # Cross-file reference checks, no orphans, no duplicate keeper slots, fee sums correct,
+      # plus check_base_continuity and check_override_balance. Reads data/ only — it is never
+      # a writer.
+      #
+      # NOT --strict: a REVIEW item is unverified, not wrong, and blocking every push on one
+      # would teach everyone to route around the gate. It is printed and counted instead, and
+      # the run says in as many words that those items have not been checked. Anyone who wants
+      # the harder gate can add --strict here.
+      - name: Validate data/
+        run: python -m rs57.validate

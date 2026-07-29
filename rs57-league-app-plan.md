@@ -491,3 +491,51 @@ Compare `Base` and `Kept` for players present in both.
 Confirmed and unchanged: the $5 tax survives a trade and is cleared only by a drop; a drop and
 re-add is a full reset; a prospect keep never sets the tax flag; repeat prospect claims are
 invalid; there is no salary cap.
+
+### Found during Phase 2
+
+Full detail in `rs57/stats.py`'s module docstring and `fixtures/prize_cases.json`. The prize
+rules now live in `CLAUDE.md`; where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+
+**Every unrecorded prize rule was settled by reproducing the sheet, and two of them are not
+what a reasonable person would guess.** The `RS57` sheet's 2025 tab reproduces exactly — all 14
+weekly high scores, all four studs (player, week *and* score), Survivor's eleven eliminations
+in order, Unlucky, Most Points and the three placings — and so does 2024, independently. The
+non-obvious ones:
+
+- **Positional studs run the whole season, including the playoff weeks.** 2025's WR stud is
+  week 16 and its TE stud is week 15. Only the *weekly high scores* stop at 14.
+- **Most Points is the regular season, weeks 1-14.** 2025 cannot distinguish the two windows —
+  Jack wins either way — but **2023 can**: weeks 1-14 gives Joey, weeks 1-17 gives Aaron, and
+  the sheet says Joe. The tab header reading "Thru: Week 17" is simply wrong. Had this been
+  closed on 2025 alone it would have been a coin flip recorded as a fact.
+- **Survivor eliminates the lowest score among the still-alive**, not the lowest in the league,
+  and its window is `teams - 1` weeks rather than a constant 11.
+
+**§9's `Unlucky` omission is confirmed and cost-bearing**, as Phase 1 recorded: $20 a season,
+awarded once, to the highest score that *lost*. A tie is not a loss.
+
+**Commissioner decisions, 2026-07-28.** `Unlucky` covers the regular season only — no recorded
+season can distinguish the windows, so this is a choice, not a reproduction. Ties **split the
+prize evenly**; no tie has ever occurred in three seasons of the sheet. Money stays integer
+dollars, so an indivisible split pays the floor and reports the remainder as REVIEW rather than
+rounding it away. `Season.consolation_winner_id` is derived and reported for confirmation but
+**never auto-populated** — a 12-team league runs two consolation ladders and ESPN does not say
+which one the league means, and reading it wrong waives the wrong team's fees for a year.
+
+**The 2023 payout question is decided: `Payout.amount` stays `NonNegMoney`.** 2023's $9.29
+weekly prize cannot be represented, and 2023 is therefore absent from
+`data/manual/payouts.json` — its stats still compute, it just gets no payout rows. Widening the
+model to carry one retired edge case would put floats into every salary in the league.
+
+**`data/private/` was not needed and was not created.** ESPN's public league endpoint exposes
+`members[].firstName` joined through `teams[].owners`, which is enough to check the sheet's
+first-name winners against `espn_team_id` in a session without storing anything. The mapping is
+deliberately not in the repo, and `tests/data/espn_scoring_2025.json` is recorded with
+`members` stripped — there is a test asserting no real name is in it.
+
+**Phase 1's "worth revisiting at Phase 2" on `espn-api` was revisited: still no.** Box scores
+are the package's strength, but `fetch_boxscore` is nine lines and its `BoxPlayer` wrapper
+hides `statSourceId` — the difference between what a player scored and what he was *projected*
+to score. Awarding a stud prize off a projection is exactly the kind of silently-wrong answer
+this pipeline exists to prevent.

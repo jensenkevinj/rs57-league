@@ -184,6 +184,177 @@ class WeeklyScore(Base):
     points: float
 
 
+class PlayoffTier(StrEnum):
+    """ESPN's ``playoffTierType``. Weeks 1-14 are all ``NONE``."""
+
+    NONE = "none"
+    WINNERS_BRACKET = "winners_bracket"
+    WINNERS_CONSOLATION_LADDER = "winners_consolation_ladder"
+    LOSERS_CONSOLATION_LADDER = "losers_consolation_ladder"
+
+
+class Matchup(Base):
+    """One head-to-head game. ``away_*`` is ``None`` for a playoff bye.
+
+    The winner is **derived from the points**, not stored. ESPN reports a ``winner`` field and
+    it agrees, but deriving it means ``Unlucky`` — the highest score that still lost — rests on
+    the same numbers everything else does, and a tie can never be silently scored as a loss.
+    """
+
+    season: int
+    week: int
+    tier: PlayoffTier = PlayoffTier.NONE
+    home_manager_id: str
+    home_points: float
+    away_manager_id: str | None = None
+    away_points: float | None = None
+
+    @property
+    def is_bye(self) -> bool:
+        return self.away_manager_id is None
+
+    @property
+    def tied(self) -> bool:
+        return not self.is_bye and self.home_points == self.away_points
+
+    @property
+    def loser(self) -> tuple[str, float] | None:
+        """The losing manager and their score, or ``None`` for a bye or a tie.
+
+        A tie has no loser, so a tied score is never an ``Unlucky`` candidate. That is the
+        rule the prize name implies: you have to actually lose.
+        """
+        if self.is_bye or self.tied:
+            return None
+        if self.home_points < self.away_points:  # type: ignore[operator]
+            return self.home_manager_id, self.home_points
+        return self.away_manager_id, self.away_points  # type: ignore[return-value]
+
+
+class PlayerWeek(Base):
+    """One player's actual scoring in one week, on one manager's roster.
+
+    ``started`` is the whole point of the record: the positional stud prize follows the
+    manager who *started* him, so a 50-point week on somebody's bench wins nothing.
+    """
+
+    season: int
+    week: int
+    manager_id: str
+    espn_player_id: int
+    player_name: str
+    position: Position
+    lineup_slot_id: int
+    started: bool
+    points: float
+
+
+class StandingRow(Base):
+    """A franchise's regular-season record, computed from the matchups rather than read off.
+
+    ``final_rank`` is ESPN's ``rankCalculatedFinal`` — the playoff bracket's answer, which is
+    what pays the champion, 2nd and 3rd. It is deliberately not derivable from this row: the
+    regular-season record does not decide the money.
+    """
+
+    season: int
+    manager_id: str
+    wins: int
+    losses: int
+    ties: int
+    points_for: float
+    points_against: float
+    final_rank: int | None = None
+    playoff_seed: int | None = None
+
+
+class WeeklyHigh(Base):
+    """The top score in one week. ``manager_ids`` holds more than one only on a tie."""
+
+    season: int
+    week: int
+    manager_ids: tuple[str, ...]
+    points: float
+
+
+class SeasonPoints(Base):
+    season: int
+    manager_id: str
+    points: float
+
+
+class StudAward(Base):
+    """The best single *started* week by any player at one position, all season.
+
+    Not a season total — the sheet records a player, a week and a score, and 2025's WR stud
+    (W16) and TE stud (W15) both land in the playoff weeks, so the window is the full season
+    rather than the 14-week regular season the weekly high scores use.
+    """
+
+    season: int
+    position: Position
+    espn_player_id: int
+    player_name: str
+    week: int
+    points: float
+    manager_ids: tuple[str, ...]
+
+
+class SurvivorElimination(Base):
+    season: int
+    week: int
+    manager_ids: tuple[str, ...]
+    points: float
+
+
+class UnluckyAward(Base):
+    """The highest score that still lost its matchup — one per season, not one per week."""
+
+    season: int
+    week: int
+    manager_ids: tuple[str, ...]
+    points: float
+
+
+class PrizeSchedule(Base):
+    """What each prize paid in one season.
+
+    Prize money is league-specific and appears nowhere in ESPN, so this is hand-recorded from
+    the ``RS57`` sheet and lives in ``data/manual/``. Amounts are **per-season, not
+    constants**: 2023 paid Survivor $50 where 2025 pays $40.
+
+    ``NonNegMoney`` throughout, which means 2023's $9.29 weekly high score cannot be
+    represented. That is deliberate — it was a one-off from the 18-week change and the league
+    is back on whole dollars. 2023 is a backfill problem for a later phase, not a reason to put
+    floats into money.
+    """
+
+    season: int
+    champion: NonNegMoney
+    second: NonNegMoney
+    third: NonNegMoney
+    most_points: NonNegMoney
+    survivor: NonNegMoney
+    stud: NonNegMoney
+    """Per position. Paid four times — QB, RB, WR, TE."""
+    unlucky: NonNegMoney
+    weekly_high: NonNegMoney
+    """Per week. Paid once for each of the 14 regular-season weeks."""
+
+    def total(self, weeks: int, positions: int = 4) -> int:
+        """What the season's pot comes to. The sheet's column footer is the check."""
+        return (
+            self.champion
+            + self.second
+            + self.third
+            + self.most_points
+            + self.survivor
+            + self.stud * positions
+            + self.unlucky
+            + self.weekly_high * weeks
+        )
+
+
 class Payout(Base):
     season: int
     label: str

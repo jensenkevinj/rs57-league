@@ -16,9 +16,14 @@ so ``base_salary`` for season Y is ``keeperValueFuture`` once Y has been drafted
 ``keeperValue`` before that. ``draftDetail.drafted`` decides, which is why this needs no
 "before or during the season?" toggle — see ``base_salary_field``.
 
-No third-party HTTP dependency. The four endpoints below are plain unauthenticated GETs and
+No third-party HTTP dependency. The endpoints below are plain unauthenticated GETs and
 ``urllib`` serves them fine; ``espn-api`` would add a dependency, and a layer that hides
-exactly the keeper fields this pipeline turns on, for no gain.
+exactly the keeper fields this pipeline turns on, for no gain. Phase 1 left that decision open
+to revisit at Phase 2, on the grounds that box scores are ``espn-api``'s strength — revisited,
+and the answer is still no: ``fetch_boxscore`` is nine lines, and the wrapper's ``BoxPlayer``
+hides ``statSourceId``, which is the difference between what a player scored and what he was
+projected to score. Awarding a stud prize off a projection is exactly the silent-wrong-answer
+failure this repo keeps guarding against.
 """
 
 from __future__ import annotations
@@ -35,9 +40,13 @@ from typing import Any
 from rs57.models import (
     AcquisitionSource,
     FranchiseName,
+    Matchup,
     Player,
+    PlayerWeek,
+    PlayoffTier,
     Position,
     RosterEntry,
+    WeeklyScore,
 )
 
 HOST = "https://lm-api-reads.fantasy.espn.com"
@@ -59,6 +68,25 @@ drift and raises rather than guessing a position."""
 MIN_ROSTER_SIZE = 10
 """Below this a team's roster is treated as a degraded response, not a small roster. Real
 rosters here run 15-16. A sync that "succeeds" with a short roster would blank a season."""
+
+BENCH_SLOT_IDS = frozenset({20, 21})
+"""``lineupSlotId`` 20 is the bench and 21 is IR. Everything else is a started slot, including
+23 (FLEX), which is why this is a deny-list rather than a list of the starting positions.
+
+The positional stud prize follows the manager who *started* the player, so this set is the
+whole basis of that award. ``stats.check_lineup_totals`` is its witness: started points must
+sum to the team's score for the week, and they do not if this set is wrong."""
+
+ACTUAL_STAT_SOURCE = 0
+"""``statSourceId`` 0 is what a player actually scored; 1 is ESPN's projection. Reading the
+projection would quietly award the stud prizes on the strength of a forecast."""
+
+TIER_BY_NAME: Mapping[str, PlayoffTier] = {
+    "NONE": PlayoffTier.NONE,
+    "WINNERS_BRACKET": PlayoffTier.WINNERS_BRACKET,
+    "WINNERS_CONSOLATION_LADDER": PlayoffTier.WINNERS_CONSOLATION_LADDER,
+    "LOSERS_CONSOLATION_LADDER": PlayoffTier.LOSERS_CONSOLATION_LADDER,
+}
 
 
 class EspnError(RuntimeError):
@@ -152,6 +180,23 @@ class EspnClient:
             team["id"]: team.get("abbrev", "FA")
             for team in data.get("settings", {}).get("proTeams", [])
         }
+
+    def fetch_matchups(self) -> list[dict]:
+        """Every matchup in the season, regular and playoff, with both sides' scores."""
+        return self._league(view=["mMatchupScore", "mScoreboard"]).get("schedule") or []
+
+    def fetch_boxscore(self, week: int) -> list[dict]:
+        """Per-player scoring for one week, with the lineup slot each player filled.
+
+        ``scoringPeriodId`` is load-bearing here for the same reason it is on
+        ``mTransactions2``: without it ESPN answers ``200`` and the roster entries come back
+        for the wrong week. The response is checked for shape rather than trusted on status.
+        """
+        payload = self._league(scoringPeriodId=week, view="mBoxscore")
+        schedule = payload.get("schedule")
+        if schedule is None:
+            raise EspnError(f"no schedule in the week {week} boxscore — schema drift")
+        return schedule
 
     def fetch_transactions(self, scoring_periods: Iterable[int] = range(0, 19)) -> list[dict]:
         """Every transaction for the season, de-duplicated.
@@ -464,4 +509,200 @@ def build_season(
         warnings=tuple(warnings),
         waiver_bases_verified=verified_waivers,
         waiver_base_mismatches=tuple(sorted(mismatched_waivers)),
+    )
+
+
+@dataclass(frozen=True)
+class SyncedScoring:
+    """One season's scoring side: matchups, weekly totals, and per-player started weeks."""
+
+    season: int
+    regular_season_weeks: int
+    scores: tuple[WeeklyScore, ...]
+    matchups: tuple[Matchup, ...]
+    player_weeks: tuple[PlayerWeek, ...]
+    final_ranks: Mapping[str, int] = field(default_factory=dict)
+    playoff_seeds: Mapping[str, int] = field(default_factory=dict)
+    espn_points: Mapping[str, float] = field(default_factory=dict)
+    """``team.points`` as ESPN reports it — the second witness for the computed standings."""
+    warnings: tuple[str, ...] = ()
+
+
+def _player_points(player: Mapping[str, Any], week: int) -> float:
+    """What the player actually scored in ``week``, never what he was projected to score."""
+    for stat in player.get("stats") or []:
+        if (
+            stat.get("scoringPeriodId") == week
+            and stat.get("statSourceId") == ACTUAL_STAT_SOURCE
+        ):
+            return float(stat.get("appliedTotal") or 0.0)
+    return 0.0
+
+
+def build_scoring_season(
+    client: EspnClient, *, managers: Mapping[int, str] | None = None
+) -> SyncedScoring:
+    """Read one season's scoring from ESPN and map it onto models.
+
+    Only **completed** matchups are mapped. ESPN publishes the full 17-week schedule from
+    preseason onward with every game ``UNDECIDED`` and every score ``0.0``, and carrying those
+    through would hand the weekly high score prize to whoever came first alphabetically at zero
+    points. Boxscores are fetched only for weeks that actually have a result, which also keeps
+    an offseason sync from making seventeen pointless round trips.
+
+    Applies no rule and awards nothing — ``rs57.stats`` does that, and it does it purely.
+    """
+    league = client.fetch_league()
+    teams = league.get("teams") or []
+    if len(teams) != LEAGUE_SIZE:
+        raise EspnError(
+            f"expected {LEAGUE_SIZE} teams for {client.year}, got {len(teams)} — "
+            f"refusing to derive stats from a degraded response"
+        )
+
+    settings = league.get("settings") or {}
+    regular_weeks = (settings.get("scheduleSettings") or {}).get("matchupPeriodCount")
+    if not regular_weeks:
+        raise EspnError(
+            f"{client.year} has no scheduleSettings.matchupPeriodCount — that number decides "
+            f"which weeks the high score, Most Points and Unlucky prizes cover"
+        )
+
+    manager_of = {team["id"]: _manager_id(team["id"], managers) for team in teams}
+    warnings: list[str] = []
+
+    matchups: list[Matchup] = []
+    scores: list[WeeklyScore] = []
+    played_weeks: set[int] = set()
+    undecided = 0
+
+    for raw in client.fetch_matchups():
+        week = raw.get("matchupPeriodId")
+        home, away = raw.get("home"), raw.get("away")
+        if week is None or not home:
+            continue
+        # A playoff bye stays UNDECIDED forever — there is no opponent to beat — but it is a
+        # played week with a real score. Distinguishing it from a genuinely unplayed game
+        # keeps the top seeds' week 15 out of the "still to come" pile.
+        scored_bye = away is None and float(home.get("totalPoints") or 0.0) > 0
+        if raw.get("winner") in (None, "UNDECIDED") and not scored_bye:
+            undecided += 1
+            continue
+
+        tier_name = raw.get("playoffTierType") or "NONE"
+        if tier_name not in TIER_BY_NAME:
+            raise EspnError(f"unknown playoffTierType {tier_name!r} — schema drift")
+
+        home_id = manager_of[home["teamId"]]
+        away_id = manager_of[away["teamId"]] if away else None
+        matchups.append(
+            Matchup(
+                season=client.year,
+                week=week,
+                tier=TIER_BY_NAME[tier_name],
+                home_manager_id=home_id,
+                home_points=float(home.get("totalPoints") or 0.0),
+                away_manager_id=away_id,
+                away_points=float(away.get("totalPoints") or 0.0) if away else None,
+            )
+        )
+        played_weeks.add(week)
+        scores.append(
+            WeeklyScore(
+                season=client.year,
+                week=week,
+                manager_id=home_id,
+                points=float(home.get("totalPoints") or 0.0),
+            )
+        )
+        if away and away_id is not None:
+            scores.append(
+                WeeklyScore(
+                    season=client.year,
+                    week=week,
+                    manager_id=away_id,
+                    points=float(away.get("totalPoints") or 0.0),
+                )
+            )
+
+    player_weeks: list[PlayerWeek] = []
+    unknown_positions: set[int] = set()
+    for week in sorted(played_weeks):
+        for raw in client.fetch_boxscore(week):
+            if raw.get("matchupPeriodId") != week:
+                continue
+            for side in ("home", "away"):
+                team_side = raw.get(side)
+                if not team_side:
+                    continue
+                manager_id = manager_of[team_side["teamId"]]
+                roster = team_side.get("rosterForCurrentScoringPeriod") or {}
+                for entry in roster.get("entries") or []:
+                    pool = entry.get("playerPoolEntry") or {}
+                    player = pool.get("player") or {}
+                    player_id = player.get("id")
+                    position_id = player.get("defaultPositionId")
+                    if player_id is None:
+                        continue
+                    if position_id not in POSITION_BY_ID:
+                        # Not fatal: a stud prize covers four positions, and a started player
+                        # dropped here shows up as a lineup-total mismatch in stats rather
+                        # than vanishing silently.
+                        unknown_positions.add(position_id)
+                        continue
+                    slot = entry.get("lineupSlotId")
+                    player_weeks.append(
+                        PlayerWeek(
+                            season=client.year,
+                            week=week,
+                            manager_id=manager_id,
+                            espn_player_id=player_id,
+                            player_name=player.get("fullName") or f"player {player_id}",
+                            position=POSITION_BY_ID[position_id],
+                            lineup_slot_id=slot,
+                            started=slot not in BENCH_SLOT_IDS,
+                            points=_player_points(player, week),
+                        )
+                    )
+
+    if not matchups:
+        warnings.append(
+            f"{client.year} has no completed matchups yet, so no prize can be awarded. "
+            f"{undecided} scheduled games are still UNDECIDED."
+        )
+    elif len(played_weeks) < regular_weeks:
+        warnings.append(
+            f"only {len(played_weeks)} of {regular_weeks} regular-season weeks have results; "
+            f"the weekly high score prizes for the rest cannot be awarded yet"
+        )
+    if unknown_positions:
+        warnings.append(
+            f"skipped players at unmapped defaultPositionId {sorted(unknown_positions)} — if "
+            f"any of them started, the lineup totals check will disagree with ESPN's score"
+        )
+
+    return SyncedScoring(
+        season=client.year,
+        regular_season_weeks=regular_weeks,
+        scores=tuple(sorted(scores, key=lambda s: (s.week, s.manager_id))),
+        matchups=tuple(sorted(matchups, key=lambda m: (m.week, m.home_manager_id))),
+        player_weeks=tuple(
+            sorted(player_weeks, key=lambda p: (p.week, p.manager_id, p.espn_player_id))
+        ),
+        final_ranks={
+            manager_of[team["id"]]: team["rankCalculatedFinal"]
+            for team in teams
+            if team.get("rankCalculatedFinal")
+        },
+        playoff_seeds={
+            manager_of[team["id"]]: team["playoffSeed"]
+            for team in teams
+            if team.get("playoffSeed")
+        },
+        espn_points={
+            manager_of[team["id"]]: float(team["points"])
+            for team in teams
+            if team.get("points") is not None
+        },
+        warnings=tuple(warnings),
     )
