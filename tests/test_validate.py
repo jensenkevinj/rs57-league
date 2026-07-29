@@ -142,9 +142,9 @@ class TestStatsChecks:
                 review={
                     "issues": [
                         {
-                            "code": "consolation_winner_unconfirmed",
+                            "code": "consolation_seats_mismatch",
                             "severity": "review",
-                            "message": "confirm the consolation bracket",
+                            "message": "the consolation ladder is not the non-playoff teams",
                         }
                     ],
                     "warnings": [],
@@ -152,7 +152,7 @@ class TestStatsChecks:
             ),
         )
         report = validate.run()
-        assert any("confirm the consolation bracket" in m for m in report.reviews)
+        assert any("not the non-playoff teams" in m for m in report.reviews)
         assert report.errors == []
 
     def test_a_recorded_error_blocks(self, data_dir):

@@ -113,6 +113,7 @@ def sync_stats(
         regular_season_weeks=scoring.regular_season_weeks,
         final_ranks=scoring.final_ranks,
         playoff_seeds=scoring.playoff_seeds,
+        playoff_team_count=scoring.playoff_team_count,
         espn_points=scoring.espn_points,
     )
 

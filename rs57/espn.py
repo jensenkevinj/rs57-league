@@ -518,6 +518,7 @@ class SyncedScoring:
 
     season: int
     regular_season_weeks: int
+    playoff_team_count: int
     scores: tuple[WeeklyScore, ...]
     matchups: tuple[Matchup, ...]
     player_weeks: tuple[PlayerWeek, ...]
@@ -567,6 +568,10 @@ def build_scoring_season(
             f"{client.year} has no scheduleSettings.matchupPeriodCount — that number decides "
             f"which weeks the high score, Most Points and Unlucky prizes cover"
         )
+
+    # How many franchises make the playoffs — the rest are the consolation field, and the
+    # best-placed of those has their fees waived the following year.
+    playoff_team_count = (settings.get("scheduleSettings") or {}).get("playoffTeamCount") or 0
 
     manager_of = {team["id"]: _manager_id(team["id"], managers) for team in teams}
     warnings: list[str] = []
@@ -684,6 +689,7 @@ def build_scoring_season(
     return SyncedScoring(
         season=client.year,
         regular_season_weeks=regular_weeks,
+        playoff_team_count=playoff_team_count,
         scores=tuple(sorted(scores, key=lambda s: (s.week, s.manager_id))),
         matchups=tuple(sorted(matchups, key=lambda m: (m.week, m.home_manager_id))),
         player_weeks=tuple(

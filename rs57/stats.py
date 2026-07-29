@@ -82,9 +82,9 @@ class StatIssueCode(StrEnum):
     STANDINGS_POINTS_MISMATCH = "standings_points_mismatch"
     FINAL_RANK_MISSING = "final_rank_missing"
     CHAMPION_BRACKET_MISMATCH = "champion_bracket_mismatch"
-    CONSOLATION_WINNER_UNCONFIRMED = "consolation_winner_unconfirmed"
     PRIZE_TOTAL_MISMATCH = "prize_total_mismatch"
     NO_PRIZE_SCHEDULE = "no_prize_schedule"
+    CONSOLATION_SEATS_MISMATCH = "consolation_seats_mismatch"
 
 
 @dataclass(frozen=True)
@@ -401,23 +401,34 @@ def standings(
 
 
 def consolation_winner(
-    matchups: Iterable[Matchup], final_ranks: Mapping[str, int] | None = None
+    matchups: Iterable[Matchup],
+    final_ranks: Mapping[str, int] | None = None,
+    playoff_seeds: Mapping[str, int] | None = None,
+    playoff_team_count: int | None = None,
 ) -> tuple[tuple[str, ...], list[StatIssue]]:
-    """Who most likely won the consolation bracket, reported for confirmation.
+    """The top finisher among the franchises that missed the playoffs.
 
-    Feeds ``Season.consolation_winner_id``, which waives that franchise's keeper fees for the
-    following year — so it is deliberately **reported, never auto-populated**. Two things make
-    it unsafe to infer:
+    The rule, as the commissioner states it (2026-07-28): the consolation winner is simply the
+    best-placed team of those that did not make the playoffs. Their keeper fees are waived the
+    following year, so ``Season.consolation_winner_id`` reads this one year back — see the
+    warning on that field.
 
-    * A 12-team league runs *two* consolation ladders (``WINNERS_CONSOLATION_LADDER`` for teams
-      knocked out of the playoffs, ``LOSERS_CONSOLATION_LADDER`` for the six that missed) and
-      nothing in ESPN says which one the league means by "the consolation bracket".
-    * A ladder is not a bracket. Its last week is several parallel placement games, not one
-      final, so "who won the last game" has more than one answer.
+    ``LOSERS_CONSOLATION_LADDER`` is what identifies "missed the playoffs" here. It is ESPN's
+    record of who actually played consolation games, which is better evidence than inferring it
+    from a seed number, and in 2023, 2024 and 2025 its membership is exactly the set seeded
+    outside the playoffs.
 
-    So this reports the best-finishing franchise in the losers' ladder — which is the ladder's
-    actual champion, by ESPN's own final ranking — and always draws a REVIEW. Reading it off by
-    one waives the wrong team's fees for a whole season.
+    Two things this deliberately does *not* do:
+
+    * **Not "won the last game".** A ladder's final week is several parallel placement games,
+      not one final. In 2025 that would name three winners.
+    * **Not "went undefeated".** 2024's ladder had four teams at 2-1 and the winner among them
+      was decided on final placing, not on record.
+
+    The seed cross-check is the guard. If ESPN's ladder membership ever stops matching the
+    teams seeded outside the playoffs — a league resize, a disabled consolation ladder, a
+    mid-season withdrawal — the two disagree and that draws a REVIEW, rather than this quietly
+    waiving the wrong franchise's fees for a season.
     """
     ladder = [
         matchup for matchup in matchups if matchup.tier is PlayoffTier.LOSERS_CONSOLATION_LADDER
@@ -427,27 +438,48 @@ def consolation_winner(
 
     entrants = {matchup.home_manager_id for matchup in ladder}
     entrants |= {m.away_manager_id for m in ladder if m.away_manager_id is not None}
-    final_week = max(matchup.week for matchup in ladder)
 
     ranked = {m: r for m, r in (final_ranks or {}).items() if m in entrants}
-    if ranked:
-        best = min(ranked.values())
-        found = tuple(sorted(m for m, r in ranked.items() if r == best))
-        detail = f"finished {best}th overall, the best of the {len(entrants)} in that ladder"
-    else:
-        found = ()
-        detail = "could not be identified — no final ranking was available"
+    if not ranked:
+        return (), [
+            StatIssue(
+                StatIssueCode.CONSOLATION_SEATS_MISMATCH,
+                Severity.REVIEW,
+                f"{len(entrants)} franchises played the consolation ladder but none carries a "
+                f"final ranking, so its winner cannot be placed",
+            )
+        ]
 
-    return found, [
-        StatIssue(
-            StatIssueCode.CONSOLATION_WINNER_UNCONFIRMED,
-            Severity.REVIEW,
-            f"losers' consolation ladder (through week {final_week}): "
-            f"{', '.join(found) or 'nobody'} {detail}. Confirm this is the bracket whose "
-            f"winner gets next season's fees waived before setting consolation_winner_id",
-            week=final_week,
+    best = min(ranked.values())
+    found = tuple(sorted(manager for manager, rank in ranked.items() if rank == best))
+
+    issues: list[StatIssue] = []
+    if playoff_seeds and playoff_team_count:
+        missed = {
+            manager
+            for manager, seed in playoff_seeds.items()
+            if seed > playoff_team_count
+        }
+        if missed != entrants:
+            issues.append(
+                StatIssue(
+                    StatIssueCode.CONSOLATION_SEATS_MISMATCH,
+                    Severity.REVIEW,
+                    f"the consolation ladder holds {sorted(entrants)} but the franchises "
+                    f"seeded outside the top {playoff_team_count} are {sorted(missed)} — these "
+                    f"normally match, and the consolation winner decides whose fees are waived",
+                )
+            )
+    if len(found) > 1:
+        issues.append(
+            StatIssue(
+                StatIssueCode.CONSOLATION_SEATS_MISMATCH,
+                Severity.REVIEW,
+                f"{len(found)} franchises share final rank {best} in the consolation ladder "
+                f"({', '.join(found)}); only one can have their fees waived",
+            )
         )
-    ]
+    return found, issues
 
 
 def check_lineup_totals(
@@ -593,6 +625,7 @@ def compute_season_stats(
     regular_season_weeks: int,
     final_ranks: Mapping[str, int] | None = None,
     playoff_seeds: Mapping[str, int] | None = None,
+    playoff_team_count: int | None = None,
     espn_points: Mapping[str, float] | None = None,
 ) -> SeasonStats:
     """Run every derived stat for one season, in one pass, with all its cross-checks.
@@ -613,7 +646,9 @@ def compute_season_stats(
     issues += survivor_issues
     unlucky_award, unlucky_issues = unlucky(matchups, weeks)
     issues += unlucky_issues
-    consolation, consolation_issues = consolation_winner(matchups, final_ranks)
+    consolation, consolation_issues = consolation_winner(
+        matchups, final_ranks, playoff_seeds, playoff_team_count
+    )
     issues += consolation_issues
 
     rows = standings(matchups, weeks, final_ranks=final_ranks, playoff_seeds=playoff_seeds)

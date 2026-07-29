@@ -298,15 +298,49 @@ class TestCrossChecks:
         wrong = check_champion_won_the_final(final, {"t2": 1, "t1": 2})
         assert [i.code for i in wrong] == [StatIssueCode.CHAMPION_BRACKET_MISMATCH]
 
-    def test_consolation_winner_is_reported_never_asserted(self):
-        ladder = [
+    def _ladder(self):
+        return [
             game(17, "t5", 90.0, "t6", 80.0, tier=PlayoffTier.LOSERS_CONSOLATION_LADDER),
             game(17, "t7", 70.0, "t8", 60.0, tier=PlayoffTier.LOSERS_CONSOLATION_LADDER),
         ]
-        found, issues = consolation_winner(ladder, {"t5": 7, "t6": 9, "t7": 8, "t8": 11})
+
+    def test_the_consolation_winner_is_the_top_finisher_who_missed_the_playoffs(self):
+        found, issues = consolation_winner(
+            self._ladder(),
+            {"t5": 7, "t6": 9, "t7": 8, "t8": 11},
+            {"t5": 7, "t6": 9, "t7": 8, "t8": 11},
+            6,
+        )
         assert found == ("t5",)
-        assert [i.code for i in issues] == [StatIssueCode.CONSOLATION_WINNER_UNCONFIRMED]
+        assert issues == [], "the rule is settled; this no longer needs confirming"
+
+    def test_it_is_not_who_won_the_last_game(self):
+        """Both t5 and t7 won in week 17. A ladder's last week is parallel placement games,
+        so 'won the final' would name two winners; placing is what decides it."""
+        found, _ = consolation_winner(self._ladder(), {"t5": 7, "t6": 9, "t7": 8, "t8": 11})
+        assert found == ("t5",)
+
+    def test_a_ladder_that_is_not_the_non_playoff_teams_draws_a_review(self):
+        """The guard: ESPN's ladder membership and the seeds outside the playoff cut normally
+        agree. If they ever stop agreeing, the fee waiver is pointing somewhere unverified."""
+        found, issues = consolation_winner(
+            self._ladder(),
+            {"t5": 7, "t6": 9, "t7": 8, "t8": 11},
+            {"t5": 7, "t6": 9, "t7": 8, "t8": 11, "t9": 12},  # t9 missed but never played
+            6,
+        )
+        assert found == ("t5",)
+        assert [i.code for i in issues] == [StatIssueCode.CONSOLATION_SEATS_MISMATCH]
         assert issues[0].severity is Severity.REVIEW
+
+    def test_a_tie_on_final_placing_draws_a_review(self):
+        found, issues = consolation_winner(self._ladder(), {"t5": 7, "t6": 9, "t7": 7, "t8": 11})
+        assert found == ("t5", "t7")
+        assert [i.code for i in issues] == [StatIssueCode.CONSOLATION_SEATS_MISMATCH]
+
+    def test_no_ladder_means_no_consolation_winner_and_no_noise(self):
+        found, issues = consolation_winner([game(1, "t1", 100.0, "t2", 90.0)])
+        assert found == () and issues == []
 
 
 class TestSplitPrize:

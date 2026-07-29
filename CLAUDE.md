@@ -31,7 +31,12 @@ tracking, and league history. NOT live scoring — that stays on ESPN.
 - Max 3 keepers + 1 prospect per team
 - salary = base + allocated fee + $5 if kept last year
 - Fee tiers: 1 keeper → $0, 2 → $5, 3 → $15, distributed freely by the manager
-- Consolation bracket winner: fees waived one year (salaries still owed in full)
+- Consolation bracket winner: fees waived one year (salaries still owed in full).
+  **The winner is the top finisher among the teams that missed the playoffs** — best
+  `rankCalculatedFinal` among ESPN's `LOSERS_CONSOLATION_LADDER`, which is exactly that set.
+  NOT "won the last ladder game" (2025 would name three) and NOT "went undefeated" (2024's
+  ladder had four teams at 2-1). Confirmed against 2023/2024/2025; 2024 returns
+  `Bijan's Mustard`, which is the `*` in the 2025 fee allocations.
 - Prospects: ≤1 NFL season, never started by any league team, rostered before the
   trade deadline, kept at acquisition value, no fee allocation
 - There is NO salary cap. Don't add one, don't leave a disabled one lying around.
