@@ -13,9 +13,10 @@ settles it:
 
 * **Weekly high score** — top score of the week, weeks 1-14 only. ESPN's
   ``scheduleSettings.matchupPeriodCount`` is 14 and the sheet pays exactly 14 of them.
-* **Most Points (Season)** — regular season only, weeks 1-14. 2025 cannot tell the difference
-  (Jack wins either way) but **2023 can**: weeks 1-14 gives Joey, weeks 1-17 gives Aaron, and
-  the sheet says Joe. The tab header reading "Thru: Week 17" is wrong.
+* **Most Points (Season)** — regular season only, weeks 1-14. 2025 cannot tell the difference,
+  since the same franchise wins under either window, but **2023 can**: the two windows name
+  *different* franchises there, and the sheet's winner is the one weeks 1-14 picks. The tab
+  header reading "Thru: Week 17" is wrong.
 * **Positional stud** — the best single *started* week by any player at the position, over the
   **whole season including the playoff weeks**. 2025's WR stud is W16 and its TE stud is W15,
   so this window is emphatically not the 14 weeks the high scores use.

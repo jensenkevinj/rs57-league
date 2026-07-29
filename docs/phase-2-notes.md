@@ -123,9 +123,9 @@ Three things in that table matter more than they look:
 
 ## Manager identity is the blocker, and it is a privacy question
 
-The sheet names winners by **first name** ("Champion, $500, Jack"). The standings tabs carry
-**full real names** alongside team names. Nothing keys on `espn_team_id`, which is what this
-codebase keys on.
+The sheet names winners by **first name** — each prize row reads prize, amount, and a person's
+first name, never a team. The standings tabs carry **full real names** alongside team names.
+Nothing keys on `espn_team_id`, which is what this codebase keys on.
 
 So Phase 2 needs a `first name -> espn_team_id` mapping, and that mapping is exactly the kind
 of thing `CLAUDE.md` puts in `data/private/`. **The repo and site are public.** Do not commit

@@ -505,10 +505,11 @@ non-obvious ones:
 
 - **Positional studs run the whole season, including the playoff weeks.** 2025's WR stud is
   week 16 and its TE stud is week 15. Only the *weekly high scores* stop at 14.
-- **Most Points is the regular season, weeks 1-14.** 2025 cannot distinguish the two windows —
-  Jack wins either way — but **2023 can**: weeks 1-14 gives Joey, weeks 1-17 gives Aaron, and
-  the sheet says Joe. The tab header reading "Thru: Week 17" is simply wrong. Had this been
-  closed on 2025 alone it would have been a coin flip recorded as a fact.
+- **Most Points is the regular season, weeks 1-14.** 2025 cannot distinguish the two windows,
+  since the same franchise wins under either — but **2023 can**: the two windows name
+  *different* franchises there, and the sheet's winner is the one weeks 1-14 picks. The tab
+  header reading "Thru: Week 17" is simply wrong. Had this been closed on 2025 alone it would
+  have been a coin flip recorded as a fact.
 - **Survivor eliminates the lowest score among the still-alive**, not the lowest in the league,
   and its window is `teams - 1` weeks rather than a constant 11.
 
