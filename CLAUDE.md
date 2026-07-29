@@ -82,7 +82,7 @@ is flagged `unpaired_ok`.
 
 ## Prize rules
 
-None of these are written down anywhere but the `RS57` sheet, and the plan doc's §9 list is
+None of these are written down anywhere but the `RS57` sheet, and the plan doc's payout list is
 wrong. The engine is `rs57/stats.py`; the ground truth is `fixtures/prize_cases.json`.
 Amounts are **per-season, not constants** — they live in `data/manual/payouts.json`.
 
@@ -95,7 +95,7 @@ Amounts are **per-season, not constants** — they live in `data/manual/payouts.
   {20 bench, 21 IR}. QB/RB/WR/TE only; DEF wins nothing.
 - **Survivor** — lowest score among the **still-alive** goes out each week, last standing
   wins. Runs weeks 1 to `teams - 1`. Derive the window from the league size, don't hardcode 11.
-- **Unlucky** ($20, and §9 omits it entirely) — the single **highest score that still lost**,
+- **Unlucky** ($20, which the plan doc omits) — the single **highest score that still lost**,
   **once per season, not once per week**. Computing it weekly would pay it fourteen times.
   Regular season only (commissioner, 2026-07-28). A tie is not a loss.
 - **Champion / 2nd / 3rd** — ESPN's `rankCalculatedFinal`, cross-checked against the winners'

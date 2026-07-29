@@ -43,7 +43,7 @@ Paste this to start Phase 3 in a fresh session.
 > Done when a manager can answer "what will my keepers cost me next year" from the site without
 > a screenshot. **Actually open the generated pages and read them** — the last two phases each
 > had an acceptance check that a session was tempted to wave through, and one of them was
-> hiding a real $5 bug. Read the Phase 1 and Phase 2 entries in `§13 Corrections` of
+> hiding a real $5 bug. Read the Phase 1 and Phase 2 entries in the Corrections log of
 > `rs57-league-app-plan.md` before you decide any verification is unnecessary.
 >
 > Before writing any code, tell me anything about what belongs on a public page that's
@@ -100,7 +100,7 @@ Four things about that shape will bite if you assume otherwise:
 `CLAUDE.md` describes a nightly Action in the present tense; it is describing the intended
 architecture, not something already running. Nothing has ever written `data/derived/` in CI.
 
-What it has to do, from §3 of the plan: pull ESPN, write `derived/`, read `manual/` +
+What it has to do, from the plan's ownership table: pull ESPN, write `derived/`, read `manual/` +
 `history/`, regenerate `site/`, commit. Notes that are easy to get wrong:
 
 - It must run **both** syncs. `rs57.sync --year <yr>` then `rs57.stats_sync --year <yr>`.
@@ -139,9 +139,10 @@ way.
 
 - **Should the site publish money at all?** Prize amounts, who won what, and totals per
   franchise are all derivable and all currently in `data/derived/`. Whether they belong on a
-  public page that anyone can find is a commissioner call, not a technical one. The plan's §10
-  says "keeper salaries" for Phase 3 and never mentions publishing payouts. Ask first.
-- **Which file is the rules page?** §10 says "rules (Markdown in the repo)" without naming one.
+  public page that anyone can find is a commissioner call, not a technical one. The plan's phase
+  breakdown says "keeper salaries" for Phase 3 and never mentions publishing payouts. Ask first.
+- **Which file is the rules page?** The phase breakdown says "rules (Markdown in the
+  repo)" without naming one.
   `CLAUDE.md` holds the rules today but is written for an agent, not for a league member.
   Probably a new `docs/rules.md`, but that is a decision.
 - **Which seasons get pages?** `data/history/` is empty until Phase 5, so "season history" can
