@@ -437,6 +437,69 @@ class TestTheRookieRuleIsEnforcedThroughRepeatClaims:
         assert not any("prospect" in m for m in report.reviews)
 
 
+class TestGraduatingASeasonIntoHistory:
+    """A season graduates by being frozen; clearing it out of the admin tool is a second,
+    manual step. Between the two, the same claims exist in both files."""
+
+    def test_the_frozen_copy_wins_when_the_two_disagree(self, data_dir):
+        """The hazard is not duplication, it is DIVERGENCE. Both copies feed the ratchet
+        audit, so a manual row edited after the season was frozen would silently override the
+        frozen record and change what the audit compares against."""
+        frozen = dict(_claim(2025, 11), computed_salary=10)
+        edited = dict(_claim(2025, 11), computed_salary=99)
+        write(
+            data_dir / "history" / "2025.json",
+            {
+                "season": 2025,
+                "roster_at_declaration": _declared(2025, 11),
+                "claims": [frozen],
+            },
+        )
+        write(data_dir / "manual" / "claims.json", {"seasons": {"2025": [edited]}})
+        write(
+            data_dir / "derived" / "2026.json",
+            {
+                "season": 2026,
+                "source": {"base_salary_field": "keeperValue", "drafted": False},
+                "franchises": [{"manager_id": "t1", "season": 2026, "name": "Fake News"}],
+                "players": [
+                    {"espn_player_id": 11, "name": "P11", "position": "WR", "nfl_team": "BUF"}
+                ],
+                "roster": [dict(_declared(2026, 11)[0], kept_prior_year=True)],
+            },
+        )
+        report = validate.run()
+        assert not [m for m in report.reviews if "base continuity" in m], (
+            "the edited manual copy overrode the frozen record in the audit"
+        )
+        assert any("already frozen" in m for m in report.reviews)
+
+    def test_an_ungraduated_season_is_still_validated_from_manual(self, data_dir):
+        write(
+            data_dir / "manual" / "claims.json",
+            {"seasons": {"2026": [_claim(2026, 11), _claim(2026, 12, "K2")]}},
+        )
+        # The current season is validated against its pre-draft derived file, which carries
+        # last season's roster forward — the pool its keepers were declared from.
+        write(
+            data_dir / "derived" / "2026.json",
+            {
+                "season": 2026,
+                "source": {"base_salary_field": "keeperValue", "drafted": False},
+                "franchises": [{"manager_id": "t1", "season": 2026, "name": "Fake News"}],
+                "players": [
+                    {"espn_player_id": pid, "name": f"P{pid}", "position": "WR",
+                     "nfl_team": "BUF"}
+                    for pid in (11, 12)
+                ],
+                "roster": _declared(2026, 11, 12),
+            },
+        )
+        report = validate.run()
+        # Two keepers owe $5 and none was allocated, so the tier check must still fire.
+        assert any("fee_total_mismatch" in m for m in report.errors)
+
+
 class TestStatsChecks:
     def _stats_doc(self, **overrides):
         doc = {

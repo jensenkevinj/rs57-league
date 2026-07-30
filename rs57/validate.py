@@ -670,6 +670,22 @@ def run(report: Report | None = None) -> Report:
 
     history = validate_history(report)
     manual_claims, manual_overrides = validate_manual_records(report)
+
+    # A season that has graduated into data/history/ may still be sitting in
+    # data/manual/claims.json — the importer cannot clear it, because that file has one writer
+    # and the importer is not it. Frozen wins, and the leftovers are reported rather than
+    # validated a second time: counting both would report every claim as a duplicate slot and
+    # a duplicate player, which is a wall of errors describing a filing job.
+    frozen_seasons = {claim.season for claim in history.claims}
+    graduated = sorted({c.season for c in manual_claims} & frozen_seasons)
+    if graduated:
+        manual_claims = [c for c in manual_claims if c.season not in frozen_seasons]
+        report.review(
+            f"data/manual/claims.json still holds claims for "
+            f"{', '.join(str(y) for y in graduated)}, which data/history/ has already frozen. "
+            f"The frozen copy is authoritative and the manual rows were ignored — clear those "
+            f"season(s) out through the admin tool so there is one record, not two."
+        )
     claims = history.claims + manual_claims
     overrides = history.overrides + manual_overrides
     all_roster = [entry for roster in roster_by_season.values() for entry in roster]

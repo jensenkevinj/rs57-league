@@ -21,7 +21,7 @@ from rs57.backfill import (
     check_completed,
 )
 from rs57.history import FrozenSeasonError, HistoryStore, OwnershipError
-from rs57.models import AcquisitionSource, KeeperSlot, RosterEntry
+from rs57.models import AcquisitionSource, KeeperClaim, KeeperSlot, RosterEntry
 
 NOW = datetime(2026, 7, 30, 12, 0, 0)
 
@@ -279,6 +279,51 @@ def test_a_known_prospect_list_prices_everything():
 
     assert all(claim.computed_salary is not None for claim in claims)
     assert not any("no computed_salary" in note for note in notes)
+
+
+# --------------------------------------------------------------- graduating a season
+
+
+def test_a_season_recorded_by_the_admin_tool_graduates_into_history(tmp_path: Path):
+    """From 2026 on there is no Fee Allocations tab, and the admin tool is the record. Without
+    this the claims would sit in data/manual/ forever and the season would freeze empty."""
+    from rs57.admin.store import ManualStore
+    from rs57.backfill import graduated_claims
+
+    (tmp_path / "manual").mkdir(parents=True)
+    manual = ManualStore(data_dir=tmp_path)
+    manual.save_team_claims(
+        2026,
+        "t9",
+        [
+            KeeperClaim(
+                season=2026,
+                manager_id="t9",
+                espn_player_id=1,
+                slot=KeeperSlot.K1,
+                fee_allocated=5,
+                computed_salary=33,
+                submitted_at=NOW,
+            )
+        ],
+    )
+    claims, notes = graduated_claims(2026, manual)
+    assert [c.espn_player_id for c in claims] == [1]
+    assert claims[0].computed_salary == 33, "copied verbatim, never recomputed"
+    assert claims[0].submitted_at == NOW, "including when it was declared"
+    assert any("Clear 2026 out" in note for note in notes), (
+        "the importer cannot clear data/manual/ itself, so it has to say so"
+    )
+
+
+def test_a_season_the_admin_tool_never_recorded_graduates_empty(tmp_path: Path):
+    from rs57.admin.store import ManualStore
+    from rs57.backfill import graduated_claims
+
+    (tmp_path / "manual").mkdir(parents=True)
+    claims, notes = graduated_claims(2026, ManualStore(data_dir=tmp_path))
+    assert claims == []
+    assert notes == []
 
 
 # --------------------------------------------------------------- only completed seasons

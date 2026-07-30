@@ -59,7 +59,13 @@ class Base(BaseModel):
 
 
 class Manager(Base):
-    """A league member. Deliberately has NO email field — see ``data/private/``."""
+    """A league member. Deliberately has NO email field and no real name.
+
+    The repo and the site are public. Nothing identifying goes in either — franchise names
+    keyed on ``espn_team_id`` are the whole published identity. A ``data/private/`` directory
+    was considered for the sheet's first-name-to-team mapping and **deliberately never
+    created**; the ``.gitignore`` entry is belt and braces for a path that does not exist.
+    """
 
     id: str
     display_name: str

@@ -59,10 +59,20 @@ having verified nothing — the same failure ``audit_ratchet``'s own comment war
 the other direction. The audit only has teeth when ``computed_salary`` is built independently:
 last season's price, plus the fee the manager actually allocated, plus the tax.
 
-That fee split exists in exactly one place, the ``Keepers`` workbook's ``Fee Allocations``
-tabs, and there are exactly two of them. So **2024 and 2025 get claims and 2019-2023 do not.**
-The earlier seasons are still worth freezing for their carried-in prices and their box-score
-history; they simply carry no claim rows, and each file says why in as many words.
+That fee split exists in exactly one place for the seasons before the admin tool, the
+``Keepers`` workbook's ``Fee Allocations`` tabs, and there are exactly two of them. So **2024
+and 2025 get claims and 2019-2023 do not.** The earlier seasons are still worth freezing for
+their carried-in prices and their box-score history; they simply carry no claim rows, and each
+file says why in as many words.
+
+**From 2026 on the admin tool is the record**, so a season with no tab is not necessarily a
+season with no claims: this reads ``data/manual/claims.json`` for it. Those rows are *better*
+than a reconstruction — their ``computed_salary`` was frozen at submission, which is literally
+what the manager was told they owed — so they are copied across verbatim and never recomputed.
+
+Graduating a season is therefore: let it finish, run this, and clear that season out of the
+admin tool. This module cannot do the clearing itself — ``data/manual/`` has one writer and it
+is not this one — so it says so instead, and ``validate`` keeps reporting until it is done.
 
 The workbook's ``K*_sal`` columns are **not** used and must never be: they are live VLOOKUPs
 that recompute against today's roster, so they render current-year numbers against old declared
@@ -90,6 +100,7 @@ from rs57.espn import (
     keeper_pick_ids,
     winning_bids,
 )
+from rs57.admin.store import ManualStore
 from rs57.history import HistoryStore
 from rs57.models import KeeperClaim, KeeperSlot, RosterEntry
 
@@ -175,6 +186,21 @@ CLAIMS_ABOUT = [
     "",
     "The workbook's K*_sal cells are live VLOOKUPs that recompute against today's roster. They",
     "are not a record of what anyone paid and are deliberately not used here.",
+]
+
+RECORDED_CLAIMS_ABOUT = [
+    "Claims recorded by the admin tool during the season, copied here verbatim when the season",
+    "was frozen. Not reconstructed and not recomputed: computed_salary was frozen at submission,",
+    "so it is exactly what the manager was told they owed -- a better witness than any later",
+    "derivation, which is why it is carried across untouched.",
+    "",
+    "check_base_continuity audits next season's carried-in prices against these figures. A",
+    "disagreement means the keeper was entered into ESPN's auction at a different number, or a",
+    "draft-cash trade was never recorded as an override.",
+    "",
+    "The same rows may still be sitting in data/manual/claims.json. That file has one writer and",
+    "it is not the importer, so clearing the graduated season out of it is a job for the admin",
+    "tool; validate reports the duplication until it is done.",
 ]
 
 NO_CLAIMS_ABOUT = [
@@ -446,7 +472,30 @@ def check_completed(client: EspnClient) -> None:
         )
 
 
-def prepare_season(year: int) -> SeasonImport:
+def graduated_claims(year: int, manual: ManualStore) -> tuple[list[KeeperClaim], list[str]]:
+    """Claims the admin tool recorded for ``year``, for a season graduating into history.
+
+    A season with no Fee Allocations tab is not necessarily a season with no claims — from
+    2026 on the admin tool is the record, and this is how a completed season's declarations
+    reach ``data/history/`` instead of sitting in ``data/manual/`` forever.
+
+    Copied **verbatim and never recomputed**. ``computed_salary`` was frozen at submission, so
+    it is literally what the manager was told they owed; re-deriving it here would replace the
+    strongest witness this pipeline has with a later guess, and would hand
+    ``check_base_continuity`` a figure derived from the same data it is auditing.
+    """
+    claims = manual.claims(year)
+    if not claims:
+        return [], []
+    return claims, [
+        f"{len(claims)} claim(s) came from data/manual/claims.json, recorded by the admin tool "
+        f"during the season and copied here unchanged. Clear {year} out of that file through "
+        f"the tool now that it is frozen — until then there are two records of one fact, and "
+        f"validate reports it every run."
+    ]
+
+
+def prepare_season(year: int, *, manual: ManualStore | None = None) -> SeasonImport:
     """Read one completed season from ESPN and assemble its frozen document. Writes nothing."""
     client = EspnClient.from_env(year)
     prior = EspnClient.from_env(year - 1)
@@ -542,6 +591,12 @@ def prepare_season(year: int) -> SeasonImport:
         prior_prospect_ids=prior_prospects or frozenset(),
         prior_prospects_known=prior_prospects is not None,
     )
+
+    recorded = False
+    if not claims and FEE_ALLOCATIONS.get(year) is None:
+        claims, graduation_notes = graduated_claims(year, manual or ManualStore())
+        notes += graduation_notes
+        recorded = bool(claims)
     waived = next(
         (
             f"t{allocation.espn_team_id}"
@@ -552,15 +607,23 @@ def prepare_season(year: int) -> SeasonImport:
     )
     started = started_player_ids(client)
 
-    about = list(CLAIMS_ABOUT if claims else NO_CLAIMS_ABOUT) + ["", *PROSPECT_RULE_NOTE]
+    if not claims:
+        about_lines = NO_CLAIMS_ABOUT
+    elif recorded:
+        about_lines = RECORDED_CLAIMS_ABOUT
+    else:
+        about_lines = CLAIMS_ABOUT
+    about = list(about_lines) + ["", *PROSPECT_RULE_NOTE]
     document: dict[str, Any] = {
         "source": {
             "base_salary_field": season.base_field,
             "carried_in_from": f"{year - 1} keeperValueFuture" if carried_in else None,
             "claims_source": (
-                f"Keepers workbook, {year} Fee Allocations tab (typed columns only)"
-                if claims
-                else None
+                None
+                if not claims
+                else "data/manual/claims.json, recorded by the admin tool"
+                if recorded
+                else f"Keepers workbook, {year} Fee Allocations tab (typed columns only)"
             ),
             "started_history_from": "ESPN mBoxscore",
             "trade_deadline": (
@@ -650,14 +713,18 @@ def _prior_snapshot(year: int) -> dict[int, dict[str, Any]]:
 
 
 def import_season(
-    year: int, *, store: HistoryStore | None = None, write: bool = True
+    year: int,
+    *,
+    store: HistoryStore | None = None,
+    manual: ManualStore | None = None,
+    write: bool = True,
 ) -> SeasonImport:
     store = store or HistoryStore()
     if write and store.exists(year):
         raise BackfillError(
             f"data/history/{year}.json is already frozen. Nothing re-writes a frozen season."
         )
-    prepared = prepare_season(year)
+    prepared = prepare_season(year, manual=manual)
     if write:
         store.write_season(year, prepared.document, about=prepared.about)
     return prepared
