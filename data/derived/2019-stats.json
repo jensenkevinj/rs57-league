@@ -1,0 +1,516 @@
+{
+  "payouts": [],
+  "positional_studs": [
+    {
+      "espn_player_id": 8439,
+      "manager_ids": [
+        "t3"
+      ],
+      "player_name": "Aaron Rodgers",
+      "points": 43.76,
+      "position": "QB",
+      "season": 2019,
+      "week": 7
+    },
+    {
+      "espn_player_id": 3042519,
+      "manager_ids": [
+        "t7"
+      ],
+      "player_name": "Aaron Jones",
+      "points": 45.7,
+      "position": "RB",
+      "season": 2019,
+      "week": 5
+    },
+    {
+      "espn_player_id": 16737,
+      "manager_ids": [
+        "t1"
+      ],
+      "player_name": "Mike Evans",
+      "points": 41.0,
+      "position": "WR",
+      "season": 2019,
+      "week": 3
+    },
+    {
+      "espn_player_id": 2576925,
+      "manager_ids": [
+        "t4"
+      ],
+      "player_name": "Darren Waller",
+      "points": 28.1,
+      "position": "TE",
+      "season": 2019,
+      "week": 7
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t3"
+    ],
+    "issues": [
+      {
+        "code": "consolation_seats_mismatch",
+        "manager_id": null,
+        "message": "the consolation ladder holds ['t10', 't3', 't5', 't6', 't8', 't9'] but the franchises seeded outside the top 6 are ['t10', 't11', 't3', 't5', 't6', 't8'] — these normally match, and the consolation winner decides whose fees are waived",
+        "position": null,
+        "severity": "review",
+        "week": null
+      },
+      {
+        "code": "lineup_points_mismatch",
+        "manager_id": "t4",
+        "message": "started lineup sums to 119.30 but the matchup reports 119.40 — the started/benched split may be misread, which is what the positional stud prize rests on",
+        "position": null,
+        "severity": "review",
+        "week": 14
+      },
+      {
+        "code": "lineup_points_mismatch",
+        "manager_id": "t6",
+        "message": "started lineup sums to 76.54 but the matchup reports 76.64 — the started/benched split may be misread, which is what the positional stud prize rests on",
+        "position": null,
+        "severity": "review",
+        "week": 14
+      },
+      {
+        "code": "no_prize_schedule",
+        "manager_id": null,
+        "message": "no prize amounts recorded for 2019 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
+        "position": null,
+        "severity": "review",
+        "week": null
+      }
+    ],
+    "warnings": []
+  },
+  "season": 2019,
+  "season_points": [
+    {
+      "manager_id": "t7",
+      "points": 1545.84,
+      "season": 2019
+    },
+    {
+      "manager_id": "t4",
+      "points": 1491.34,
+      "season": 2019
+    },
+    {
+      "manager_id": "t12",
+      "points": 1476.02,
+      "season": 2019
+    },
+    {
+      "manager_id": "t1",
+      "points": 1457.46,
+      "season": 2019
+    },
+    {
+      "manager_id": "t11",
+      "points": 1435.74,
+      "season": 2019
+    },
+    {
+      "manager_id": "t2",
+      "points": 1417.26,
+      "season": 2019
+    },
+    {
+      "manager_id": "t8",
+      "points": 1383.6,
+      "season": 2019
+    },
+    {
+      "manager_id": "t9",
+      "points": 1378.24,
+      "season": 2019
+    },
+    {
+      "manager_id": "t6",
+      "points": 1330.32,
+      "season": 2019
+    },
+    {
+      "manager_id": "t5",
+      "points": 1234.82,
+      "season": 2019
+    },
+    {
+      "manager_id": "t3",
+      "points": 1177.76,
+      "season": 2019
+    },
+    {
+      "manager_id": "t10",
+      "points": 1156.08,
+      "season": 2019
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 13,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 2,
+      "losses": 3,
+      "manager_id": "t4",
+      "playoff_seed": 1,
+      "points_against": 1243.82,
+      "points_for": 1491.34,
+      "season": 2019,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 4,
+      "losses": 3,
+      "manager_id": "t2",
+      "playoff_seed": 2,
+      "points_against": 1272.94,
+      "points_for": 1417.26,
+      "season": 2019,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 6,
+      "losses": 5,
+      "manager_id": "t7",
+      "playoff_seed": 3,
+      "points_against": 1398.4,
+      "points_for": 1545.84,
+      "season": 2019,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 5,
+      "losses": 5,
+      "manager_id": "t12",
+      "playoff_seed": 4,
+      "points_against": 1386.58,
+      "points_for": 1476.02,
+      "season": 2019,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 3,
+      "losses": 5,
+      "manager_id": "t1",
+      "playoff_seed": 5,
+      "points_against": 1404.96,
+      "points_for": 1457.46,
+      "season": 2019,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 8,
+      "losses": 5,
+      "manager_id": "t9",
+      "playoff_seed": 6,
+      "points_against": 1325.9,
+      "points_for": 1378.24,
+      "season": 2019,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 1,
+      "losses": 8,
+      "manager_id": "t11",
+      "playoff_seed": 7,
+      "points_against": 1412.22,
+      "points_for": 1435.74,
+      "season": 2019,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 12,
+      "losses": 8,
+      "manager_id": "t6",
+      "playoff_seed": 8,
+      "points_against": 1368.48,
+      "points_for": 1330.32,
+      "season": 2019,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 11,
+      "losses": 8,
+      "manager_id": "t5",
+      "playoff_seed": 9,
+      "points_against": 1411.42,
+      "points_for": 1234.82,
+      "season": 2019,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 9,
+      "losses": 9,
+      "manager_id": "t8",
+      "playoff_seed": 10,
+      "points_against": 1426.14,
+      "points_for": 1383.6,
+      "season": 2019,
+      "ties": 0,
+      "wins": 4
+    },
+    {
+      "final_rank": 10,
+      "losses": 9,
+      "manager_id": "t10",
+      "playoff_seed": 11,
+      "points_against": 1385.72,
+      "points_for": 1156.08,
+      "season": 2019,
+      "ties": 0,
+      "wins": 4
+    },
+    {
+      "final_rank": 7,
+      "losses": 10,
+      "manager_id": "t3",
+      "playoff_seed": 12,
+      "points_against": 1447.9,
+      "points_for": 1177.76,
+      "season": 2019,
+      "ties": 0,
+      "wins": 3
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t10"
+        ],
+        "points": 76.1,
+        "season": 2019,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t3"
+        ],
+        "points": 63.36,
+        "season": 2019,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t8"
+        ],
+        "points": 90.86,
+        "season": 2019,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 71.5,
+        "season": 2019,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 97.74,
+        "season": 2019,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 61.52,
+        "season": 2019,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 68.16,
+        "season": 2019,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 65.1,
+        "season": 2019,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t7"
+        ],
+        "points": 66.14,
+        "season": 2019,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 92.18,
+        "season": 2019,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 110.98,
+        "season": 2019,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t12"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t11"
+    ],
+    "points": 137.04,
+    "season": 2019,
+    "week": 3
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 139.4,
+      "season": 2019,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 173.54,
+      "season": 2019,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 140.62,
+      "season": 2019,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 152.4,
+      "season": 2019,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t8"
+      ],
+      "points": 153.1,
+      "season": 2019,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 159.64,
+      "season": 2019,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t4"
+      ],
+      "points": 122.12,
+      "season": 2019,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 175.28,
+      "season": 2019,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 135.36,
+      "season": 2019,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t11"
+      ],
+      "points": 138.1,
+      "season": 2019,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 135.54,
+      "season": 2019,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t4"
+      ],
+      "points": 138.66,
+      "season": 2019,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t11"
+      ],
+      "points": 131.06,
+      "season": 2019,
+      "week": 13
+    }
+  ]
+}

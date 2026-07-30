@@ -1,0 +1,661 @@
+{
+  "payouts": [
+    {
+      "amount": 500,
+      "label": "Champion",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t5"
+    },
+    {
+      "amount": 200,
+      "label": "2nd Place",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 100,
+      "label": "3rd Place",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 100,
+      "label": "Most Points (Season)",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 40,
+      "label": "Survivor",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t3"
+    },
+    {
+      "amount": 25,
+      "label": "QB Stud",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 25,
+      "label": "RB Stud",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 25,
+      "label": "WR Stud",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t5"
+    },
+    {
+      "amount": 25,
+      "label": "TE Stud",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t3"
+    },
+    {
+      "amount": 20,
+      "label": "Unlucky",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 10,
+      "label": "Week 1 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 10,
+      "label": "Week 2 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t12"
+    },
+    {
+      "amount": 10,
+      "label": "Week 3 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 4 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 10,
+      "label": "Week 5 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t6"
+    },
+    {
+      "amount": 10,
+      "label": "Week 6 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t6"
+    },
+    {
+      "amount": 10,
+      "label": "Week 7 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 10,
+      "label": "Week 8 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t6"
+    },
+    {
+      "amount": 10,
+      "label": "Week 9 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t1"
+    },
+    {
+      "amount": 10,
+      "label": "Week 10 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t6"
+    },
+    {
+      "amount": 10,
+      "label": "Week 11 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t6"
+    },
+    {
+      "amount": 10,
+      "label": "Week 12 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 10,
+      "label": "Week 13 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 10,
+      "label": "Week 14 High Score",
+      "paid": false,
+      "season": 2024,
+      "winner_manager_id": "t3"
+    }
+  ],
+  "positional_studs": [
+    {
+      "espn_player_id": 3918298,
+      "manager_ids": [
+        "t9"
+      ],
+      "player_name": "Josh Allen",
+      "points": 51.88,
+      "position": "QB",
+      "season": 2024,
+      "week": 14
+    },
+    {
+      "espn_player_id": 3929630,
+      "manager_ids": [
+        "t2"
+      ],
+      "player_name": "Saquon Barkley",
+      "points": 44.2,
+      "position": "RB",
+      "season": 2024,
+      "week": 12
+    },
+    {
+      "espn_player_id": 4362628,
+      "manager_ids": [
+        "t5"
+      ],
+      "player_name": "Ja'Marr Chase",
+      "points": 49.9,
+      "position": "WR",
+      "season": 2024,
+      "week": 10
+    },
+    {
+      "espn_player_id": 2468609,
+      "manager_ids": [
+        "t3"
+      ],
+      "player_name": "Taysom Hill",
+      "points": 37.52,
+      "position": "TE",
+      "season": 2024,
+      "week": 11
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t10"
+    ],
+    "issues": [],
+    "warnings": []
+  },
+  "season": 2024,
+  "season_points": [
+    {
+      "manager_id": "t2",
+      "points": 1683.2,
+      "season": 2024
+    },
+    {
+      "manager_id": "t6",
+      "points": 1630.1,
+      "season": 2024
+    },
+    {
+      "manager_id": "t9",
+      "points": 1621.1,
+      "season": 2024
+    },
+    {
+      "manager_id": "t3",
+      "points": 1560.1,
+      "season": 2024
+    },
+    {
+      "manager_id": "t1",
+      "points": 1488.22,
+      "season": 2024
+    },
+    {
+      "manager_id": "t8",
+      "points": 1469.04,
+      "season": 2024
+    },
+    {
+      "manager_id": "t11",
+      "points": 1440.42,
+      "season": 2024
+    },
+    {
+      "manager_id": "t5",
+      "points": 1440.12,
+      "season": 2024
+    },
+    {
+      "manager_id": "t10",
+      "points": 1376.42,
+      "season": 2024
+    },
+    {
+      "manager_id": "t12",
+      "points": 1354.14,
+      "season": 2024
+    },
+    {
+      "manager_id": "t7",
+      "points": 1310.78,
+      "season": 2024
+    },
+    {
+      "manager_id": "t4",
+      "points": 1283.9,
+      "season": 2024
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 14,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 2,
+      "losses": 3,
+      "manager_id": "t2",
+      "playoff_seed": 1,
+      "points_against": 1490.58,
+      "points_for": 1683.2,
+      "season": 2024,
+      "ties": 0,
+      "wins": 11
+    },
+    {
+      "final_rank": 4,
+      "losses": 4,
+      "manager_id": "t3",
+      "playoff_seed": 2,
+      "points_against": 1403.82,
+      "points_for": 1560.1,
+      "season": 2024,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 5,
+      "losses": 5,
+      "manager_id": "t6",
+      "playoff_seed": 3,
+      "points_against": 1439.62,
+      "points_for": 1630.1,
+      "season": 2024,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 3,
+      "losses": 6,
+      "manager_id": "t9",
+      "playoff_seed": 4,
+      "points_against": 1575.96,
+      "points_for": 1621.1,
+      "season": 2024,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 6,
+      "losses": 6,
+      "manager_id": "t1",
+      "playoff_seed": 5,
+      "points_against": 1402.72,
+      "points_for": 1488.22,
+      "season": 2024,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 8,
+      "losses": 8,
+      "manager_id": "t8",
+      "playoff_seed": 7,
+      "points_against": 1539.6,
+      "points_for": 1469.04,
+      "season": 2024,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 7,
+      "losses": 8,
+      "manager_id": "t10",
+      "playoff_seed": 8,
+      "points_against": 1519.6,
+      "points_for": 1376.42,
+      "season": 2024,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 11,
+      "losses": 8,
+      "manager_id": "t7",
+      "playoff_seed": 11,
+      "points_against": 1390.18,
+      "points_for": 1310.78,
+      "season": 2024,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 9,
+      "losses": 9,
+      "manager_id": "t11",
+      "playoff_seed": 9,
+      "points_against": 1465.76,
+      "points_for": 1440.42,
+      "season": 2024,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 1,
+      "losses": 9,
+      "manager_id": "t5",
+      "playoff_seed": 6,
+      "points_against": 1533.16,
+      "points_for": 1440.12,
+      "season": 2024,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 12,
+      "losses": 9,
+      "manager_id": "t12",
+      "playoff_seed": 10,
+      "points_against": 1465.94,
+      "points_for": 1354.14,
+      "season": 2024,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 10,
+      "losses": 9,
+      "manager_id": "t4",
+      "playoff_seed": 12,
+      "points_against": 1430.6,
+      "points_for": 1283.9,
+      "season": 2024,
+      "ties": 0,
+      "wins": 5
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t7"
+        ],
+        "points": 66.36,
+        "season": 2024,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 81.82,
+        "season": 2024,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 62.44,
+        "season": 2024,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 74.02,
+        "season": 2024,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t10"
+        ],
+        "points": 60.36,
+        "season": 2024,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 79.0,
+        "season": 2024,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 88.92,
+        "season": 2024,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t12"
+        ],
+        "points": 100.96,
+        "season": 2024,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 110.62,
+        "season": 2024,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t8"
+        ],
+        "points": 94.1,
+        "season": 2024,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 132.78,
+        "season": 2024,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t3"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t2"
+    ],
+    "points": 141.4,
+    "season": 2024,
+    "week": 14
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 121.08,
+      "season": 2024,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 153.44,
+      "season": 2024,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 145.46,
+      "season": 2024,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 131.7,
+      "season": 2024,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t6"
+      ],
+      "points": 145.18,
+      "season": 2024,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t6"
+      ],
+      "points": 139.92,
+      "season": 2024,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 131.58,
+      "season": 2024,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t6"
+      ],
+      "points": 147.38,
+      "season": 2024,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 166.0,
+      "season": 2024,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t6"
+      ],
+      "points": 125.92,
+      "season": 2024,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t6"
+      ],
+      "points": 140.94,
+      "season": 2024,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 143.92,
+      "season": 2024,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 147.82,
+      "season": 2024,
+      "week": 13
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 155.1,
+      "season": 2024,
+      "week": 14
+    }
+  ]
+}

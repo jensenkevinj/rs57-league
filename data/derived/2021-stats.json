@@ -1,0 +1,509 @@
+{
+  "payouts": [],
+  "positional_studs": [
+    {
+      "espn_player_id": 4038941,
+      "manager_ids": [
+        "t9"
+      ],
+      "player_name": "Justin Herbert",
+      "points": 42.82,
+      "position": "QB",
+      "season": 2021,
+      "week": 5
+    },
+    {
+      "espn_player_id": 4242335,
+      "manager_ids": [
+        "t4"
+      ],
+      "player_name": "Jonathan Taylor",
+      "points": 51.9,
+      "position": "RB",
+      "season": 2021,
+      "week": 11
+    },
+    {
+      "espn_player_id": 4362628,
+      "manager_ids": [
+        "t5"
+      ],
+      "player_name": "Ja'Marr Chase",
+      "points": 50.1,
+      "position": "WR",
+      "season": 2021,
+      "week": 17
+    },
+    {
+      "espn_player_id": 3116365,
+      "manager_ids": [
+        "t3"
+      ],
+      "player_name": "Mark Andrews",
+      "points": 36.2,
+      "position": "TE",
+      "season": 2021,
+      "week": 5
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t5"
+    ],
+    "issues": [
+      {
+        "code": "consolation_seats_mismatch",
+        "manager_id": null,
+        "message": "the consolation ladder holds ['t1', 't2', 't4', 't5', 't8', 't9'] but the franchises seeded outside the top 6 are ['t1', 't2', 't5', 't6', 't8', 't9'] — these normally match, and the consolation winner decides whose fees are waived",
+        "position": null,
+        "severity": "review",
+        "week": null
+      },
+      {
+        "code": "no_prize_schedule",
+        "manager_id": null,
+        "message": "no prize amounts recorded for 2021 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
+        "position": null,
+        "severity": "review",
+        "week": null
+      }
+    ],
+    "warnings": []
+  },
+  "season": 2021,
+  "season_points": [
+    {
+      "manager_id": "t3",
+      "points": 1831.32,
+      "season": 2021
+    },
+    {
+      "manager_id": "t10",
+      "points": 1702.84,
+      "season": 2021
+    },
+    {
+      "manager_id": "t12",
+      "points": 1668.98,
+      "season": 2021
+    },
+    {
+      "manager_id": "t11",
+      "points": 1557.68,
+      "season": 2021
+    },
+    {
+      "manager_id": "t6",
+      "points": 1492.22,
+      "season": 2021
+    },
+    {
+      "manager_id": "t9",
+      "points": 1484.82,
+      "season": 2021
+    },
+    {
+      "manager_id": "t7",
+      "points": 1481.3,
+      "season": 2021
+    },
+    {
+      "manager_id": "t2",
+      "points": 1477.78,
+      "season": 2021
+    },
+    {
+      "manager_id": "t4",
+      "points": 1405.14,
+      "season": 2021
+    },
+    {
+      "manager_id": "t5",
+      "points": 1346.76,
+      "season": 2021
+    },
+    {
+      "manager_id": "t1",
+      "points": 1288.08,
+      "season": 2021
+    },
+    {
+      "manager_id": "t8",
+      "points": 1196.74,
+      "season": 2021
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 14,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 1,
+      "losses": 3,
+      "manager_id": "t3",
+      "playoff_seed": 1,
+      "points_against": 1446.36,
+      "points_for": 1831.32,
+      "season": 2021,
+      "ties": 0,
+      "wins": 11
+    },
+    {
+      "final_rank": 2,
+      "losses": 4,
+      "manager_id": "t10",
+      "playoff_seed": 2,
+      "points_against": 1492.34,
+      "points_for": 1702.84,
+      "season": 2021,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 4,
+      "losses": 5,
+      "manager_id": "t11",
+      "playoff_seed": 3,
+      "points_against": 1515.68,
+      "points_for": 1557.68,
+      "season": 2021,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 5,
+      "losses": 7,
+      "manager_id": "t12",
+      "playoff_seed": 4,
+      "points_against": 1557.84,
+      "points_for": 1668.98,
+      "season": 2021,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 3,
+      "losses": 7,
+      "manager_id": "t7",
+      "playoff_seed": 5,
+      "points_against": 1584.76,
+      "points_for": 1481.3,
+      "season": 2021,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 9,
+      "losses": 7,
+      "manager_id": "t4",
+      "playoff_seed": 6,
+      "points_against": 1466.68,
+      "points_for": 1405.14,
+      "season": 2021,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 7,
+      "losses": 7,
+      "manager_id": "t5",
+      "playoff_seed": 7,
+      "points_against": 1386.36,
+      "points_for": 1346.76,
+      "season": 2021,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 6,
+      "losses": 8,
+      "manager_id": "t6",
+      "playoff_seed": 8,
+      "points_against": 1535.08,
+      "points_for": 1492.22,
+      "season": 2021,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 8,
+      "losses": 8,
+      "manager_id": "t9",
+      "playoff_seed": 9,
+      "points_against": 1472.92,
+      "points_for": 1484.82,
+      "season": 2021,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 11,
+      "losses": 8,
+      "manager_id": "t2",
+      "playoff_seed": 10,
+      "points_against": 1473.3,
+      "points_for": 1477.78,
+      "season": 2021,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 12,
+      "losses": 8,
+      "manager_id": "t1",
+      "playoff_seed": 11,
+      "points_against": 1413.46,
+      "points_for": 1288.08,
+      "season": 2021,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 10,
+      "losses": 12,
+      "manager_id": "t8",
+      "playoff_seed": 12,
+      "points_against": 1588.88,
+      "points_for": 1196.74,
+      "season": 2021,
+      "ties": 0,
+      "wins": 2
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 44.42,
+        "season": 2021,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 62.32,
+        "season": 2021,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 76.64,
+        "season": 2021,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t8"
+        ],
+        "points": 72.0,
+        "season": 2021,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 96.34,
+        "season": 2021,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t12"
+        ],
+        "points": 69.18,
+        "season": 2021,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 34.1,
+        "season": 2021,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 90.32,
+        "season": 2021,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t7"
+        ],
+        "points": 69.38,
+        "season": 2021,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 71.54,
+        "season": 2021,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t3"
+        ],
+        "points": 113.66,
+        "season": 2021,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t10"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t10"
+    ],
+    "points": 147.34,
+    "season": 2021,
+    "week": 6
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 153.42,
+      "season": 2021,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 173.24,
+      "season": 2021,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 145.92,
+      "season": 2021,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t5"
+      ],
+      "points": 130.12,
+      "season": 2021,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 206.3,
+      "season": 2021,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 149.1,
+      "season": 2021,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 153.64,
+      "season": 2021,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 135.66,
+      "season": 2021,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t4"
+      ],
+      "points": 131.16,
+      "season": 2021,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 138.94,
+      "season": 2021,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 169.02,
+      "season": 2021,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 128.8,
+      "season": 2021,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 142.4,
+      "season": 2021,
+      "week": 13
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 174.22,
+      "season": 2021,
+      "week": 14
+    }
+  ]
+}

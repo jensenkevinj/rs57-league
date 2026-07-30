@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2023 season — RS57 League</title>
+<style>
+  :root {
+    --ink: #1b1f24;
+    --muted: #5b6470;
+    --line: #dfe3e8;
+    --bg: #ffffff;
+    --panel: #f6f8fa;
+    --accent: #0b5cad;
+    --flag: #8a5a00;
+    --flag-bg: #fff8e6;
+    --flag-line: #e8c96a;
+    --bad: #96200f;
+    --bad-bg: #fdf0ee;
+    --bad-line: #e4a99e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.top .wrap { padding-top: 1.5rem; padding-bottom: 0; }
+  .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  nav { margin: 0.85rem 0 0; display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.75rem;
+    border-bottom: 2px solid transparent; font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.65rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; max-width: 44rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.88rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.5rem; font-size: 0.95rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.88rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.15rem; margin: 1.25rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.25rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .tag-inline {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+  }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
+  .jump a { font-size: 0.9rem; }
+  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
+  .team h3 { margin-top: 0; }
+  .team table { margin-bottom: 0; }
+  .team tbody tr:last-child td { border-bottom: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <nav>
+      <a href="index.html" class="">Home</a>
+      <a href="keepers.html" class="">Keepers</a>
+      <a href="seasons.html" class="on">Seasons</a>
+      <a href="rules.html" class="">Rules</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<h1>2023 season</h1>
+<p class="lede">
+  Final standings, every prize, and what each franchise took home. Regular season is weeks 1
+  to 14.
+</p>
+
+  <div class="flag ">
+    <span class="tag">
+        Unverified — nobody has checked this
+    </span>
+    <div>[no_prize_schedule] no prize amounts recorded for 2023 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything</div>
+      <div class="small muted">2023 stats</div>
+  </div>
+
+
+<h2>Standings</h2>
+<div class="scroll">
+  <table>
+    <caption>
+      Record and points are computed from the matchups. Final rank is the playoff bracket's
+      answer, which is what pays the placing prizes.
+    </caption>
+    <thead>
+      <tr>
+        <th class="num">Final</th>
+        <th>Franchise</th>
+        <th class="num">W</th>
+        <th class="num">L</th>
+        <th class="num">T</th>
+        <th class="num">Points for</th>
+        <th class="num">Points against</th>
+        <th class="num">Seed</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Brosh Chaylor</td>
+          <td class="num">9</td>
+          <td class="num">5</td>
+          <td class="num">0</td>
+          <td class="num">1586.32</td>
+          <td class="num">1406.42</td>
+          <td class="num">1</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Too Much Moxie</td>
+          <td class="num">8</td>
+          <td class="num">6</td>
+          <td class="num">0</td>
+          <td class="num">1631.70</td>
+          <td class="num">1542.06</td>
+          <td class="num">2</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>CeeDee Drive</td>
+          <td class="num">7</td>
+          <td class="num">7</td>
+          <td class="num">0</td>
+          <td class="num">1463.96</td>
+          <td class="num">1526.10</td>
+          <td class="num">6</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>I&#39;m Thielen This</td>
+          <td class="num">7</td>
+          <td class="num">7</td>
+          <td class="num">0</td>
+          <td class="num">1498.84</td>
+          <td class="num">1472.16</td>
+          <td class="num">4</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">7</td>
+          <td class="num">7</td>
+          <td class="num">0</td>
+          <td class="num">1446.48</td>
+          <td class="num">1395.62</td>
+          <td class="num">5</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>The Infirmary</td>
+          <td class="num">11</td>
+          <td class="num">3</td>
+          <td class="num">0</td>
+          <td class="num">1457.26</td>
+          <td class="num">1361.46</td>
+          <td class="num">3</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Yes, Chef</td>
+          <td class="num">6</td>
+          <td class="num">8</td>
+          <td class="num">0</td>
+          <td class="num">1487.78</td>
+          <td class="num">1431.26</td>
+          <td class="num">7</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Calling Audibles</td>
+          <td class="num">7</td>
+          <td class="num">7</td>
+          <td class="num">0</td>
+          <td class="num">1441.92</td>
+          <td class="num">1439.68</td>
+          <td class="num">8</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Bishop Sycamore All-Stars</td>
+          <td class="num">3</td>
+          <td class="num">11</td>
+          <td class="num">0</td>
+          <td class="num">1428.12</td>
+          <td class="num">1543.66</td>
+          <td class="num">10</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Team Underperform</td>
+          <td class="num">8</td>
+          <td class="num">6</td>
+          <td class="num">0</td>
+          <td class="num">1330.46</td>
+          <td class="num">1433.14</td>
+          <td class="num">9</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">5</td>
+          <td class="num">9</td>
+          <td class="num">0</td>
+          <td class="num">1336.70</td>
+          <td class="num">1448.60</td>
+          <td class="num">12</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>Chase-ing LVIII</td>
+          <td class="num">6</td>
+          <td class="num">8</td>
+          <td class="num">0</td>
+          <td class="num">1378.80</td>
+          <td class="num">1488.18</td>
+          <td class="num">11</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Prizes</h2>
+  <div class="flag">
+    <span class="tag">No prize amounts recorded</span>
+    <div>
+      This season's stats were derived, but no prize amounts are recorded for it, so nobody
+      is shown as having been paid anything.
+    </div>
+  </div>
+
+<h2>How the prizes were won</h2>
+
+<h3>Most points, regular season</h3>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">#</th><th>Franchise</th><th class="num">Points, weeks 1&ndash;14</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Too Much Moxie</td>
+          <td class="num">1631.70</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Brosh Chaylor</td>
+          <td class="num">1586.32</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>I&#39;m Thielen This</td>
+          <td class="num">1498.84</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>Yes, Chef</td>
+          <td class="num">1487.78</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>CeeDee Drive</td>
+          <td class="num">1463.96</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>The Infirmary</td>
+          <td class="num">1457.26</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">1446.48</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Calling Audibles</td>
+          <td class="num">1441.92</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Bishop Sycamore All-Stars</td>
+          <td class="num">1428.12</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Chase-ing LVIII</td>
+          <td class="num">1378.80</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">1336.70</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>Team Underperform</td>
+          <td class="num">1330.46</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Weekly high scores</h3>
+<p class="small muted">Regular season only — the playoff weeks do not pay a weekly high score.</p>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">Week</th><th>Franchise</th><th class="num">Points</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Too Much Moxie</td>
+          <td class="num">131.08</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>CeeDee Drive</td>
+          <td class="num">135.76</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>CeeDee Drive</td>
+          <td class="num">133.98</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>I&#39;m Thielen This</td>
+          <td class="num">156.54</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>Yes, Chef</td>
+          <td class="num">141.58</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>Yes, Chef</td>
+          <td class="num">110.82</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Chase-ing LVIII</td>
+          <td class="num">146.56</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Too Much Moxie</td>
+          <td class="num">152.36</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Too Much Moxie</td>
+          <td class="num">127.82</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>The Infirmary</td>
+          <td class="num">149.46</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">123.06</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>I&#39;m Thielen This</td>
+          <td class="num">130.86</td>
+        </tr>
+        <tr>
+          <td class="num">13</td>
+          <td>The Infirmary</td>
+          <td class="num">153.58</td>
+        </tr>
+        <tr>
+          <td class="num">14</td>
+          <td>Brosh Chaylor</td>
+          <td class="num">149.44</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Positional studs</h3>
+<p class="small muted">
+  The single best week by a started player at each position, across the whole season
+  including the playoff weeks.
+</p>
+<div class="scroll">
+  <table>
+    <thead>
+      <tr><th>Pos</th><th>Player</th><th class="num">Week</th><th class="num">Points</th><th>Started by</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>QB</td>
+          <td>C.J. Stroud</td>
+          <td class="num">9</td>
+          <td class="num">41.80</td>
+          <td>I&#39;m Thielen This</td>
+        </tr>
+        <tr>
+          <td>RB</td>
+          <td>Christian McCaffrey</td>
+          <td class="num">4</td>
+          <td class="num">45.20</td>
+          <td>I&#39;m Thielen This</td>
+        </tr>
+        <tr>
+          <td>WR</td>
+          <td>Amari Cooper</td>
+          <td class="num">16</td>
+          <td class="num">46.00</td>
+          <td>Too Much Moxie</td>
+        </tr>
+        <tr>
+          <td>TE</td>
+          <td>Travis Kelce</td>
+          <td class="num">7</td>
+          <td class="num">29.90</td>
+          <td>The Infirmary</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Survivor</h3>
+<p>
+  Winner: <strong>Brosh Chaylor</strong>
+</p>
+<div class="scroll">
+  <table>
+    <caption>The lowest score among the teams still alive goes out each week.</caption>
+    <thead><tr><th class="num">Week</th><th>Eliminated</th><th class="num">Points</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">61.56</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">75.50</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>Calling Audibles</td>
+          <td class="num">81.48</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>The Infirmary</td>
+          <td class="num">74.24</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>CeeDee Drive</td>
+          <td class="num">77.14</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>I&#39;m Thielen This</td>
+          <td class="num">68.82</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Team Underperform</td>
+          <td class="num">61.94</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Chase-ing LVIII</td>
+          <td class="num">85.70</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Bishop Sycamore All-Stars</td>
+          <td class="num">78.94</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Yes, Chef</td>
+          <td class="num">91.80</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Too Much Moxie</td>
+          <td class="num">73.60</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Unlucky</h3>
+  <p>
+    The highest score in the regular season that still lost:
+    <strong>Bishop Sycamore All-Stars</strong>,
+    153.28 in week 4.
+  </p>
+
+<h3>Consolation bracket</h3>
+  <div class="flag">
+    <span class="tag">Unverified — nobody has checked this</span>
+    <div>
+      Yes, Chef is the top finisher among the teams that
+      missed the playoffs, which would waive their keeper fees for 2024.
+      Derived from the final standings and <strong>not</strong> confirmed by the
+      commissioner.
+    </div>
+  </div>
+
+<footer class="small muted">
+  <p>
+    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
+    history, and the rules.
+  </p>
+  <p>
+    Teams are identified by their ESPN team id. Franchise names change every season, so a
+    season's names come from that season's own record.
+  </p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,492 @@
+{
+  "payouts": [],
+  "positional_studs": [
+    {
+      "espn_player_id": 3139477,
+      "manager_ids": [
+        "t2"
+      ],
+      "player_name": "Patrick Mahomes",
+      "points": 40.0,
+      "position": "QB",
+      "season": 2020,
+      "week": 3
+    },
+    {
+      "espn_player_id": 3054850,
+      "manager_ids": [
+        "t12"
+      ],
+      "player_name": "Alvin Kamara",
+      "points": 54.7,
+      "position": "RB",
+      "season": 2020,
+      "week": 16
+    },
+    {
+      "espn_player_id": 3116406,
+      "manager_ids": [
+        "t11"
+      ],
+      "player_name": "Tyreek Hill",
+      "points": 51.4,
+      "position": "WR",
+      "season": 2020,
+      "week": 12
+    },
+    {
+      "espn_player_id": 2576925,
+      "manager_ids": [
+        "t8"
+      ],
+      "player_name": "Darren Waller",
+      "points": 38.5,
+      "position": "TE",
+      "season": 2020,
+      "week": 13
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t10"
+    ],
+    "issues": [
+      {
+        "code": "no_prize_schedule",
+        "manager_id": null,
+        "message": "no prize amounts recorded for 2020 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
+        "position": null,
+        "severity": "review",
+        "week": null
+      }
+    ],
+    "warnings": []
+  },
+  "season": 2020,
+  "season_points": [
+    {
+      "manager_id": "t12",
+      "points": 1564.26,
+      "season": 2020
+    },
+    {
+      "manager_id": "t1",
+      "points": 1492.22,
+      "season": 2020
+    },
+    {
+      "manager_id": "t7",
+      "points": 1450.8,
+      "season": 2020
+    },
+    {
+      "manager_id": "t5",
+      "points": 1440.24,
+      "season": 2020
+    },
+    {
+      "manager_id": "t10",
+      "points": 1405.94,
+      "season": 2020
+    },
+    {
+      "manager_id": "t8",
+      "points": 1405.16,
+      "season": 2020
+    },
+    {
+      "manager_id": "t9",
+      "points": 1402.72,
+      "season": 2020
+    },
+    {
+      "manager_id": "t11",
+      "points": 1395.1,
+      "season": 2020
+    },
+    {
+      "manager_id": "t3",
+      "points": 1394.7,
+      "season": 2020
+    },
+    {
+      "manager_id": "t2",
+      "points": 1378.98,
+      "season": 2020
+    },
+    {
+      "manager_id": "t4",
+      "points": 1302.9,
+      "season": 2020
+    },
+    {
+      "manager_id": "t6",
+      "points": 1151.26,
+      "season": 2020
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 13,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 3,
+      "losses": 4,
+      "manager_id": "t1",
+      "playoff_seed": 1,
+      "points_against": 1369.74,
+      "points_for": 1492.22,
+      "season": 2020,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 4,
+      "losses": 4,
+      "manager_id": "t11",
+      "playoff_seed": 2,
+      "points_against": 1290.88,
+      "points_for": 1395.1,
+      "season": 2020,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 6,
+      "losses": 5,
+      "manager_id": "t5",
+      "playoff_seed": 3,
+      "points_against": 1247.9,
+      "points_for": 1440.24,
+      "season": 2020,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 2,
+      "losses": 5,
+      "manager_id": "t4",
+      "playoff_seed": 4,
+      "points_against": 1371.46,
+      "points_for": 1302.9,
+      "season": 2020,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 5,
+      "losses": 6,
+      "manager_id": "t12",
+      "playoff_seed": 5,
+      "points_against": 1469.44,
+      "points_for": 1564.26,
+      "season": 2020,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 1,
+      "losses": 6,
+      "manager_id": "t7",
+      "playoff_seed": 6,
+      "points_against": 1347.18,
+      "points_for": 1450.8,
+      "season": 2020,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 12,
+      "losses": 6,
+      "manager_id": "t3",
+      "playoff_seed": 7,
+      "points_against": 1444.8,
+      "points_for": 1394.7,
+      "season": 2020,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 7,
+      "losses": 7,
+      "manager_id": "t10",
+      "playoff_seed": 8,
+      "points_against": 1387.16,
+      "points_for": 1405.94,
+      "season": 2020,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 11,
+      "losses": 7,
+      "manager_id": "t9",
+      "playoff_seed": 9,
+      "points_against": 1382.66,
+      "points_for": 1402.72,
+      "season": 2020,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 9,
+      "losses": 8,
+      "manager_id": "t8",
+      "playoff_seed": 10,
+      "points_against": 1531.32,
+      "points_for": 1405.16,
+      "season": 2020,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 8,
+      "losses": 9,
+      "manager_id": "t2",
+      "playoff_seed": 11,
+      "points_against": 1469.34,
+      "points_for": 1378.98,
+      "season": 2020,
+      "ties": 0,
+      "wins": 4
+    },
+    {
+      "final_rank": 10,
+      "losses": 11,
+      "manager_id": "t6",
+      "playoff_seed": 12,
+      "points_against": 1472.4,
+      "points_for": 1151.26,
+      "season": 2020,
+      "ties": 0,
+      "wins": 2
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 76.86,
+        "season": 2020,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 87.3,
+        "season": 2020,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 74.18,
+        "season": 2020,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t7"
+        ],
+        "points": 64.7,
+        "season": 2020,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t12"
+        ],
+        "points": 92.42,
+        "season": 2020,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 94.8,
+        "season": 2020,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 80.98,
+        "season": 2020,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t10"
+        ],
+        "points": 70.22,
+        "season": 2020,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 88.82,
+        "season": 2020,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t3"
+        ],
+        "points": 93.12,
+        "season": 2020,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 86.14,
+        "season": 2020,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t8"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t2"
+    ],
+    "points": 136.68,
+    "season": 2020,
+    "week": 12
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 131.8,
+      "season": 2020,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 170.28,
+      "season": 2020,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 148.68,
+      "season": 2020,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 163.58,
+      "season": 2020,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 135.42,
+      "season": 2020,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 134.64,
+      "season": 2020,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 152.26,
+      "season": 2020,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t5"
+      ],
+      "points": 136.84,
+      "season": 2020,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 144.28,
+      "season": 2020,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 132.98,
+      "season": 2020,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 127.14,
+      "season": 2020,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 141.28,
+      "season": 2020,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t12"
+      ],
+      "points": 133.76,
+      "season": 2020,
+      "week": 13
+    }
+  ]
+}

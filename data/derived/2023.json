@@ -1,0 +1,2899 @@
+{
+  "franchises": [
+    {
+      "manager_id": "t1",
+      "name": "Yes, Chef",
+      "season": 2023
+    },
+    {
+      "manager_id": "t2",
+      "name": "Bishop Sycamore All-Stars",
+      "season": 2023
+    },
+    {
+      "manager_id": "t3",
+      "name": "Brosh Chaylor",
+      "season": 2023
+    },
+    {
+      "manager_id": "t4",
+      "name": "Chase-ing LVIII",
+      "season": 2023
+    },
+    {
+      "manager_id": "t5",
+      "name": "The Infirmary",
+      "season": 2023
+    },
+    {
+      "manager_id": "t6",
+      "name": "CeeDee Drive",
+      "season": 2023
+    },
+    {
+      "manager_id": "t7",
+      "name": "I'm Thielen This",
+      "season": 2023
+    },
+    {
+      "manager_id": "t8",
+      "name": "Calling Audibles",
+      "season": 2023
+    },
+    {
+      "manager_id": "t9",
+      "name": "Purdy Good at Fantasy",
+      "season": 2023
+    },
+    {
+      "manager_id": "t10",
+      "name": "Team Underperform",
+      "season": 2023
+    },
+    {
+      "manager_id": "t11",
+      "name": "Belichick's Spy",
+      "season": 2023
+    },
+    {
+      "manager_id": "t12",
+      "name": "Too Much Moxie",
+      "season": 2023
+    }
+  ],
+  "players": [
+    {
+      "espn_player_id": -16034,
+      "name": "Texans D/ST",
+      "nfl_team": "Hou",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16025,
+      "name": "49ers D/ST",
+      "nfl_team": "SF",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16023,
+      "name": "Steelers D/ST",
+      "nfl_team": "Pit",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16020,
+      "name": "Jets D/ST",
+      "nfl_team": "NYJ",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16018,
+      "name": "Saints D/ST",
+      "nfl_team": "NO",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16015,
+      "name": "Dolphins D/ST",
+      "nfl_team": "Mia",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16012,
+      "name": "Chiefs D/ST",
+      "nfl_team": "KC",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16011,
+      "name": "Colts D/ST",
+      "nfl_team": "Ind",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16005,
+      "name": "Browns D/ST",
+      "nfl_team": "Cle",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16004,
+      "name": "Bengals D/ST",
+      "nfl_team": "Cin",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16003,
+      "name": "Bears D/ST",
+      "nfl_team": "Chi",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16002,
+      "name": "Bills D/ST",
+      "nfl_team": "Buf",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": 12483,
+      "name": "Matthew Stafford",
+      "nfl_team": "LAR",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 14881,
+      "name": "Russell Wilson",
+      "nfl_team": "Pit",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 15795,
+      "name": "DeAndre Hopkins",
+      "nfl_team": "Ten",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 15818,
+      "name": "Keenan Allen",
+      "nfl_team": "Chi",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 15847,
+      "name": "Travis Kelce",
+      "nfl_team": "KC",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 15920,
+      "name": "Latavius Murray",
+      "nfl_team": "Buf",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 16460,
+      "name": "Adam Thielen",
+      "nfl_team": "Car",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 16731,
+      "name": "Brandin Cooks",
+      "nfl_team": "Dal",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 16733,
+      "name": "Odell Beckham Jr.",
+      "nfl_team": "FA",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 16737,
+      "name": "Mike Evans",
+      "nfl_team": "TB",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 16757,
+      "name": "Derek Carr",
+      "nfl_team": "NO",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 16800,
+      "name": "Davante Adams",
+      "nfl_team": "LV",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 16813,
+      "name": "Logan Thomas",
+      "nfl_team": "Wsh",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 2468609,
+      "name": "Taysom Hill",
+      "nfl_team": "NO",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 2573401,
+      "name": "Tyler Higbee",
+      "nfl_team": "LAR",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 2576414,
+      "name": "Raheem Mostert",
+      "nfl_team": "Mia",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 2576925,
+      "name": "Darren Waller",
+      "nfl_team": "NYG",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 2577327,
+      "name": "Tyler Lockett",
+      "nfl_team": "Sea",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 2577417,
+      "name": "Dak Prescott",
+      "nfl_team": "Dal",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 2975674,
+      "name": "Robert Tonyan",
+      "nfl_team": "Chi",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 2976212,
+      "name": "Stefon Diggs",
+      "nfl_team": "Buf",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 2976316,
+      "name": "Michael Thomas",
+      "nfl_team": "NO",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 2976499,
+      "name": "Amari Cooper",
+      "nfl_team": "Cle",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 2977187,
+      "name": "Cooper Kupp",
+      "nfl_team": "LAR",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3040151,
+      "name": "George Kittle",
+      "nfl_team": "SF",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3042519,
+      "name": "Aaron Jones",
+      "nfl_team": "Min",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3043078,
+      "name": "Derrick Henry",
+      "nfl_team": "Bal",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3043116,
+      "name": "Demarcus Robinson",
+      "nfl_team": "LAR",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3044720,
+      "name": "Joshua Dobbs",
+      "nfl_team": "SF",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3045138,
+      "name": "Mike Williams",
+      "nfl_team": "NYJ",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3045144,
+      "name": "Tyler Boyd",
+      "nfl_team": "Cin",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3045147,
+      "name": "James Conner",
+      "nfl_team": "Ari",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3045523,
+      "name": "Kendrick Bourne",
+      "nfl_team": "NE",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3046779,
+      "name": "Jared Goff",
+      "nfl_team": "Det",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3051392,
+      "name": "Ezekiel Elliott",
+      "nfl_team": "NE",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3051876,
+      "name": "Evan Engram",
+      "nfl_team": "Jax",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3051926,
+      "name": "Gus Edwards",
+      "nfl_team": "LAC",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3052587,
+      "name": "Baker Mayfield",
+      "nfl_team": "TB",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3054850,
+      "name": "Alvin Kamara",
+      "nfl_team": "NO",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3059722,
+      "name": "Zay Jones",
+      "nfl_team": "Jax",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3059915,
+      "name": "Kareem Hunt",
+      "nfl_team": "Cle",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3068267,
+      "name": "Austin Ekeler",
+      "nfl_team": "Wsh",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3116165,
+      "name": "Chris Godwin",
+      "nfl_team": "TB",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3116385,
+      "name": "Joe Mixon",
+      "nfl_team": "Hou",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3116389,
+      "name": "Samaje Perine",
+      "nfl_team": "Den",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3116406,
+      "name": "Tyreek Hill",
+      "nfl_team": "Mia",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3117251,
+      "name": "Christian McCaffrey",
+      "nfl_team": "SF",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3117256,
+      "name": "Dalton Schultz",
+      "nfl_team": "Hou",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3121023,
+      "name": "Dallas Goedert",
+      "nfl_team": "Phi",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3121409,
+      "name": "Noah Brown",
+      "nfl_team": "Hou",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3121422,
+      "name": "Terry McLaurin",
+      "nfl_team": "Wsh",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3121427,
+      "name": "Curtis Samuel",
+      "nfl_team": "Buf",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3122672,
+      "name": "Royce Freeman",
+      "nfl_team": "LAR",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3122976,
+      "name": "Jeff Wilson Jr.",
+      "nfl_team": "Mia",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3123076,
+      "name": "David Njoku",
+      "nfl_team": "Cle",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3125116,
+      "name": "D'Onta Foreman",
+      "nfl_team": "Cle",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3126486,
+      "name": "Deebo Samuel",
+      "nfl_team": "SF",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3128429,
+      "name": "Courtland Sutton",
+      "nfl_team": "Den",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3139477,
+      "name": "Patrick Mahomes",
+      "nfl_team": "KC",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3886812,
+      "name": "Jake Browning",
+      "nfl_team": "Cin",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3895856,
+      "name": "Christian Kirk",
+      "nfl_team": "Jax",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3915416,
+      "name": "DJ Moore",
+      "nfl_team": "Chi",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3915486,
+      "name": "Tyler Conklin",
+      "nfl_team": "NYJ",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3916148,
+      "name": "Tony Pollard",
+      "nfl_team": "Ten",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3916387,
+      "name": "Lamar Jackson",
+      "nfl_team": "Bal",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3916433,
+      "name": "Jakobi Meyers",
+      "nfl_team": "LV",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3916566,
+      "name": "K.J. Osborn",
+      "nfl_team": "NE",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3917315,
+      "name": "Kyler Murray",
+      "nfl_team": "Ari",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3918298,
+      "name": "Josh Allen",
+      "nfl_team": "Buf",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 3918639,
+      "name": "Gerald Everett",
+      "nfl_team": "Chi",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 3925357,
+      "name": "Calvin Ridley",
+      "nfl_team": "Ten",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 3929630,
+      "name": "Saquon Barkley",
+      "nfl_team": "Phi",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 3932905,
+      "name": "Diontae Johnson",
+      "nfl_team": "Car",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4032473,
+      "name": "Rashid Shaheed",
+      "nfl_team": "NO",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4035198,
+      "name": "Brandon Johnson",
+      "nfl_team": "Den",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4035538,
+      "name": "David Montgomery",
+      "nfl_team": "Det",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4035676,
+      "name": "Zack Moss",
+      "nfl_team": "Cin",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4035687,
+      "name": "Michael Pittman Jr.",
+      "nfl_team": "Ind",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4035886,
+      "name": "Khalil Herbert",
+      "nfl_team": "Chi",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4036133,
+      "name": "T.J. Hockenson",
+      "nfl_team": "Min",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4036378,
+      "name": "Jordan Love",
+      "nfl_team": "GB",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4037235,
+      "name": "Greg Dortch",
+      "nfl_team": "Ari",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4038441,
+      "name": "Justice Hill",
+      "nfl_team": "Bal",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4038815,
+      "name": "Rico Dowdle",
+      "nfl_team": "Dal",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4040715,
+      "name": "Jalen Hurts",
+      "nfl_team": "Phi",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4040761,
+      "name": "Devin Singletary",
+      "nfl_team": "NYG",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4045163,
+      "name": "Miles Sanders",
+      "nfl_team": "Car",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4047365,
+      "name": "Josh Jacobs",
+      "nfl_team": "GB",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4047646,
+      "name": "A.J. Brown",
+      "nfl_team": "Phi",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4047650,
+      "name": "DK Metcalf",
+      "nfl_team": "Sea",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4048244,
+      "name": "Alexander Mattison",
+      "nfl_team": "LV",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4239934,
+      "name": "AJ Dillon",
+      "nfl_team": "GB",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4239993,
+      "name": "Tee Higgins",
+      "nfl_team": "Cin",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4239996,
+      "name": "Travis Etienne Jr.",
+      "nfl_team": "Jax",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4240021,
+      "name": "Cam Akers",
+      "nfl_team": "Min",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4241372,
+      "name": "Marquise Brown",
+      "nfl_team": "KC",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4241389,
+      "name": "CeeDee Lamb",
+      "nfl_team": "Dal",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4241416,
+      "name": "Chuba Hubbard",
+      "nfl_team": "Car",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4241457,
+      "name": "Najee Harris",
+      "nfl_team": "Pit",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4241463,
+      "name": "Jerry Jeudy",
+      "nfl_team": "Cle",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4241474,
+      "name": "Brian Robinson Jr.",
+      "nfl_team": "Wsh",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4241478,
+      "name": "DeVonta Smith",
+      "nfl_team": "Phi",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4241479,
+      "name": "Tua Tagovailoa",
+      "nfl_team": "Mia",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4242214,
+      "name": "Clyde Edwards-Helaire",
+      "nfl_team": "KC",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4242335,
+      "name": "Jonathan Taylor",
+      "nfl_team": "Ind",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4242355,
+      "name": "Jake Ferguson",
+      "nfl_team": "Dal",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4242431,
+      "name": "Ty Chandler",
+      "nfl_team": "Min",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4242433,
+      "name": "Joshua Palmer",
+      "nfl_team": "LAC",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4243537,
+      "name": "Gabe Davis",
+      "nfl_team": "Jax",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4248528,
+      "name": "Christian Watson",
+      "nfl_team": "GB",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4258173,
+      "name": "Nico Collins",
+      "nfl_team": "Hou",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4258595,
+      "name": "Cole Kmet",
+      "nfl_team": "Chi",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4259545,
+      "name": "D'Andre Swift",
+      "nfl_team": "Chi",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4262921,
+      "name": "Justin Jefferson",
+      "nfl_team": "Min",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4360238,
+      "name": "Dameon Pierce",
+      "nfl_team": "Hou",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4360248,
+      "name": "Kyle Pitts",
+      "nfl_team": "Atl",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4360294,
+      "name": "Antonio Gibson",
+      "nfl_team": "NE",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4360310,
+      "name": "Trevor Lawrence",
+      "nfl_team": "Jax",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4360438,
+      "name": "Brandon Aiyuk",
+      "nfl_team": "SF",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4360635,
+      "name": "Chigoziem Okonkwo",
+      "nfl_team": "Ten",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4361050,
+      "name": "Isaiah Likely",
+      "nfl_team": "Bal",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4361307,
+      "name": "Trey McBride",
+      "nfl_team": "Ari",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4361370,
+      "name": "Chris Olave",
+      "nfl_team": "NO",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4361409,
+      "name": "Jahan Dotson",
+      "nfl_team": "Wsh",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4361411,
+      "name": "Pat Freiermuth",
+      "nfl_team": "Pit",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4361432,
+      "name": "Romeo Doubs",
+      "nfl_team": "GB",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4361529,
+      "name": "Isiah Pacheco",
+      "nfl_team": "KC",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4361579,
+      "name": "Javonte Williams",
+      "nfl_team": "Den",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4361741,
+      "name": "Brock Purdy",
+      "nfl_team": "SF",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4361777,
+      "name": "Zamir White",
+      "nfl_team": "LV",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4362238,
+      "name": "Chase Brown",
+      "nfl_team": "Cin",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4362249,
+      "name": "Jayden Reed",
+      "nfl_team": "GB",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4362504,
+      "name": "Brevin Jordan",
+      "nfl_team": "Hou",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4362628,
+      "name": "Ja'Marr Chase",
+      "nfl_team": "Cin",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4362887,
+      "name": "Justin Fields",
+      "nfl_team": "Pit",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4366031,
+      "name": "Tank Dell",
+      "nfl_team": "Hou",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4372016,
+      "name": "Jaylen Waddle",
+      "nfl_team": "Mia",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4372019,
+      "name": "Jerome Ford",
+      "nfl_team": "Cle",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4372414,
+      "name": "Elijah Moore",
+      "nfl_team": "Cle",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4373626,
+      "name": "Tyler Allgeier",
+      "nfl_team": "Atl",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4374302,
+      "name": "Amon-Ra St. Brown",
+      "nfl_team": "Det",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4379399,
+      "name": "James Cook",
+      "nfl_team": "Buf",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4426354,
+      "name": "George Pickens",
+      "nfl_team": "Pit",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4426385,
+      "name": "Zach Charbonnet",
+      "nfl_team": "Sea",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4426386,
+      "name": "Roschon Johnson",
+      "nfl_team": "Chi",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4426388,
+      "name": "Jameson Williams",
+      "nfl_team": "Det",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4426485,
+      "name": "Jonathan Mingo",
+      "nfl_team": "Car",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4426502,
+      "name": "Drake London",
+      "nfl_team": "Atl",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4426515,
+      "name": "Puka Nacua",
+      "nfl_team": "LAR",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4426875,
+      "name": "Sam Howell",
+      "nfl_team": "Sea",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4427095,
+      "name": "DeMario Douglas",
+      "nfl_team": "NE",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4427366,
+      "name": "Breece Hall",
+      "nfl_team": "NYJ",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4428085,
+      "name": "Luke Musgrave",
+      "nfl_team": "GB",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4428331,
+      "name": "Rashee Rice",
+      "nfl_team": "KC",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4428557,
+      "name": "Tyjae Spears",
+      "nfl_team": "Ten",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4429013,
+      "name": "Tank Bigsby",
+      "nfl_team": "Jax",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4429025,
+      "name": "Quentin Johnston",
+      "nfl_team": "LAC",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4429084,
+      "name": "Anthony Richardson",
+      "nfl_team": "Ind",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4429160,
+      "name": "De'Von Achane",
+      "nfl_team": "Mia",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4429205,
+      "name": "Jordan Addison",
+      "nfl_team": "Min",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4429615,
+      "name": "Zay Flowers",
+      "nfl_team": "Bal",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4429795,
+      "name": "Jahmyr Gibbs",
+      "nfl_team": "Det",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4430027,
+      "name": "Sam LaPorta",
+      "nfl_team": "Det",
+      "position": "TE"
+    },
+    {
+      "espn_player_id": 4430737,
+      "name": "Kyren Williams",
+      "nfl_team": "LAR",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4430807,
+      "name": "Bijan Robinson",
+      "nfl_team": "Atl",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4430878,
+      "name": "Jaxon Smith-Njigba",
+      "nfl_team": "Sea",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4432577,
+      "name": "C.J. Stroud",
+      "nfl_team": "Hou",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 4567048,
+      "name": "Kenneth Walker III",
+      "nfl_team": "Sea",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4569173,
+      "name": "Rhamondre Stevenson",
+      "nfl_team": "NE",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4569587,
+      "name": "Wan'Dale Robinson",
+      "nfl_team": "NYG",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4569618,
+      "name": "Garrett Wilson",
+      "nfl_team": "NYJ",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4569987,
+      "name": "Jaylen Warren",
+      "nfl_team": "Pit",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4596334,
+      "name": "Keaton Mitchell",
+      "nfl_team": "Bal",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4688813,
+      "name": "Josh Downs",
+      "nfl_team": "Ind",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4697815,
+      "name": "Rachaad White",
+      "nfl_team": "TB",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4722893,
+      "name": "Jaleel McLaughlin",
+      "nfl_team": "Den",
+      "position": "RB"
+    }
+  ],
+  "review": {
+    "waiver_base_mismatches": [],
+    "waiver_bases_verified": 77,
+    "warnings": []
+  },
+  "roster": [
+    {
+      "acquired_at": "2023-09-17T16:06:00.818000",
+      "base_salary": 0,
+      "espn_player_id": -16023,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 25,
+      "espn_player_id": 15795,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-29T09:59:24.870000",
+      "base_salary": 0,
+      "espn_player_id": 2573401,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 6,
+      "espn_player_id": 2576414,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 23,
+      "espn_player_id": 2577327,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.304000",
+      "base_salary": 75,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-06T17:07:22.754000",
+      "base_salary": 0,
+      "espn_player_id": 3059722,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 11,
+      "espn_player_id": 3895856,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 2,
+      "espn_player_id": 3916433,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 11,
+      "espn_player_id": 4035886,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.304000",
+      "base_salary": 6,
+      "espn_player_id": 4036133,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 16,
+      "espn_player_id": 4241372,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-13T20:19:21.670000",
+      "base_salary": 0,
+      "espn_player_id": 4360310,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.304000",
+      "base_salary": 0,
+      "espn_player_id": 4362887,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4366031,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-09T12:56:21.280000",
+      "base_salary": 0,
+      "espn_player_id": 4722893,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-22T10:51:01.629000",
+      "base_salary": 6,
+      "espn_player_id": -16015,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 4,
+      "espn_player_id": 16460,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-01T09:04:45.807000",
+      "base_salary": 12,
+      "espn_player_id": 16731,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 29,
+      "espn_player_id": 2976212,
+      "kept_prior_year": true,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-14T14:32:14.859000",
+      "base_salary": 36,
+      "espn_player_id": 3042519,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-12-06T08:09:36.311000",
+      "base_salary": 10,
+      "espn_player_id": 3044720,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-20T07:26:17.144000",
+      "base_salary": 12,
+      "espn_player_id": 3059915,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-14T14:32:14.859000",
+      "base_salary": 6,
+      "espn_player_id": 3121023,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-11-30T23:32:45.216000",
+      "base_salary": 0,
+      "espn_player_id": 3886812,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 15,
+      "espn_player_id": 3925357,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-21T11:48:55.267000",
+      "base_salary": 56,
+      "espn_player_id": 3929630,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 22,
+      "espn_player_id": 4048244,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 20,
+      "espn_player_id": 4262921,
+      "kept_prior_year": true,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 3,
+      "espn_player_id": 4428557,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 63,
+      "espn_player_id": 4430807,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 3,
+      "espn_player_id": -16025,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-18T01:57:14.727000",
+      "base_salary": 0,
+      "espn_player_id": 12483,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-24T14:48:36.266000",
+      "base_salary": 0,
+      "espn_player_id": 14881,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 5,
+      "espn_player_id": 16733,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 23,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 40,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-26T01:06:31.266000",
+      "base_salary": 0,
+      "espn_player_id": 3122672,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 15,
+      "espn_player_id": 4240021,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 40,
+      "espn_player_id": 4241457,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 15,
+      "espn_player_id": 4259545,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-17T19:21:57.779000",
+      "base_salary": 0,
+      "espn_player_id": 4372019,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 20,
+      "espn_player_id": 4374302,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 7,
+      "espn_player_id": 4426388,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-09T16:29:29.178000",
+      "base_salary": 0,
+      "espn_player_id": 4428085,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 4,
+      "espn_player_id": 4429025,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4430027,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-21T07:00:32.033000",
+      "base_salary": 3,
+      "espn_player_id": -16005,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 18,
+      "espn_player_id": 16737,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-28T23:15:36.104000",
+      "base_salary": 0,
+      "espn_player_id": 16757,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 33,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-27T09:17:09.510000",
+      "base_salary": 1,
+      "espn_player_id": 3043116,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 69,
+      "espn_player_id": 3068267,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-15T18:54:50.091000",
+      "base_salary": 0,
+      "espn_player_id": 3122976,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 10,
+      "espn_player_id": 4047646,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4239996,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 2,
+      "espn_player_id": 4241479,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-30T08:55:32.831000",
+      "base_salary": 51,
+      "espn_player_id": 4242214,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-01T09:04:45.869000",
+      "base_salary": 0,
+      "espn_player_id": 4242355,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 6,
+      "espn_player_id": 4243537,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-27T12:04:57.178000",
+      "base_salary": 0,
+      "espn_player_id": 4429013,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 3,
+      "espn_player_id": 4429160,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 12,
+      "espn_player_id": 4569618,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": -16012,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-02T17:30:00.439000",
+      "base_salary": 0,
+      "espn_player_id": 16813,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 24,
+      "espn_player_id": 2576925,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 3051926,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-15T08:45:27.141000",
+      "base_salary": 2,
+      "espn_player_id": 4038815,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.304000",
+      "base_salary": 37,
+      "espn_player_id": 4047365,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-13T08:56:21.874000",
+      "base_salary": 50,
+      "espn_player_id": 4242431,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 29,
+      "espn_player_id": 4248528,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 7,
+      "espn_player_id": 4258173,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 19,
+      "espn_player_id": 4360438,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-13T07:57:52.627000",
+      "base_salary": 0,
+      "espn_player_id": 4361741,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-13T08:56:21.877000",
+      "base_salary": 25,
+      "espn_player_id": 4361777,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 45,
+      "espn_player_id": 4372016,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-07T08:41:55.801000",
+      "base_salary": 0,
+      "espn_player_id": 4426385,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-08T19:01:11.368000",
+      "base_salary": 0,
+      "espn_player_id": 4426515,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.304000",
+      "base_salary": 13,
+      "espn_player_id": 4567048,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-13T08:56:21.913000",
+      "base_salary": 4,
+      "espn_player_id": -16002,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 29,
+      "espn_player_id": 15818,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-14T22:50:39.714000",
+      "base_salary": 41,
+      "espn_player_id": 2977187,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 10,
+      "espn_player_id": 3128429,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-14T22:50:39.714000",
+      "base_salary": 23,
+      "espn_player_id": 3916387,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-12-30T01:08:57.871000",
+      "base_salary": 0,
+      "espn_player_id": 4035198,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-31T15:56:40.036000",
+      "base_salary": 0,
+      "espn_player_id": 4037235,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 19,
+      "espn_player_id": 4242335,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-27T07:27:50.876000",
+      "base_salary": 13,
+      "espn_player_id": 4242433,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-01T08:59:35.269000",
+      "base_salary": 0,
+      "espn_player_id": 4360294,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-06T08:09:36.310000",
+      "base_salary": 12,
+      "espn_player_id": 4361050,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-26T16:02:29.116000",
+      "base_salary": 0,
+      "espn_player_id": 4361307,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 15,
+      "espn_player_id": 4361579,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 26,
+      "espn_player_id": 4427366,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-13T07:57:52.615000",
+      "base_salary": 21,
+      "espn_player_id": 4430737,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 10,
+      "espn_player_id": 4430878,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-06T16:39:29.914000",
+      "base_salary": 0,
+      "espn_player_id": -16018,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-14T14:32:14.859000",
+      "base_salary": 0,
+      "espn_player_id": 3045138,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 17,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-11T13:21:18.264000",
+      "base_salary": 0,
+      "espn_player_id": 3121409,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 35,
+      "espn_player_id": 3139477,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-06T16:40:11.766000",
+      "base_salary": 0,
+      "espn_player_id": 3918639,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-29T07:07:36.305000",
+      "base_salary": 0,
+      "espn_player_id": 4241416,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-14T14:32:14.858000",
+      "base_salary": 0,
+      "espn_player_id": 4241463,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 18,
+      "espn_player_id": 4361409,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 22,
+      "espn_player_id": 4379399,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 7,
+      "espn_player_id": 4426354,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-09T08:13:14.215000",
+      "base_salary": 3,
+      "espn_player_id": 4426875,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-04T07:21:10.911000",
+      "base_salary": 5,
+      "espn_player_id": 4428331,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 4,
+      "espn_player_id": 4429084,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 10,
+      "espn_player_id": 4429615,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4569987,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-29T15:33:45.291000",
+      "base_salary": 0,
+      "espn_player_id": -16020,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 56,
+      "espn_player_id": 15847,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 2577417,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 3117256,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-15T18:08:56.966000",
+      "base_salary": 0,
+      "espn_player_id": 4035676,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4040761,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-26T16:34:36.505000",
+      "base_salary": 0,
+      "espn_player_id": 4045163,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 35,
+      "espn_player_id": 4047650,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 31,
+      "espn_player_id": 4241478,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 12,
+      "espn_player_id": 4360248,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 13,
+      "espn_player_id": 4361370,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 30,
+      "espn_player_id": 4362628,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-29T15:30:37.398000",
+      "base_salary": 0,
+      "espn_player_id": 4426485,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-28T20:43:23.270000",
+      "base_salary": 0,
+      "espn_player_id": 4569587,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-14T20:39:24.373000",
+      "base_salary": 0,
+      "espn_player_id": 4596334,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-20T10:16:13.603000",
+      "base_salary": 0,
+      "espn_player_id": -16034,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-17T12:32:14.835000",
+      "base_salary": 0,
+      "espn_player_id": 15920,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 7,
+      "espn_player_id": 2976316,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 13,
+      "espn_player_id": 3051876,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-08T10:46:00.346000",
+      "base_salary": 0,
+      "espn_player_id": 3052587,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-11T07:39:28.538000",
+      "base_salary": 0,
+      "espn_player_id": 3121427,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-13T08:56:21.876000",
+      "base_salary": 30,
+      "espn_player_id": 3125116,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-19T14:10:39.829000",
+      "base_salary": 0,
+      "espn_player_id": 3917315,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 8,
+      "espn_player_id": 4035687,
+      "kept_prior_year": true,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-24T19:49:20.644000",
+      "base_salary": 0,
+      "espn_player_id": 4038441,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 8,
+      "espn_player_id": 4241389,
+      "kept_prior_year": true,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 38,
+      "espn_player_id": 4360238,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-17T12:31:32.448000",
+      "base_salary": 0,
+      "espn_player_id": 4372414,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4426386,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 11,
+      "espn_player_id": 4426502,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 18,
+      "espn_player_id": 4697815,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-23T20:16:09.981000",
+      "base_salary": 0,
+      "espn_player_id": -16003,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 53,
+      "espn_player_id": 16800,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-30T04:40:27.322000",
+      "base_salary": 0,
+      "espn_player_id": 2975674,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 3045144,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-13T07:57:52.623000",
+      "base_salary": 16,
+      "espn_player_id": 3045523,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-20T10:16:13.602000",
+      "base_salary": 21,
+      "espn_player_id": 3046779,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 2,
+      "espn_player_id": 3051392,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-29T09:59:24.866000",
+      "base_salary": 6,
+      "espn_player_id": 3116389,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 61,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 36,
+      "espn_player_id": 3126486,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-29T09:59:24.868000",
+      "base_salary": 2,
+      "espn_player_id": 3915486,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 14,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 4258595,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-28T07:11:01.589000",
+      "base_salary": 11,
+      "espn_player_id": 4361432,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-14T08:16:59.545000",
+      "base_salary": 0,
+      "espn_player_id": 4373626,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-28T12:18:20.546000",
+      "base_salary": 0,
+      "espn_player_id": 4432577,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-12-03T17:33:07.374000",
+      "base_salary": 0,
+      "espn_player_id": -16011,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-10-27T20:11:20.652000",
+      "base_salary": 0,
+      "espn_player_id": 2468609,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 22,
+      "espn_player_id": 3915416,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 18,
+      "espn_player_id": 3916148,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 1,
+      "espn_player_id": 3916566,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 26,
+      "espn_player_id": 3932905,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-13T23:56:52.107000",
+      "base_salary": 0,
+      "espn_player_id": 4032473,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 28,
+      "espn_player_id": 4040715,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 34,
+      "espn_player_id": 4239993,
+      "kept_prior_year": true,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 10,
+      "espn_player_id": 4241474,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-10T17:55:55.453000",
+      "base_salary": 0,
+      "espn_player_id": 4360635,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 8,
+      "espn_player_id": 4361411,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 11,
+      "espn_player_id": 4361529,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-10T16:43:54.877000",
+      "base_salary": 0,
+      "espn_player_id": 4362504,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 35,
+      "espn_player_id": 4429795,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-30T17:03:38.687000",
+      "base_salary": 0,
+      "espn_player_id": -16004,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 13,
+      "espn_player_id": 3040151,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 18,
+      "espn_player_id": 3116165,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 46,
+      "espn_player_id": 3116385,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 24,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-11-01T09:04:45.866000",
+      "base_salary": 5,
+      "espn_player_id": 3123076,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-14T22:50:39.714000",
+      "base_salary": 13,
+      "espn_player_id": 3918298,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-12-07T16:41:25.032000",
+      "base_salary": 0,
+      "espn_player_id": 4036378,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 8,
+      "espn_player_id": 4239934,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-12-29T00:42:56.369000",
+      "base_salary": 0,
+      "espn_player_id": 4362238,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 3,
+      "espn_player_id": 4362249,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-28T02:00:55.812000",
+      "base_salary": 0,
+      "espn_player_id": 4427095,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2023-11-14T22:50:39.714000",
+      "base_salary": 12,
+      "espn_player_id": 4429205,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2023-09-02T01:56:22.305000",
+      "base_salary": 6,
+      "espn_player_id": 4569173,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2023-10-06T08:16:56.050000",
+      "base_salary": 0,
+      "espn_player_id": 4688813,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2023,
+      "source": "waiver"
+    }
+  ],
+  "season": 2023,
+  "source": {
+    "base_salary_field": "keeperValueFuture",
+    "drafted": true,
+    "trade_deadline": "2023-11-22T17:00:00"
+  }
+}

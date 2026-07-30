@@ -1,0 +1,502 @@
+{
+  "payouts": [],
+  "positional_studs": [
+    {
+      "espn_player_id": 3916387,
+      "manager_ids": [
+        "t8"
+      ],
+      "player_name": "Lamar Jackson",
+      "points": 42.62,
+      "position": "QB",
+      "season": 2022,
+      "week": 2
+    },
+    {
+      "espn_player_id": 3116385,
+      "manager_ids": [
+        "t2"
+      ],
+      "player_name": "Joe Mixon",
+      "points": 53.1,
+      "position": "RB",
+      "season": 2022,
+      "week": 9
+    },
+    {
+      "espn_player_id": 16737,
+      "manager_ids": [
+        "t1"
+      ],
+      "player_name": "Mike Evans",
+      "points": 43.7,
+      "position": "WR",
+      "season": 2022,
+      "week": 17
+    },
+    {
+      "espn_player_id": 4036133,
+      "manager_ids": [
+        "t1"
+      ],
+      "player_name": "T.J. Hockenson",
+      "points": 35.9,
+      "position": "TE",
+      "season": 2022,
+      "week": 4
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t2"
+    ],
+    "issues": [
+      {
+        "code": "no_prize_schedule",
+        "manager_id": null,
+        "message": "no prize amounts recorded for 2022 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
+        "position": null,
+        "severity": "review",
+        "week": null
+      }
+    ],
+    "warnings": []
+  },
+  "season": 2022,
+  "season_points": [
+    {
+      "manager_id": "t3",
+      "points": 1761.6,
+      "season": 2022
+    },
+    {
+      "manager_id": "t7",
+      "points": 1738.12,
+      "season": 2022
+    },
+    {
+      "manager_id": "t10",
+      "points": 1720.38,
+      "season": 2022
+    },
+    {
+      "manager_id": "t11",
+      "points": 1621.22,
+      "season": 2022
+    },
+    {
+      "manager_id": "t2",
+      "points": 1445.98,
+      "season": 2022
+    },
+    {
+      "manager_id": "t1",
+      "points": 1403.94,
+      "season": 2022
+    },
+    {
+      "manager_id": "t12",
+      "points": 1393.06,
+      "season": 2022
+    },
+    {
+      "manager_id": "t5",
+      "points": 1322.36,
+      "season": 2022
+    },
+    {
+      "manager_id": "t4",
+      "points": 1313.96,
+      "season": 2022
+    },
+    {
+      "manager_id": "t8",
+      "points": 1301.8,
+      "season": 2022
+    },
+    {
+      "manager_id": "t9",
+      "points": 1241.52,
+      "season": 2022
+    },
+    {
+      "manager_id": "t6",
+      "points": 1144.3,
+      "season": 2022
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 14,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 4,
+      "losses": 1,
+      "manager_id": "t11",
+      "playoff_seed": 1,
+      "points_against": 1346.28,
+      "points_for": 1621.22,
+      "season": 2022,
+      "ties": 0,
+      "wins": 13
+    },
+    {
+      "final_rank": 3,
+      "losses": 3,
+      "manager_id": "t7",
+      "playoff_seed": 2,
+      "points_against": 1328.14,
+      "points_for": 1738.12,
+      "season": 2022,
+      "ties": 0,
+      "wins": 11
+    },
+    {
+      "final_rank": 6,
+      "losses": 5,
+      "manager_id": "t5",
+      "playoff_seed": 3,
+      "points_against": 1393.02,
+      "points_for": 1322.36,
+      "season": 2022,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 5,
+      "losses": 6,
+      "manager_id": "t10",
+      "playoff_seed": 4,
+      "points_against": 1468.6,
+      "points_for": 1720.38,
+      "season": 2022,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 1,
+      "losses": 6,
+      "manager_id": "t1",
+      "playoff_seed": 5,
+      "points_against": 1432.44,
+      "points_for": 1403.94,
+      "season": 2022,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 2,
+      "losses": 7,
+      "manager_id": "t3",
+      "playoff_seed": 6,
+      "points_against": 1590.36,
+      "points_for": 1761.6,
+      "season": 2022,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 7,
+      "losses": 7,
+      "manager_id": "t2",
+      "playoff_seed": 7,
+      "points_against": 1435.38,
+      "points_for": 1445.98,
+      "season": 2022,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 8,
+      "losses": 8,
+      "manager_id": "t4",
+      "playoff_seed": 8,
+      "points_against": 1376.58,
+      "points_for": 1313.96,
+      "season": 2022,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 9,
+      "losses": 9,
+      "manager_id": "t12",
+      "playoff_seed": 9,
+      "points_against": 1530.26,
+      "points_for": 1393.06,
+      "season": 2022,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 10,
+      "losses": 9,
+      "manager_id": "t8",
+      "playoff_seed": 10,
+      "points_against": 1450.04,
+      "points_for": 1301.8,
+      "season": 2022,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 11,
+      "losses": 10,
+      "manager_id": "t9",
+      "playoff_seed": 11,
+      "points_against": 1470.08,
+      "points_for": 1241.52,
+      "season": 2022,
+      "ties": 0,
+      "wins": 4
+    },
+    {
+      "final_rank": 12,
+      "losses": 13,
+      "manager_id": "t6",
+      "playoff_seed": 12,
+      "points_against": 1587.06,
+      "points_for": 1144.3,
+      "season": 2022,
+      "ties": 0,
+      "wins": 1
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t8"
+        ],
+        "points": 71.62,
+        "season": 2022,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 57.7,
+        "season": 2022,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 75.24,
+        "season": 2022,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 77.88,
+        "season": 2022,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 87.04,
+        "season": 2022,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t12"
+        ],
+        "points": 84.3,
+        "season": 2022,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t10"
+        ],
+        "points": 76.42,
+        "season": 2022,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 92.1,
+        "season": 2022,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t3"
+        ],
+        "points": 94.7,
+        "season": 2022,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 101.38,
+        "season": 2022,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 105.88,
+        "season": 2022,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t7"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t8"
+    ],
+    "points": 149.32,
+    "season": 2022,
+    "week": 2
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 156.92,
+      "season": 2022,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 172.48,
+      "season": 2022,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 152.2,
+      "season": 2022,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 144.0,
+      "season": 2022,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 192.16,
+      "season": 2022,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 116.8,
+      "season": 2022,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 130.12,
+      "season": 2022,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 151.9,
+      "season": 2022,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t2"
+      ],
+      "points": 140.4,
+      "season": 2022,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t11"
+      ],
+      "points": 149.0,
+      "season": 2022,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t7",
+        "t8"
+      ],
+      "points": 134.26,
+      "season": 2022,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 133.72,
+      "season": 2022,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 157.12,
+      "season": 2022,
+      "week": 13
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 133.48,
+      "season": 2022,
+      "week": 14
+    }
+  ]
+}
