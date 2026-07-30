@@ -5,13 +5,14 @@ screen: post the form, call the function, re-render the fragment. Nothing here r
 salary, a fee tier or a tax — those come from ``keeper_rules`` and are handed to the templates
 already computed, the same arrangement ``rs57.site`` uses. The templates loop and format.
 
-The other half of this module's job is saying what has **not** been checked. Three keeper rules
+The other half of this module's job is saying what has **not** been checked. Two things
 cannot be verified from anything in ``data/``:
 
-* prospect rule 2 (never started by any league team) needs box-score history — Phase 5. The
-  engine already reports ``PROSPECT_START_HISTORY_UNVERIFIED`` for it.
-* prospect rule 1 (at most one NFL season) needs seasons-played data that no file here holds.
-  The engine's check silently passes when the mapping is empty, so this module adds the note.
+* prospect rule 1 — **a prospect must be a rookie** — needs a rookie year or a seasons-played
+  count, and ESPN's player payload carries neither. The engine's check silently passes when
+  the mapping is empty, so this module adds the note. What *is* enforceable is a repeat
+  prospect claim: a player has one rookie season, so if he was a prospect before he is not a
+  rookie now, and ``PROSPECT_REPEAT_CLAIM`` catches that much.
 * the fee waiver needs a recorded consolation winner. Until one exists, fees are priced in
   full and the screen says the waiver is unconfirmed.
 
@@ -172,9 +173,10 @@ def _prospect_notes(claims: list[KeeperClaim], deadline: datetime | None, prior:
     notes = [
         Note(
             "review",
-            "Prospect rule 1 (at most one NFL season) is NOT checked: nothing in data/ records "
-            "how many NFL seasons a player has played, so the engine's check has no data to "
-            "fail on. Confirm it by eye.",
+            "Prospect rule 1 (must be a rookie) is NOT checked: ESPN carries no rookie year "
+            "and nothing in data/ records how many NFL seasons a player has played, so the "
+            "engine's check has no data to fail on. A repeat prospect claim IS caught, since "
+            "nobody has two rookie seasons. Confirm the rest by eye.",
         )
     ]
     if deadline is None:
@@ -323,8 +325,8 @@ def build_team_screen(
         notes.append(
             Note(
                 "info",
-                "Some prior prospect keeps come from data/manual/prospects.json rather than "
-                "recorded claims, because no claims exist for completed seasons yet.",
+                "Some prior prospect keeps come from the frozen claims in data/history/ "
+                "rather than from claims recorded here.",
                 team_specific=False,
             )
         )

@@ -1,5 +1,41 @@
 # Phase 5 handoff — history and backfill
 
+> **CLOSED 2026-07-30.** Every question in "Still open" below is answered; the answers are in
+> "Found during Phase 5" in the Corrections log of `rs57-league-app-plan.md`, and the ESPN field
+> correction is in `docs/espn-field-semantics.md`. The acceptance criterion **was run**:
+> `python -m rs57.validate` audits the ratchet for 2025 and 2026, each against the previous
+> season's recorded claims. Running it found **three** silent bugs — a completed season's
+> `keeperValue` is not the carried-in price (ESPN overwrites it at the draft); neither adjacent
+> roster snapshot is the roster keepers were declared from; and a season whose predecessor has
+> no `Fee Allocations` tab has an **unknowable $5 tax**, which the first draft of the import
+> guessed at and thereby manufactured three false findings. None of the three raised anything.
+>
+> The audit now reports 8 REVIEW items and 0 errors. They are in
+> `docs/open-reconciliations.md`, which is the working list.
+>
+> Three answers changed the shape of the phase. **The backfill goes back to 2019** for rosters
+> and box-score history, but **claims exist only for 2024 and 2025** — the workbook holds
+> exactly two `Fee Allocations` tabs, and a claim reconstructed from ESPN's own `bidAmount`
+> would make the ratchet audit tautological. **Prospect rule 2 is retired** (commissioner,
+> 2026-07-30): prospects may be started, and the only stipulation is that they are rookies.
+> **The repeat-prospect check therefore matters more, not less** — ESPN carries no rookie year,
+> so a repeat claim is the only detectable form of the rookie rule, and it applies from
+> `PROSPECT_RULES_TIGHTENED` rather than retroactively.
+>
+> The section below is kept as the record of what was open.
+
+## What the audit found — for the commissioner, not for code
+
+The working list is `docs/open-reconciliations.md`. In short: eight keepers where what the
+record says was owed and what ESPN charged disagree. Three are the workbook's
+`Manually Changed Salaries` rows (Saquon, Jaxon Smith-Njigba, Jonathan Taylor, all 2025), which
+have **never been recorded as `SalaryOverride` rows** — entering them in the admin tool clears
+those three. The other five have no recorded explanation and are most likely unrecorded
+draft-cash trades. Michael Pittman Jr. appears in consecutive seasons, so he compounds.
+
+The box-score history is still frozen for 2019-2025, but **nothing reads it** now that rule 2
+is gone. It is retained as league history rather than deleted, and the docstrings say so.
+
 Written at the end of Phase 4. Everything here is context a fresh session cannot recover from the
 repo alone. Read `CLAUDE.md` first; it holds the rules. `docs/phase-4-notes.md` records what the
 admin tool settled and why. This holds what Phase 5 needs and what is still open.

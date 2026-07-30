@@ -661,3 +661,76 @@ button **pushes to `main`** behind a mandatory diff preview, which is the only r
 state lives in a new `data/manual/payments.json` keyed on `(season, label, winner_manager_id)` —
 `Payout.paid` could not be used because `stats_sync` writes those rows into `data/derived/` and the
 nightly Action rewrites that file every run.
+
+### Found during Phase 5
+
+Full detail in `rs57/backfill.py`'s module docstring, `rs57/history.py`, and the Phase 5
+correction in `docs/espn-field-semantics.md`.
+
+**`keeperValue` stops being the carried-in price the moment a season drafts.** The field
+semantics doc was settled against 2026, which had not drafted, and the answer does not
+generalise backwards: for a completed season ESPN overwrites `keeperValue` with
+`keeperValueFuture`, so both hold what that season's own auction charged. The carried-in price
+for season *Y* is `keeperValueFuture(Y−1)`, read from the previous season's payload, and it is
+not recoverable from *Y*'s own once *Y* has drafted. Getting this wrong makes every keeper look
+as though he carried in exactly what he was charged, and `check_base_continuity` then reports
+the whole league as off by precisely its own fees and taxes. **Nothing raises.** It was caught
+by running the audit and reading fifteen REVIEW items that were all off by $5 or by one fee
+tier. `validate.check_carried_in_prices` is now the tripwire.
+
+**A backfill built from ESPN alone would make the ratchet audit tautological.** Next season's
+`keeperValue` equals this season's keeper `bidAmount` by construction, so a `computed_salary`
+reconstructed from ESPN's own charge would be audited against itself and report a clean ratchet
+having verified nothing — the same failure `audit_ratchet`'s comment warns about, from the
+other direction. The audit only has teeth when `computed_salary` is built independently: last
+season's price, plus the fee the manager allocated, plus the tax. That fee split exists in
+exactly one place, the `Keepers` workbook's `Fee Allocations` tabs, and **there are only two of
+them.** So 2024 and 2025 have claims and 2019-2023 do not; the earlier seasons are frozen for
+their carried-in prices and their box-score history and carry no claim rows.
+
+**ESPN's answer window is 2019-2025.** 2018 returns `401`, 2017 and earlier `404`. Rosters,
+draft records, FAAB and box scores are complete throughout. **2019 and 2020 ran 13
+regular-season weeks, not 14.**
+
+**Neither roster snapshot is the roster keepers were declared from, and both fail quietly.**
+The previous season's ends before the offseason trades — Garrett Wilson finished 2023 on t12
+and was kept by t1 — and the season's own end-of-year roster has already lost every keeper
+dropped during it, Christian Kirk and Kyle Pitts among them. ESPN preserves no roster as it
+stood on the keeper deadline. The draft record does, for the players that matter: a keeper pick
+names the team that kept him. That is what `roster_at_declaration` is built from.
+
+**The sheet and ESPN disagree about real money, and the audit now says where.** Eight keepers
+across 2024 and 2025, listed in `docs/open-reconciliations.md`. Three are the
+`Manually Changed Salaries` rows (Saquon −$3, Jaxon Smith-Njigba −$1, Jonathan Taylor +$1, all
+season 2025 per the commissioner) which have **never been recorded as `SalaryOverride` rows**
+anywhere in `data/`, and so are reported every run until someone enters them through the admin
+tool — the importer must not, because `data/manual/` has one writer. The other five have no
+recorded explanation. The sheet's fee splits sum to the correct tier on every team; ESPN's
+implied ones do not. Flagged for review rather than resolved.
+
+**A tax that cannot be determined must not be guessed, and guessing it manufactures findings.**
+A prospect keep sets no $5 tax, and ESPN marks all four keeper picks identically — so for a
+season whose predecessor has no `Fee Allocations` tab, **there is no way to tell which of last
+season's keeps was the prospect.** The first import assumed taxed, which over-priced every one
+of them by exactly $5 and produced three confident false discontinuities (Kyren Williams, Drake
+London, Travis Etienne Jr.) that would have been chased through the league group chat. Those
+claims now carry `computed_salary: null` — `check_base_continuity` skips unpriced claims, so
+they are *not audited* rather than audited against a guess, while the slot and fee the tab does
+record are kept. Thirteen of 2024's forty claims are in that state.
+
+**Commissioner decisions, 2026-07-30. Prospect rule 2 is retired.** Prospects **may** be
+started; the only stipulation is that a prospect is a **rookie**. The old rule required that he
+had never been started by any league team, and separately allowed second-year players — both are
+gone, and the documentation had simply not caught up. `docs/rules.md` and `CLAUDE.md` are
+updated; `PROSPECT_ALREADY_STARTED` and `PROSPECT_START_HISTORY_UNVERIFIED` are removed.
+
+**Which makes `PROSPECT_REPEAT_CLAIM` more important, not less.** Rule 1 has no data source,
+confirmed rather than assumed: ESPN's player payload carries no rookie year and no
+seasons-played field. But a player has exactly **one** rookie season, so a repeat prospect claim
+is the one detectable form of the rookie rule. It applies from `PROSPECT_RULES_TIGHTENED` (2026)
+rather than retroactively — Tyjae Spears was legitimately a prospect in both 2024 and 2025 under
+the old rule, and applying today's rule backwards would turn a correct record into errors.
+
+**The box-score history is frozen and now reads by nothing.** It was collected for rule 2. It is
+retained as league history rather than deleted — the seasons are frozen with it — and the
+docstrings say plainly that no rule consumes it.

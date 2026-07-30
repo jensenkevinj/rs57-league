@@ -136,9 +136,7 @@
     {"case": "prospect with two NFL seasons", "expect_code": "prospect_too_many_seasons",   "severity": "error"},
     {"case": "prospect acquired after deadline","expect_code": "prospect_acquired_after_deadline", "severity": "error"},
     {"case": "prospect claimed twice",        "expect_code": "prospect_repeat_claim",       "severity": "error",
-     "why": "Tyjae Spears, claimed as a prospect in both 2024 and 2025. Confirmed an oversight."},
-    {"case": "every prospect needs review",   "expect_code": "prospect_start_history_unverified", "severity": "review",
-     "why": "Rule 2 needs historical starting-lineup data we will not have until Phase 5."},
+     "why": "A player has ONE rookie season, so a repeat prospect claim is the only detectable form of rule 1 (must be a rookie) -- ESPN carries no rookie year. Applied from 2026 only: the league previously allowed second-year prospects, which is why Tyjae Spears is legitimately a prospect in both 2024 and 2025 (commissioner, 2026-07-30)."},
     {"case": "base does not match prior salary","expect_code": "base_discontinuity",        "severity": "review"},
     {"case": "cash trade missing a leg",      "expect_code": "overrides_unbalanced",        "severity": "review"}
   ]

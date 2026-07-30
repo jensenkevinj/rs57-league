@@ -27,6 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from rs57.history import HistoryStore
 from rs57.models import (
     KeeperClaim,
     KeeperSlot,
@@ -231,14 +232,17 @@ class ManualStore:
     def prior_prospect_ids(self, before_season: int) -> tuple[set[int], bool]:
         """Players already kept in the PROSPECT slot in an earlier season.
 
-        Two sources, unioned: recorded claims, and the legacy ``prospects.json``. The legacy
-        file still exists because ``rs57.sync`` reads it to keep a prospect keep untaxed, and
-        deriving it from claims needs claims for **completed** seasons — which is the Phase 5
-        backfill, not this phase. Its own header comment says to delete it once claims exist;
-        that instruction is premature and deleting it today would silently re-tax every
-        prospect.
+        Two sources, unioned: claims recorded here for the season being decided, and the
+        frozen claims in ``data/history/``. Both are real ``KeeperClaim`` rows carrying a
+        slot, so the answer is **derived** from ``slot == PROSPECT``.
 
-        Returns the ids and whether the legacy file contributed any, so a screen can say where
+        This used to union a hand-maintained ``data/manual/prospects.json`` instead, which
+        existed only because no completed season recorded a slot — ESPN marks all four keeper
+        picks identically. The history backfill supplies those slots, which is what that
+        file's own header said had to happen before it could go. Deleting it any earlier
+        would have silently re-taxed every prospect $5.
+
+        Returns the ids and whether ``history/`` contributed any, so a screen can say where
         the answer came from.
         """
         from_claims = {
@@ -246,11 +250,10 @@ class ManualStore:
             for claim in self.claims()
             if claim.slot is KeeperSlot.PROSPECT and claim.season < before_season
         }
-        legacy: set[int] = set()
-        for year, ids in (self.load(PROSPECTS).get("seasons") or {}).items():
-            if int(year) < before_season:
-                legacy |= {int(pid) for pid in ids}
-        return from_claims | legacy, bool(legacy - from_claims)
+        # Read-only, and the only place this package looks outside data/manual/. HistoryStore
+        # owns that directory; nothing here may write it.
+        frozen = HistoryStore(data_dir=self.data_dir).prospect_ids(before_season)
+        return from_claims | frozen, bool(frozen - from_claims)
 
     # -- overrides --------------------------------------------------------------
 

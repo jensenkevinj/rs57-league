@@ -5,7 +5,7 @@ This is the reverse of the guard in ``.github/workflows/nightly.yml``. That work
 ``data/manual/`` and fails if anything else appears in the index. Neither trusts the other to
 have behaved.
 
-Two things this deliberately does not do:
+Three things this deliberately does not do:
 
 * **It never stages a path it was not asked to.** ``git add -- data/manual`` and nothing wider.
   A dirty ``data/derived/`` — which is exactly what a local ``rs57.sync`` leaves behind — is
@@ -13,6 +13,9 @@ Two things this deliberately does not do:
 * **It never commits without the diff having been rendered first.** The preview *is* the review
   step. There is no pull request between this button and a public repo, so if the diff is not
   read, nothing is.
+* **It never writes anything in order to render the preview.** See ``Git.preview`` — the
+  ``--intent-to-add`` this used to run left index entries behind that another commit would
+  write out as empty files.
 """
 
 from __future__ import annotations
@@ -128,21 +131,69 @@ class Git:
             found.append(Change(status=line[:2], path=line[3:].strip().strip('"')))
         return found
 
+    def _new_file_diff(self, path: str) -> str:
+        """A ``git diff``-shaped rendering of a file git has never seen, read from the tree.
+
+        Not byte-identical to what git would print for an added file, and it does not need to
+        be — it needs to be readable and it needs to be a *read*. The commit page is the only
+        review step between this tool and a public repo, so a new file has to show its
+        contents, not just its name.
+        """
+        try:
+            body = (self.repo / path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            return (
+                f"diff --git a/{path} b/{path}\nnew file\n--- /dev/null\n+++ b/{path}\n"
+                f"@@ unreadable: {exc} @@"
+            )
+        lines = body.splitlines()
+        return "\n".join(
+            [
+                f"diff --git a/{path} b/{path}",
+                "new file",
+                "--- /dev/null",
+                f"+++ b/{path}",
+                f"@@ -0,0 +1,{len(lines)} @@",
+                *(f"+{line}" for line in lines),
+            ]
+        )
+
     def preview(self) -> CommitPreview:
         """The diff of ``data/manual/``, including files git has never seen.
 
-        ``--intent-to-add`` is what makes a brand-new ``claims.json`` show up as a diff instead
-        of as an untracked path with no content. It records the path in the index without
-        staging its content, so this stays a read of the working tree.
+        **This runs no command that changes the repository.** An earlier version reached for
+        ``git add --intent-to-add`` to make a brand-new ``claims.json`` show up in ``git
+        diff``. For the button's own flow that was harmless, because ``commit_and_push``
+        stages the real content immediately after — but the entries stayed in the index once
+        the page was closed, and **an intent-to-add entry that gets committed is committed as
+        an empty file**. Any other commit made while the tool was open swept them in and
+        blanked them. That is not hypothetical; it happened while committing Phase 4. What
+        made it nasty is that ``git diff --cached --name-only`` did not list the paths, so
+        they looked absent from the staged set right up until the commit wrote them empty.
+
+        New files are rendered from ``git status`` plus a direct read instead. A preview that
+        mutates the repository in order to describe the repository is the wrong shape however
+        safe the mutation happens to be today — and ``data/history/`` now has a writer, where
+        an empty file committed over a frozen season is exactly the loss the freeze exists to
+        prevent.
         """
         error = None
+        every: list[Change] = []
         try:
-            self.run("add", "--intent-to-add", "--", OWNED.rstrip("/"), check=False)
+            every = self.changes()
             diff = self.run("diff", "--", OWNED.rstrip("/"))
         except GitError as exc:
             diff, error = "", str(exc)
 
-        every = self.changes()
+        untracked = [
+            change for change in every if change.owned and change.status.strip() == "??"
+        ]
+        diff = "\n".join(
+            part
+            for part in [diff.rstrip("\n"), *(self._new_file_diff(c.path) for c in untracked)]
+            if part
+        )
+
         return CommitPreview(
             branch=self.branch(),
             changes=tuple(change for change in every if change.owned),

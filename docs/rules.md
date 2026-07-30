@@ -57,14 +57,19 @@ people out:
 
 ### Prospects
 
-A prospect must meet all of these:
+A prospect must meet both of these:
 
-- **One NFL season or fewer.**
-- **Never started by any team in this league** — not just never started by you.
+- **He must be a rookie.**
 - **Rostered before the trade deadline.**
-- Kept at his acquisition value, with **no fee** and **no tax**.
 
-A player can only ever be kept as a prospect once. After that he is an ordinary keeper.
+He is kept at his acquisition value, with **no fee** and **no tax**.
+
+A player can only ever be kept as a prospect once — he has one rookie season, so the second
+claim is never legal. After that he is an ordinary keeper.
+
+**Prospects may be started.** The old rule that a prospect must never have been started by any
+team in the league was dropped, and so was the allowance for second-year players. Both changes
+are already in force; this page was simply behind.
 
 ### The consolation bracket winner
 

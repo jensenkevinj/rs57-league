@@ -1,0 +1,3505 @@
+{
+  "_about": [
+    "No claims: this season predates the Fee Allocations tabs, of which the workbook holds",
+    "exactly two (2024 and 2025). ESPN records WHICH players were kept and the price charged,",
+    "but not the slot and not the fee split, so a claim for this season cannot be recorded --",
+    "only invented. An invented claim would be worse than none: check_base_continuity would",
+    "compare a number against itself and report a clean ratchet.",
+    "",
+    "The season is still frozen here for its carried-in prices and its started-lineup history,",
+    "which ESPN does serve this far back. That history is retained as a league record; the",
+    "prospect rule that required a prospect to have never been started is retired.",
+    "",
+    "The prospect rules have CHANGED. This league once allowed both rookies and second-year",
+    "players to be prospected; it is rookies only now. So the same player legitimately appears",
+    "as a prospect in two different seasons in the record below, and that is not an error to be",
+    "tidied up. Today's repeat-claim rule is not applied retroactively to these seasons."
+  ],
+  "claims": [],
+  "fees_waived_manager_id": null,
+  "franchises": [
+    {
+      "manager_id": "t1",
+      "name": "Limited Edition",
+      "season": 2021
+    },
+    {
+      "manager_id": "t2",
+      "name": "Absolute Unit",
+      "season": 2021
+    },
+    {
+      "manager_id": "t3",
+      "name": "Davash Kupgomery",
+      "season": 2021
+    },
+    {
+      "manager_id": "t4",
+      "name": "ARob Szn",
+      "season": 2021
+    },
+    {
+      "manager_id": "t5",
+      "name": "The Infirmary",
+      "season": 2021
+    },
+    {
+      "manager_id": "t6",
+      "name": "CeeDee Drive",
+      "season": 2021
+    },
+    {
+      "manager_id": "t7",
+      "name": "Hinkie Died For Your Sins",
+      "season": 2021
+    },
+    {
+      "manager_id": "t8",
+      "name": "Greatest Show On Paper",
+      "season": 2021
+    },
+    {
+      "manager_id": "t9",
+      "name": "Taxpayer Funded Stadiums",
+      "season": 2021
+    },
+    {
+      "manager_id": "t10",
+      "name": "Cam Girl Newton",
+      "season": 2021
+    },
+    {
+      "manager_id": "t11",
+      "name": "Belichick's Spy",
+      "season": 2021
+    },
+    {
+      "manager_id": "t12",
+      "name": "Too Much Moxie",
+      "season": 2021
+    }
+  ],
+  "overrides": [],
+  "review": {
+    "notes": []
+  },
+  "roster": [
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 4,
+      "espn_player_id": -16027,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 10,
+      "espn_player_id": 8439,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 5,
+      "espn_player_id": 15072,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-25T18:29:54.351000",
+      "base_salary": 0,
+      "espn_player_id": 15971,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-27T07:23:58.753000",
+      "base_salary": 55,
+      "espn_player_id": 2974858,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-01T09:18:41.296000",
+      "base_salary": 35,
+      "espn_player_id": 2980453,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 41,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-10T21:20:44.174000",
+      "base_salary": 0,
+      "espn_player_id": 3043275,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 3116164,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-14T07:43:24.706000",
+      "base_salary": 0,
+      "espn_player_id": 3120348,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-28T16:04:34.930000",
+      "base_salary": 0,
+      "espn_player_id": 3126246,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 32,
+      "espn_player_id": 3915416,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-20T09:08:49.989000",
+      "base_salary": 0,
+      "espn_player_id": 3916430,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 3,
+      "espn_player_id": 3916433,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 5,
+      "espn_player_id": 4052042,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-03T20:02:37.106000",
+      "base_salary": 0,
+      "espn_player_id": 4243160,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-29T08:59:30.595000",
+      "base_salary": 0,
+      "espn_player_id": -16025,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 12483,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 22,
+      "espn_player_id": 13229,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-10-13T07:41:55.240000",
+      "base_salary": 0,
+      "espn_player_id": 15835,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 31,
+      "espn_player_id": 16733,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 19,
+      "espn_player_id": 2976212,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 4,
+      "espn_player_id": 3886818,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.912000",
+      "base_salary": 57,
+      "espn_player_id": 3912550,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-06T08:26:43.596000",
+      "base_salary": 13,
+      "espn_player_id": 3930066,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 11,
+      "espn_player_id": 4240657,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 64,
+      "espn_player_id": 4241457,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 15,
+      "espn_player_id": 4259545,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 10,
+      "espn_player_id": 4262921,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 26,
+      "espn_player_id": 4361579,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 3,
+      "espn_player_id": 4372016,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": -16002,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-15T14:09:42.063000",
+      "base_salary": 0,
+      "espn_player_id": 13295,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 14924,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 2,
+      "espn_player_id": 3045138,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 3,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 73,
+      "espn_player_id": 3051392,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 15,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 66,
+      "espn_player_id": 3116593,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 3122840,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-12T15:37:17.999000",
+      "base_salary": 0,
+      "espn_player_id": 3139925,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2022-01-02T16:19:27.934000",
+      "base_salary": 0,
+      "espn_player_id": 4035671,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 24,
+      "espn_player_id": 4036133,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 4040761,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4046692,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-12T15:36:26.354000",
+      "base_salary": 0,
+      "espn_player_id": 4258595,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-14T14:23:37.818000",
+      "base_salary": 0,
+      "espn_player_id": 4362452,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.152000",
+      "base_salary": 10,
+      "espn_player_id": -16024,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-06T08:26:43.597000",
+      "base_salary": 5,
+      "espn_player_id": -16017,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-01T23:40:50.875000",
+      "base_salary": 0,
+      "espn_player_id": -16015,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 5,
+      "espn_player_id": 2330,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 10,
+      "espn_player_id": 16731,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.736000",
+      "base_salary": 15,
+      "espn_player_id": 2576623,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 26,
+      "espn_player_id": 2577327,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 18,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 25,
+      "espn_player_id": 3116165,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 49,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 2,
+      "espn_player_id": 3121023,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 41,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-01T20:23:08.201000",
+      "base_salary": 0,
+      "espn_player_id": 3930086,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-19T17:44:39.604000",
+      "base_salary": 0,
+      "espn_player_id": 4048244,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-24T08:05:02.409000",
+      "base_salary": 0,
+      "espn_player_id": 4241401,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 5,
+      "espn_player_id": 4569173,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.914000",
+      "base_salary": 0,
+      "espn_player_id": -16018,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-03T20:02:11.757000",
+      "base_salary": 0,
+      "espn_player_id": 13983,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-17T08:49:53.408000",
+      "base_salary": 6,
+      "espn_player_id": 15880,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 29,
+      "espn_player_id": 16460,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 6,
+      "espn_player_id": 2577417,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-08T17:46:17.959000",
+      "base_salary": 0,
+      "espn_player_id": 3051806,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-07T07:14:28.898000",
+      "base_salary": 0,
+      "espn_player_id": 3115394,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 56,
+      "espn_player_id": 3116385,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-25T09:03:16.253000",
+      "base_salary": 0,
+      "espn_player_id": 3116389,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-03T08:52:20.185000",
+      "base_salary": 0,
+      "espn_player_id": 3128721,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 3916148,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.154000",
+      "base_salary": 8,
+      "espn_player_id": 3916566,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-16T21:48:10.794000",
+      "base_salary": 0,
+      "espn_player_id": 3918639,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 17,
+      "espn_player_id": 4039359,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-06T08:26:43.597000",
+      "base_salary": 9,
+      "espn_player_id": 4040655,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 4047650,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T15:58:19.257000",
+      "base_salary": 0,
+      "espn_player_id": -16003,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-06T12:15:46.540000",
+      "base_salary": 0,
+      "espn_player_id": 13981,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.153000",
+      "base_salary": 10,
+      "espn_player_id": 13982,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 29,
+      "espn_player_id": 16737,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-16T09:05:57.666000",
+      "base_salary": 4,
+      "espn_player_id": 16790,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 64,
+      "espn_player_id": 16800,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 12,
+      "espn_player_id": 2576434,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 23,
+      "espn_player_id": 2977187,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 18,
+      "espn_player_id": 3059915,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-13T07:41:55.234000",
+      "base_salary": 41,
+      "espn_player_id": 3115375,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 20,
+      "espn_player_id": 3116365,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-17T08:49:53.407000",
+      "base_salary": 11,
+      "espn_player_id": 3125116,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3918298,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 18,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 4040715,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-10T08:18:22.907000",
+      "base_salary": 4,
+      "espn_player_id": 4361411,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-02T23:24:15.660000",
+      "base_salary": 0,
+      "espn_player_id": -16022,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.915000",
+      "base_salary": 0,
+      "espn_player_id": -16021,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 8,
+      "espn_player_id": 13934,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 19,
+      "espn_player_id": 16799,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-06T17:55:33.362000",
+      "base_salary": 0,
+      "espn_player_id": 3115378,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 19,
+      "espn_player_id": 3139477,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-27T12:44:17.464000",
+      "base_salary": 0,
+      "espn_player_id": 3895856,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 20,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 60,
+      "espn_player_id": 3929630,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-02T23:25:34.137000",
+      "base_salary": 0,
+      "espn_player_id": 4036131,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-15T07:12:40.657000",
+      "base_salary": 67,
+      "espn_player_id": 4241555,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 6,
+      "espn_player_id": 4241985,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 30,
+      "espn_player_id": 4242335,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-04T15:29:39.027000",
+      "base_salary": 0,
+      "espn_player_id": 4372414,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-03T06:41:11.509000",
+      "base_salary": 0,
+      "espn_player_id": -16011,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.143000",
+      "base_salary": 10,
+      "espn_player_id": -16007,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-22T08:01:02.403000",
+      "base_salary": 25,
+      "espn_player_id": 15807,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 17,
+      "espn_player_id": 2574808,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 7,
+      "espn_player_id": 2979843,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 10,
+      "espn_player_id": 3045144,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 3046439,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3917315,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 36,
+      "espn_player_id": 3925357,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-09T07:04:24.125000",
+      "base_salary": 1,
+      "espn_player_id": 4046530,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 32,
+      "espn_player_id": 4047365,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 19,
+      "espn_player_id": 4241463,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 21,
+      "espn_player_id": 4241478,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 11,
+      "espn_player_id": 4360248,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 20,
+      "espn_player_id": 4362628,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-10T08:18:22.909000",
+      "base_salary": 0,
+      "espn_player_id": -16010,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 40,
+      "espn_player_id": 15818,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-01T09:18:41.302000",
+      "base_salary": 0,
+      "espn_player_id": 16757,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.740000",
+      "base_salary": 0,
+      "espn_player_id": 16760,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-10T08:18:22.908000",
+      "base_salary": 0,
+      "espn_player_id": 2573401,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 3115364,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3119195,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.737000",
+      "base_salary": 5,
+      "espn_player_id": 3128390,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-29T07:32:47.310000",
+      "base_salary": 6,
+      "espn_player_id": 3135321,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-17T08:49:53.409000",
+      "base_salary": 0,
+      "espn_player_id": 3915486,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 22,
+      "espn_player_id": 3925347,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 24,
+      "espn_player_id": 3932905,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 4,
+      "espn_player_id": 4035170,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 6,
+      "espn_player_id": 4036348,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 12,
+      "espn_player_id": 4241389,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4360294,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.918000",
+      "base_salary": 0,
+      "espn_player_id": -16026,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.917000",
+      "base_salary": 0,
+      "espn_player_id": 12537,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 14,
+      "espn_player_id": 14881,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 56,
+      "espn_player_id": 15847,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-09T08:02:11.587000",
+      "base_salary": 5,
+      "espn_player_id": 2468609,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.166000",
+      "base_salary": 0,
+      "espn_player_id": 2576716,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 58,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 25,
+      "espn_player_id": 3068267,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.913000",
+      "base_salary": 10,
+      "espn_player_id": 3116136,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 17,
+      "espn_player_id": 3126486,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4239934,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 4239996,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 4240021,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.739000",
+      "base_salary": 0,
+      "espn_player_id": 4243537,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T16:36:48.224000",
+      "base_salary": 0,
+      "espn_player_id": 4258195,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-26T16:42:57.233000",
+      "base_salary": 0,
+      "espn_player_id": -16004,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": 15349,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-09T20:32:31.217000",
+      "base_salary": 0,
+      "espn_player_id": 15920,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-23T14:25:31.294000",
+      "base_salary": 0,
+      "espn_player_id": 16944,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-17T12:38:04.602000",
+      "base_salary": 0,
+      "espn_player_id": 2572861,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 22,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 48,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 32,
+      "espn_player_id": 3051926,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T16:16:39.225000",
+      "base_salary": 0,
+      "espn_player_id": 3060022,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-24T19:52:25.289000",
+      "base_salary": 0,
+      "espn_player_id": 3843945,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-31T16:40:12.250000",
+      "base_salary": 0,
+      "espn_player_id": 3915411,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-17T08:49:53.409000",
+      "base_salary": 0,
+      "espn_player_id": 3915511,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 4038818,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 14,
+      "espn_player_id": 4239993,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 54,
+      "espn_player_id": 4242214,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 20,
+      "espn_player_id": 4360438,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-27T07:23:58.757000",
+      "base_salary": 0,
+      "espn_player_id": -16006,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 53,
+      "espn_player_id": 15795,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-29T08:59:30.595000",
+      "base_salary": 5,
+      "espn_player_id": 2983509,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 33,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T15:42:32.721000",
+      "base_salary": 0,
+      "espn_player_id": 3059722,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-30T15:22:29.909000",
+      "base_salary": 0,
+      "espn_player_id": 3117256,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T15:38:02.441000",
+      "base_salary": 0,
+      "espn_player_id": 3917612,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 4035687,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T15:40:53.566000",
+      "base_salary": 0,
+      "espn_player_id": 4035886,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 5,
+      "espn_player_id": 4038941,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 38,
+      "espn_player_id": 4045163,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 6,
+      "espn_player_id": 4241372,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-18T09:20:19.990000",
+      "base_salary": 3,
+      "espn_player_id": 4241416,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-05T16:03:56.386000",
+      "base_salary": 0,
+      "espn_player_id": 4372485,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-12T16:09:31.583000",
+      "base_salary": 0,
+      "espn_player_id": 4374302,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    }
+  ],
+  "roster_at_declaration": [
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4052042,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 36,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-22T17:16:41.602000",
+      "base_salary": 0,
+      "espn_player_id": 4240380,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3121410,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 8,
+      "espn_player_id": 4047650,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3918298,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 30,
+      "espn_player_id": 4242335,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 14,
+      "espn_player_id": 16799,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 36,
+      "espn_player_id": 3925357,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3917315,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3119195,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4360294,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 7,
+      "espn_player_id": 3925347,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 12,
+      "espn_player_id": 4241389,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 20,
+      "espn_player_id": 3068267,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 38,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4239934,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4239993,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 17,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 48,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 5,
+      "espn_player_id": 3886818,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 4035687,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 8,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 10,
+      "espn_player_id": 4262921,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 15,
+      "espn_player_id": 4259545,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 19,
+      "espn_player_id": 2976212,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4036133,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 10,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4046692,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 2,
+      "espn_player_id": 3045138,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 26,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-22T01:05:00.990000",
+      "base_salary": 0,
+      "espn_player_id": 4035676,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 44,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    }
+  ],
+  "roster_carried_in": [
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 2,
+      "espn_player_id": -16027,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 3,
+      "espn_player_id": 8439,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 16,
+      "espn_player_id": 15072,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-27T07:23:58.753000",
+      "base_salary": 23,
+      "espn_player_id": 2974858,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-01T09:18:41.296000",
+      "base_salary": 0,
+      "espn_player_id": 2980453,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 36,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-10T21:20:44.174000",
+      "base_salary": 0,
+      "espn_player_id": 3043275,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 3116164,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-14T07:43:24.706000",
+      "base_salary": 12,
+      "espn_player_id": 3120348,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 20,
+      "espn_player_id": 3915416,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-20T09:08:49.989000",
+      "base_salary": 7,
+      "espn_player_id": 3916430,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 3916433,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4052042,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-03T20:02:37.106000",
+      "base_salary": 1,
+      "espn_player_id": 4243160,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-29T08:59:30.595000",
+      "base_salary": 0,
+      "espn_player_id": -16025,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 0,
+      "espn_player_id": 13229,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-10-13T07:41:55.240000",
+      "base_salary": 0,
+      "espn_player_id": 15835,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 16733,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 19,
+      "espn_player_id": 2976212,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 5,
+      "espn_player_id": 3886818,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.912000",
+      "base_salary": 17,
+      "espn_player_id": 3912550,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 15,
+      "espn_player_id": 4259545,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 10,
+      "espn_player_id": 4262921,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": -16002,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-15T14:09:42.063000",
+      "base_salary": 0,
+      "espn_player_id": 13295,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 14924,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 2,
+      "espn_player_id": 3045138,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 6,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 78,
+      "espn_player_id": 3051392,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 10,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 70,
+      "espn_player_id": 3116593,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 5,
+      "espn_player_id": 3122840,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-12T15:37:17.999000",
+      "base_salary": 0,
+      "espn_player_id": 3139925,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4036133,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 13,
+      "espn_player_id": 4040761,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4046692,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 4,
+      "espn_player_id": 2330,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 7,
+      "espn_player_id": 16731,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.736000",
+      "base_salary": 17,
+      "espn_player_id": 2576623,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 32,
+      "espn_player_id": 2577327,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 8,
+      "espn_player_id": 3116165,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 44,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-22T23:58:55.847000",
+      "base_salary": 3,
+      "espn_player_id": 3121023,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 26,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-03T20:02:11.757000",
+      "base_salary": 16,
+      "espn_player_id": 13983,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-17T08:49:53.408000",
+      "base_salary": 25,
+      "espn_player_id": 15880,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 37,
+      "espn_player_id": 16460,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-07T07:14:28.898000",
+      "base_salary": 0,
+      "espn_player_id": 3115394,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 49,
+      "espn_player_id": 3116385,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-03T08:52:20.185000",
+      "base_salary": 0,
+      "espn_player_id": 3128721,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 3916148,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 1,
+      "espn_player_id": 4039359,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 8,
+      "espn_player_id": 4047650,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2022-01-02T15:58:19.257000",
+      "base_salary": 0,
+      "espn_player_id": -16003,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-11-06T12:15:46.540000",
+      "base_salary": 46,
+      "espn_player_id": 13981,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.153000",
+      "base_salary": 60,
+      "espn_player_id": 13982,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 56,
+      "espn_player_id": 16737,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-16T09:05:57.666000",
+      "base_salary": 9,
+      "espn_player_id": 16790,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 61,
+      "espn_player_id": 16800,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 19,
+      "espn_player_id": 2576434,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 35,
+      "espn_player_id": 2977187,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 9,
+      "espn_player_id": 3059915,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 12,
+      "espn_player_id": 3116365,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3918298,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4040715,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-02T23:24:15.660000",
+      "base_salary": 0,
+      "espn_player_id": -16022,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 13934,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 14,
+      "espn_player_id": 16799,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-11-06T17:55:33.362000",
+      "base_salary": 0,
+      "espn_player_id": 3115378,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 27,
+      "espn_player_id": 3139477,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-10-27T12:44:17.464000",
+      "base_salary": 2,
+      "espn_player_id": 3895856,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 72,
+      "espn_player_id": 3929630,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-02T23:25:34.137000",
+      "base_salary": 3,
+      "espn_player_id": 4036131,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 15,
+      "espn_player_id": 4241985,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 30,
+      "espn_player_id": 4242335,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-03T06:41:11.509000",
+      "base_salary": 1,
+      "espn_player_id": -16011,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 2574808,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 14,
+      "espn_player_id": 2979843,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 17,
+      "espn_player_id": 3045144,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 10,
+      "espn_player_id": 3046439,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3917315,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 36,
+      "espn_player_id": 3925357,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 55,
+      "espn_player_id": 4047365,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 11,
+      "espn_player_id": 4241463,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 35,
+      "espn_player_id": 15818,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-01T09:18:41.302000",
+      "base_salary": 0,
+      "espn_player_id": 16757,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 38,
+      "espn_player_id": 3115364,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 3119195,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-15T09:51:13.737000",
+      "base_salary": 0,
+      "espn_player_id": 3128390,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 7,
+      "espn_player_id": 3925347,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 6,
+      "espn_player_id": 3932905,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 12,
+      "espn_player_id": 4241389,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4360294,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-23T08:44:18.918000",
+      "base_salary": 3,
+      "espn_player_id": -16026,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 8,
+      "espn_player_id": 14881,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 49,
+      "espn_player_id": 15847,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-12-09T08:02:11.587000",
+      "base_salary": 0,
+      "espn_player_id": 2468609,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-12-08T08:48:22.166000",
+      "base_salary": 9,
+      "espn_player_id": 2576716,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 38,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 20,
+      "espn_player_id": 3068267,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 8,
+      "espn_player_id": 3126486,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 4239934,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 4240021,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 15349,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-09T20:32:31.217000",
+      "base_salary": 2,
+      "espn_player_id": 15920,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-23T14:25:31.294000",
+      "base_salary": 63,
+      "espn_player_id": 16944,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-10-17T12:38:04.602000",
+      "base_salary": 0,
+      "espn_player_id": 2572861,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 17,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 48,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 0,
+      "espn_player_id": 3051926,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 4,
+      "espn_player_id": 4239993,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 60,
+      "espn_player_id": 4242214,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 7,
+      "espn_player_id": 4360438,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 60,
+      "espn_player_id": 15795,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 13,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-30T15:22:29.909000",
+      "base_salary": 0,
+      "espn_player_id": 3117256,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 8,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 3,
+      "espn_player_id": 4035687,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 0,
+      "espn_player_id": 4038941,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.897000",
+      "base_salary": 30,
+      "espn_player_id": 4045163,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2021-09-08T01:42:50.898000",
+      "base_salary": 3,
+      "espn_player_id": 4241372,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2021,
+      "source": "draft"
+    }
+  ],
+  "season": 2021,
+  "source": {
+    "base_salary_field": "keeperValueFuture",
+    "carried_in_from": "2020 keeperValueFuture",
+    "claims_source": null,
+    "started_history_from": "ESPN mBoxscore",
+    "trade_deadline": "2021-11-24T17:00:00"
+  },
+  "started_player_ids": [
+    -16034,
+    -16033,
+    -16029,
+    -16028,
+    -16027,
+    -16026,
+    -16025,
+    -16024,
+    -16023,
+    -16022,
+    -16021,
+    -16018,
+    -16017,
+    -16016,
+    -16015,
+    -16014,
+    -16013,
+    -16011,
+    -16010,
+    -16009,
+    -16007,
+    -16006,
+    -16005,
+    -16004,
+    -16003,
+    -16002,
+    2330,
+    8439,
+    11237,
+    11283,
+    12483,
+    12537,
+    13229,
+    13295,
+    13934,
+    13981,
+    13982,
+    13983,
+    13994,
+    14053,
+    14876,
+    14880,
+    14881,
+    14924,
+    15072,
+    15349,
+    15478,
+    15705,
+    15795,
+    15807,
+    15818,
+    15835,
+    15847,
+    15880,
+    15920,
+    15971,
+    16002,
+    16460,
+    16728,
+    16731,
+    16733,
+    16737,
+    16757,
+    16760,
+    16777,
+    16790,
+    16799,
+    16800,
+    16813,
+    16944,
+    17359,
+    2468609,
+    2508176,
+    2572861,
+    2573079,
+    2573401,
+    2574576,
+    2574808,
+    2576414,
+    2576434,
+    2576623,
+    2576716,
+    2576925,
+    2577327,
+    2577417,
+    2969939,
+    2974858,
+    2976212,
+    2976499,
+    2976592,
+    2977187,
+    2978109,
+    2979477,
+    2979843,
+    2980453,
+    2983509,
+    2998565,
+    3025433,
+    3040151,
+    3042519,
+    3042778,
+    3043078,
+    3043080,
+    3043275,
+    3045138,
+    3045144,
+    3045147,
+    3045238,
+    3045523,
+    3046409,
+    3046439,
+    3051392,
+    3051439,
+    3051738,
+    3051806,
+    3051876,
+    3051902,
+    3054212,
+    3054850,
+    3059722,
+    3059915,
+    3060022,
+    3061612,
+    3068267,
+    3115306,
+    3115364,
+    3115375,
+    3115378,
+    3116136,
+    3116164,
+    3116165,
+    3116365,
+    3116385,
+    3116406,
+    3116593,
+    3117251,
+    3117256,
+    3119195,
+    3120348,
+    3121023,
+    3121422,
+    3122103,
+    3122866,
+    3122976,
+    3125116,
+    3126246,
+    3126486,
+    3127586,
+    3128429,
+    3128451,
+    3128720,
+    3128721,
+    3134353,
+    3135321,
+    3139033,
+    3139477,
+    3139602,
+    3139925,
+    3843945,
+    3886818,
+    3895827,
+    3895856,
+    3912550,
+    3915411,
+    3915416,
+    3915486,
+    3915511,
+    3916148,
+    3916387,
+    3916430,
+    3916433,
+    3916566,
+    3916945,
+    3917315,
+    3917792,
+    3918298,
+    3918639,
+    3919596,
+    3925347,
+    3925357,
+    3928925,
+    3929630,
+    3930066,
+    3930086,
+    3932905,
+    4035004,
+    4035170,
+    4035538,
+    4035671,
+    4035676,
+    4035687,
+    4035886,
+    4036131,
+    4036133,
+    4036348,
+    4038818,
+    4038941,
+    4039359,
+    4040655,
+    4040715,
+    4040761,
+    4045163,
+    4046692,
+    4047365,
+    4047646,
+    4047650,
+    4048244,
+    4052042,
+    4212989,
+    4239934,
+    4239993,
+    4240600,
+    4240657,
+    4241372,
+    4241389,
+    4241416,
+    4241457,
+    4241463,
+    4241475,
+    4241478,
+    4241479,
+    4241555,
+    4242214,
+    4242335,
+    4243160,
+    4258195,
+    4258595,
+    4259545,
+    4262921,
+    4360248,
+    4360294,
+    4360438,
+    4360939,
+    4361411,
+    4361579,
+    4362628,
+    4362887,
+    4371733,
+    4372016,
+    4372414,
+    4372485,
+    4374302,
+    4411193,
+    4569173
+  ]
+}

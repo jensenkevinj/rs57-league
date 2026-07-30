@@ -39,6 +39,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from rs57.keeper_rules import (
+    PROSPECT_RULES_TIGHTENED,
     Severity,
     check_base_continuity,
     check_override_balance,
@@ -47,6 +48,7 @@ from rs57.keeper_rules import (
 from rs57.models import (
     FranchiseName,
     KeeperClaim,
+    KeeperSlot,
     Payment,
     Player,
     PrizeSchedule,
@@ -102,6 +104,12 @@ class LoadedSeason:
     franchises: list[FranchiseName]
     players: list[Player]
     roster: list[RosterEntry]
+    base_field: str = ""
+    """Which ESPN field ``base_salary`` came from. Load-bearing for the ratchet audit and for
+    nothing else: ``keeperValue`` is the price each player carried INTO the season, which is
+    what last season's claims are audited against, while ``keeperValueFuture`` is what this
+    season's auction charged. Comparing the latter against last season's claims compares two
+    numbers that are not supposed to be equal."""
 
 
 def validate_derived_season(path: Path, report: Report) -> LoadedSeason | None:
@@ -149,59 +157,177 @@ def validate_derived_season(path: Path, report: Report) -> LoadedSeason | None:
         franchises=franchises,
         players=players,
         roster=roster,
+        base_field=(doc.get("source") or {}).get("base_salary_field") or "",
     )
 
 
 def validate_claims(
     claims: Sequence[KeeperClaim],
-    roster: Sequence[RosterEntry],
-    overrides: Sequence[SalaryOverride],
+    eligible_roster: dict[int, list[RosterEntry]],
     label: str,
     report: Report,
+    history: LoadedHistory | None = None,
+    fees_waived: dict[int, str] | None = None,
 ) -> None:
-    """Run the keeper engine's own validation over recorded claims, team by team."""
-    by_manager: dict[str, list[KeeperClaim]] = {}
-    for claim in claims:
-        by_manager.setdefault(claim.manager_id, []).append(claim)
+    """Run the keeper engine's own validation over recorded claims, season by season.
 
-    for manager, team_claims in sorted(by_manager.items()):
-        team_roster = [entry for entry in roster if entry.manager_id == manager]
-        for issue in validate_team_claims(team_claims, team_roster):
-            message = f"{label}: {manager}: [{issue.code}] {issue.message}"
-            if issue.severity is Severity.ERROR:
-                report.error(message)
-            else:
-                report.review(message)
-    if by_manager:
-        report.ok(f"{label}: keeper claims validated for {len(by_manager)} teams")
+    ``eligible_roster`` maps a claim's season to **the roster as it stood when keepers were
+    declared**. For the season being decided that is the pre-draft derived file; for a frozen
+    season it is the declaration roster reconstructed from ESPN's draft record.
 
+    Neither adjacent roster snapshot will do, and both fail quietly. The previous season's ends
+    before the offseason trades, so a keeper who changed hands reads as claimed by a manager
+    who never had him — five did across 2024 and 2025. This season's own end-of-year roster has
+    already lost every keeper dropped during it, Christian Kirk among them.
 
-def validate_history(report: Report) -> tuple[list[KeeperClaim], list[SalaryOverride]]:
-    """Load recorded claims and overrides from ``data/history/``, if there are any.
-
-    The shape is deliberately permissive: ``history/`` is written once per completed season and
-    nothing has written one yet. An empty directory is reported as a skipped check, because the
-    two audits below cannot run without it and a silent pass would be a lie.
+    A season with no such roster is reported as unchecked rather than checked against whatever
+    snapshot happened to be nearest.
     """
-    claims: list[KeeperClaim] = []
-    overrides: list[SalaryOverride] = []
+    fees_waived = fees_waived or {}
+    by_season: dict[int, dict[str, list[KeeperClaim]]] = {}
+    for claim in claims:
+        by_season.setdefault(claim.season, {}).setdefault(claim.manager_id, []).append(claim)
+
+    checked = 0
+    for season, by_manager in sorted(by_season.items()):
+        roster = eligible_roster.get(season)
+        if roster is None:
+            report.skip(
+                f"{label}: {season}'s claims were NOT validated against a roster — the "
+                f"{season - 1} snapshot they were chosen from is not on disk, so player "
+                f"membership, fee tiers and the prospect rules are all unchecked for that "
+                f"season"
+            )
+            continue
+        waived_by = (history.fees_waived.get(season) if history else None) or fees_waived.get(
+            season
+        )
+        # A prospect must be a rookie, and a repeat claim is the only detectable form of that
+        # — ESPN carries no rookie year. It is applied only from the season the rule tightened:
+        # second-year prospects were legal before, and the record holds one.
+        repeats: set[int] = set()
+        if history and season >= PROSPECT_RULES_TIGHTENED:
+            repeats = {
+                claim.espn_player_id
+                for claim in history.claims
+                if claim.slot is KeeperSlot.PROSPECT and claim.season < season
+            }
+        for manager, team_claims in sorted(by_manager.items()):
+            team_roster = [entry for entry in roster if entry.manager_id == manager]
+            for issue in validate_team_claims(
+                team_claims,
+                team_roster,
+                fees_waived=manager == waived_by,
+                prior_prospect_ids=repeats,
+            ):
+                message = f"{label}: {season}: {manager}: [{issue.code}] {issue.message}"
+                if issue.severity is Severity.ERROR:
+                    report.error(message)
+                else:
+                    report.review(message)
+        checked += 1
+
+    if checked:
+        report.ok(
+            f"{label}: keeper claims validated for {checked} season(s), each against the "
+            f"roster they were declared from"
+        )
+
+
+@dataclass
+class LoadedHistory:
+    """Everything the frozen seasons contribute."""
+
+    claims: list[KeeperClaim]
+    overrides: list[SalaryOverride]
+    rosters: dict[int, list[RosterEntry]]
+    """Season to the roster its keepers were DECLARED from, reconstructed from ESPN's draft
+    record. What that season's own claims are checked against."""
+    full_rosters: dict[int, list[RosterEntry]]
+    """Season to its whole roster, priced at what each player cost in it."""
+    carried_in: dict[int, list[RosterEntry]]
+    """Season to its roster priced at what each player carried IN, which is the *previous*
+    season's ``keeperValueFuture``. The half of the ratchet ``data/derived/`` cannot hold for
+    a season that has already drafted, because ESPN overwrites ``keeperValue`` at the draft."""
+    started_by_season: dict[int, set[int]]
+    """Season to the players any league team started in it.
+
+    Retained as league history. It was collected for a prospect rule requiring that a prospect
+    had never been started, and **that rule is retired** (commissioner, 2026-07-30) — prospects
+    may be started now, and the only remaining stipulation is that they are rookies. Nothing
+    validates against this today."""
+    fees_waived: dict[int, str]
+    """Season to the manager whose fees were waived in it, as the previous season's
+    consolation winner. Without it a waived team reads as a $5 fee shortfall."""
+
+    @classmethod
+    def empty(cls) -> LoadedHistory:
+        return cls(
+            claims=[],
+            overrides=[],
+            rosters={},
+            full_rosters={},
+            carried_in={},
+            started_by_season={},
+            fees_waived={},
+        )
+
+def validate_history(report: Report) -> LoadedHistory:
+    """Load the frozen seasons from ``data/history/``, if any have been written.
+
+    The shape is deliberately permissive. An empty directory is reported as a skipped check,
+    because the audits below cannot run without it and a silent pass would be a lie.
+    """
+    loaded = LoadedHistory.empty()
     files = _season_files(DATA / "history")
     if not files:
         report.skip(
             "data/history/ is empty — no recorded keeper claims to audit, so "
             "check_base_continuity has nothing to compare this season's bases against"
         )
-        return claims, overrides
+        return loaded
 
     for path in files:
         try:
             doc = _load(path)
-            claims += [KeeperClaim(**row) for row in doc.get("claims") or []]
-            overrides += [SalaryOverride(**row) for row in doc.get("overrides") or []]
-        except (ValidationError, json.JSONDecodeError, TypeError, KeyError) as exc:
+            year = int(doc.get("season") or path.stem)
+            loaded.claims += [KeeperClaim(**row) for row in doc.get("claims") or []]
+            loaded.overrides += [
+                SalaryOverride(**row) for row in doc.get("overrides") or []
+            ]
+            # The declaration roster is what a season's own claims are checked against; it
+            # comes from ESPN's draft record rather than from a roster snapshot taken on some
+            # other day. See backfill's ``roster_at_declaration``.
+            declared = [RosterEntry(**row) for row in doc.get("roster_at_declaration") or []]
+            if declared:
+                loaded.rosters[year] = declared
+            full = [RosterEntry(**row) for row in doc.get("roster") or []]
+            if full:
+                loaded.full_rosters[year] = full
+            carried = [RosterEntry(**row) for row in doc.get("roster_carried_in") or []]
+            if carried:
+                loaded.carried_in[year] = carried
+            started = doc.get("started_player_ids")
+            if started:
+                loaded.started_by_season[year] = {int(pid) for pid in started}
+            if doc.get("fees_waived_manager_id"):
+                loaded.fees_waived[year] = doc["fees_waived_manager_id"]
+        except (ValidationError, json.JSONDecodeError, TypeError, KeyError, ValueError) as exc:
             report.error(f"{path.name}: does not load into the models — {exc}")
-    report.ok(f"data/history/: {len(claims)} claims, {len(overrides)} overrides loaded")
-    return claims, overrides
+
+    report.ok(
+        f"data/history/: {len(loaded.claims)} claims, {len(loaded.overrides)} overrides, "
+        f"{len(loaded.full_rosters)} rosters, {len(loaded.carried_in)} carried-in rosters "
+        f"loaded"
+    )
+    if loaded.started_by_season:
+        years = sorted(loaded.started_by_season)
+        report.ok(
+            f"data/history/: started-lineup history for {years[0]}-{years[-1]}, retained as "
+            f"league history — no rule validates against it since the never-started prospect "
+            f"rule was retired"
+        )
+    return loaded
 
 
 def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[SalaryOverride]]:
@@ -268,10 +394,12 @@ def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[Sal
 
 
 def audit_ratchet(
-    roster_by_season: dict[str, list[RosterEntry]],
+    carried_in_by_season: dict[int, list[RosterEntry]],
     claims: Sequence[KeeperClaim],
     overrides: Sequence[SalaryOverride],
     report: Report,
+    unusable: dict[int, str] | None = None,
+    names: dict[int, str] | None = None,
 ) -> None:
     """Run ``check_base_continuity`` season by season, each against the season before it.
 
@@ -279,25 +407,44 @@ def audit_ratchet(
     salary *last* season, so 2026's roster is audited against 2025's claims. Handing the engine
     every claim at once would compare 2026's base against 2026's own recorded salary — a number
     against itself — and report a clean ratchet having verified nothing.
+
+    **And the base has to be the carried-in one.** ``carried_in_by_season`` holds rosters priced
+    at ESPN's ``keeperValue`` — what each player carried *into* the season. That is the only
+    number last season's claims can be audited against. A season that has drafted reports
+    ``keeperValueFuture`` instead, which is what its own auction charged, and charging is the
+    thing being audited: comparing it against the previous season's claims would silently flag
+    every keeper by exactly that season's own fee and tax. That is not a hypothetical — the
+    moment this year's auction runs, ``data/derived/`` for the current season flips from one
+    field to the other, and a pairing that took whatever roster was to hand would start
+    reporting garbage on the day the draft happened. Seasons with no usable base are reported
+    in ``unusable`` rather than quietly dropped.
     """
     by_season: dict[int, list[KeeperClaim]] = {}
     for claim in claims:
         by_season.setdefault(claim.season, []).append(claim)
 
     audited: list[str] = []
-    for season, roster in sorted(roster_by_season.items()):
-        try:
-            year = int(season)
-        except ValueError:
-            continue
+    for year, roster in sorted(carried_in_by_season.items()):
         prior = by_season.get(year - 1)
         if not prior:
             continue
         for issue in check_base_continuity(roster, prior, overrides):
+            # Named, not just numbered. A finding the commissioner has to take to the league
+            # chat is unusable as "player 4035687", and looking each one up by hand is exactly
+            # the friction that gets a REVIEW list ignored.
+            who = names.get(issue.espn_player_id) if names else None
+            label = f"{who} ({issue.espn_player_id})" if who else f"player {issue.espn_player_id}"
             report.review(
-                f"base continuity: {season}: player {issue.espn_player_id}: {issue.message}"
+                f"base continuity: {year}: {issue.manager_id}: {label}: {issue.message}"
             )
-        audited.append(season)
+        audited.append(str(year))
+
+    for year, why in sorted((unusable or {}).items()):
+        if by_season.get(year - 1):
+            report.skip(
+                f"check_base_continuity: {year} has recorded claims for {year - 1} to be "
+                f"audited against, but {why}, so that pairing is UNVERIFIED"
+            )
 
     if audited:
         report.ok(
@@ -395,24 +542,76 @@ def validate_stats_season(path: Path, franchises: set[str], report: Report) -> N
         report.review(f"{path.name}: {warning}")
 
 
+def check_carried_in_prices(history: LoadedHistory, report: Report) -> None:
+    """A season's carried-in prices must equal the previous season's charged prices.
+
+    Two frozen seasons hold the same number from opposite ends: ``{Y}.roster_carried_in`` is
+    what each player brought *into* Y, and ``{Y-1}.roster`` is what he cost *in* Y-1. Under the
+    ratchet those are the same figure, so any disagreement means one of them was read from the
+    wrong ESPN field.
+
+    Which is not hypothetical. ``keeperValue`` looks like the carried-in price and is, right up
+    until that season drafts — at which point ESPN overwrites it with ``keeperValueFuture``.
+    Building a completed season's carried-in roster from it yields that season's own auction
+    result, every keeper then appears to have carried in exactly what he was charged, and the
+    ratchet audit reports the whole league as off by precisely its own fees and taxes. Nothing
+    raises. This check is the tripwire.
+    """
+    pairs = 0
+    for year, carried in sorted(history.carried_in.items()):
+        prior = history.full_rosters.get(year - 1) or []
+        charged = {entry.espn_player_id: entry.base_salary for entry in prior}
+        if not charged:
+            continue
+        pairs += 1
+        for entry in carried:
+            was = charged.get(entry.espn_player_id)
+            if was is not None and was != entry.base_salary:
+                report.error(
+                    f"data/history/{year}.json: player {entry.espn_player_id} carried in "
+                    f"${entry.base_salary} but {year - 1} recorded him at ${was} — one of the "
+                    f"two was read from the wrong ESPN field"
+                )
+    if pairs:
+        report.ok(
+            f"carried-in prices agree with the previous season's charged prices across "
+            f"{pairs} season pair(s)"
+        )
+
+
+def _recorded_waivers(report: Report) -> dict[int, str]:
+    """Season to the manager whose keeper fees are waived in it.
+
+    ``Season.consolation_winner_id`` names the winner of **that** season's consolation bracket
+    and the waiver lands the year after, so this shifts by one. Read it off by one year and
+    every waiver applies to the wrong team for a whole season.
+    """
+    path = DATA / "manual" / "seasons.json"
+    if not path.exists():
+        return {}
+    waivers: dict[int, str] = {}
+    try:
+        for row in (_load(path).get("seasons") or {}).values():
+            season = Season(**row)
+            if season.consolation_winner_id:
+                waivers[season.year + 1] = season.consolation_winner_id
+    except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        report.error(f"seasons.json: could not read the fee waivers — {exc}")
+    return waivers
+
+
 def validate_manual(report: Report) -> None:
     """Check the hand-owned files parse and say what they claim to say."""
-    prospects = DATA / "manual" / "prospects.json"
-    if prospects.exists():
-        try:
-            seasons = _load(prospects).get("seasons") or {}
-            for year, ids in seasons.items():
-                int(year)
-                if not all(isinstance(player_id, int) for player_id in ids):
-                    report.error(
-                        f"prospects.json: season {year} holds a non-integer player id — "
-                        f"prospects are matched on espn_player_id, never on name"
-                    )
-            report.ok(f"prospects.json: {len(seasons)} seasons recorded")
-        except (json.JSONDecodeError, ValueError) as exc:
-            report.error(f"prospects.json: {exc}")
-    else:
-        report.skip("data/manual/prospects.json is missing — prospect keeps cannot be untaxed")
+    # ``data/manual/prospects.json`` is gone: prospect keeps are now derived from frozen
+    # claims where ``slot == PROSPECT``. A leftover copy would be a second source for the
+    # same fact, and the two would drift.
+    stale = DATA / "manual" / "prospects.json"
+    if stale.exists():
+        report.error(
+            "data/manual/prospects.json still exists, but prospect keeps are now derived from "
+            "the frozen claims in data/history/. Two records of the same fact will disagree — "
+            "delete it."
+        )
 
     payouts = DATA / "manual" / "payouts.json"
     if payouts.exists():
@@ -436,6 +635,9 @@ def run(report: Report | None = None) -> Report:
 
     franchises_by_season: dict[str, set[str]] = {}
     roster_by_season: dict[str, list[RosterEntry]] = {}
+    derived_carried_in: dict[int, list[RosterEntry]] = {}
+    player_names: dict[int, str] = {}
+    unusable: dict[int, str] = {}
     if not seasons:
         report.skip(
             "data/derived/ holds no season files — nothing to cross-check. The nightly "
@@ -445,24 +647,66 @@ def run(report: Report | None = None) -> Report:
         loaded = validate_derived_season(path, report)
         if loaded is None:
             continue
+        player_names.update(
+            {player.espn_player_id: player.name for player in loaded.players}
+        )
         franchises_by_season[loaded.season] = {
             franchise.manager_id for franchise in loaded.franchises
         }
         roster_by_season[loaded.season] = loaded.roster
+        try:
+            year = int(loaded.season)
+        except ValueError:
+            continue
+        # Only a season that has NOT drafted reports carried-in prices in its derived file.
+        if loaded.base_field == "keeperValue":
+            derived_carried_in[year] = loaded.roster
+        else:
+            unusable[year] = (
+                f"data/derived/{year}.json holds {loaded.base_field or 'an unrecorded field'}, "
+                f"which is what that season's own auction charged rather than what its keepers "
+                f"carried in"
+            )
 
-    history_claims, history_overrides = validate_history(report)
+    history = validate_history(report)
     manual_claims, manual_overrides = validate_manual_records(report)
-    claims = history_claims + manual_claims
-    overrides = history_overrides + manual_overrides
+    claims = history.claims + manual_claims
+    overrides = history.overrides + manual_overrides
     all_roster = [entry for roster in roster_by_season.values() for entry in roster]
 
-    if history_claims and all_roster:
-        validate_claims(history_claims, all_roster, history_overrides, "data/history/", report)
-    if manual_claims and all_roster:
-        validate_claims(manual_claims, all_roster, manual_overrides, "data/manual/", report)
+    # A season's keepers are chosen from the roster as it stood at the END of the season
+    # before, so season Y's roster is what year Y+1's claims are checked against. A pre-draft
+    # derived file already holds last season's roster carried forward, which is the same pool
+    # for the season now being decided.
+    carried_in = {**derived_carried_in, **history.carried_in}
+    eligible_roster = dict(history.rosters)
+    eligible_roster.update({year: roster for year, roster in derived_carried_in.items()})
+    unusable = {year: why for year, why in unusable.items() if year not in carried_in}
 
-    if all_roster:
-        audit_ratchet(roster_by_season, claims, overrides, report)
+    # The waiver for the season being decided is recorded in seasons.json against the season
+    # before — the consolation winner of year Y has their fees waived in Y+1. Frozen seasons
+    # carry their own.
+    manual_waivers = _recorded_waivers(report)
+
+    if history.claims:
+        validate_claims(history.claims, eligible_roster, "data/history/", report, history)
+    if manual_claims:
+        validate_claims(
+            manual_claims,
+            eligible_roster,
+            "data/manual/",
+            report,
+            history,
+            fees_waived=manual_waivers,
+        )
+
+    # Called even with nothing to audit against: a ratchet that cannot run has to SAY it did
+    # not run. Guarding this on having data is how the check goes quiet exactly when it is
+    # least verified.
+    check_carried_in_prices(history, report)
+
+    if all_roster or claims:
+        audit_ratchet(carried_in, claims, overrides, report, unusable, player_names)
 
     if overrides and all_roster:
         for issue in check_override_balance(all_roster, overrides):

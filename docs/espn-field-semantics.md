@@ -19,6 +19,38 @@ in cases where the two 2025 fields disagree, so it is not a coincidence of equal
 `keeperValueFuture` is `0` league-wide until that season's draft happens — 188/188 zeros in
 the 2026 payload today, because the 2026 auction has not been held.
 
+### Correction, found during Phase 5: this only holds while a season is UNDRAFTED
+
+The table above was settled against 2026, which had not drafted. It does **not** generalise
+backwards. **Once a season has drafted, ESPN overwrites its `keeperValue` to equal its
+`keeperValueFuture`** — both then hold what that season's own auction charged, and the
+carried-in price is no longer in the payload at all.
+
+Puka Nacua, read live:
+
+| Season | `keeperValue` | `keeperValueFuture` | drafted |
+|---|---|---|---|
+| 2024 | 0 | 0 | yes |
+| 2025 | **5** | 5 | yes |
+| 2026 | 5 | 0 | no |
+
+His 2025 `keeperValue` should be his 2024 salary of `$0` under the table above. It reads `$5`,
+which is what the 2025 auction charged. Only the undrafted 2026 row still shows a genuine
+carried-in value.
+
+So **the carried-in price for season *Y* is `keeperValueFuture(Y−1)`** — read from the previous
+season's payload — and it cannot be recovered from *Y*'s own once *Y* has drafted.
+
+This is exactly the failure mode `CLAUDE.md` warns about: it does not fail loudly. Building a
+completed season's carried-in roster from its `keeperValue` makes every keeper appear to have
+carried in precisely what he was charged, so `check_base_continuity` reports the entire league
+as off by exactly its own fees and taxes. It was caught only by running the audit and reading
+what it said — fifteen REVIEW items that were all off by $5 or by one fee tier.
+
+`rs57.validate.check_carried_in_prices` is now the tripwire: a frozen season's carried-in
+prices must equal the previous season's charged prices, and the two are recorded in separate
+files so they can disagree.
+
 ### The rule for `RosterEntry.base_salary`
 
 ```
@@ -128,6 +160,13 @@ Every endpoint this pipeline uses answers unauthenticated, including the histori
 | `mTransactions2` + `scoringPeriodId` (FAAB) | works |
 | `seasons/{year}/segments/0/leagues/{id}` back to 2019 | works |
 | `leagueHistory/{id}?seasonId=…` | **404 — wrong path shape, not auth** |
+
+Phase 5 established the far end of that range: **2019 is the oldest season served.** 2018
+answers `401` (so it may be reachable with cookies, untested) and 2017 and earlier answer
+`404`. Rosters, draft records, FAAB transactions and box scores are all complete for
+2019-2025. Note 2019 and 2020 ran **13** regular-season weeks, not 14 —
+`scheduleSettings.matchupPeriodCount` says so, and anything that assumes 14 is wrong for
+those two.
 
 The `leagueHistory` route 404s for every season tried. That is a path-shape problem, not a
 permissions one — auth failures here return 401, and the per-season `seasons/{year}` path

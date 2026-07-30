@@ -37,8 +37,12 @@ tracking, and league history. NOT live scoring — that stays on ESPN.
   NOT "won the last ladder game" (2025 would name three) and NOT "went undefeated" (2024's
   ladder had four teams at 2-1). Confirmed against 2023/2024/2025; 2024 returns
   `Bijan's Mustard`, which is the `*` in the 2025 fee allocations.
-- Prospects: ≤1 NFL season, never started by any league team, rostered before the
-  trade deadline, kept at acquisition value, no fee allocation
+- Prospects: **must be a rookie**, rostered before the trade deadline, kept at
+  acquisition value, no fee allocation. **Prospects may be started** — the old
+  "never started by any league team" rule is retired, as is the allowance for
+  second-year players (commissioner, 2026-07-30). Nothing in data/ records a rookie
+  year, so the enforceable form is a repeat claim: nobody has two rookie seasons.
+  Not applied before `PROSPECT_RULES_TIGHTENED`; the record holds legal repeats.
 - There is NO salary cap. Don't add one, don't leave a disabled one lying around.
 
 ### The ratchet — the thing most likely to be got wrong

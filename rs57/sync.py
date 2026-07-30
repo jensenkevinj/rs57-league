@@ -34,23 +34,36 @@ from rs57.models import dump_json
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 DERIVED = DATA / "derived"
-PROSPECTS = DATA / "manual" / "prospects.json"
+HISTORY = DATA / "history"
 
 
-def prior_prospect_ids(season: int, path: Path = PROSPECTS) -> set[int] | None:
-    """Players kept in the PROSPECT slot in ``season``, read from ``data/manual/``.
+def prior_prospect_ids(season: int, history_dir: Path = HISTORY) -> set[int] | None:
+    """Players kept in the PROSPECT slot in ``season``, read from ``data/history/``.
 
-    Read-only: ``data/manual/`` is the human-owned store and the Action must never write it.
+    Read-only: the backfill importer owns ``data/history/`` and the Action must never write it.
 
-    Returns ``None`` when the file has nothing for that season, which is not the same as an
-    empty list — ``None`` means "unknown, warn about it", ``[]`` means "checked, there were
-    none". Collapsing the two would let an unrecorded prospect be taxed silently.
+    This used to read a hand-maintained ``data/manual/prospects.json``, which existed only
+    because no claim carried a slot — ESPN marks all four keeper picks the same way and
+    ``draftSettings.keeperCount`` is 4, so it cannot tell a prospect from a keeper. Now that
+    completed seasons record real ``KeeperClaim`` rows the answer is **derived** from
+    ``slot == PROSPECT`` instead of transcribed, which is what that file's own header said to
+    do once claims existed. Deleting it any earlier would have silently re-taxed every
+    prospect $5.
+
+    Returns ``None`` when that season is not frozen, which is not the same as an empty set —
+    ``None`` means "unknown, warn about it" and ``set()`` means "checked, there were none".
+    Collapsing the two would let an unrecorded prospect be taxed in silence.
     """
+    path = history_dir / f"{season}.json"
     if not path.exists():
         return None
-    seasons = json.loads(path.read_text(encoding="utf-8")).get("seasons") or {}
-    found = seasons.get(str(season))
-    return set(found) if found is not None else None
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    claims = doc.get("claims")
+    if claims is None:
+        return None
+    return {
+        claim["espn_player_id"] for claim in claims if claim.get("slot") == "PROSPECT"
+    }
 
 
 def season_document(season: SyncedSeason) -> dict[str, Any]:

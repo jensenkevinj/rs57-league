@@ -35,6 +35,23 @@ FEE_TIERS: Mapping[int, int] = {0: 0, 1: 0, 2: 5, 3: 15}
 MAX_KEEPERS = 3
 MAX_PROSPECTS = 1
 
+PROSPECT_RULES_TIGHTENED = 2026
+"""First season a prospect must be a **rookie**.
+
+The league previously allowed second-year players to be prospected as well, and separately
+required that a prospect had never been *started* by any league team. Both were relaxed to the
+single rookie-only rule (commissioner, 2026-07-30); the never-started rule is gone entirely and
+prospects may now be started.
+
+The date matters because the record contains claims made under the old rule that the new one
+would reject — Tyjae Spears was kept as a prospect in both 2024 and 2025, legally. Applying
+today's rule backwards would turn a correct historical record into a wall of errors, so callers
+pass ``prior_prospect_ids`` only for seasons from here on.
+
+Set to 2026 because the 2025 declarations still include a second-year prospect. If the change
+actually landed mid-2025, this is the one line to move.
+"""
+
 KEEPER_SLOTS = (KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3)
 
 
@@ -61,7 +78,6 @@ class IssueCode(StrEnum):
     PROSPECT_REPEAT_CLAIM = "prospect_repeat_claim"
     BASE_DISCONTINUITY = "base_discontinuity"
     OVERRIDES_UNBALANCED = "overrides_unbalanced"
-    PROSPECT_START_HISTORY_UNVERIFIED = "prospect_start_history_unverified"
 
 
 @dataclass(frozen=True)
@@ -285,13 +301,20 @@ def validate_team_claims(
 ) -> list[ValidationIssue]:
     """Everything the spreadsheet's ``VALID`` column used to mean, and then some.
 
-    ``seasons_played`` maps ``espn_player_id`` to NFL seasons played, for prospect rule 1.
-    ``prior_prospect_ids`` are players already kept as a prospect in an earlier season — a
-    repeat claim is invalid regardless of which manager makes it.
+    ``seasons_played`` maps ``espn_player_id`` to NFL seasons played, for prospect rule 1 —
+    **a prospect must be a rookie**. Nothing in ``data/`` populates it: ESPN's player payload
+    carries no rookie year and no seasons-played field, so rule 1 cannot be checked directly.
 
-    Prospect rule 2 (never started by any team in the league) cannot be checked without
-    historical starting-lineup data, so every prospect draws a REVIEW issue instead. It is
-    reported as unverified rather than assumed fine.
+    ``prior_prospect_ids`` is what makes it enforceable anyway. A player has exactly one rookie
+    year, so **a repeat prospect claim is a rookie-rule violation you can actually detect**:
+    if he was a prospect last season he is not a rookie this one. That indirection is the only
+    reason the check exists, and it is why it stays even though ``seasons_played`` never
+    arrives.
+
+    Pass ``prior_prospect_ids`` only for seasons the *current* rule governs. The league once
+    allowed second-year players to be prospected too, so the same player legitimately appears
+    twice in the historical record — see ``PROSPECT_RULES_TIGHTENED``. The threshold is the
+    caller's to know, which is why this takes the ids rather than deriving them.
     """
     seasons_played = seasons_played or {}
     manager_id = claims[0].manager_id if claims else None
@@ -420,24 +443,13 @@ def validate_team_claims(
                 ValidationIssue(
                     IssueCode.PROSPECT_REPEAT_CLAIM,
                     Severity.ERROR,
-                    "player was already kept as a prospect in an earlier season",
+                    "player was kept as a prospect in an earlier season, so he is not a "
+                    "rookie now",
                     manager_id=claim.manager_id,
                     espn_player_id=claim.espn_player_id,
                     slot=claim.slot,
                 )
             )
-
-        issues.append(
-            ValidationIssue(
-                IssueCode.PROSPECT_START_HISTORY_UNVERIFIED,
-                Severity.REVIEW,
-                "prospect rule 2 (never started by any league team) is not checked "
-                "automatically — needs commissioner review",
-                manager_id=claim.manager_id,
-                espn_player_id=claim.espn_player_id,
-                slot=claim.slot,
-            )
-        )
 
     # Only price a legal number of keepers. Above the cap the tier is undefined, and
     # TOO_MANY_KEEPERS above already says what's wrong.

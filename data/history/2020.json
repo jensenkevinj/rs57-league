@@ -1,0 +1,3491 @@
+{
+  "_about": [
+    "No claims: this season predates the Fee Allocations tabs, of which the workbook holds",
+    "exactly two (2024 and 2025). ESPN records WHICH players were kept and the price charged,",
+    "but not the slot and not the fee split, so a claim for this season cannot be recorded --",
+    "only invented. An invented claim would be worse than none: check_base_continuity would",
+    "compare a number against itself and report a clean ratchet.",
+    "",
+    "The season is still frozen here for its carried-in prices and its started-lineup history,",
+    "which ESPN does serve this far back. That history is retained as a league record; the",
+    "prospect rule that required a prospect to have never been started is retired.",
+    "",
+    "The prospect rules have CHANGED. This league once allowed both rookies and second-year",
+    "players to be prospected; it is rookies only now. So the same player legitimately appears",
+    "as a prospect in two different seasons in the record below, and that is not an error to be",
+    "tidied up. Today's repeat-claim rule is not applied retroactively to these seasons."
+  ],
+  "claims": [],
+  "fees_waived_manager_id": null,
+  "franchises": [
+    {
+      "manager_id": "t1",
+      "name": "Thicker Than A Bowl Of Oatmeal",
+      "season": 2020
+    },
+    {
+      "manager_id": "t2",
+      "name": "Absolute Unit",
+      "season": 2020
+    },
+    {
+      "manager_id": "t3",
+      "name": "Ju-Joe Joneson",
+      "season": 2020
+    },
+    {
+      "manager_id": "t4",
+      "name": "My Guy Joe",
+      "season": 2020
+    },
+    {
+      "manager_id": "t5",
+      "name": "The Infirmary",
+      "season": 2020
+    },
+    {
+      "manager_id": "t6",
+      "name": "Ray Lewis’ Suit",
+      "season": 2020
+    },
+    {
+      "manager_id": "t7",
+      "name": "Hinkie Died For Your Sins",
+      "season": 2020
+    },
+    {
+      "manager_id": "t8",
+      "name": "Greatest Show On Paper",
+      "season": 2020
+    },
+    {
+      "manager_id": "t9",
+      "name": "Vegas Ramblin'Raiders",
+      "season": 2020
+    },
+    {
+      "manager_id": "t10",
+      "name": "Latrell's Banana Hammock",
+      "season": 2020
+    },
+    {
+      "manager_id": "t11",
+      "name": "Belichick's Spy",
+      "season": 2020
+    },
+    {
+      "manager_id": "t12",
+      "name": "Electric Alvinue",
+      "season": 2020
+    }
+  ],
+  "overrides": [],
+  "review": {
+    "notes": []
+  },
+  "roster": [
+    {
+      "acquired_at": "2020-11-29T17:04:38.313000",
+      "base_salary": 0,
+      "espn_player_id": -16022,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-19T01:42:42.144000",
+      "base_salary": 0,
+      "espn_player_id": 12649,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-20T16:28:15.919000",
+      "base_salary": 0,
+      "espn_player_id": 13295,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-22T17:12:44.135000",
+      "base_salary": 0,
+      "espn_player_id": 14880,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 31,
+      "espn_player_id": 15825,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 49,
+      "espn_player_id": 15847,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 2,
+      "espn_player_id": 15920,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 56,
+      "espn_player_id": 16737,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 23,
+      "espn_player_id": 2974858,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 36,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-20T16:30:23.099000",
+      "base_salary": 0,
+      "espn_player_id": 3115378,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-28T07:59:40.613000",
+      "base_salary": 0,
+      "espn_player_id": 3128390,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-09T07:13:00.490000",
+      "base_salary": 0,
+      "espn_player_id": 3128429,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-02T07:02:09.516000",
+      "base_salary": 0,
+      "espn_player_id": 3916945,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-08T22:37:07.428000",
+      "base_salary": 0,
+      "espn_player_id": 4052042,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-22T17:16:41.602000",
+      "base_salary": 0,
+      "espn_player_id": 4240380,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.670000",
+      "base_salary": 3,
+      "espn_player_id": -16014,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 19,
+      "espn_player_id": 2976212,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 3059915,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-27T19:24:38.086000",
+      "base_salary": 0,
+      "espn_player_id": 3116164,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3116165,
+      "kept_prior_year": true,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 12,
+      "espn_player_id": 3116365,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-04T09:03:28.094000",
+      "base_salary": 10,
+      "espn_player_id": 3121427,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3126486,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-15T07:11:08.084000",
+      "base_salary": 2,
+      "espn_player_id": 4034952,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-08T01:18:31.195000",
+      "base_salary": 0,
+      "espn_player_id": 4038941,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.246000",
+      "base_salary": 0,
+      "espn_player_id": 4240021,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.242000",
+      "base_salary": 3,
+      "espn_player_id": 4241372,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 11,
+      "espn_player_id": 4241463,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 60,
+      "espn_player_id": 4242214,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 15,
+      "espn_player_id": 4259545,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 10,
+      "espn_player_id": 4262921,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-23T07:13:36.340000",
+      "base_salary": 2,
+      "espn_player_id": -16027,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-04T16:29:25.986000",
+      "base_salary": 0,
+      "espn_player_id": -16012,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.244000",
+      "base_salary": 0,
+      "espn_player_id": 14924,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-19T00:31:02.884000",
+      "base_salary": 0,
+      "espn_player_id": 16777,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-23T07:13:36.332000",
+      "base_salary": 63,
+      "espn_player_id": 16944,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-02T17:20:59.053000",
+      "base_salary": 0,
+      "espn_player_id": 2574808,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-08T07:35:24.956000",
+      "base_salary": 2,
+      "espn_player_id": 3045138,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 78,
+      "espn_player_id": 3051392,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-01T15:26:52.835000",
+      "base_salary": 0,
+      "espn_player_id": 3051926,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 10,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3122840,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-08T01:08:57.826000",
+      "base_salary": 0,
+      "espn_player_id": 3134353,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 72,
+      "espn_player_id": 3929630,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 4036133,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-19T13:00:47.797000",
+      "base_salary": 0,
+      "espn_player_id": 4046692,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-16T08:09:29.801000",
+      "base_salary": 3,
+      "espn_player_id": 4259979,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.676000",
+      "base_salary": 3,
+      "espn_player_id": -16026,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-12T01:26:25.689000",
+      "base_salary": 0,
+      "espn_player_id": -16005,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-01T17:49:47.717000",
+      "base_salary": 0,
+      "espn_player_id": 2580,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.240000",
+      "base_salary": 5,
+      "espn_player_id": 14876,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 25,
+      "espn_player_id": 15880,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 61,
+      "espn_player_id": 16800,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-18T18:15:27.089000",
+      "base_salary": 0,
+      "espn_player_id": 2468609,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 19,
+      "espn_player_id": 2576434,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-13T00:03:57.323000",
+      "base_salary": 49,
+      "espn_player_id": 3025433,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-04T09:03:28.098000",
+      "base_salary": 2,
+      "espn_player_id": 3051876,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 13,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 44,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-01T07:26:15.217000",
+      "base_salary": 3,
+      "espn_player_id": 3121023,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 26,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-02T07:41:52.030000",
+      "base_salary": 7,
+      "espn_player_id": 3916430,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-22T01:05:00.990000",
+      "base_salary": 0,
+      "espn_player_id": 4035676,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.789000",
+      "base_salary": 0,
+      "espn_player_id": -16034,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-18T08:20:47.953000",
+      "base_salary": 0,
+      "espn_player_id": 15835,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.668000",
+      "base_salary": 16,
+      "espn_player_id": 16913,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 17,
+      "espn_player_id": 2576623,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-07T07:17:24.804000",
+      "base_salary": 14,
+      "espn_player_id": 2975674,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-15T07:11:08.087000",
+      "base_salary": 0,
+      "espn_player_id": 2976592,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 35,
+      "espn_player_id": 2977187,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 38,
+      "espn_player_id": 3115364,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3115394,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3121410,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.786000",
+      "base_salary": 0,
+      "espn_player_id": 3123969,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-19T17:54:31.770000",
+      "base_salary": 0,
+      "espn_player_id": 3128721,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 27,
+      "espn_player_id": 3139477,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 17,
+      "espn_player_id": 3912550,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T07:26:41.148000",
+      "base_salary": 0,
+      "espn_player_id": 3916148,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 4047650,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-17T13:03:48.773000",
+      "base_salary": 0,
+      "espn_player_id": -16025,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-21T20:15:43.076000",
+      "base_salary": 0,
+      "espn_player_id": 13934,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 60,
+      "espn_player_id": 13982,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-16T19:18:18.984000",
+      "base_salary": 37,
+      "espn_player_id": 16460,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-10-29T13:43:58.269000",
+      "base_salary": 0,
+      "espn_player_id": 16733,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-18T08:20:47.954000",
+      "base_salary": 0,
+      "espn_player_id": 16757,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-21T08:08:12.800000",
+      "base_salary": 5,
+      "espn_player_id": 2979477,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-08T14:18:56.370000",
+      "base_salary": 0,
+      "espn_player_id": 3045127,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-10T08:18:27.440000",
+      "base_salary": 20,
+      "espn_player_id": 3051902,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 49,
+      "espn_player_id": 3116385,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-18T08:20:47.960000",
+      "base_salary": 0,
+      "espn_player_id": 3117256,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-15T07:11:08.085000",
+      "base_salary": 2,
+      "espn_player_id": 3895856,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-29T17:11:42.241000",
+      "base_salary": 0,
+      "espn_player_id": 3916433,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-16T19:18:18.984000",
+      "base_salary": 3,
+      "espn_player_id": 3918298,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 20,
+      "espn_player_id": 3919596,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 13,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.788000",
+      "base_salary": 0,
+      "espn_player_id": -16028,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-17T19:41:33.681000",
+      "base_salary": 0,
+      "espn_player_id": 16782,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 14,
+      "espn_player_id": 16799,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-11T19:24:02.889000",
+      "base_salary": 0,
+      "espn_player_id": 16813,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 30,
+      "espn_player_id": 2508176,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 12,
+      "espn_player_id": 2576414,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.786000",
+      "base_salary": 3,
+      "espn_player_id": 3042910,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-02T07:02:09.515000",
+      "base_salary": 2,
+      "espn_player_id": 3054212,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-12T19:17:54.772000",
+      "base_salary": 0,
+      "espn_player_id": 3139605,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 20,
+      "espn_player_id": 3915416,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 6,
+      "espn_player_id": 3932905,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 4241802,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-24T08:03:45.786000",
+      "base_salary": 30,
+      "espn_player_id": 4242335,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-15T14:41:35.628000",
+      "base_salary": 0,
+      "espn_player_id": 4243315,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 7,
+      "espn_player_id": 4360438,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 2,
+      "espn_player_id": -16023,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 16,
+      "espn_player_id": 13983,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 13994,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 14881,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 16790,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 2576716,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-13T22:15:14.221000",
+      "base_salary": 0,
+      "espn_player_id": 2971618,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 10,
+      "espn_player_id": 3046439,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 20,
+      "espn_player_id": 3052876,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 70,
+      "espn_player_id": 3116593,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3917315,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 4036131,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 13,
+      "espn_player_id": 4040761,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 10,
+      "espn_player_id": 4241475,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 15,
+      "espn_player_id": 4241985,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.245000",
+      "base_salary": 0,
+      "espn_player_id": -16002,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-11T10:18:06.662000",
+      "base_salary": 0,
+      "espn_player_id": 5536,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 46,
+      "espn_player_id": 13981,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 16,
+      "espn_player_id": 15072,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.237000",
+      "base_salary": 10,
+      "espn_player_id": 16725,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-11T09:16:59.598000",
+      "base_salary": 4,
+      "espn_player_id": 2570986,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-08T00:14:50.532000",
+      "base_salary": 0,
+      "espn_player_id": 2572861,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3042778,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-24T07:39:06.196000",
+      "base_salary": 0,
+      "espn_player_id": 3043275,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-16T19:18:18.984000",
+      "base_salary": 3,
+      "espn_player_id": 3119195,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.238000",
+      "base_salary": 10,
+      "espn_player_id": 3915823,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 3924365,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 7,
+      "espn_player_id": 3925347,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 12,
+      "espn_player_id": 4241389,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-07T16:58:49.072000",
+      "base_salary": 4,
+      "espn_player_id": 4360294,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-24T08:03:45.786000",
+      "base_salary": 15,
+      "espn_player_id": -16033,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-24T08:03:45.786000",
+      "base_salary": 3,
+      "espn_player_id": 8439,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.788000",
+      "base_salary": 0,
+      "espn_player_id": 11291,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-24T00:58:42.856000",
+      "base_salary": 0,
+      "espn_player_id": 13229,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 60,
+      "espn_player_id": 15795,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-10T08:18:27.447000",
+      "base_salary": 0,
+      "espn_player_id": 16804,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-07T17:11:59.083000",
+      "base_salary": 0,
+      "espn_player_id": 2980453,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 38,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 6,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 20,
+      "espn_player_id": 3068267,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-16T08:09:29.794000",
+      "base_salary": 20,
+      "espn_player_id": 3122976,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.677000",
+      "base_salary": 0,
+      "espn_player_id": 3139925,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 36,
+      "espn_player_id": 3925357,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-28T07:59:40.611000",
+      "base_salary": 1,
+      "espn_player_id": 4035072,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.677000",
+      "base_salary": 0,
+      "espn_player_id": 4239934,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": -16011,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-24T00:58:42.856000",
+      "base_salary": 4,
+      "espn_player_id": 2330,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 7,
+      "espn_player_id": 16731,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 17,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 31,
+      "espn_player_id": 2976316,
+      "kept_prior_year": true,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 48,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T12:59:11.532000",
+      "base_salary": 0,
+      "espn_player_id": 3046779,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-13T16:18:23.366000",
+      "base_salary": 0,
+      "espn_player_id": 3066074,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 4035403,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 4036431,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 4039359,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 30,
+      "espn_player_id": 4045163,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 55,
+      "espn_player_id": 4047365,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 4239993,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.574000",
+      "base_salary": 1,
+      "espn_player_id": 4243160,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-13T17:22:37.976000",
+      "base_salary": 0,
+      "espn_player_id": -16003,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-11T13:49:41.646000",
+      "base_salary": 0,
+      "espn_player_id": 15349,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 35,
+      "espn_player_id": 15818,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-12T21:52:42.259000",
+      "base_salary": 0,
+      "espn_player_id": 15826,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-07T07:17:24.809000",
+      "base_salary": 1,
+      "espn_player_id": 16732,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 32,
+      "espn_player_id": 2577327,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 14,
+      "espn_player_id": 2979843,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 13,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 17,
+      "espn_player_id": 3045144,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 12,
+      "espn_player_id": 3120348,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.239000",
+      "base_salary": 5,
+      "espn_player_id": 3122866,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 8,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-12T15:59:47.495000",
+      "base_salary": 0,
+      "espn_player_id": 3128774,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-16T07:33:51.680000",
+      "base_salary": 5,
+      "espn_player_id": 3886818,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-18T08:20:47.946000",
+      "base_salary": 3,
+      "espn_player_id": 4035687,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-18T01:23:18.538000",
+      "base_salary": 0,
+      "espn_player_id": 4040715,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    }
+  ],
+  "roster_at_declaration": [
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 15,
+      "espn_player_id": 3915416,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 13,
+      "espn_player_id": 2974858,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 26,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3139477,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3115394,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3121410,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 4047650,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 7,
+      "espn_player_id": 3120348,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3919596,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 14,
+      "espn_player_id": 2979843,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 16799,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 16,
+      "espn_player_id": 16790,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3917315,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3046439,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3042778,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 46,
+      "espn_player_id": 13981,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 3,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 19,
+      "espn_player_id": 2976316,
+      "kept_prior_year": true,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 22,
+      "espn_player_id": 4045163,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 55,
+      "espn_player_id": 4047365,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 20,
+      "espn_player_id": 3068267,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3116365,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3059915,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3126486,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 3116165,
+      "kept_prior_year": true,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-09T07:13:00.490000",
+      "base_salary": 5,
+      "espn_player_id": 3128429,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3122840,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 4036133,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 41,
+      "espn_player_id": 16800,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2019-09-12T08:11:22.451000",
+      "base_salary": 0,
+      "espn_player_id": 4047839,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 39,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    }
+  ],
+  "roster_carried_in": [
+    {
+      "acquired_at": "2020-11-19T01:42:42.144000",
+      "base_salary": 30,
+      "espn_player_id": 12649,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-20T16:28:15.919000",
+      "base_salary": 16,
+      "espn_player_id": 13295,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-22T17:12:44.135000",
+      "base_salary": 8,
+      "espn_player_id": 14880,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 66,
+      "espn_player_id": 15825,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 32,
+      "espn_player_id": 15847,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 15920,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 36,
+      "espn_player_id": 16737,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 13,
+      "espn_player_id": 2974858,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 26,
+      "espn_player_id": 3043078,
+      "kept_prior_year": true,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-09T07:13:00.490000",
+      "base_salary": 5,
+      "espn_player_id": 3128429,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-02T07:02:09.516000",
+      "base_salary": 0,
+      "espn_player_id": 3916945,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.670000",
+      "base_salary": 1,
+      "espn_player_id": -16014,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 39,
+      "espn_player_id": 2976212,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3059915,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-27T19:24:38.086000",
+      "base_salary": 0,
+      "espn_player_id": 3116164,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 3116165,
+      "kept_prior_year": true,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3116365,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-04T09:03:28.094000",
+      "base_salary": 6,
+      "espn_player_id": 3121427,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3126486,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.242000",
+      "base_salary": 1,
+      "espn_player_id": 4241372,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-04T16:29:25.986000",
+      "base_salary": 0,
+      "espn_player_id": -16012,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.244000",
+      "base_salary": 45,
+      "espn_player_id": 14924,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-19T00:31:02.884000",
+      "base_salary": 1,
+      "espn_player_id": 16777,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-23T07:13:36.332000",
+      "base_salary": 36,
+      "espn_player_id": 16944,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-02T17:20:59.053000",
+      "base_salary": 5,
+      "espn_player_id": 2574808,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-08T07:35:24.956000",
+      "base_salary": 26,
+      "espn_player_id": 3045138,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 62,
+      "espn_player_id": 3051392,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3116406,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3122840,
+      "kept_prior_year": true,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 78,
+      "espn_player_id": 3929630,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 4,
+      "espn_player_id": 4036133,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.676000",
+      "base_salary": 0,
+      "espn_player_id": -16026,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-12T01:26:25.689000",
+      "base_salary": 0,
+      "espn_player_id": -16005,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-01T17:49:47.717000",
+      "base_salary": 2,
+      "espn_player_id": 2580,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.240000",
+      "base_salary": 0,
+      "espn_player_id": 14876,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 19,
+      "espn_player_id": 15880,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 41,
+      "espn_player_id": 16800,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 25,
+      "espn_player_id": 2576434,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-04T09:03:28.098000",
+      "base_salary": 9,
+      "espn_player_id": 3051876,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3054850,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 39,
+      "espn_player_id": 3117251,
+      "kept_prior_year": true,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-01T07:26:15.217000",
+      "base_salary": 0,
+      "espn_player_id": 3121023,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 10,
+      "espn_player_id": 3121422,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-02T07:41:52.030000",
+      "base_salary": 0,
+      "espn_player_id": 3916430,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-23T08:33:57.789000",
+      "base_salary": 0,
+      "espn_player_id": -16034,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-18T08:20:47.953000",
+      "base_salary": 19,
+      "espn_player_id": 15835,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.668000",
+      "base_salary": 17,
+      "espn_player_id": 16913,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 2576623,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-15T07:11:08.087000",
+      "base_salary": 7,
+      "espn_player_id": 2976592,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 24,
+      "espn_player_id": 2977187,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 70,
+      "espn_player_id": 3115364,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3115394,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3121410,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-19T17:54:31.770000",
+      "base_salary": 20,
+      "espn_player_id": 3128721,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3139477,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3912550,
+      "kept_prior_year": true,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T07:26:41.148000",
+      "base_salary": 0,
+      "espn_player_id": 3916148,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 4047650,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-17T13:03:48.773000",
+      "base_salary": 5,
+      "espn_player_id": -16025,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 80,
+      "espn_player_id": 13982,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-16T19:18:18.984000",
+      "base_salary": 46,
+      "espn_player_id": 16460,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-10-29T13:43:58.269000",
+      "base_salary": 59,
+      "espn_player_id": 16733,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-21T08:08:12.800000",
+      "base_salary": 0,
+      "espn_player_id": 2979477,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-12-10T08:18:27.440000",
+      "base_salary": 0,
+      "espn_player_id": 3051902,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 65,
+      "espn_player_id": 3116385,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-15T07:11:08.085000",
+      "base_salary": 0,
+      "espn_player_id": 3895856,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-29T17:11:42.241000",
+      "base_salary": 1,
+      "espn_player_id": 3916433,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-16T19:18:18.984000",
+      "base_salary": 0,
+      "espn_player_id": 3918298,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": 3919596,
+      "kept_prior_year": true,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 27,
+      "espn_player_id": 4035538,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 16799,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 10,
+      "espn_player_id": 2576414,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-12T19:17:54.772000",
+      "base_salary": 0,
+      "espn_player_id": 3139605,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-09-27T15:37:43.638000",
+      "base_salary": 15,
+      "espn_player_id": 3915416,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3916387,
+      "kept_prior_year": true,
+      "manager_id": "t4",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 5,
+      "espn_player_id": -16023,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 22,
+      "espn_player_id": 13983,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 2,
+      "espn_player_id": 14881,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 16,
+      "espn_player_id": 16790,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 2,
+      "espn_player_id": 2576716,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3046439,
+      "kept_prior_year": true,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3052876,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 68,
+      "espn_player_id": 3116593,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3917315,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 4036131,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 4040761,
+      "kept_prior_year": false,
+      "manager_id": "t5",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.245000",
+      "base_salary": 0,
+      "espn_player_id": -16002,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 46,
+      "espn_player_id": 13981,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 18,
+      "espn_player_id": 15072,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T08:16:04.237000",
+      "base_salary": 11,
+      "espn_player_id": 16725,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-11T09:16:59.598000",
+      "base_salary": 0,
+      "espn_player_id": 2570986,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 3042778,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-24T07:39:06.196000",
+      "base_salary": 1,
+      "espn_player_id": 3043275,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-11-24T08:03:45.786000",
+      "base_salary": 17,
+      "espn_player_id": -16033,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-24T08:03:45.786000",
+      "base_salary": 8,
+      "espn_player_id": 8439,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 64,
+      "espn_player_id": 15795,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-12-10T08:18:27.447000",
+      "base_salary": 2,
+      "espn_player_id": 16804,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-10-07T17:11:59.083000",
+      "base_salary": 2,
+      "espn_player_id": 2980453,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3042519,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 3045147,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 20,
+      "espn_player_id": 3068267,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-11-25T08:13:55.677000",
+      "base_salary": 8,
+      "espn_player_id": 3139925,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 8,
+      "espn_player_id": 3925357,
+      "kept_prior_year": true,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-28T07:59:40.611000",
+      "base_salary": 5,
+      "espn_player_id": 4035072,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": 4047646,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 0,
+      "espn_player_id": -16011,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-11-24T00:58:42.856000",
+      "base_salary": 2,
+      "espn_player_id": 2330,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 1,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 19,
+      "espn_player_id": 2976316,
+      "kept_prior_year": true,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 56,
+      "espn_player_id": 2976499,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-12-04T12:59:11.532000",
+      "base_salary": 0,
+      "espn_player_id": 3046779,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 9,
+      "espn_player_id": 4039359,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 22,
+      "espn_player_id": 4045163,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 55,
+      "espn_player_id": 4047365,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-11T13:49:41.646000",
+      "base_salary": 1,
+      "espn_player_id": 15349,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 32,
+      "espn_player_id": 15818,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 12,
+      "espn_player_id": 2577327,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 14,
+      "espn_player_id": 2979843,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 3,
+      "espn_player_id": 3040151,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-08-30T01:53:42.573000",
+      "base_salary": 28,
+      "espn_player_id": 3045144,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "draft"
+    },
+    {
+      "acquired_at": "2020-10-23T05:29:50.770000",
+      "base_salary": 7,
+      "espn_player_id": 3120348,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    },
+    {
+      "acquired_at": "2020-09-17T14:23:47.410000",
+      "base_salary": 3,
+      "espn_player_id": 3128720,
+      "kept_prior_year": true,
+      "manager_id": "t9",
+      "season": 2020,
+      "source": "trade"
+    }
+  ],
+  "season": 2020,
+  "source": {
+    "base_salary_field": "keeperValueFuture",
+    "carried_in_from": "2019 keeperValueFuture",
+    "claims_source": null,
+    "started_history_from": "ESPN mBoxscore",
+    "trade_deadline": "2020-11-30T17:00:00"
+  },
+  "started_player_ids": [
+    -16034,
+    -16033,
+    -16029,
+    -16028,
+    -16027,
+    -16026,
+    -16025,
+    -16024,
+    -16023,
+    -16022,
+    -16021,
+    -16019,
+    -16018,
+    -16017,
+    -16016,
+    -16015,
+    -16014,
+    -16013,
+    -16012,
+    -16011,
+    -16010,
+    -16009,
+    -16006,
+    -16005,
+    -16003,
+    -16002,
+    2330,
+    2580,
+    5536,
+    8439,
+    8479,
+    8664,
+    10452,
+    10475,
+    11237,
+    11283,
+    11674,
+    12483,
+    12537,
+    12649,
+    13217,
+    13229,
+    13232,
+    13295,
+    13934,
+    13981,
+    13982,
+    13983,
+    14054,
+    14876,
+    14877,
+    14880,
+    14881,
+    14924,
+    15072,
+    15349,
+    15773,
+    15795,
+    15818,
+    15825,
+    15826,
+    15835,
+    15847,
+    15860,
+    15880,
+    15920,
+    15971,
+    16460,
+    16504,
+    16725,
+    16728,
+    16731,
+    16732,
+    16733,
+    16737,
+    16757,
+    16777,
+    16782,
+    16790,
+    16799,
+    16800,
+    16804,
+    16813,
+    16913,
+    16944,
+    16974,
+    2468609,
+    2508176,
+    2570986,
+    2572861,
+    2573079,
+    2573974,
+    2574808,
+    2576414,
+    2576434,
+    2576623,
+    2576716,
+    2576925,
+    2577327,
+    2577417,
+    2577654,
+    2969962,
+    2971618,
+    2972460,
+    2974858,
+    2975674,
+    2976212,
+    2976316,
+    2976499,
+    2977187,
+    2977644,
+    2979477,
+    2979843,
+    2980453,
+    2991767,
+    3025433,
+    3039707,
+    3040035,
+    3040151,
+    3042519,
+    3042778,
+    3042910,
+    3043078,
+    3043275,
+    3045127,
+    3045138,
+    3045144,
+    3045147,
+    3045523,
+    3046439,
+    3046779,
+    3049916,
+    3051392,
+    3051439,
+    3051738,
+    3051876,
+    3051891,
+    3051926,
+    3052117,
+    3052876,
+    3054212,
+    3054850,
+    3059915,
+    3060022,
+    3066074,
+    3068267,
+    3071572,
+    3115306,
+    3115364,
+    3115378,
+    3115394,
+    3116136,
+    3116164,
+    3116165,
+    3116365,
+    3116385,
+    3116406,
+    3116593,
+    3117251,
+    3117256,
+    3119195,
+    3120348,
+    3121023,
+    3121422,
+    3121427,
+    3122449,
+    3122840,
+    3122866,
+    3122976,
+    3123969,
+    3125403,
+    3126486,
+    3127335,
+    3128390,
+    3128451,
+    3128720,
+    3128721,
+    3128774,
+    3134353,
+    3135321,
+    3139477,
+    3139522,
+    3886818,
+    3895856,
+    3910544,
+    3912550,
+    3914397,
+    3915399,
+    3915411,
+    3915416,
+    3915511,
+    3915823,
+    3916148,
+    3916387,
+    3916430,
+    3916433,
+    3916925,
+    3916945,
+    3917315,
+    3917792,
+    3918298,
+    3919596,
+    3924365,
+    3925347,
+    3925357,
+    3928925,
+    3929630,
+    3932905,
+    4035004,
+    4035072,
+    4035403,
+    4035538,
+    4035676,
+    4036131,
+    4036133,
+    4036348,
+    4038524,
+    4038941,
+    4039359,
+    4040655,
+    4040715,
+    4040761,
+    4045163,
+    4047365,
+    4047646,
+    4047650,
+    4048244,
+    4052042,
+    4239993,
+    4240021,
+    4240380,
+    4240631,
+    4241372,
+    4241389,
+    4241463,
+    4241475,
+    4241479,
+    4241802,
+    4241985,
+    4242214,
+    4242335,
+    4243160,
+    4243315,
+    4243537,
+    4259545,
+    4259979,
+    4262921,
+    4360438
+  ]
+}

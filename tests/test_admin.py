@@ -110,8 +110,25 @@ def data_dir(tmp_path: Path) -> Path:
     prior["source"]["trade_deadline"] = "2025-11-26T17:00:00"
     (root / "derived" / f"{PRIOR}.json").write_text(json.dumps(prior), encoding="utf-8")
 
-    (root / "manual" / "prospects.json").write_text(
-        json.dumps({"_about": ["why this file exists"], "seasons": {str(PRIOR): [EX_PROSPECT]}}),
+    # A frozen prior season is now the only record of who was kept as a prospect. It replaced
+    # a hand-maintained data/manual/prospects.json, which existed only because no completed
+    # season recorded a slot.
+    (root / "history" / f"{PRIOR}.json").write_text(
+        json.dumps(
+            {
+                "season": PRIOR,
+                "claims": [
+                    {
+                        "season": PRIOR,
+                        "manager_id": "t1",
+                        "espn_player_id": EX_PROSPECT,
+                        "slot": "PROSPECT",
+                        "fee_allocated": 0,
+                        "computed_salary": 3,
+                    }
+                ],
+            }
+        ),
         encoding="utf-8",
     )
     (root / "manual" / "payouts.json").write_text(
@@ -400,7 +417,7 @@ def test_a_review_never_renders_as_checked(client):
         data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0)),
     ).get_data(as_text=True)
     body = text(page).lower()
-    assert "prospect rule 2" in body
+    assert "prospect rule 1" in body, "the rookie rule cannot be checked and must say so"
     assert "unverified" in body
     assert "nobody has checked this" in body
 
@@ -508,11 +525,18 @@ def test_prospect_rule_one_is_reported_as_unchecked(data_dir: Path, store: Manua
     assert any("rule 1" in note.message for note in screen.unverified)
 
 
-def test_a_repeat_prospect_claim_is_caught_from_the_legacy_file(data_dir: Path, store: ManualStore):
-    """``prospects.json`` still earns its place: it is the only record of prior prospect keeps."""
-    ids, used_legacy = store.prior_prospect_ids(SEASON)
+def test_a_repeat_prospect_claim_is_caught_from_frozen_history(
+    data_dir: Path, store: ManualStore
+):
+    """Prior prospect keeps are derived from frozen claims where ``slot == PROSPECT``.
+
+    That is what retired ``data/manual/prospects.json``. Until completed seasons recorded a
+    slot there was nothing to derive from — ESPN marks all four keeper picks identically —
+    and deleting the file before then would have silently re-taxed every prospect $5.
+    """
+    ids, from_history = store.prior_prospect_ids(SEASON)
     assert ids == {EX_PROSPECT}
-    assert used_legacy
+    assert from_history
 
     derived = Derived(derived_dir=data_dir / "derived")
     claims = [
@@ -661,9 +685,6 @@ def test_about_prose_survives_a_write(store: ManualStore):
     after = json.loads((store.manual / "payouts.json").read_text())
     assert after["_about"] == before["_about"]
     assert after["_not_recorded"] == before["_not_recorded"]
-
-    prospects = json.loads((store.manual / "prospects.json").read_text())
-    assert prospects["_about"] == ["why this file exists"]
 
 
 def test_every_written_file_is_deterministic_and_ends_in_a_newline(store: ManualStore):
@@ -858,6 +879,37 @@ def test_the_button_commits_only_data_manual(repo: Path):
     assert committed == ["data/manual/claims.json"]
     # The Action's file is still sitting there uncommitted, exactly as it was.
     assert "data/derived/2026.json" in git.run("status", "--porcelain", "-uall")
+
+
+def test_previewing_leaves_nothing_in_the_index(repo: Path):
+    """A preview is a READ. It must not put the paths it describes into the index.
+
+    The reproduction from the Phase 5 notes: render the commit page, close it, and an
+    ``--intent-to-add`` entry is left behind. An intent-to-add entry that gets committed is
+    committed as an EMPTY FILE, and ``git diff --cached --name-only`` does not list it — so
+    any other commit made while the tool was open silently blanks the file. This happened
+    for real while committing Phase 4.
+    """
+    (repo / "data" / "manual" / "claims.json").write_text(
+        '{"seasons": {"2026": []}}\n', encoding="utf-8"
+    )
+    git = Git(repo=repo)
+    preview = git.preview()
+
+    assert "seasons" in preview.diff, "a brand-new file still has to show its contents"
+    assert git.run("ls-files", "--stage", "--", "data/manual").strip() == "", (
+        "preview() left an entry in the index"
+    )
+
+    # And the damage the entry used to do: an unrelated commit blanking the file.
+    (repo / "README.md").write_text("touched\n", encoding="utf-8")
+    git.run("commit", "-qam", "an unrelated commit made while the tool was open")
+    assert "data/manual/claims.json" not in git.run(
+        "show", "--name-only", "--format=", "HEAD"
+    ), "an unrelated commit swept in a file the preview had staged"
+    assert '{"seasons": {"2026": []}}' in (
+        repo / "data" / "manual" / "claims.json"
+    ).read_text(encoding="utf-8")
 
 
 def test_the_button_refuses_when_something_else_is_staged(repo: Path):

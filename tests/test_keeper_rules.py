@@ -12,6 +12,8 @@ from rs57.keeper_rules import (
     KEEPER_TAX,
     IssueCode,
     Severity,
+    TeamKeeperResult,
+    ValidationIssue,
     check_base_continuity,
     check_override_balance,
     compute_team_keepers,
@@ -298,18 +300,31 @@ def test_prospect_claimed_in_an_earlier_season():
     assert IssueCode.PROSPECT_REPEAT_CLAIM in codes(issues)
 
 
-def test_every_prospect_needs_a_human_check():
-    """Rule 2 needs starting-lineup history we will not have until Phase 5. It is reported
-    as unverified rather than assumed fine."""
-    roster = [entry(1, 3)]
-    issues = validate_team_claims([claim(1, KeeperSlot.PROSPECT)], roster)
-    review = [
-        issue
-        for issue in issues
-        if issue.code is IssueCode.PROSPECT_START_HISTORY_UNVERIFIED
-    ]
-    assert len(review) == 1
-    assert review[0].severity is Severity.REVIEW
+def test_a_prospect_who_has_been_started_is_fine_now():
+    """The never-started rule is retired (commissioner, 2026-07-30). Prospects may be started;
+    the only remaining stipulation is that they are rookies."""
+    issues = validate_team_claims([claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)])
+    assert codes(issues) == set(), "a legal prospect raises nothing at all"
+
+
+def test_a_repeat_prospect_claim_is_how_the_rookie_rule_is_enforced():
+    """Rule 1 is "must be a rookie" and ESPN carries no rookie year, so it cannot be checked
+    directly. A player has exactly one rookie season, which makes a repeat claim the one
+    detectable form of the violation — and the reason this check outlived rule 2."""
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], prior_prospect_ids={1}
+    )
+    repeat = [i for i in issues if i.code is IssueCode.PROSPECT_REPEAT_CLAIM]
+    assert len(repeat) == 1
+    assert repeat[0].severity is Severity.ERROR
+    assert "not a rookie" in repeat[0].message
+
+
+def test_the_repeat_check_is_the_callers_to_apply():
+    """Passing no prior prospects is how a season under the OLD rule is validated — second-year
+    prospects were legal then, and the record holds one."""
+    issues = validate_team_claims([claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)])
+    assert IssueCode.PROSPECT_REPEAT_CLAIM not in codes(issues)
 
 
 # ------------------------------------------------------------------------- pricing
@@ -330,11 +345,14 @@ def test_compute_prices_a_whole_team():
 
 
 def test_review_issues_do_not_block():
-    roster = [entry(1, 25), entry(2, 3)]
-    claims = [claim(1, KeeperSlot.K1, fee=0), claim(2, KeeperSlot.PROSPECT, fee=0)]
-    result = compute_team_keepers(claims, roster)
-    assert result.issues, "a prospect always draws a review issue"
-    assert result.blocked is False
+    """``blocked`` is ERROR-only. Every REVIEW code now comes from the audits rather than from
+    claim validation, so this exercises the property directly."""
+    review = ValidationIssue(
+        IssueCode.BASE_DISCONTINUITY, Severity.REVIEW, "unverified, not wrong"
+    )
+    assert TeamKeeperResult(manager_id="m1", issues=(review,)).blocked is False
+    error = ValidationIssue(IssueCode.NEGATIVE_FEE, Severity.ERROR, "wrong")
+    assert TeamKeeperResult(manager_id="m1", issues=(review, error)).blocked is True
 
 
 def test_errors_block_but_salaries_still_compute():
