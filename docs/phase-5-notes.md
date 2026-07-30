@@ -18,7 +18,10 @@ Paste this to start Phase 5 in a fresh session.
 > Scope: import completed seasons into `data/history/` and freeze them, and add the box-score
 > history that prospect rule 2 needs. Stop there — no changes to the keeper or stats engines, no
 > changes to the nightly Action, the site generator, or the admin tool beyond what reading
-> `data/history/` requires.
+> `data/history/` requires. **One exception:** fix the `gitops.preview()` intent-to-add defect
+> described under "What Phase 4 leaves you" before you write anything that commits — it can
+> commit a file as empty, and this phase adds a writer for the one directory where that is
+> unrecoverable.
 >
 > Read `rs57/keeper_rules.py`, `rs57/validate.py` and `rs57/admin/store.py` before writing any of
 > it. `check_base_continuity` is the reason this phase exists, and it compares a season's bases
@@ -101,6 +104,39 @@ three are the admin tool's.
 Every one of them carries an `_about` key holding prose. `ManualStore` merges into the loaded
 document rather than replacing it, so the prose survives a write. Whatever reads `history/` should
 do the same.
+
+### A known defect: viewing the commit page leaves entries in the git index
+
+**`gitops.Git.preview()` runs `git add --intent-to-add -- data/manual` as a side effect of
+rendering the page.** That is what makes a brand-new `claims.json` show up as a diff instead of
+as an untracked path with no content, and for the button's own flow it is harmless — the very
+next thing `commit_and_push` does is stage the real content.
+
+The problem is everything else. Those entries stay in the index after the page is closed, and an
+intent-to-add entry that gets committed is committed **as an empty file**. So any *other* commit
+made while the tool has been open sweeps them in and blanks them. This is not hypothetical: it
+happened while committing Phase 4 itself. `git diff --cached --name-only` did not list them,
+which is what makes it nasty — the paths look absent from the staged set right up until the
+commit writes them as empty.
+
+What saves you today is that the admin tool only ever commits with an explicit
+`data/manual/` pathspec. What does not save you is `git commit -a`, a commit from another tool,
+or a Phase 5 importer that stages its own paths and commits.
+
+Reproduce it:
+
+```
+python -m rs57.admin           # open /commit, then stop the server
+git ls-files --stage -- data/manual   # claims.json is in the index, empty blob
+git reset -- data/manual              # the fix, until preview() stops doing this
+```
+
+Worth fixing properly in this phase, because a `data/history/` writer makes it worse: an empty
+`history/{year}.json` committed over a frozen season is exactly the loss the freeze exists to
+prevent. Two options, both cheap — have `preview()` undo the intent-to-add once it has taken the
+diff, or drop `--intent-to-add` and render new files from `git status` plus a direct read instead
+of from `git diff`. The second is the better shape: a preview that mutates the repository to
+describe the repository is the wrong thing regardless of whether the mutation is currently safe.
 
 ### Where a completed season's claims should end up
 
