@@ -540,3 +540,66 @@ are the package's strength, but `fetch_boxscore` is nine lines and its `BoxPlaye
 hides `statSourceId` — the difference between what a player scored and what he was *projected*
 to score. Awarding a stud prize off a projection is exactly the kind of silently-wrong answer
 this pipeline exists to prevent.
+
+### Found during Phase 3
+
+Full detail in `rs57/site.py`'s module docstring and `.github/workflows/nightly.yml`'s header
+comment.
+
+**The phase breakdown's "nightly Action" did not exist, and neither did anything it was
+supposed to have written.** `data/derived/` was empty: no CI job had ever written it, so the
+2025 stats that derive perfectly from ESPN existed nowhere as a file the site could read. The
+distinction that matters is that this is *not* the Phase 5 history backfill — `data/history/`
+is still empty and still Phase 5's. A completed season's `derived/` files are simply an ESPN
+read that nothing had ever run.
+
+**Commissioner decisions, 2026-07-29.** The site publishes prize winners, prize amounts, and
+per-franchise season earnings. The rules page is a new `docs/rules.md`, written for league
+members rather than for an agent. The nightly schedule syncs **the current season only**;
+completed seasons are static and are populated once by a `workflow_dispatch` run with an
+explicit season list, then left alone.
+
+**An unplayed season is blocked, not broken, and the Action must not treat it as a failure.**
+`stats_sync --year 2026` in the offseason exits non-zero with 19 ERROR issues — fourteen
+`missing_week`, four `no_stud_for_position`, one `no_unlucky` — because a season with no games
+correctly refuses to award anything. `validate.py` re-surfaces those as errors, so a nightly
+job that simply ran both syncs for the current season would fail its own gate every night from
+February to September. The workflow therefore discards a blocked stats file and keeps the
+committed one, and goes red only when that season *had* derived on a previous run — checked by
+asking git whether the file is tracked, before the sync runs. Failing every night until the
+season starts is how a gate gets ignored, which is the same reasoning that kept `--strict` off
+`validate` in CI.
+
+**A season page needs both derived files.** Franchise names live in `{year}.json`'s
+`franchises[]`, keyed per season, while winners in `{year}-stats.json` are only `manager_id`.
+A stats file without its keeper file can therefore only render `t3`, and the site says so
+rather than borrowing an adjacent season's names — names change yearly, so a borrowed name is
+a wrong name on a real result.
+
+**The fee is deliberately absent from every published keeper price.** The tier depends on how
+many keepers a manager declares and the split across them is the manager's own choice, and no
+`KeeperClaim` exists to read until Phase 4. The site publishes `base + $5 tax` per player and
+the fee tiers as a table, and says in as many words that nobody has declared anything. Reading
+the page and adding the tier by hand reproduces `compute_team_keepers` to the dollar; that was
+checked end to end against t3's roster, not assumed.
+
+**Rendering Markdown without a Markdown dependency was the safer option, but only just.** The
+usual libraries pass raw HTML straight through, which would have meant handing a repo file the
+ability to inject markup and reaching for the `safe` filter to do it. `render_markdown` escapes
+every line *before* it adds a single tag instead. Getting the subset wrong is still a real bug:
+the first version formatted line by line, so a bullet that wrapped onto a second line broke the
+entire list and a bold run spanning a line break left both pairs of asterisks on the page. The
+rules page's whole prize list rendered as one run-on paragraph. **Nothing caught this but
+opening the page and reading it** — the tests were green, and a test asserting the rendered
+rules file contains no stray asterisk was written only after the eye found it.
+
+**The phase breakdown says "GitHub Pages" and Pages had never been enabled** — `has_pages` was
+false and `GET /repos/.../pages` returned 404. It is published from an uploaded artifact rather
+than from a branch, because branch-based Pages can serve only the repository root or `/docs`
+and neither is available here. Serving the root would scatter generated HTML among human-owned
+files, make a clean rebuild impossible (you cannot `rm -rf` the repo root, so a page that stops
+being generated is served forever), and reduce the workflow's ownership guard from a
+self-maintaining directory prefix to a hand-listed set of filenames. Serving `/docs` is worse:
+the generator *reads* `docs/rules.md`, so the Action would be writing into the directory it
+takes its input from. The artifact leaves `site/` committed and diffable and costs fourteen
+lines.

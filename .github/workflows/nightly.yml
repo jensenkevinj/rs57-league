@@ -1,0 +1,246 @@
+name: Nightly
+
+# Pulls ESPN, writes data/derived/, regenerates site/, commits both, and publishes the site
+# to GitHub Pages.
+#
+# OWNERSHIP. This workflow owns `data/derived/` and `site/`, and nothing else. It must never
+# write `data/manual/` (the human-owned store) or `data/history/` (frozen once a season
+# completes). NO FILE HAS TWO WRITERS — there is a step below that checks the staged paths and
+# fails if anything outside the two owned directories has been staged.
+#
+# PAGES. Published from an uploaded artifact rather than from a branch, because branch-based
+# Pages can only serve the repository root or `/docs` — never an arbitrary folder like
+# `site/`. Serving the root would put generated HTML among human-owned files and make a
+# clean rebuild impossible; serving `/docs` would have this workflow writing into the very
+# directory the site generator reads `rules.md` out of. An artifact keeps `site/` exactly
+# where it is, committed and diffable, and leaves the ownership rule intact.
+#
+# SEASONS. The schedule syncs the current season only. A completed season is static, so it is
+# populated once by hand — run this workflow from the Actions tab with `seasons: 2024 2025` —
+# and then left alone. The site renders whatever seasons exist in `data/derived/`.
+#
+# CREDENTIALS. None are needed: the league is public and every endpoint the pipeline uses
+# answers unauthenticated. ESPN_S2/SWID are passed through from secrets purely as insurance in
+# case ESPN ever tightens up. They are NEVER echoed — this repo is public, so these logs are
+# public. Nothing below runs `set -x`.
+
+on:
+  schedule:
+    # 09:17 UTC, off the top of the hour so it does not queue behind everyone else's cron.
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: "Seasons to sync, space-separated (e.g. '2024 2025'). Blank = current season."
+        required: false
+        default: ""
+
+# A second run writing data/derived/ while the first is mid-commit is exactly the two-writer
+# problem this repo is built around avoiding.
+concurrency:
+  group: nightly-derived-and-site
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  # Pages deployment only. `id-token` is what deploy-pages uses to prove the artifact came
+  # from this workflow run; neither grants anything the commit step needs.
+  pages: write
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Surfaces the published URL on the run itself, so a nightly says where it went.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      # The engines decide every salary and every prize on this site. If they are broken,
+      # publishing is worse than not publishing.
+      - name: Test
+        run: pytest -q
+
+      - name: Choose seasons
+        id: seasons
+        env:
+          SEASONS_INPUT: ${{ inputs.seasons }}
+        run: |
+          set -euo pipefail
+          current=$(python -c "
+          from datetime import date
+          today = date.today()
+          # A season is named for the calendar year it starts in, so January and February
+          # still belong to the season before them.
+          print(today.year if today.month >= 3 else today.year - 1)
+          ")
+          seasons="${SEASONS_INPUT:-}"
+          if [ -z "$seasons" ]; then
+            seasons="$current"
+          fi
+          # Never interpolate a workflow input straight into a shell loop.
+          if ! printf '%s' "$seasons" | grep -Eq '^[0-9]{4}( [0-9]{4})*$'; then
+            echo "seasons must be four-digit years separated by spaces" >&2
+            exit 1
+          fi
+          echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
+          echo "Syncing: $seasons (current season is $current)"
+
+      # The two syncs write two different files and fail for different reasons. They are kept
+      # separate here for the same reason they are separate modules: a broken box score must
+      # not be able to blank a season of salaries.
+      - name: Sync keepers
+        env:
+          ESPN_S2: ${{ secrets.ESPN_S2 }}
+          SWID: ${{ secrets.SWID }}
+        run: |
+          set -uo pipefail
+          for year in ${{ steps.seasons.outputs.seasons }}; do
+            if python -m rs57.sync --year "$year"; then
+              echo "keepers $year: written"
+            else
+              echo "keepers $year: FAILED" | tee -a failures.txt
+              git checkout -- "data/derived/${year}.json" 2>/dev/null || rm -f "data/derived/${year}.json"
+            fi
+          done
+
+      - name: Sync stats
+        if: always()
+        env:
+          ESPN_S2: ${{ secrets.ESPN_S2 }}
+          SWID: ${{ secrets.SWID }}
+        run: |
+          set -uo pipefail
+          for year in ${{ steps.seasons.outputs.seasons }}; do
+            file="data/derived/${year}-stats.json"
+            # Did this season work yesterday? That is what decides whether today's failure is
+            # news. Checked BEFORE the sync, while the index still reflects the last commit.
+            had_one=no
+            git ls-files --error-unmatch "$file" >/dev/null 2>&1 && had_one=yes
+
+            # A non-zero exit means the season is blocked. Discard whatever it wrote and keep
+            # the committed copy — an offseason run must never overwrite a good season with an
+            # empty one.
+            if python -m rs57.stats_sync --year "$year"; then
+              echo "stats $year: written"
+              continue
+            fi
+            git checkout -- "$file" 2>/dev/null || rm -f "$file"
+
+            if [ "$had_one" = yes ]; then
+              # It derived before and does not now. That is a regression, not the offseason.
+              echo "stats $year: BLOCKED, though it derived on a previous run" | tee -a failures.txt
+            else
+              # Expected from now until the season is played: an unplayed season has no scores
+              # in any of its weeks, so every prize is correctly refused. Reported, not red —
+              # a job that fails every night until September teaches everyone to ignore it.
+              echo "stats $year: no completed games yet, nothing to derive" | tee -a notes.txt
+            fi
+          done
+
+      # After the syncs and before the commit, so a bad sync is caught before it lands.
+      - name: Validate data/
+        run: |
+          set -uo pipefail
+          if ! python -m rs57.validate; then
+            echo "::error::validate found ERRORs — discarding this run's derived files"
+            git checkout -- data/derived 2>/dev/null || true
+            git clean -fd data/derived
+            exit 1
+          fi
+
+      - name: Build site
+        run: python -m rs57.site
+
+      # Deploy before the commit, not after. The artifact is built from the same site/ the
+      # commit stages, and publishing does not depend on the push succeeding.
+      #
+      # `enablement: true` turns Pages on via the API the first time this runs, so the repo
+      # needs no manual setup. If an org policy blocks that, this step fails with a clear
+      # message and Settings -> Pages -> Source: GitHub Actions is the one-time fix.
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Stage and check ownership
+        id: stage
+        run: |
+          set -euo pipefail
+
+          # The invariant, checked against the working tree rather than the index: this
+          # workflow owns data/derived/ and site/, and NOTHING may have written the
+          # human-owned store or the frozen history. `git add` below would not have committed
+          # a stray write there, but a sync that produced one is a bug worth failing on rather
+          # than discarding quietly.
+          intruders=$(git status --porcelain -- data/manual data/history)
+          if [ -n "$intruders" ]; then
+            echo "::error::a step wrote to data/manual/ or data/history/, which this workflow does not own"
+            printf '%s\n' "$intruders"
+            exit 1
+          fi
+
+          # Only stage what exists: `git add` on a missing path is a fatal error, and the
+          # useful signal in that case is the empty diff below, not a pathspec crash.
+          for owned in data/derived site; do
+            [ -e "$owned" ] && git add -- "$owned"
+          done
+          staged=$(git diff --cached --name-only)
+          if [ -z "$staged" ]; then
+            echo "changed=0" >> "$GITHUB_OUTPUT"
+            echo "Nothing changed."
+            exit 0
+          fi
+          # Belt and braces on the index itself, in case a step above ever stages something.
+          if printf '%s\n' "$staged" | grep -Ev '^(data/derived/|site/)' ; then
+            echo "::error::staged a path this workflow does not own"
+            exit 1
+          fi
+          echo "changed=1" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$staged" | sed 's/^/  /'
+
+      - name: Commit
+        if: steps.stage.outputs.changed == '1'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Nightly: sync ${{ steps.seasons.outputs.seasons }}, rebuild site"
+          git push
+
+      # Deliberately last. A season that failed to sync still lets the others publish, but the
+      # run then goes red so nobody reads a green tick as "ESPN answered".
+      - name: Report
+        if: always()
+        run: |
+          set -uo pipefail
+          if [ -f notes.txt ]; then
+            echo "### Expected, nothing to do" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' notes.txt >> "$GITHUB_STEP_SUMMARY"
+            cat notes.txt
+          fi
+          if [ -f failures.txt ]; then
+            echo "### Seasons that did not sync" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' failures.txt >> "$GITHUB_STEP_SUMMARY"
+            cat failures.txt
+            exit 1
+          fi
+          echo "No sync failures." >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "_notes.html" as ui %}
+
+{% block title %}Seasons — RS57 League{% endblock %}
+
+{% block content %}
+<h1>Seasons</h1>
+<p class="lede">
+  Every season that has been synced. Each page holds the final standings, every prize, and
+  what each franchise took home.
+</p>
+
+{% if seasons %}
+  {% for season in seasons %}
+    <h2><a href="season-{{ season.season }}.html">{{ season.season }}</a></h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Prize</th><th>Winner</th><th class="num">Amount</th></tr>
+        </thead>
+        <tbody>
+          {% for group in season.prizes %}
+            {% if group.label in ('Champion', '2nd Place', '3rd Place', 'Most Points (Season)', 'Survivor', 'Unlucky') %}
+              {% for row in group.rows %}
+                <tr>
+                  <td>{% if loop.first %}{{ group.label }}{% else %}<span class="muted">{{ group.label }}</span>{% endif %}</td>
+                  <td>
+                    {% if row.winner %}
+                      {{ ui.team(row.winner) }}
+                    {% else %}
+                      <span class="muted">unawarded</span>
+                    {% endif %}
+                  </td>
+                  <td class="num money">${{ row.amount }}</td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          {% else %}
+            <tr><td colspan="3" class="muted">No prize amounts are recorded for this season.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="small">
+      Season pot <span class="money">${{ season.pot }}</span> ·
+      {{ season.standings | length }} franchises ·
+      <a href="season-{{ season.season }}.html">weekly high scores, studs, survivor and standings &rarr;</a>
+    </p>
+    {% if season.notes %}
+      <p class="small muted">
+        {{ season.notes | length }} item(s) on this season have not been checked — they are
+        shown on the season page.
+      </p>
+    {% endif %}
+  {% endfor %}
+{% else %}
+  <p class="muted">
+    No completed season has been synced yet. The nightly build writes the current season, and
+    a completed season is populated once and then left alone.
+  </p>
+{% endif %}
+{% endblock %}

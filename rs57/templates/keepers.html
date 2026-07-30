@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% import "_notes.html" as ui %}
+
+{% block title %}Keeper prices — RS57 League{% endblock %}
+
+{% block content %}
+{% if not current %}
+  <h1>Keeper prices</h1>
+  <p class="lede">
+    No season has been synced yet, so there are no keeper prices to show. The nightly build
+    writes them.
+  </p>
+{% else %}
+  <h1>{{ current.season }} keeper prices</h1>
+  <p class="lede">
+    What every player on every roster would cost to keep in {{ current.season }}. Find your
+    team, add up the players you want, then add the keeper fee for that many keepers.
+  </p>
+
+  <div class="panel">
+    <h3 style="margin-top:0">How to read this</h3>
+    <p>
+      A keeper's price is <strong>his base plus the ${{ keeper_tax }} tax</strong> if you kept
+      him last season. Base is what he cost you this season, not what you originally paid —
+      every fee and tax you have paid on him is already inside it, which is why a player you
+      have held for years is expensive.
+    </p>
+    {% if not current.drafted %}
+      <p>
+        {{ current.season }} has not been drafted yet, so a base here is last season's salary
+        carried forward. That is the right number to make a keeper decision on; it is re-read
+        after the auction.
+      </p>
+    {% endif %}
+    <p>
+      <strong>The keeper fee is not in these prices.</strong> The fee depends on how many
+      keepers you declare and you choose how to split it, so it cannot be worked out per
+      player. Add it yourself:
+    </p>
+    <table style="max-width:22rem">
+      <thead><tr><th>Keepers declared</th><th class="num">Fee, in total</th></tr></thead>
+      <tbody>
+        {% for count, fee in fee_tiers %}
+          <tr>
+            <td>{{ count }}</td>
+            <td class="num money">${{ fee }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="small muted">
+      Maximum {{ max_keepers }} keepers plus {{ max_prospects }} prospect. A prospect is kept
+      at his base with no fee and no tax. There is no salary cap.
+    </p>
+  </div>
+
+  <div class="flag">
+    <span class="tag">Prices, not declarations</span>
+    <div>
+      Nobody has declared a keeper yet. Every player below is priced as though he could be
+      kept; none of this means anyone has claimed him. The tool that records declarations is
+      not built.
+    </div>
+  </div>
+
+  {% if current.waiver_manager_id %}
+    <div class="flag">
+      <span class="tag">Unverified — nobody has checked this</span>
+      <div>
+        {% if current.waiver_name %}{{ current.waiver_name }}{% else %}{{ current.waiver_manager_id }}{% endif %}
+        appears to have won the {{ current.waiver_from_season }} consolation bracket, which
+        would waive their keeper fees for {{ current.season }}. Salaries would still be owed
+        in full — only the fee is waived. This is derived from the final standings and has
+        <strong>not</strong> been confirmed by the commissioner, so it is not applied to
+        anything on this page.
+      </div>
+    </div>
+  {% endif %}
+
+  {{ ui.flags(current.notes) }}
+
+  <h2>Rosters</h2>
+  <p class="small muted">
+    {{ current.teams | length }} franchises, cheapest player first. Jump to a team:
+  </p>
+  <p class="jump">
+    {% for team in current.teams %}
+      <a href="#{{ team.manager_id }}">{% if team.name_known %}{{ team.name }}{% else %}{{ team.manager_id }}{% endif %}</a>
+    {% endfor %}
+  </p>
+
+  {% for team in current.teams %}
+    <div class="team" id="{{ team.manager_id }}">
+      <h3>
+        {% if team.name_known %}{{ team.name }}{% else %}{{ team.manager_id }}{% endif %}
+        {% if team.fees_waived %}
+          <span class="tag-inline" title="Derived from the standings, not confirmed by the commissioner">fees waived?</span>
+        {% endif %}
+      </h3>
+      <p class="small muted">
+        {{ team.manager_id }} · {{ team.lines | length }} players ·
+        {{ team.taxed }} carrying the ${{ keeper_tax }} tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for line in team.lines %}
+              <tr>
+                <td>{{ line.player_name }}</td>
+                <td>{{ line.position }}</td>
+                <td class="muted">{{ line.nfl_team }}</td>
+                <td class="muted small">{{ line.source }}</td>
+                <td class="num">${{ line.base }}</td>
+                <td class="num">
+                  {% if line.kept_prior_year %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
+                </td>
+                <td class="num money">${{ line.price }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

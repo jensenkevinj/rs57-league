@@ -1,5 +1,12 @@
 # Phase 3 handoff — static site + nightly deploy
 
+> **CLOSED 2026-07-29.** Every question in "Still open" below is answered; the answers are in
+> "Found during Phase 3" in the Corrections log of `rs57-league-app-plan.md`. The acceptance
+> criterion **was run**: the pages were generated from real ESPN data and read, a manager's
+> reading of the keeper page was checked against `compute_team_keepers` and matched to the
+> dollar, and reading them found a real rendering bug (the rules page's entire prize list
+> collapsing into one paragraph). The section below is kept as the record of what was open.
+
 Written at the end of Phase 2. Everything here is context a fresh session cannot recover from
 the repo alone. Read `CLAUDE.md` first; it holds the rules. `docs/phase-2-notes.md` records
 what the stats engine settled and why. This holds what Phase 3 needs and what is still open.

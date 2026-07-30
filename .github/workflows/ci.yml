@@ -30,3 +30,9 @@ jobs:
       # the harder gate can add --strict here.
       - name: Validate data/
         run: python -m rs57.validate
+
+      # A template that does not compile takes the nightly build down at the point where it
+      # would otherwise commit. Cheaper to find it here. --preview writes the gitignored
+      # .preview/, never site/ — site/ belongs to the nightly Action.
+      - name: Build the site
+        run: python -m rs57.site --preview

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% import "_notes.html" as ui %}
+
+{% block title %}{{ season.season }} season — RS57 League{% endblock %}
+
+{% block content %}
+<h1>{{ season.season }} season</h1>
+<p class="lede">
+  Final standings, every prize, and what each franchise took home. Regular season is weeks 1
+  to {{ season.regular_season_weeks }}.
+</p>
+
+{{ ui.flags(season.notes) }}
+
+<h2>Standings</h2>
+<div class="scroll">
+  <table>
+    <caption>
+      Record and points are computed from the matchups. Final rank is the playoff bracket's
+      answer, which is what pays the placing prizes.
+    </caption>
+    <thead>
+      <tr>
+        <th class="num">Final</th>
+        <th>Franchise</th>
+        <th class="num">W</th>
+        <th class="num">L</th>
+        <th class="num">T</th>
+        <th class="num">Points for</th>
+        <th class="num">Points against</th>
+        <th class="num">Seed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in season.standings %}
+        <tr>
+          <td class="num">{% if row.final_rank %}{{ row.final_rank }}{% else %}<span class="muted">—</span>{% endif %}</td>
+          <td>{{ ui.team(row.team) }}</td>
+          <td class="num">{{ row.wins }}</td>
+          <td class="num">{{ row.losses }}</td>
+          <td class="num">{{ row.ties }}</td>
+          <td class="num">{{ "%.2f" | format(row.points_for) }}</td>
+          <td class="num">{{ "%.2f" | format(row.points_against) }}</td>
+          <td class="num">{% if row.playoff_seed %}{{ row.playoff_seed }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Prizes</h2>
+{% if season.prizes %}
+  <div class="scroll">
+    <table>
+      <caption>
+        A prize split by a tie shows one row per winner. A prize nobody won still shows its
+        money, so the pot always adds up.
+      </caption>
+      <thead>
+        <tr>
+          <th>Prize</th>
+          <th>Winner</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in season.prizes %}
+          {% for row in group.rows %}
+            <tr>
+              <td>{% if loop.first %}{{ group.label }}{% else %}<span class="muted">{{ group.label }}</span>{% endif %}</td>
+              <td>
+                {% if row.winner %}
+                  {{ ui.team(row.winner) }}
+                {% else %}
+                  <span class="muted">unawarded</span>
+                {% endif %}
+              </td>
+              <td class="num money">${{ row.amount }}</td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Season pot</th>
+          <td class="num money">${{ season.pot }}</td>
+        </tr>
+        {% if season.unawarded %}
+          <tr>
+            <th colspan="2">Of which unawarded</th>
+            <td class="num money">${{ season.unawarded }}</td>
+          </tr>
+        {% endif %}
+      </tfoot>
+    </table>
+  </div>
+
+  <h3>Franchise earnings</h3>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Franchise</th><th class="num">Won</th></tr>
+      </thead>
+      <tbody>
+        {% for earning in season.earnings %}
+          <tr>
+            <td>{{ ui.team(earning.team) }}</td>
+            <td class="num money">${{ earning.total }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="flag">
+    <span class="tag">No prize amounts recorded</span>
+    <div>
+      This season's stats were derived, but no prize amounts are recorded for it, so nobody
+      is shown as having been paid anything.
+    </div>
+  </div>
+{% endif %}
+
+<h2>How the prizes were won</h2>
+
+<h3>Most points, regular season</h3>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">#</th><th>Franchise</th><th class="num">Points, weeks 1&ndash;{{ season.regular_season_weeks }}</th></tr></thead>
+    <tbody>
+      {% for row in season.season_points %}
+        <tr>
+          <td class="num">{{ loop.index }}</td>
+          <td>{{ ui.team(row.team) }}</td>
+          <td class="num">{{ "%.2f" | format(row.points) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h3>Weekly high scores</h3>
+<p class="small muted">Regular season only — the playoff weeks do not pay a weekly high score.</p>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">Week</th><th>Franchise</th><th class="num">Points</th></tr></thead>
+    <tbody>
+      {% for row in season.weekly_highs %}
+        <tr>
+          <td class="num">{{ row.week }}</td>
+          <td>{{ ui.teams(row.teams) }}</td>
+          <td class="num">{{ "%.2f" | format(row.points) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h3>Positional studs</h3>
+<p class="small muted">
+  The single best week by a started player at each position, across the whole season
+  including the playoff weeks.
+</p>
+<div class="scroll">
+  <table>
+    <thead>
+      <tr><th>Pos</th><th>Player</th><th class="num">Week</th><th class="num">Points</th><th>Started by</th></tr>
+    </thead>
+    <tbody>
+      {% for row in season.studs %}
+        <tr>
+          <td>{{ row.position }}</td>
+          <td>{{ row.player_name }}</td>
+          <td class="num">{{ row.week }}</td>
+          <td class="num">{{ "%.2f" | format(row.points) }}</td>
+          <td>{{ ui.teams(row.teams) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h3>Survivor</h3>
+<p>
+  Winner: <strong>{{ ui.teams(season.survivor_winners) }}</strong>
+</p>
+<div class="scroll">
+  <table>
+    <caption>The lowest score among the teams still alive goes out each week.</caption>
+    <thead><tr><th class="num">Week</th><th>Eliminated</th><th class="num">Points</th></tr></thead>
+    <tbody>
+      {% for row in season.survivor_eliminations %}
+        <tr>
+          <td class="num">{{ row.week }}</td>
+          <td>{{ ui.teams(row.teams) }}</td>
+          <td class="num">{{ "%.2f" | format(row.points) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h3>Unlucky</h3>
+{% if season.unlucky %}
+  <p>
+    The highest score in the regular season that still lost:
+    <strong>{{ ui.teams(season.unlucky.teams) }}</strong>,
+    {{ "%.2f" | format(season.unlucky.points) }} in week {{ season.unlucky.week }}.
+  </p>
+{% else %}
+  <p class="muted">No Unlucky award for this season.</p>
+{% endif %}
+
+<h3>Consolation bracket</h3>
+{% if season.consolation_winners %}
+  <div class="flag">
+    <span class="tag">Unverified — nobody has checked this</span>
+    <div>
+      {{ ui.teams(season.consolation_winners) }} is the top finisher among the teams that
+      missed the playoffs, which would waive their keeper fees for {{ season.waiver_season }}.
+      Derived from the final standings and <strong>not</strong> confirmed by the
+      commissioner.
+    </div>
+  </div>
+{% else %}
+  <p class="muted">No consolation bracket winner could be derived for this season.</p>
+{% endif %}
+{% endblock %}

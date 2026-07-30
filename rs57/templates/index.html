@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% import "_notes.html" as ui %}
+
+{% block title %}RS57 League{% endblock %}
+
+{% block content %}
+<h1>RS57 League</h1>
+<p class="lede">
+  A 12-team keeper auction league. This site answers the two questions that used to need a
+  screenshot: what your keepers will cost, and who won what.
+</p>
+
+{% if current %}
+  <h2>{{ current.season }} keepers</h2>
+  <p>
+    Every player on all {{ current.teams | length }} rosters is priced for
+    {{ current.season }} — base plus the ${{ keeper_tax }} tax where it applies.
+    <a href="keepers.html">See the keeper prices &rarr;</a>
+  </p>
+  {{ ui.flags(current.notes) }}
+{% else %}
+  <h2>Keepers</h2>
+  <p class="muted">No season has been synced yet, so there are no keeper prices to show.</p>
+{% endif %}
+
+<h2>Seasons</h2>
+{% if seasons %}
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Season</th>
+          <th>Champion</th>
+          <th class="num">Pot</th>
+          <th class="num">Unverified</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for season in seasons %}
+          <tr>
+            <td>{{ season.season }}</td>
+            <td>
+              {% for group in season.prizes %}
+                {% if group.label == 'Champion' %}
+                  {% for row in group.rows %}
+                    {% if row.winner %}{{ ui.team(row.winner) }}{% else %}<span class="muted">unawarded</span>{% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </td>
+            <td class="num money">${{ season.pot }}</td>
+            <td class="num">
+              {% if season.notes %}{{ season.notes | length }}{% else %}<span class="muted">0</span>{% endif %}
+            </td>
+            <td><a href="season-{{ season.season }}.html">Standings &amp; prizes &rarr;</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="muted">
+    No completed season has been synced yet, so there are no standings or prizes to show.
+  </p>
+{% endif %}
+
+<h2>Rules</h2>
+<p>
+  Keeper limits, the salary formula, the ${{ keeper_tax }} tax, prospects, and every prize.
+  <a href="rules.html">Read the rules &rarr;</a>
+</p>
+{% endblock %}

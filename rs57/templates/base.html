@@ -1,0 +1,122 @@
+{# The shell every page sits in.
+
+   Autoescaping is on for every template in this directory and no template calls the "safe"
+   filter — there is a test asserting it. The one variable that arrives as markup is `rules`,
+   built by site.render_markdown, which escapes before it adds tags. #}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}RS57 League{% endblock %}</title>
+<style>
+  :root {
+    --ink: #1b1f24;
+    --muted: #5b6470;
+    --line: #dfe3e8;
+    --bg: #ffffff;
+    --panel: #f6f8fa;
+    --accent: #0b5cad;
+    --flag: #8a5a00;
+    --flag-bg: #fff8e6;
+    --flag-line: #e8c96a;
+    --bad: #96200f;
+    --bad-bg: #fdf0ee;
+    --bad-line: #e4a99e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.top .wrap { padding-top: 1.5rem; padding-bottom: 0; }
+  .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  nav { margin: 0.85rem 0 0; display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.75rem;
+    border-bottom: 2px solid transparent; font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.65rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; max-width: 44rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.88rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.5rem; font-size: 0.95rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.88rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.15rem; margin: 1.25rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.25rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .tag-inline {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+  }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
+  .jump a { font-size: 0.9rem; }
+  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
+  .team h3 { margin-top: 0; }
+  .team table { margin-bottom: 0; }
+  .team tbody tr:last-child td { border-bottom: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <nav>
+      <a href="index.html" class="{% if page == 'home' %}on{% endif %}">Home</a>
+      <a href="keepers.html" class="{% if page == 'keepers' %}on{% endif %}">Keepers</a>
+      <a href="seasons.html" class="{% if page == 'seasons' %}on{% endif %}">Seasons</a>
+      <a href="rules.html" class="{% if page == 'rules' %}on{% endif %}">Rules</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+{% block content %}{% endblock %}
+
+<footer class="small muted">
+  <p>
+    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
+    history, and the rules.
+  </p>
+  <p>
+    Teams are identified by their ESPN team id. Franchise names change every season, so a
+    season's names come from that season's own record.
+  </p>
+</footer>
+</div>
+</body>
+</html>

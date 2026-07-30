@@ -54,9 +54,13 @@ def test_no_io_imports(module: str):
 
 @pytest.mark.parametrize("module", PURE_MODULES)
 def test_no_dependency_on_the_impure_half(module: str):
-    """The dependency only ever points one way: sync -> stats -> keeper_rules -> models."""
+    """The dependency only ever points one way: sync -> stats -> keeper_rules -> models.
+
+    ``rs57.site`` is on the impure list for the same reason as the rest: the site generator
+    imports the engines to price a keeper, and neither engine ever learns about Jinja.
+    """
     source = (SOURCE / f"{module}.py").read_text(encoding="utf-8")
-    for impure in ("rs57.espn", "rs57.sync", "rs57.stats_sync", "rs57.validate"):
+    for impure in ("rs57.espn", "rs57.sync", "rs57.stats_sync", "rs57.validate", "rs57.site"):
         assert f"from {impure}" not in source and f"import {impure}" not in source, (
             f"{module}.py imports {impure} — that inverts the dependency. "
             f"{impure} is allowed to know about {module}, never the other way round."

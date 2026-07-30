@@ -9,6 +9,9 @@ description = "Keeper salaries, prize tracking, and league history for the RS57 
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.7",
+    # The site generator only. Autoescaping is on and stays on; markupsafe comes with it and
+    # is what render_markdown escapes with.
+    "jinja2>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -18,6 +21,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = ["rs57*"]
+
+[tool.setuptools.package-data]
+rs57 = ["templates/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
