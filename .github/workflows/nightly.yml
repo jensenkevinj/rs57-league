@@ -161,26 +161,6 @@ jobs:
       - name: Build site
         run: python -m rs57.site
 
-      # Deploy before the commit, not after. The artifact is built from the same site/ the
-      # commit stages, and publishing does not depend on the push succeeding.
-      #
-      # `enablement: true` turns Pages on via the API the first time this runs, so the repo
-      # needs no manual setup. If an org policy blocks that, this step fails with a clear
-      # message and Settings -> Pages -> Source: GitHub Actions is the one-time fix.
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Upload the site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
       - name: Stage and check ownership
         id: stage
         run: |
@@ -225,6 +205,26 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Nightly: sync ${{ steps.seasons.outputs.seasons }}, rebuild site"
           git push
+
+      # Publish AFTER the commit, deliberately. Publishing is downstream of the data: a Pages
+      # outage must not be able to discard a good ESPN sync, which is exactly what happened
+      # the first time these steps sat above the commit. If a deploy fails the data is already
+      # safe on main and the next run republishes it.
+      #
+      # Pages must already be enabled with Source: GitHub Actions. `enablement: true` is not
+      # set because GITHUB_TOKEN cannot create a Pages site — it returns "Resource not
+      # accessible by integration" — so enabling it is a one-time human step, done once.
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       # Deliberately last. A season that failed to sync still lets the others publish, but the
       # run then goes red so nobody reads a green tick as "ESPN answered".
