@@ -1,0 +1,2392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keeper prices — RS57 League</title>
+<style>
+  :root {
+    --ink: #1b1f24;
+    --muted: #5b6470;
+    --line: #dfe3e8;
+    --bg: #ffffff;
+    --panel: #f6f8fa;
+    --accent: #0b5cad;
+    --flag: #8a5a00;
+    --flag-bg: #fff8e6;
+    --flag-line: #e8c96a;
+    --bad: #96200f;
+    --bad-bg: #fdf0ee;
+    --bad-line: #e4a99e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.top .wrap { padding-top: 1.5rem; padding-bottom: 0; }
+  .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  nav { margin: 0.85rem 0 0; display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.75rem;
+    border-bottom: 2px solid transparent; font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.65rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; max-width: 44rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.88rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.5rem; font-size: 0.95rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.88rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.15rem; margin: 1.25rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.25rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .tag-inline {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+  }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
+  .jump a { font-size: 0.9rem; }
+  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
+  .team h3 { margin-top: 0; }
+  .team table { margin-bottom: 0; }
+  .team tbody tr:last-child td { border-bottom: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <nav>
+      <a href="index.html" class="">Home</a>
+      <a href="keepers.html" class="on">Keepers</a>
+      <a href="seasons.html" class="">Seasons</a>
+      <a href="rules.html" class="">Rules</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>2026 keeper prices</h1>
+  <p class="lede">
+    What every player on every roster would cost to keep in 2026. Find your
+    team, add up the players you want, then add the keeper fee for that many keepers.
+  </p>
+
+  <div class="panel">
+    <h3 style="margin-top:0">How to read this</h3>
+    <p>
+      A keeper's price is <strong>his base plus the $5 tax</strong> if you kept
+      him last season. Base is what he cost you this season, not what you originally paid —
+      every fee and tax you have paid on him is already inside it, which is why a player you
+      have held for years is expensive.
+    </p>
+      <p>
+        2026 has not been drafted yet, so a base here is last season's salary
+        carried forward. That is the right number to make a keeper decision on; it is re-read
+        after the auction.
+      </p>
+    <p>
+      <strong>The keeper fee is not in these prices.</strong> The fee depends on how many
+      keepers you declare and you choose how to split it, so it cannot be worked out per
+      player. Add it yourself:
+    </p>
+    <table style="max-width:22rem">
+      <thead><tr><th>Keepers declared</th><th class="num">Fee, in total</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>1</td>
+            <td class="num money">$0</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="num money">$5</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="num money">$15</td>
+          </tr>
+      </tbody>
+    </table>
+    <p class="small muted">
+      Maximum 3 keepers plus 1 prospect. A prospect is kept
+      at his base with no fee and no tax. There is no salary cap.
+    </p>
+  </div>
+
+  <div class="flag">
+    <span class="tag">Prices, not declarations</span>
+    <div>
+      Nobody has declared a keeper yet. Every player below is priced as though he could be
+      kept; none of this means anyone has claimed him. The tool that records declarations is
+      not built.
+    </div>
+  </div>
+
+    <div class="flag">
+      <span class="tag">Unverified — nobody has checked this</span>
+      <div>
+Jaxian McJigberson        appears to have won the 2025 consolation bracket, which
+        would waive their keeper fees for 2026. Salaries would still be owed
+        in full — only the fee is waived. This is derived from the final standings and has
+        <strong>not</strong> been confirmed by the commissioner, so it is not applied to
+        anything on this page.
+      </div>
+    </div>
+
+    <div class="flag ">
+    <span class="tag">
+        Unverified — nobody has checked this
+    </span>
+    <div>2026 has not been drafted, so base_salary is keeperValue (last season&#39;s salary carried forward). Re-sync after the auction.</div>
+      <div class="small muted">2026 keepers</div>
+  </div>
+
+
+  <h2>Rosters</h2>
+  <p class="small muted">
+    12 franchises, cheapest player first. Jump to a team:
+  </p>
+  <p class="jump">
+      <a href="#t1">Fake News</a>
+      <a href="#t2">100yd Reverse Hurdles</a>
+      <a href="#t3">Jaxian McJigberson</a>
+      <a href="#t4">Cooking Rice</a>
+      <a href="#t5">The Infirmary</a>
+      <a href="#t6">CeeDee Drive</a>
+      <a href="#t7">Aiyukiddinme? I&#39;m Odunze here</a>
+      <a href="#t8">Calling Audibles</a>
+      <a href="#t9">Purdy Good at Fantasy</a>
+      <a href="#t10">Bijan&#39;s Mustard</a>
+      <a href="#t11">Belichick&#39;s Spy</a>
+      <a href="#t12">Too Much Moxie</a>
+  </p>
+
+    <div class="team" id="t1">
+      <h3>
+Fake News      </h3>
+      <p class="small muted">
+        t1 · 15 players ·
+        1 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Elic Ayomanor</td>
+                <td>WR</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Harold Fannin Jr.</td>
+                <td>TE</td>
+                <td class="muted">CLE</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>John Metchie III</td>
+                <td>WR</td>
+                <td class="muted">CAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Justin Herbert</td>
+                <td>QB</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Ravens D/ST</td>
+                <td>DEF</td>
+                <td class="muted">BAL</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Tez Johnson</td>
+                <td>WR</td>
+                <td class="muted">TB</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Keenan Allen</td>
+                <td>WR</td>
+                <td class="muted">FA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Jordan Addison</td>
+                <td>WR</td>
+                <td class="muted">MIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Travis Kelce</td>
+                <td>TE</td>
+                <td class="muted">KC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Bucky Irving</td>
+                <td>RB</td>
+                <td class="muted">TB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$7</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$12</td>
+              </tr>
+              <tr>
+                <td>David Montgomery</td>
+                <td>RB</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">draft</td>
+                <td class="num">$15</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$15</td>
+              </tr>
+              <tr>
+                <td>Jaylen Waddle</td>
+                <td>WR</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$20</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$20</td>
+              </tr>
+              <tr>
+                <td>Zay Flowers</td>
+                <td>WR</td>
+                <td class="muted">BAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$20</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$20</td>
+              </tr>
+              <tr>
+                <td>Davante Adams</td>
+                <td>WR</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">draft</td>
+                <td class="num">$27</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$27</td>
+              </tr>
+              <tr>
+                <td>Tyrone Tracy Jr.</td>
+                <td>RB</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$79</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$79</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t2">
+      <h3>
+100yd Reverse Hurdles      </h3>
+      <p class="small muted">
+        t2 · 15 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Jayden Reed</td>
+                <td>WR</td>
+                <td class="muted">GB</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Joe Burrow</td>
+                <td>QB</td>
+                <td class="muted">CIN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Kyle Monangai</td>
+                <td>RB</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Luther Burden III</td>
+                <td>WR</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Theo Johnson</td>
+                <td>TE</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Caleb Williams</td>
+                <td>QB</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Eagles D/ST</td>
+                <td>DEF</td>
+                <td class="muted">PHI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Khalil Shakir</td>
+                <td>WR</td>
+                <td class="muted">BUF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$6</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$6</td>
+              </tr>
+              <tr>
+                <td>Puka Nacua</td>
+                <td>WR</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$10</td>
+              </tr>
+              <tr>
+                <td>Nico Collins</td>
+                <td>WR</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">draft</td>
+                <td class="num">$12</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$17</td>
+              </tr>
+              <tr>
+                <td>DeVonta Smith</td>
+                <td>WR</td>
+                <td class="muted">PHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$21</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$21</td>
+              </tr>
+              <tr>
+                <td>Emanuel Wilson</td>
+                <td>RB</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$21</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$21</td>
+              </tr>
+              <tr>
+                <td>Mark Andrews</td>
+                <td>TE</td>
+                <td class="muted">BAL</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$33</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$33</td>
+              </tr>
+              <tr>
+                <td>Josh Jacobs</td>
+                <td>RB</td>
+                <td class="muted">GB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$58</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$58</td>
+              </tr>
+              <tr>
+                <td>Saquon Barkley</td>
+                <td>RB</td>
+                <td class="muted">PHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$68</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$73</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t3">
+      <h3>
+Jaxian McJigberson          <span class="tag-inline" title="Derived from the standings, not confirmed by the commissioner">fees waived?</span>
+      </h3>
+      <p class="small muted">
+        t3 · 16 players ·
+        2 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Jacory Croskey-Merritt</td>
+                <td>RB</td>
+                <td class="muted">WSH</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Jawhar Jordan</td>
+                <td>RB</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Kyle Williams</td>
+                <td>WR</td>
+                <td class="muted">NE</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Woody Marks</td>
+                <td>RB</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Michael Wilson</td>
+                <td>WR</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Brian Robinson Jr.</td>
+                <td>RB</td>
+                <td class="muted">ATL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Broncos D/ST</td>
+                <td>DEF</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Colston Loveland</td>
+                <td>TE</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$7</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$7</td>
+              </tr>
+              <tr>
+                <td>Brock Purdy</td>
+                <td>QB</td>
+                <td class="muted">SF</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$9</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$9</td>
+              </tr>
+              <tr>
+                <td>Tucker Kraft</td>
+                <td>TE</td>
+                <td class="muted">GB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$9</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$9</td>
+              </tr>
+              <tr>
+                <td>Isiah Pacheco</td>
+                <td>RB</td>
+                <td class="muted">DET</td>
+                <td class="muted small">draft</td>
+                <td class="num">$15</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$15</td>
+              </tr>
+              <tr>
+                <td>Chris Olave</td>
+                <td>WR</td>
+                <td class="muted">NO</td>
+                <td class="muted small">draft</td>
+                <td class="num">$16</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$16</td>
+              </tr>
+              <tr>
+                <td>Deebo Samuel</td>
+                <td>WR</td>
+                <td class="muted">FA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$19</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$19</td>
+              </tr>
+              <tr>
+                <td>Jaxon Smith-Njigba</td>
+                <td>WR</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$18</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$23</td>
+              </tr>
+              <tr>
+                <td>Justin Jefferson</td>
+                <td>WR</td>
+                <td class="muted">MIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$30</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$35</td>
+              </tr>
+              <tr>
+                <td>Christian McCaffrey</td>
+                <td>RB</td>
+                <td class="muted">SF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$62</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$62</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t4">
+      <h3>
+Cooking Rice      </h3>
+      <p class="small muted">
+        t4 · 15 players ·
+        2 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Geno Smith</td>
+                <td>QB</td>
+                <td class="muted">NYJ</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Kendrick Bourne</td>
+                <td>WR</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Kyle Pitts Sr.</td>
+                <td>TE</td>
+                <td class="muted">ATL</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Malik Willis</td>
+                <td>QB</td>
+                <td class="muted">MIA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Rams D/ST</td>
+                <td>DEF</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Lions D/ST</td>
+                <td>DEF</td>
+                <td class="muted">DET</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Darren Waller</td>
+                <td>TE</td>
+                <td class="muted">FA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Chris Godwin Jr.</td>
+                <td>WR</td>
+                <td class="muted">TB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>RJ Harvey</td>
+                <td>RB</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$19</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$19</td>
+              </tr>
+              <tr>
+                <td>Emeka Egbuka</td>
+                <td>WR</td>
+                <td class="muted">TB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$20</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$20</td>
+              </tr>
+              <tr>
+                <td>Michael Carter</td>
+                <td>RB</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$21</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$21</td>
+              </tr>
+              <tr>
+                <td>DJ Moore</td>
+                <td>WR</td>
+                <td class="muted">BUF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$23</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$23</td>
+              </tr>
+              <tr>
+                <td>Rashee Rice</td>
+                <td>WR</td>
+                <td class="muted">KC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$20</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$25</td>
+              </tr>
+              <tr>
+                <td>Kyren Williams</td>
+                <td>RB</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">draft</td>
+                <td class="num">$28</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$28</td>
+              </tr>
+              <tr>
+                <td>James Cook III</td>
+                <td>RB</td>
+                <td class="muted">BUF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$42</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$47</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t5">
+      <h3>
+The Infirmary      </h3>
+      <p class="small muted">
+        t5 · 16 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Adam Thielen</td>
+                <td>WR</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Chimere Dike</td>
+                <td>WR</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Colby Parkinson</td>
+                <td>TE</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Jaxson Dart</td>
+                <td>QB</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Kenny Gainwell</td>
+                <td>RB</td>
+                <td class="muted">TB</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Shedeur Sanders</td>
+                <td>QB</td>
+                <td class="muted">CLE</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Tre&#39; Harris</td>
+                <td>WR</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Trevor Lawrence</td>
+                <td>QB</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Hunter Henry</td>
+                <td>TE</td>
+                <td class="muted">NE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Kareem Hunt</td>
+                <td>RB</td>
+                <td class="muted">FA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Patriots D/ST</td>
+                <td>DEF</td>
+                <td class="muted">NE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Tyreek Hill</td>
+                <td>WR</td>
+                <td class="muted">FA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$30</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$30</td>
+              </tr>
+              <tr>
+                <td>Malik Nabers</td>
+                <td>WR</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">draft</td>
+                <td class="num">$28</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$33</td>
+              </tr>
+              <tr>
+                <td>Xavier Worthy</td>
+                <td>WR</td>
+                <td class="muted">KC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$29</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$34</td>
+              </tr>
+              <tr>
+                <td>Omarion Hampton</td>
+                <td>RB</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$44</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$44</td>
+              </tr>
+              <tr>
+                <td>Ja&#39;Marr Chase</td>
+                <td>WR</td>
+                <td class="muted">CIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$40</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$45</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t6">
+      <h3>
+CeeDee Drive      </h3>
+      <p class="small muted">
+        t6 · 16 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Aaron Rodgers</td>
+                <td>QB</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Cowboys D/ST</td>
+                <td>DEF</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Dalton Schultz</td>
+                <td>TE</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Darius Slayton</td>
+                <td>WR</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Keaton Mitchell</td>
+                <td>RB</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Matthew Stafford</td>
+                <td>QB</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Rachaad White</td>
+                <td>RB</td>
+                <td class="muted">WSH</td>
+                <td class="muted small">draft</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Jaylen Warren</td>
+                <td>RB</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">trade</td>
+                <td class="num">$6</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$6</td>
+              </tr>
+              <tr>
+                <td>Kimani Vidal</td>
+                <td>RB</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$9</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$9</td>
+              </tr>
+              <tr>
+                <td>Jakobi Meyers</td>
+                <td>WR</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">draft</td>
+                <td class="num">$10</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$10</td>
+              </tr>
+              <tr>
+                <td>T.J. Hockenson</td>
+                <td>TE</td>
+                <td class="muted">MIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$13</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$13</td>
+              </tr>
+              <tr>
+                <td>Ladd McConkey</td>
+                <td>WR</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">trade</td>
+                <td class="num">$10</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$15</td>
+              </tr>
+              <tr>
+                <td>J.K. Dobbins</td>
+                <td>RB</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$16</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$16</td>
+              </tr>
+              <tr>
+                <td>Kenneth Walker III</td>
+                <td>RB</td>
+                <td class="muted">KC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$27</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$27</td>
+              </tr>
+              <tr>
+                <td>Drake London</td>
+                <td>WR</td>
+                <td class="muted">ATL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$24</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$29</td>
+              </tr>
+              <tr>
+                <td>CeeDee Lamb</td>
+                <td>WR</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$39</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$44</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t7">
+      <h3>
+Aiyukiddinme? I&#39;m Odunze here      </h3>
+      <p class="small muted">
+        t7 · 16 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Blake Corum</td>
+                <td>RB</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Calvin Austin III</td>
+                <td>WR</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Cooper Kupp</td>
+                <td>WR</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Giants D/ST</td>
+                <td>DEF</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Jared Goff</td>
+                <td>QB</td>
+                <td class="muted">DET</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Taysom Hill</td>
+                <td>TE</td>
+                <td class="muted">FA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Darnell Mooney</td>
+                <td>WR</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Rashod Bateman</td>
+                <td>WR</td>
+                <td class="muted">BAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Rashid Shaheed</td>
+                <td>WR</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Jerry Jeudy</td>
+                <td>WR</td>
+                <td class="muted">CLE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$17</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$17</td>
+              </tr>
+              <tr>
+                <td>Brian Thomas Jr.</td>
+                <td>WR</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">trade</td>
+                <td class="num">$16</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$21</td>
+              </tr>
+              <tr>
+                <td>Tony Pollard</td>
+                <td>RB</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$22</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$22</td>
+              </tr>
+              <tr>
+                <td>Brock Bowers</td>
+                <td>TE</td>
+                <td class="muted">LV</td>
+                <td class="muted small">draft</td>
+                <td class="num">$18</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$23</td>
+              </tr>
+              <tr>
+                <td>Jalen Hurts</td>
+                <td>QB</td>
+                <td class="muted">PHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$25</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$25</td>
+              </tr>
+              <tr>
+                <td>Tee Higgins</td>
+                <td>WR</td>
+                <td class="muted">CIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$28</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$33</td>
+              </tr>
+              <tr>
+                <td>Ashton Jeanty</td>
+                <td>RB</td>
+                <td class="muted">LV</td>
+                <td class="muted small">draft</td>
+                <td class="num">$61</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$61</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t8">
+      <h3>
+Calling Audibles      </h3>
+      <p class="small muted">
+        t8 · 16 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Chargers D/ST</td>
+                <td>DEF</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Juwan Johnson</td>
+                <td>TE</td>
+                <td class="muted">NO</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Pat Bryant</td>
+                <td>WR</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Sterling Shepard</td>
+                <td>WR</td>
+                <td class="muted">FA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Tre Tucker</td>
+                <td>WR</td>
+                <td class="muted">LV</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Wan&#39;Dale Robinson</td>
+                <td>WR</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Trey Benson</td>
+                <td>RB</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Jauan Jennings</td>
+                <td>WR</td>
+                <td class="muted">MIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$4</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$4</td>
+              </tr>
+              <tr>
+                <td>Patrick Mahomes</td>
+                <td>QB</td>
+                <td class="muted">KC</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Aaron Jones Sr.</td>
+                <td>RB</td>
+                <td class="muted">MIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$15</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$15</td>
+              </tr>
+              <tr>
+                <td>Chuba Hubbard</td>
+                <td>RB</td>
+                <td class="muted">CAR</td>
+                <td class="muted small">draft</td>
+                <td class="num">$17</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$22</td>
+              </tr>
+              <tr>
+                <td>Garrett Wilson</td>
+                <td>WR</td>
+                <td class="muted">NYJ</td>
+                <td class="muted small">draft</td>
+                <td class="num">$25</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$25</td>
+              </tr>
+              <tr>
+                <td>George Kittle</td>
+                <td>TE</td>
+                <td class="muted">SF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$25</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$25</td>
+              </tr>
+              <tr>
+                <td>Marvin Harrison Jr.</td>
+                <td>WR</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$28</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$28</td>
+              </tr>
+              <tr>
+                <td>Mike Evans</td>
+                <td>WR</td>
+                <td class="muted">SF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$29</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$34</td>
+              </tr>
+              <tr>
+                <td>Jahmyr Gibbs</td>
+                <td>RB</td>
+                <td class="muted">DET</td>
+                <td class="muted small">draft</td>
+                <td class="num">$45</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$50</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t9">
+      <h3>
+Purdy Good at Fantasy      </h3>
+      <p class="small muted">
+        t9 · 16 players ·
+        2 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Seahawks D/ST</td>
+                <td>DEF</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Texans D/ST</td>
+                <td>DEF</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Tyler Shough</td>
+                <td>QB</td>
+                <td class="muted">NO</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Travis Etienne Jr.</td>
+                <td>RB</td>
+                <td class="muted">NO</td>
+                <td class="muted small">draft</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Tyjae Spears</td>
+                <td>RB</td>
+                <td class="muted">TEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Cam Skattebo</td>
+                <td>RB</td>
+                <td class="muted">NYG</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Ricky Pearsall</td>
+                <td>WR</td>
+                <td class="muted">SF</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$7</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$7</td>
+              </tr>
+              <tr>
+                <td>Jayden Higgins</td>
+                <td>WR</td>
+                <td class="muted">HOU</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$8</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$8</td>
+              </tr>
+              <tr>
+                <td>Stefon Diggs</td>
+                <td>WR</td>
+                <td class="muted">FA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$10</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$10</td>
+              </tr>
+              <tr>
+                <td>Chase Brown</td>
+                <td>RB</td>
+                <td class="muted">CIN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$8</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$13</td>
+              </tr>
+              <tr>
+                <td>Rome Odunze</td>
+                <td>WR</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$20</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$20</td>
+              </tr>
+              <tr>
+                <td>D&#39;Andre Swift</td>
+                <td>RB</td>
+                <td class="muted">CHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$21</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$21</td>
+              </tr>
+              <tr>
+                <td>Courtland Sutton</td>
+                <td>WR</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$24</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$24</td>
+              </tr>
+              <tr>
+                <td>George Pickens</td>
+                <td>WR</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$27</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$27</td>
+              </tr>
+              <tr>
+                <td>Trey McBride</td>
+                <td>TE</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$22</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$27</td>
+              </tr>
+              <tr>
+                <td>Josh Allen</td>
+                <td>QB</td>
+                <td class="muted">BUF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$28</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$28</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t10">
+      <h3>
+Bijan&#39;s Mustard      </h3>
+      <p class="small muted">
+        t10 · 15 players ·
+        2 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Bam Knight</td>
+                <td>RB</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Bengals D/ST</td>
+                <td>DEF</td>
+                <td class="muted">CIN</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Drake Maye</td>
+                <td>QB</td>
+                <td class="muted">NE</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Rico Dowdle</td>
+                <td>RB</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">trade</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Dallas Goedert</td>
+                <td>TE</td>
+                <td class="muted">PHI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Dalton Kincaid</td>
+                <td>TE</td>
+                <td class="muted">BUF</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Jake Ferguson</td>
+                <td>TE</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">trade</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Troy Franklin</td>
+                <td>WR</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">trade</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Tyler Allgeier</td>
+                <td>RB</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">draft</td>
+                <td class="num">$3</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$3</td>
+              </tr>
+              <tr>
+                <td>Bo Nix</td>
+                <td>QB</td>
+                <td class="muted">DEN</td>
+                <td class="muted small">draft</td>
+                <td class="num">$9</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$9</td>
+              </tr>
+              <tr>
+                <td>Tetairoa McMillan</td>
+                <td>WR</td>
+                <td class="muted">CAR</td>
+                <td class="muted small">draft</td>
+                <td class="num">$27</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$27</td>
+              </tr>
+              <tr>
+                <td>Jameson Williams</td>
+                <td>WR</td>
+                <td class="muted">DET</td>
+                <td class="muted small">trade</td>
+                <td class="num">$28</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$28</td>
+              </tr>
+              <tr>
+                <td>Michael Pittman Jr.</td>
+                <td>WR</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">trade</td>
+                <td class="num">$30</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$35</td>
+              </tr>
+              <tr>
+                <td>Jonathan Taylor</td>
+                <td>RB</td>
+                <td class="muted">IND</td>
+                <td class="muted small">draft</td>
+                <td class="num">$33</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$38</td>
+              </tr>
+              <tr>
+                <td>Bijan Robinson</td>
+                <td>RB</td>
+                <td class="muted">ATL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$66</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$66</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t11">
+      <h3>
+Belichick&#39;s Spy      </h3>
+      <p class="small muted">
+        t11 · 16 players ·
+        3 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Adonai Mitchell</td>
+                <td>WR</td>
+                <td class="muted">NYJ</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Brandon Aiyuk</td>
+                <td>WR</td>
+                <td class="muted">SF</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Brenton Strange</td>
+                <td>TE</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Christian Watson</td>
+                <td>WR</td>
+                <td class="muted">GB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Jaguars D/ST</td>
+                <td>DEF</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Dak Prescott</td>
+                <td>QB</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$6</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$6</td>
+              </tr>
+              <tr>
+                <td>Javonte Williams</td>
+                <td>RB</td>
+                <td class="muted">DAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$7</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$7</td>
+              </tr>
+              <tr>
+                <td>Quinshon Judkins</td>
+                <td>RB</td>
+                <td class="muted">CLE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$8</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$8</td>
+              </tr>
+              <tr>
+                <td>Baker Mayfield</td>
+                <td>QB</td>
+                <td class="muted">TB</td>
+                <td class="muted small">draft</td>
+                <td class="num">$9</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$9</td>
+              </tr>
+              <tr>
+                <td>Oronde Gadsden</td>
+                <td>TE</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$10</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$10</td>
+              </tr>
+              <tr>
+                <td>Sam LaPorta</td>
+                <td>TE</td>
+                <td class="muted">DET</td>
+                <td class="muted small">draft</td>
+                <td class="num">$6</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$11</td>
+              </tr>
+              <tr>
+                <td>Quentin Johnston</td>
+                <td>WR</td>
+                <td class="muted">LAC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$12</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$12</td>
+              </tr>
+              <tr>
+                <td>Breece Hall</td>
+                <td>RB</td>
+                <td class="muted">NYJ</td>
+                <td class="muted small">draft</td>
+                <td class="num">$30</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$30</td>
+              </tr>
+              <tr>
+                <td>Amon-Ra St. Brown</td>
+                <td>WR</td>
+                <td class="muted">DET</td>
+                <td class="muted small">draft</td>
+                <td class="num">$30</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$35</td>
+              </tr>
+              <tr>
+                <td>Terry McLaurin</td>
+                <td>WR</td>
+                <td class="muted">WSH</td>
+                <td class="muted small">draft</td>
+                <td class="num">$36</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$41</td>
+              </tr>
+              <tr>
+                <td>TreVeyon Henderson</td>
+                <td>RB</td>
+                <td class="muted">NE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$45</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$45</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="team" id="t12">
+      <h3>
+Too Much Moxie      </h3>
+      <p class="small muted">
+        t12 · 16 players ·
+        2 carrying the $5 tax
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>NFL</th>
+              <th>Acquired</th>
+              <th class="num">Base</th>
+              <th class="num">Tax</th>
+              <th class="num">Keeper price</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>Audric Estime</td>
+                <td>RB</td>
+                <td class="muted">NO</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Dylan Sampson</td>
+                <td>RB</td>
+                <td class="muted">CLE</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Emari Demercado</td>
+                <td>RB</td>
+                <td class="muted">KC</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Josh Downs</td>
+                <td>WR</td>
+                <td class="muted">IND</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Konata Mumpfield</td>
+                <td>WR</td>
+                <td class="muted">LAR</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Parker Washington</td>
+                <td>WR</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$0</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$0</td>
+              </tr>
+              <tr>
+                <td>Jaylen Wright</td>
+                <td>RB</td>
+                <td class="muted">MIA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$1</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$1</td>
+              </tr>
+              <tr>
+                <td>Rhamondre Stevenson</td>
+                <td>RB</td>
+                <td class="muted">NE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$2</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$2</td>
+              </tr>
+              <tr>
+                <td>Tyler Warren</td>
+                <td>TE</td>
+                <td class="muted">IND</td>
+                <td class="muted small">draft</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Zach Charbonnet</td>
+                <td>RB</td>
+                <td class="muted">SEA</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$5</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$5</td>
+              </tr>
+              <tr>
+                <td>Jacoby Brissett</td>
+                <td>QB</td>
+                <td class="muted">ARI</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$6</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$6</td>
+              </tr>
+              <tr>
+                <td>Steelers D/ST</td>
+                <td>DEF</td>
+                <td class="muted">PIT</td>
+                <td class="muted small">waiver</td>
+                <td class="num">$12</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$12</td>
+              </tr>
+              <tr>
+                <td>Travis Hunter</td>
+                <td>WR</td>
+                <td class="muted">JAX</td>
+                <td class="muted small">draft</td>
+                <td class="num">$13</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$13</td>
+              </tr>
+              <tr>
+                <td>De&#39;Von Achane</td>
+                <td>RB</td>
+                <td class="muted">MIA</td>
+                <td class="muted small">draft</td>
+                <td class="num">$23</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$28</td>
+              </tr>
+              <tr>
+                <td>A.J. Brown</td>
+                <td>WR</td>
+                <td class="muted">NE</td>
+                <td class="muted small">draft</td>
+                <td class="num">$25</td>
+                <td class="num">
+$5                </td>
+                <td class="num money">$30</td>
+              </tr>
+              <tr>
+                <td>Derrick Henry</td>
+                <td>RB</td>
+                <td class="muted">BAL</td>
+                <td class="muted small">draft</td>
+                <td class="num">$52</td>
+                <td class="num">
+<span class="muted">—</span>                </td>
+                <td class="num money">$52</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+<footer class="small muted">
+  <p>
+    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
+    history, and the rules.
+  </p>
+  <p>
+    Teams are identified by their ESPN team id. Franchise names change every season, so a
+    season's names come from that season's own record.
+  </p>
+</footer>
+</div>
+</body>
+</html>

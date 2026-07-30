@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2025 season — RS57 League</title>
+<style>
+  :root {
+    --ink: #1b1f24;
+    --muted: #5b6470;
+    --line: #dfe3e8;
+    --bg: #ffffff;
+    --panel: #f6f8fa;
+    --accent: #0b5cad;
+    --flag: #8a5a00;
+    --flag-bg: #fff8e6;
+    --flag-line: #e8c96a;
+    --bad: #96200f;
+    --bad-bg: #fdf0ee;
+    --bad-line: #e4a99e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.top .wrap { padding-top: 1.5rem; padding-bottom: 0; }
+  .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  nav { margin: 0.85rem 0 0; display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.75rem;
+    border-bottom: 2px solid transparent; font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.65rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; max-width: 44rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.88rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.5rem; font-size: 0.95rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.88rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.15rem; margin: 1.25rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.25rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .tag-inline {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+  }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
+  .jump a { font-size: 0.9rem; }
+  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
+  .team h3 { margin-top: 0; }
+  .team table { margin-bottom: 0; }
+  .team tbody tr:last-child td { border-bottom: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <nav>
+      <a href="index.html" class="">Home</a>
+      <a href="keepers.html" class="">Keepers</a>
+      <a href="seasons.html" class="on">Seasons</a>
+      <a href="rules.html" class="">Rules</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<h1>2025 season</h1>
+<p class="lede">
+  Final standings, every prize, and what each franchise took home. Regular season is weeks 1
+  to 14.
+</p>
+
+
+
+<h2>Standings</h2>
+<div class="scroll">
+  <table>
+    <caption>
+      Record and points are computed from the matchups. Final rank is the playoff bracket's
+      answer, which is what pays the placing prizes.
+    </caption>
+    <thead>
+      <tr>
+        <th class="num">Final</th>
+        <th>Franchise</th>
+        <th class="num">W</th>
+        <th class="num">L</th>
+        <th class="num">T</th>
+        <th class="num">Points for</th>
+        <th class="num">Points against</th>
+        <th class="num">Seed</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">10</td>
+          <td class="num">4</td>
+          <td class="num">0</td>
+          <td class="num">1737.50</td>
+          <td class="num">1417.12</td>
+          <td class="num">1</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Cooking Rice</td>
+          <td class="num">10</td>
+          <td class="num">4</td>
+          <td class="num">0</td>
+          <td class="num">1401.36</td>
+          <td class="num">1269.38</td>
+          <td class="num">2</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>Too Much Moxie</td>
+          <td class="num">8</td>
+          <td class="num">6</td>
+          <td class="num">0</td>
+          <td class="num">1439.60</td>
+          <td class="num">1436.96</td>
+          <td class="num">6</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">8</td>
+          <td class="num">6</td>
+          <td class="num">0</td>
+          <td class="num">1493.66</td>
+          <td class="num">1492.52</td>
+          <td class="num">5</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">9</td>
+          <td class="num">5</td>
+          <td class="num">0</td>
+          <td class="num">1616.62</td>
+          <td class="num">1362.14</td>
+          <td class="num">3</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>100yd Reverse Hurdles</td>
+          <td class="num">9</td>
+          <td class="num">5</td>
+          <td class="num">0</td>
+          <td class="num">1445.98</td>
+          <td class="num">1476.16</td>
+          <td class="num">4</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Jaxian McJigberson</td>
+          <td class="num">7</td>
+          <td class="num">7</td>
+          <td class="num">0</td>
+          <td class="num">1595.86</td>
+          <td class="num">1397.70</td>
+          <td class="num">7</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>CeeDee Drive</td>
+          <td class="num">8</td>
+          <td class="num">6</td>
+          <td class="num">0</td>
+          <td class="num">1382.12</td>
+          <td class="num">1387.88</td>
+          <td class="num">8</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Fake News</td>
+          <td class="num">6</td>
+          <td class="num">8</td>
+          <td class="num">0</td>
+          <td class="num">1403.92</td>
+          <td class="num">1462.68</td>
+          <td class="num">9</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Calling Audibles</td>
+          <td class="num">5</td>
+          <td class="num">9</td>
+          <td class="num">0</td>
+          <td class="num">1354.72</td>
+          <td class="num">1545.74</td>
+          <td class="num">10</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>The Infirmary</td>
+          <td class="num">1</td>
+          <td class="num">13</td>
+          <td class="num">0</td>
+          <td class="num">1218.42</td>
+          <td class="num">1550.12</td>
+          <td class="num">12</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>Aiyukiddinme? I&#39;m Odunze here</td>
+          <td class="num">3</td>
+          <td class="num">11</td>
+          <td class="num">0</td>
+          <td class="num">1237.28</td>
+          <td class="num">1528.64</td>
+          <td class="num">11</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Prizes</h2>
+  <div class="scroll">
+    <table>
+      <caption>
+        A prize split by a tie shows one row per winner. A prize nobody won still shows its
+        money, so the pot always adds up.
+      </caption>
+      <thead>
+        <tr>
+          <th>Prize</th>
+          <th>Winner</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr>
+              <td>Champion</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$500</td>
+            </tr>
+            <tr>
+              <td>2nd Place</td>
+              <td>
+                  Cooking Rice
+              </td>
+              <td class="num money">$200</td>
+            </tr>
+            <tr>
+              <td>3rd Place</td>
+              <td>
+                  Too Much Moxie
+              </td>
+              <td class="num money">$100</td>
+            </tr>
+            <tr>
+              <td>Most Points (Season)</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$100</td>
+            </tr>
+            <tr>
+              <td>Survivor</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$40</td>
+            </tr>
+            <tr>
+              <td>QB Stud</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$25</td>
+            </tr>
+            <tr>
+              <td>RB Stud</td>
+              <td>
+                  Calling Audibles
+              </td>
+              <td class="num money">$25</td>
+            </tr>
+            <tr>
+              <td>WR Stud</td>
+              <td>
+                  100yd Reverse Hurdles
+              </td>
+              <td class="num money">$25</td>
+            </tr>
+            <tr>
+              <td>TE Stud</td>
+              <td>
+                  Cooking Rice
+              </td>
+              <td class="num money">$25</td>
+            </tr>
+            <tr>
+              <td>Unlucky</td>
+              <td>
+                  Jaxian McJigberson
+              </td>
+              <td class="num money">$20</td>
+            </tr>
+            <tr>
+              <td>Week 1 High Score</td>
+              <td>
+                  Jaxian McJigberson
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 2 High Score</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 3 High Score</td>
+              <td>
+                  Fake News
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 4 High Score</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 5 High Score</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 6 High Score</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 7 High Score</td>
+              <td>
+                  Jaxian McJigberson
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 8 High Score</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 9 High Score</td>
+              <td>
+                  Aiyukiddinme? I&#39;m Odunze here
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 10 High Score</td>
+              <td>
+                  Bijan&#39;s Mustard
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 11 High Score</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 12 High Score</td>
+              <td>
+                  Calling Audibles
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 13 High Score</td>
+              <td>
+                  Cooking Rice
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+            <tr>
+              <td>Week 14 High Score</td>
+              <td>
+                  Purdy Good at Fantasy
+              </td>
+              <td class="num money">$10</td>
+            </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Season pot</th>
+          <td class="num money">$1200</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <h3>Franchise earnings</h3>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Franchise</th><th class="num">Won</th></tr>
+      </thead>
+      <tbody>
+          <tr>
+            <td>Purdy Good at Fantasy</td>
+            <td class="num money">$655</td>
+          </tr>
+          <tr>
+            <td>Cooking Rice</td>
+            <td class="num money">$235</td>
+          </tr>
+          <tr>
+            <td>Too Much Moxie</td>
+            <td class="num money">$100</td>
+          </tr>
+          <tr>
+            <td>Bijan&#39;s Mustard</td>
+            <td class="num money">$90</td>
+          </tr>
+          <tr>
+            <td>Jaxian McJigberson</td>
+            <td class="num money">$40</td>
+          </tr>
+          <tr>
+            <td>Calling Audibles</td>
+            <td class="num money">$35</td>
+          </tr>
+          <tr>
+            <td>100yd Reverse Hurdles</td>
+            <td class="num money">$25</td>
+          </tr>
+          <tr>
+            <td>Fake News</td>
+            <td class="num money">$10</td>
+          </tr>
+          <tr>
+            <td>Aiyukiddinme? I&#39;m Odunze here</td>
+            <td class="num money">$10</td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+
+<h2>How the prizes were won</h2>
+
+<h3>Most points, regular season</h3>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">#</th><th>Franchise</th><th class="num">Points, weeks 1&ndash;14</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">1737.50</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">1616.62</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>Jaxian McJigberson</td>
+          <td class="num">1595.86</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">1493.66</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>100yd Reverse Hurdles</td>
+          <td class="num">1445.98</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>Too Much Moxie</td>
+          <td class="num">1439.60</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Fake News</td>
+          <td class="num">1403.92</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Cooking Rice</td>
+          <td class="num">1401.36</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>CeeDee Drive</td>
+          <td class="num">1382.12</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Calling Audibles</td>
+          <td class="num">1354.72</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Aiyukiddinme? I&#39;m Odunze here</td>
+          <td class="num">1237.28</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>The Infirmary</td>
+          <td class="num">1218.42</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Weekly high scores</h3>
+<p class="small muted">Regular season only — the playoff weeks do not pay a weekly high score.</p>
+<div class="scroll">
+  <table>
+    <thead><tr><th class="num">Week</th><th>Franchise</th><th class="num">Points</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>Jaxian McJigberson</td>
+          <td class="num">129.62</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">126.00</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>Fake News</td>
+          <td class="num">140.02</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">154.06</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">135.32</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">182.34</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>Jaxian McJigberson</td>
+          <td class="num">138.56</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">129.68</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Aiyukiddinme? I&#39;m Odunze here</td>
+          <td class="num">141.36</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Bijan&#39;s Mustard</td>
+          <td class="num">130.20</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">162.18</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td>Calling Audibles</td>
+          <td class="num">144.68</td>
+        </tr>
+        <tr>
+          <td class="num">13</td>
+          <td>Cooking Rice</td>
+          <td class="num">123.86</td>
+        </tr>
+        <tr>
+          <td class="num">14</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">137.04</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Positional studs</h3>
+<p class="small muted">
+  The single best week by a started player at each position, across the whole season
+  including the playoff weeks.
+</p>
+<div class="scroll">
+  <table>
+    <thead>
+      <tr><th>Pos</th><th>Player</th><th class="num">Week</th><th class="num">Points</th><th>Started by</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>QB</td>
+          <td>Josh Allen</td>
+          <td class="num">11</td>
+          <td class="num">42.68</td>
+          <td>Purdy Good at Fantasy</td>
+        </tr>
+        <tr>
+          <td>RB</td>
+          <td>Jahmyr Gibbs</td>
+          <td class="num">12</td>
+          <td class="num">49.90</td>
+          <td>Calling Audibles</td>
+        </tr>
+        <tr>
+          <td>WR</td>
+          <td>Puka Nacua</td>
+          <td class="num">16</td>
+          <td class="num">40.50</td>
+          <td>100yd Reverse Hurdles</td>
+        </tr>
+        <tr>
+          <td>TE</td>
+          <td>Kyle Pitts Sr.</td>
+          <td class="num">15</td>
+          <td class="num">40.10</td>
+          <td>Cooking Rice</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Survivor</h3>
+<p>
+  Winner: <strong>Bijan&#39;s Mustard</strong>
+</p>
+<div class="scroll">
+  <table>
+    <caption>The lowest score among the teams still alive goes out each week.</caption>
+    <thead><tr><th class="num">Week</th><th>Eliminated</th><th class="num">Points</th></tr></thead>
+    <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td>The Infirmary</td>
+          <td class="num">43.62</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td>Aiyukiddinme? I&#39;m Odunze here</td>
+          <td class="num">84.24</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td>Jaxian McJigberson</td>
+          <td class="num">92.52</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td>Fake News</td>
+          <td class="num">83.18</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>Too Much Moxie</td>
+          <td class="num">83.64</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td>Calling Audibles</td>
+          <td class="num">77.38</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td>CeeDee Drive</td>
+          <td class="num">71.74</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td>Purdy Good at Fantasy</td>
+          <td class="num">102.62</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td>Belichick&#39;s Spy</td>
+          <td class="num">99.20</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td>Cooking Rice</td>
+          <td class="num">69.22</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td>100yd Reverse Hurdles</td>
+          <td class="num">67.92</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Unlucky</h3>
+  <p>
+    The highest score in the regular season that still lost:
+    <strong>Jaxian McJigberson</strong>,
+    127.86 in week 14.
+  </p>
+
+<h3>Consolation bracket</h3>
+  <div class="flag">
+    <span class="tag">Unverified — nobody has checked this</span>
+    <div>
+      Jaxian McJigberson is the top finisher among the teams that
+      missed the playoffs, which would waive their keeper fees for 2026.
+      Derived from the final standings and <strong>not</strong> confirmed by the
+      commissioner.
+    </div>
+  </div>
+
+<footer class="small muted">
+  <p>
+    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
+    history, and the rules.
+  </p>
+  <p>
+    Teams are identified by their ESPN team id. Franchise names change every season, so a
+    season's names come from that season's own record.
+  </p>
+</footer>
+</div>
+</body>
+</html>

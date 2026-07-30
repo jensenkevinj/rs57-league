@@ -1,0 +1,661 @@
+{
+  "payouts": [
+    {
+      "amount": 500,
+      "label": "Champion",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 200,
+      "label": "2nd Place",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t4"
+    },
+    {
+      "amount": 100,
+      "label": "3rd Place",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t12"
+    },
+    {
+      "amount": 100,
+      "label": "Most Points (Season)",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 40,
+      "label": "Survivor",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 25,
+      "label": "QB Stud",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 25,
+      "label": "RB Stud",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t8"
+    },
+    {
+      "amount": 25,
+      "label": "WR Stud",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t2"
+    },
+    {
+      "amount": 25,
+      "label": "TE Stud",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t4"
+    },
+    {
+      "amount": 20,
+      "label": "Unlucky",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t3"
+    },
+    {
+      "amount": 10,
+      "label": "Week 1 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t3"
+    },
+    {
+      "amount": 10,
+      "label": "Week 2 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 3 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t1"
+    },
+    {
+      "amount": 10,
+      "label": "Week 4 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 10,
+      "label": "Week 5 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 6 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 7 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t3"
+    },
+    {
+      "amount": 10,
+      "label": "Week 8 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 9 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t7"
+    },
+    {
+      "amount": 10,
+      "label": "Week 10 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t10"
+    },
+    {
+      "amount": 10,
+      "label": "Week 11 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    },
+    {
+      "amount": 10,
+      "label": "Week 12 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t8"
+    },
+    {
+      "amount": 10,
+      "label": "Week 13 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t4"
+    },
+    {
+      "amount": 10,
+      "label": "Week 14 High Score",
+      "paid": false,
+      "season": 2025,
+      "winner_manager_id": "t9"
+    }
+  ],
+  "positional_studs": [
+    {
+      "espn_player_id": 3918298,
+      "manager_ids": [
+        "t9"
+      ],
+      "player_name": "Josh Allen",
+      "points": 42.68,
+      "position": "QB",
+      "season": 2025,
+      "week": 11
+    },
+    {
+      "espn_player_id": 4429795,
+      "manager_ids": [
+        "t8"
+      ],
+      "player_name": "Jahmyr Gibbs",
+      "points": 49.9,
+      "position": "RB",
+      "season": 2025,
+      "week": 12
+    },
+    {
+      "espn_player_id": 4426515,
+      "manager_ids": [
+        "t2"
+      ],
+      "player_name": "Puka Nacua",
+      "points": 40.5,
+      "position": "WR",
+      "season": 2025,
+      "week": 16
+    },
+    {
+      "espn_player_id": 4360248,
+      "manager_ids": [
+        "t4"
+      ],
+      "player_name": "Kyle Pitts Sr.",
+      "points": 40.1,
+      "position": "TE",
+      "season": 2025,
+      "week": 15
+    }
+  ],
+  "review": {
+    "consolation_winner_manager_ids": [
+      "t3"
+    ],
+    "issues": [],
+    "warnings": []
+  },
+  "season": 2025,
+  "season_points": [
+    {
+      "manager_id": "t9",
+      "points": 1737.5,
+      "season": 2025
+    },
+    {
+      "manager_id": "t10",
+      "points": 1616.62,
+      "season": 2025
+    },
+    {
+      "manager_id": "t3",
+      "points": 1595.86,
+      "season": 2025
+    },
+    {
+      "manager_id": "t11",
+      "points": 1493.66,
+      "season": 2025
+    },
+    {
+      "manager_id": "t2",
+      "points": 1445.98,
+      "season": 2025
+    },
+    {
+      "manager_id": "t12",
+      "points": 1439.6,
+      "season": 2025
+    },
+    {
+      "manager_id": "t1",
+      "points": 1403.92,
+      "season": 2025
+    },
+    {
+      "manager_id": "t4",
+      "points": 1401.36,
+      "season": 2025
+    },
+    {
+      "manager_id": "t6",
+      "points": 1382.12,
+      "season": 2025
+    },
+    {
+      "manager_id": "t8",
+      "points": 1354.72,
+      "season": 2025
+    },
+    {
+      "manager_id": "t7",
+      "points": 1237.28,
+      "season": 2025
+    },
+    {
+      "manager_id": "t5",
+      "points": 1218.42,
+      "season": 2025
+    }
+  ],
+  "source": {
+    "regular_season_weeks": 14,
+    "weeks_with_results": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  },
+  "standings": [
+    {
+      "final_rank": 1,
+      "losses": 4,
+      "manager_id": "t9",
+      "playoff_seed": 1,
+      "points_against": 1417.12,
+      "points_for": 1737.5,
+      "season": 2025,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 2,
+      "losses": 4,
+      "manager_id": "t4",
+      "playoff_seed": 2,
+      "points_against": 1269.38,
+      "points_for": 1401.36,
+      "season": 2025,
+      "ties": 0,
+      "wins": 10
+    },
+    {
+      "final_rank": 5,
+      "losses": 5,
+      "manager_id": "t10",
+      "playoff_seed": 3,
+      "points_against": 1362.14,
+      "points_for": 1616.62,
+      "season": 2025,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 6,
+      "losses": 5,
+      "manager_id": "t2",
+      "playoff_seed": 4,
+      "points_against": 1476.16,
+      "points_for": 1445.98,
+      "season": 2025,
+      "ties": 0,
+      "wins": 9
+    },
+    {
+      "final_rank": 4,
+      "losses": 6,
+      "manager_id": "t11",
+      "playoff_seed": 5,
+      "points_against": 1492.52,
+      "points_for": 1493.66,
+      "season": 2025,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 3,
+      "losses": 6,
+      "manager_id": "t12",
+      "playoff_seed": 6,
+      "points_against": 1436.96,
+      "points_for": 1439.6,
+      "season": 2025,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 8,
+      "losses": 6,
+      "manager_id": "t6",
+      "playoff_seed": 8,
+      "points_against": 1387.88,
+      "points_for": 1382.12,
+      "season": 2025,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": 7,
+      "losses": 7,
+      "manager_id": "t3",
+      "playoff_seed": 7,
+      "points_against": 1397.7,
+      "points_for": 1595.86,
+      "season": 2025,
+      "ties": 0,
+      "wins": 7
+    },
+    {
+      "final_rank": 9,
+      "losses": 8,
+      "manager_id": "t1",
+      "playoff_seed": 9,
+      "points_against": 1462.68,
+      "points_for": 1403.92,
+      "season": 2025,
+      "ties": 0,
+      "wins": 6
+    },
+    {
+      "final_rank": 10,
+      "losses": 9,
+      "manager_id": "t8",
+      "playoff_seed": 10,
+      "points_against": 1545.74,
+      "points_for": 1354.72,
+      "season": 2025,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": 12,
+      "losses": 11,
+      "manager_id": "t7",
+      "playoff_seed": 11,
+      "points_against": 1528.64,
+      "points_for": 1237.28,
+      "season": 2025,
+      "ties": 0,
+      "wins": 3
+    },
+    {
+      "final_rank": 11,
+      "losses": 13,
+      "manager_id": "t5",
+      "playoff_seed": 12,
+      "points_against": 1550.12,
+      "points_for": 1218.42,
+      "season": 2025,
+      "ties": 0,
+      "wins": 1
+    }
+  ],
+  "survivor": {
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 43.62,
+        "season": 2025,
+        "week": 1
+      },
+      {
+        "manager_ids": [
+          "t7"
+        ],
+        "points": 84.24,
+        "season": 2025,
+        "week": 2
+      },
+      {
+        "manager_ids": [
+          "t3"
+        ],
+        "points": 92.52,
+        "season": 2025,
+        "week": 3
+      },
+      {
+        "manager_ids": [
+          "t1"
+        ],
+        "points": 83.18,
+        "season": 2025,
+        "week": 4
+      },
+      {
+        "manager_ids": [
+          "t12"
+        ],
+        "points": 83.64,
+        "season": 2025,
+        "week": 5
+      },
+      {
+        "manager_ids": [
+          "t8"
+        ],
+        "points": 77.38,
+        "season": 2025,
+        "week": 6
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 71.74,
+        "season": 2025,
+        "week": 7
+      },
+      {
+        "manager_ids": [
+          "t9"
+        ],
+        "points": 102.62,
+        "season": 2025,
+        "week": 8
+      },
+      {
+        "manager_ids": [
+          "t11"
+        ],
+        "points": 99.2,
+        "season": 2025,
+        "week": 9
+      },
+      {
+        "manager_ids": [
+          "t4"
+        ],
+        "points": 69.22,
+        "season": 2025,
+        "week": 10
+      },
+      {
+        "manager_ids": [
+          "t2"
+        ],
+        "points": 67.92,
+        "season": 2025,
+        "week": 11
+      }
+    ],
+    "winner_manager_ids": [
+      "t10"
+    ]
+  },
+  "unlucky": {
+    "manager_ids": [
+      "t3"
+    ],
+    "points": 127.86,
+    "season": 2025,
+    "week": 14
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 129.62,
+      "season": 2025,
+      "week": 1
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 126.0,
+      "season": 2025,
+      "week": 2
+    },
+    {
+      "manager_ids": [
+        "t1"
+      ],
+      "points": 140.02,
+      "season": 2025,
+      "week": 3
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 154.06,
+      "season": 2025,
+      "week": 4
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 135.32,
+      "season": 2025,
+      "week": 5
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 182.34,
+      "season": 2025,
+      "week": 6
+    },
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 138.56,
+      "season": 2025,
+      "week": 7
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 129.68,
+      "season": 2025,
+      "week": 8
+    },
+    {
+      "manager_ids": [
+        "t7"
+      ],
+      "points": 141.36,
+      "season": 2025,
+      "week": 9
+    },
+    {
+      "manager_ids": [
+        "t10"
+      ],
+      "points": 130.2,
+      "season": 2025,
+      "week": 10
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 162.18,
+      "season": 2025,
+      "week": 11
+    },
+    {
+      "manager_ids": [
+        "t8"
+      ],
+      "points": 144.68,
+      "season": 2025,
+      "week": 12
+    },
+    {
+      "manager_ids": [
+        "t4"
+      ],
+      "points": 123.86,
+      "season": 2025,
+      "week": 13
+    },
+    {
+      "manager_ids": [
+        "t9"
+      ],
+      "points": 137.04,
+      "season": 2025,
+      "week": 14
+    }
+  ]
+}

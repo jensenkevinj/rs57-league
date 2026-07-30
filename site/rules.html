@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rules — RS57 League</title>
+<style>
+  :root {
+    --ink: #1b1f24;
+    --muted: #5b6470;
+    --line: #dfe3e8;
+    --bg: #ffffff;
+    --panel: #f6f8fa;
+    --accent: #0b5cad;
+    --flag: #8a5a00;
+    --flag-bg: #fff8e6;
+    --flag-line: #e8c96a;
+    --bad: #96200f;
+    --bad-bg: #fdf0ee;
+    --bad-line: #e4a99e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.top .wrap { padding-top: 1.5rem; padding-bottom: 0; }
+  .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  nav { margin: 0.85rem 0 0; display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.75rem;
+    border-bottom: 2px solid transparent; font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.65rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; max-width: 44rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.88rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.5rem; font-size: 0.95rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.88rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.15rem; margin: 1.25rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.25rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .tag-inline {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+  }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
+  .jump a { font-size: 0.9rem; }
+  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
+  .team h3 { margin-top: 0; }
+  .team table { margin-bottom: 0; }
+  .team tbody tr:last-child td { border-bottom: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <nav>
+      <a href="index.html" class="">Home</a>
+      <a href="keepers.html" class="">Keepers</a>
+      <a href="seasons.html" class="">Seasons</a>
+      <a href="rules.html" class="on">Rules</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<h1>Rules</h1>
+<p class="lede">
+  The keeper and prize rules the site computes from. Edited in <code>docs/rules.md</code>;
+  this page is built from it.
+</p>
+
+<h2>RS57 League Rules</h2>
+<p>The keeper and prize rules, written for league members. This file is the source for the site&#39;s rules page — edit it here and the nightly build picks it up.</p>
+<p><code>CLAUDE.md</code> in this repo says the same things in the form the code needs them. Where the two disagree, <code>CLAUDE.md</code> is the one the engine follows and this file is the one that needs fixing.</p>
+<h3>Keepers</h3>
+<p>You may keep up to <strong>three keepers plus one prospect</strong>. Nobody is required to keep anyone.</p>
+<p>There is <strong>no salary cap</strong>. Keep whoever you can afford to keep; the only limit is the count.</p>
+<h4>What a keeper costs</h4>
+<p>A keeper&#39;s salary is three things added together:</p>
+<p><code>salary = base + your allocated fee + $5 if you kept him last year</code></p>
+<p><strong>Base</strong> is what the player cost you <em>this</em> season — not what you originally paid for him years ago. Keepers go back into the auction at their keeper price, so ESPN&#39;s per-season value already carries every fee and tax you have ever paid on that player. Next season&#39;s base is this season&#39;s salary.</p>
+<p>Puka Nacua is the clearest example. Picked up off waivers for $0. Kept for $0 the following season, because a first keep is untaxed. Kept for $5 the season after that, once the tax applied. He goes for $10 next season.</p>
+<p>That compounding is the point of the system, and it is why a player you have held for four years is expensive even though you got him for nothing.</p>
+<h4>The keeper fee</h4>
+<p>The fee depends on <strong>how many keepers you declare</strong>, not on who they are:</p>
+<ul><li>1 keeper — <strong>$0</strong></li><li>2 keepers — <strong>$5</strong> total</li><li>3 keepers — <strong>$15</strong> total</li></ul>
+<p>The total is for your whole keeper group, and you split it across your keepers however you like. Put all $15 on one player or spread it evenly; the total is what matters.</p>
+<p>Prospects never carry a fee and never count toward the keeper count.</p>
+<h4>The $5 tax</h4>
+<p>If you kept a player last season, he costs $5 more this season. Three things about it catch people out:</p>
+<ul><li><strong>Trading a player does not clear the tax.</strong> It follows him to his new team, because it is a fact about the player&#39;s history and not about who currently holds him.</li><li><strong>Dropping him does clear it</strong> — completely. If you drop a player and pick him back up, the tax is gone <em>and</em> his base resets to whatever you paid to re-acquire him.</li><li><strong>A prospect keep never sets the tax.</strong> Keep someone in the prospect slot and he starts the next season untaxed.</li></ul>
+<h4>Prospects</h4>
+<p>A prospect must meet all of these:</p>
+<ul><li><strong>One NFL season or fewer.</strong></li><li><strong>Never started by any team in this league</strong> — not just never started by you.</li><li><strong>Rostered before the trade deadline.</strong></li><li>Kept at his acquisition value, with <strong>no fee</strong> and <strong>no tax</strong>.</li></ul>
+<p>A player can only ever be kept as a prospect once. After that he is an ordinary keeper.</p>
+<h4>The consolation bracket winner</h4>
+<p>The consolation bracket winner has their <strong>keeper fees waived for one year</strong>. Salaries are still owed in full — it is the fee on top that goes away, not the price of the players.</p>
+<p>The winner is the <strong>top finisher among the teams that missed the playoffs</strong>. It is not whoever won the last game of the consolation ladder, and it is not whoever went undefeated in it; in most seasons those questions have several answers and this one has exactly one.</p>
+<h3>Prizes</h3>
+<p>Prize amounts are set per season, so the figures on the site are the ones actually recorded for that season rather than fixed constants.</p>
+<ul><li><strong>Champion, 2nd, 3rd</strong> — final standings.</li><li><strong>Most Points (Season)</strong> — most total points across the <strong>regular season</strong>, weeks 1-14.</li><li><strong>Weekly High Score</strong> — top score of the week, for each of the <strong>14 regular-season weeks</strong>. Playoff weeks do not pay a weekly high score.</li><li><strong>Positional Stud</strong> — the single best week by a <strong>started</strong> player at each of QB, RB, WR and TE, across the <strong>whole season including the playoff weeks</strong>. It is one great week, not a season total, and a player who put it up on your bench wins nothing. Defenses do not compete for it.</li><li><strong>Survivor</strong> — the lowest score among the teams still alive is eliminated each week. Last team standing wins.</li><li><strong>Unlucky</strong> — the <strong>single highest score in the regular season that still lost its matchup</strong>, awarded once for the whole season. A tie is not a loss.</li></ul>
+<p>If two teams tie for a prize, the money is <strong>split evenly</strong> between them. Prizes are whole dollars, so a split that does not divide evenly pays the floor and the remainder is left for the commissioner to place.</p>
+<h3>How the site gets its numbers</h3>
+<p>Everything on this site is read from ESPN each night and recomputed from the rules above. Nothing is typed in by hand except the prize amounts for each season and the record of which players were kept in a prospect slot, neither of which ESPN stores.</p>
+<p>Teams are tracked by their ESPN team id, not by their team name — names change every year.</p>
+<p>Where a number could not be verified, the site says so rather than showing it as though it had been checked.</p>
+
+<footer class="small muted">
+  <p>
+    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
+    history, and the rules.
+  </p>
+  <p>
+    Teams are identified by their ESPN team id. Franchise names change every season, so a
+    season's names come from that season's own record.
+  </p>
+</footer>
+</div>
+</body>
+</html>
