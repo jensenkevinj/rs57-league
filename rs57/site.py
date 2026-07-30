@@ -54,6 +54,7 @@ from rs57.keeper_rules import (
 from rs57.models import (
     Base,
     FranchiseName,
+    KeeperClaim,
     KeeperSlot,
     Payout,
     Player,
@@ -71,6 +72,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DERIVED = DATA / "derived"
 HISTORY = DATA / "history"
+MANUAL = DATA / "manual"
 RULES_MD = ROOT / "docs" / "rules.md"
 TEMPLATES = Path(__file__).resolve().parent / "templates"
 SITE = ROOT / "site"
@@ -108,7 +110,13 @@ class Note:
 
 @dataclass(frozen=True)
 class KeeperLine:
-    """One rostered player and what keeping him would cost, before any fee allocation."""
+    """One rostered player and what keeping him would cost, before any fee allocation.
+
+    ``declared`` separates a *claim* from a *price*. Every rostered player carries a price,
+    because pricing him needs nothing but the roster; only a player the admin tool has recorded
+    a ``KeeperClaim`` for is actually being kept, and only he has a fee and a final salary. A
+    page that blurred the two would publish a number nobody owes.
+    """
 
     player_name: str
     position: str
@@ -118,6 +126,11 @@ class KeeperLine:
     price: int
     kept_prior_year: bool
     source: str
+    declared: bool = False
+    slot: str = ""
+    fee: int = 0
+    salary: int | None = None
+    """The salary recorded at declaration — the figure the manager was told they owed."""
 
 
 @dataclass(frozen=True)
@@ -128,6 +141,9 @@ class TeamKeepers:
     lines: tuple[KeeperLine, ...]
     taxed: int
     fees_waived: bool
+    declared_count: int = 0
+    declared_salary: int = 0
+    declared_fees: int = 0
 
 
 @dataclass(frozen=True)
@@ -142,6 +158,8 @@ class KeeperSeason:
     waiver_manager_id: str | None
     waiver_name: str | None
     waiver_from_season: int | None
+    any_declared: bool = False
+    """Whether any team has recorded a claim. Until one has, the page says so in as many words."""
 
 
 @dataclass(frozen=True)
@@ -390,6 +408,23 @@ def _named(manager_id: str, names: dict[str, str]) -> Named:
 # ---------------------------------------------------------------------------
 
 
+def load_claims(season: int, manual_dir: Path = MANUAL) -> list[KeeperClaim]:
+    """Recorded keeper claims for one season, from ``data/manual/claims.json``. Read-only.
+
+    The admin tool owns that file. The site reads it and never writes it, exactly as it reads
+    ``payouts.json``. A malformed file is skipped rather than allowed to take the nightly build
+    down — ``validate.py`` is the place that reports it.
+    """
+    path = manual_dir / "claims.json"
+    if not path.exists():
+        return []
+    try:
+        rows = (_load(path).get("seasons") or {}).get(str(season)) or []
+        return [KeeperClaim(**row) for row in rows]
+    except (ValidationError, TypeError, json.JSONDecodeError):
+        return []
+
+
 def build_keeper_season(
     derived_dir: Path,
     season: int,
@@ -397,14 +432,22 @@ def build_keeper_season(
     overrides: Sequence[SalaryOverride] = (),
     waiver_manager_id: str | None = None,
     waiver_from_season: int | None = None,
+    claims: Sequence[KeeperClaim] = (),
 ) -> KeeperSeason:
-    """What every rostered player would cost to keep in ``season``.
+    """What every rostered player would cost to keep in ``season``, and who has been declared.
 
-    The price is ``base + $5 tax``, straight out of ``keeper_rules.keeper_salary`` with a zero
-    fee. **The fee is deliberately not in it**: the tier depends on how many keepers a manager
-    declares, the split across them is the manager's choice, and no declaration exists to read
-    — the admin tool that records ``KeeperClaim`` rows is a later phase. A page that added a
-    guessed fee would be publishing a number nobody owes.
+    Two different numbers live in this function and they must not be confused.
+
+    A **price** is ``base + $5 tax``, straight out of ``keeper_rules.keeper_salary`` with a zero
+    fee, and every rostered player has one. The fee is deliberately absent: the tier depends on
+    how many keepers a manager declares and the split is the manager's own choice, so there is no
+    per-player fee to publish for a player nobody has claimed.
+
+    A **declared keeper** is one the admin tool has recorded a ``KeeperClaim`` for. He carries the
+    fee his manager allocated and the salary recorded at declaration — the figure that manager was
+    actually told they owed. That salary is read off the claim rather than recomputed here, so this
+    page shows what was agreed instead of what today's roster would price it at; a disagreement
+    between the two is the admin tool's to surface, not something to paper over on a public page.
     """
     notes: list[Note] = []
     doc = _load(derived_dir / f"{season}.json")
@@ -429,6 +472,8 @@ def build_keeper_season(
             )
         )
 
+    declared = {(claim.manager_id, claim.espn_player_id): claim for claim in claims}
+
     by_id = {player.espn_player_id: player for player in players}
     lines: dict[str, list[KeeperLine]] = {}
     for entry in roster:
@@ -447,6 +492,7 @@ def build_keeper_season(
             continue
         base = effective_base_salary(entry, overrides)
         price = keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
+        claim = declared.get((entry.manager_id, entry.espn_player_id))
         lines.setdefault(entry.manager_id, []).append(
             KeeperLine(
                 player_name=player.name,
@@ -457,14 +503,24 @@ def build_keeper_season(
                 price=price,
                 kept_prior_year=entry.kept_prior_year,
                 source=str(entry.source),
+                declared=claim is not None,
+                slot=str(claim.slot) if claim else "",
+                fee=claim.fee_allocated if claim else 0,
+                salary=claim.computed_salary if claim else None,
             )
         )
 
     names = {row.manager_id: row.name for row in franchises}
     teams: list[TeamKeepers] = []
     for manager_id in sorted(lines, key=lambda mid: (len(mid), mid)):
-        team_lines = sorted(lines[manager_id], key=lambda line: (line.price, line.player_name))
+        # Declared keepers first, then the rest by price. Somebody reading their own team wants
+        # what they have committed to above what they merely could commit to.
+        team_lines = sorted(
+            lines[manager_id],
+            key=lambda line: (not line.declared, line.slot, line.price, line.player_name),
+        )
         named = _named(manager_id, names)
+        claimed = [line for line in team_lines if line.declared]
         teams.append(
             TeamKeepers(
                 manager_id=manager_id,
@@ -473,6 +529,11 @@ def build_keeper_season(
                 lines=tuple(team_lines),
                 taxed=sum(line.kept_prior_year for line in team_lines),
                 fees_waived=manager_id == waiver_manager_id,
+                declared_count=len(claimed),
+                # Added here, not in a template. A declared line always carries a recorded
+                # salary, but `or 0` keeps a half-written claim from crashing the build.
+                declared_salary=sum(line.salary or 0 for line in claimed),
+                declared_fees=sum(line.fee for line in claimed),
             )
         )
 
@@ -485,6 +546,7 @@ def build_keeper_season(
         waiver_manager_id=waiver_manager_id,
         waiver_name=names.get(waiver_manager_id) if waiver_manager_id else None,
         waiver_from_season=waiver_from_season,
+        any_declared=any(team.declared_count for team in teams),
     )
 
 
@@ -660,6 +722,7 @@ def build_site(
     *,
     derived_dir: Path = DERIVED,
     history_dir: Path = HISTORY,
+    manual_dir: Path = MANUAL,
     rules_path: Path = RULES_MD,
     templates: Path = TEMPLATES,
 ) -> list[Path]:
@@ -689,6 +752,7 @@ def build_site(
             overrides=overrides,
             waiver_manager_id=waiver_id,
             waiver_from_season=waiver_from,
+            claims=load_claims(current_year, manual_dir),
         )
         if current_year is not None
         else None

@@ -603,3 +603,61 @@ self-maintaining directory prefix to a hand-listed set of filenames. Serving `/d
 the generator *reads* `docs/rules.md`, so the Action would be writing into the directory it
 takes its input from. The artifact leaves `site/` committed and diffable and costs fourteen
 lines.
+
+### Found during Phase 4
+
+Full detail in `rs57/admin/`'s module docstrings and `docs/phase-5-notes.md`.
+
+**A prospect claim must be checked against the PRIOR season's trade deadline, and using the
+obvious one kills the check silently.** A claim for 2026 is priced against `data/derived/2026.json`,
+whose `source.trade_deadline` is **2026-12-02** — while the roster it carries holds *2025*
+acquisition dates, because a pre-draft season file is last season's roster carried forward.
+Passing that file's own deadline means every acquisition precedes it and
+`PROSPECT_ACQUIRED_AFTER_DEADLINE` can never fire. Two real 2025 pickups (2025-12-19 and
+2025-12-24) are after 2025's deadline and are exactly what the rule exists to reject. The admin
+tool passes `prior.trade_deadline`, and there is a mutation test that swaps in the current
+season's file and asserts the check stops firing.
+
+**§10's Phase 4 acceptance criterion is reachable, and running it found four real bugs.** Driving
+the tool and submitting a real claim surfaced: a `Derived` cache keyed on the year alone, so a
+re-sync while the tool was open kept pricing claims off a stale roster and said nothing; the
+settings route rebuilding a whole `Season` row from the form, so any request missing a field
+silently blanked it — including `consolation_winner_id`, the one value in the tool that cannot be
+re-derived; `git status --porcelain` collapsing untracked files into a bare `data/derived/`, so
+the "left alone, deliberately" list named a directory instead of the files; and the ESPN deadline
+prefill converting epoch milliseconds in **local** time while `espn._epoch_ms` uses naive UTC,
+which would have put two records of one deadline five hours apart into `data/manual/` and
+`data/derived/`. None of the four was caught by a test that existed first.
+
+**The note's claim that Phase 4 "finally audits the ratchet" is not quite right — the audit needs
+the season AFTER the claims.** `check_base_continuity` compares a season's bases against the
+*previous* season's recorded claims, so 2026 claims are audited by the 2027 sync, not by
+themselves. Handing the engine every claim and every roster at once, as `validate.py` did while
+`history/` was empty, would compare 2026's base against 2026's own recorded salary — a number
+against itself, reported as a clean ratchet. `validate.py` now pairs each season with the one
+before it and reports SKIPPED with the reason until a following season exists.
+
+**ESPN cannot supply keeper selections before they are entered, and can never supply the slot.**
+Probed live with a keeper freshly selected in the ESPN UI: 2026's `mDraftDetail` returns 180 pick
+slots at `playerId: -1`, and none of the 12 rosters carries any keeper field beyond `keeperValue`
+/ `keeperValueFuture`. Pre-deadline selections are not in the public API. *After* entry they are —
+2025 returns 33 keeper picks whose `bidAmount` is the price charged — and that is what the
+reconciliation screen reads. Also confirmed, and it settles "is the tool the record or a shortcut
+into ESPN": **2026's `keeperValue` equals the 2025 keeper `bidAmount` player for player**, so what
+gets typed into ESPN becomes next season's base. ESPN is downstream; the tool is the record; and
+`check_base_continuity` is what audits the hand-entry a year later.
+
+**`prospects.json` cannot be deleted yet, despite its own header comment saying to.**
+`sync.py`'s `prior_prospect_ids(year - 1)` reads it to keep a prospect keep untaxed, and deriving
+it from `slot == PROSPECT` needs claims for **completed** seasons — the Phase 5 backfill. Deleting
+it today would silently re-tax every prospect. The admin tool unions the legacy file with recorded
+claims and says on screen which source an answer came from.
+
+**Commissioner decisions, 2026-07-29.** The tool is commissioner-only on localhost with no
+accounts — managers select keepers in ESPN and send their fee splits by text, and the tool is where
+those become a record. The keeper deadline is **shown and stamped, never enforced**: a tool that
+locks the commissioner out at 5:01pm is one that gets worked around by editing JSON. The commit
+button **pushes to `main`** behind a mandatory diff preview, which is the only review step. Payment
+state lives in a new `data/manual/payments.json` keyed on `(season, label, winner_manager_id)` —
+`Payout.paid` could not be used because `stats_sync` writes those rows into `data/derived/` and the
+nightly Action rewrites that file every run.

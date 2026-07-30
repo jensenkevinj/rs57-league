@@ -47,10 +47,12 @@ from rs57.keeper_rules import (
 from rs57.models import (
     FranchiseName,
     KeeperClaim,
+    Payment,
     Player,
     PrizeSchedule,
     RosterEntry,
     SalaryOverride,
+    Season,
 )
 
 DATA = Path(__file__).resolve().parent.parent / "data"
@@ -202,6 +204,123 @@ def validate_history(report: Report) -> tuple[list[KeeperClaim], list[SalaryOver
     return claims, overrides
 
 
+def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[SalaryOverride]]:
+    """Load the claims and overrides the admin tool records in ``data/manual/``.
+
+    ``history/`` holds a *completed* season, frozen; ``manual/`` holds the season being decided.
+    Both are read, because the ratchet audit compares one against the other and does not care
+    which file a claim came from — a claim recorded last August is what this August's base has
+    to match.
+
+    A file that does not exist is not an error. Neither existed before Phase 4.
+    """
+    claims: list[KeeperClaim] = []
+    overrides: list[SalaryOverride] = []
+
+    claims_path = DATA / "manual" / "claims.json"
+    if claims_path.exists():
+        try:
+            for year, rows in (_load(claims_path).get("seasons") or {}).items():
+                for row in rows:
+                    claim = KeeperClaim(**row)
+                    if claim.season != int(year):
+                        report.error(
+                            f"claims.json: a row under season {year} says season {claim.season}"
+                        )
+                    claims.append(claim)
+            report.ok(f"claims.json: {len(claims)} keeper claims load cleanly")
+        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            report.error(f"claims.json: {exc}")
+    else:
+        report.skip(
+            "data/manual/claims.json does not exist — no keeper claims have been recorded, so "
+            "the ratchet has nothing to be audited against"
+        )
+
+    overrides_path = DATA / "manual" / "overrides.json"
+    if overrides_path.exists():
+        try:
+            for rows in (_load(overrides_path).get("seasons") or {}).values():
+                overrides += [SalaryOverride(**row) for row in rows]
+            report.ok(f"overrides.json: {len(overrides)} salary overrides load cleanly")
+        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            report.error(f"overrides.json: {exc}")
+
+    seasons_path = DATA / "manual" / "seasons.json"
+    if seasons_path.exists():
+        try:
+            rows = (_load(seasons_path).get("seasons") or {}).values()
+            recorded = [Season(**row) for row in rows]
+            report.ok(f"seasons.json: {len(recorded)} seasons of settings load cleanly")
+        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            report.error(f"seasons.json: {exc}")
+
+    payments_path = DATA / "manual" / "payments.json"
+    if payments_path.exists():
+        try:
+            rows = _load(payments_path).get("payments") or []
+            payments = [Payment(**row) for row in rows]
+            report.ok(f"payments.json: {len(payments)} payment records load cleanly")
+        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            report.error(f"payments.json: {exc}")
+
+    return claims, overrides
+
+
+def audit_ratchet(
+    roster_by_season: dict[str, list[RosterEntry]],
+    claims: Sequence[KeeperClaim],
+    overrides: Sequence[SalaryOverride],
+    report: Report,
+) -> None:
+    """Run ``check_base_continuity`` season by season, each against the season before it.
+
+    **The pairing is the whole check.** A kept player's base this season must equal his computed
+    salary *last* season, so 2026's roster is audited against 2025's claims. Handing the engine
+    every claim at once would compare 2026's base against 2026's own recorded salary — a number
+    against itself — and report a clean ratchet having verified nothing.
+    """
+    by_season: dict[int, list[KeeperClaim]] = {}
+    for claim in claims:
+        by_season.setdefault(claim.season, []).append(claim)
+
+    audited: list[str] = []
+    for season, roster in sorted(roster_by_season.items()):
+        try:
+            year = int(season)
+        except ValueError:
+            continue
+        prior = by_season.get(year - 1)
+        if not prior:
+            continue
+        for issue in check_base_continuity(roster, prior, overrides):
+            report.review(
+                f"base continuity: {season}: player {issue.espn_player_id}: {issue.message}"
+            )
+        audited.append(season)
+
+    if audited:
+        report.ok(
+            f"check_base_continuity ran for {', '.join(audited)}, each against the previous "
+            f"season's recorded claims"
+        )
+        return
+
+    recorded = sorted(by_season)
+    if recorded:
+        report.skip(
+            f"check_base_continuity: claims exist for {', '.join(str(y) for y in recorded)} but "
+            f"no synced season follows one of them, so the ratchet is UNVERIFIED. It audits "
+            f"next season's bases against this season's claims — it can only run once the "
+            f"following season is synced."
+        )
+    else:
+        report.skip(
+            "check_base_continuity: no keeper claims recorded, so this season's bases have "
+            "nothing to be audited against — the ratchet is UNVERIFIED, not verified"
+        )
+
+
 def validate_stats_season(path: Path, franchises: set[str], report: Report) -> None:
     """Check a derived stats file against the season's franchises and its own arithmetic."""
     try:
@@ -331,19 +450,19 @@ def run(report: Report | None = None) -> Report:
         }
         roster_by_season[loaded.season] = loaded.roster
 
-    claims, overrides = validate_history(report)
+    history_claims, history_overrides = validate_history(report)
+    manual_claims, manual_overrides = validate_manual_records(report)
+    claims = history_claims + manual_claims
+    overrides = history_overrides + manual_overrides
     all_roster = [entry for roster in roster_by_season.values() for entry in roster]
 
-    if claims and all_roster:
-        validate_claims(claims, all_roster, overrides, "data/history/", report)
-        for issue in check_base_continuity(all_roster, claims, overrides):
-            report.review(f"base continuity: {issue.espn_player_id}: {issue.message}")
-        report.ok("check_base_continuity ran against the recorded claims")
-    elif all_roster:
-        report.skip(
-            "check_base_continuity: no prior-season keeper claims recorded, so this season's "
-            "bases have nothing to be audited against — the ratchet is UNVERIFIED, not verified"
-        )
+    if history_claims and all_roster:
+        validate_claims(history_claims, all_roster, history_overrides, "data/history/", report)
+    if manual_claims and all_roster:
+        validate_claims(manual_claims, all_roster, manual_overrides, "data/manual/", report)
+
+    if all_roster:
+        audit_ratchet(roster_by_season, claims, overrides, report)
 
     if overrides and all_roster:
         for issue in check_override_balance(all_roster, overrides):

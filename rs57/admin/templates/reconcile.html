@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% set page = 'reconcile' %}
+{% block title %}Reconcile {{ year }} with ESPN{% endblock %}
+
+{% block content %}
+<h1>Reconcile {{ year }} with ESPN</h1>
+<p class="lede">
+  Every declared keeper has to be entered into ESPN's auction at his keeper price by hand. ESPN
+  then reports that number back as next season's base — so a typo does not stay a typo, it becomes
+  the player's base and the ratchet carries it forward every year after.
+</p>
+
+{% if result.error %}
+  <div class="flag bad">
+    <span class="tag">Could not reach ESPN</span>
+    <div>{{ result.error }}</div>
+  </div>
+{% endif %}
+
+{% if result.espn_pick_count == 0 %}
+  <div class="flag">
+    <span class="tag">ESPN holds no keeper picks for {{ year }} yet</span>
+    <div>
+      This is the normal state before keepers are entered, not a failure. Pre-deadline selections
+      made in the ESPN UI do not appear in the API — checked against a live selection — so there is
+      nothing to compare against until you enter the keepers into ESPN's draft at the salaries this
+      tool computed. Come back then.
+    </div>
+  </div>
+{% endif %}
+
+{% if result.rows %}
+  <div class="scroll">
+    <table>
+      <caption>
+        Matched on ESPN player id, never on name — the spreadsheet this replaces under-charges
+        James Cook by $5 because it matched a name against a feed that now says “James Cook III”.
+      </caption>
+      <thead>
+        <tr>
+          <th>Team</th>
+          <th>Player</th>
+          <th>Slot</th>
+          <th class="num">Recorded</th>
+          <th class="num">ESPN</th>
+          <th class="num">Delta</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in result.rows %}
+          <tr>
+            <td class="small">{{ row.manager_id }}</td>
+            <td>{{ row.name }}</td>
+            <td class="small">{{ row.slot or '—' }}</td>
+            <td class="num">{% if row.recorded_salary is none %}—{% else %}${{ row.recorded_salary }}{% endif %}</td>
+            <td class="num">{% if row.espn_bid is none %}—{% else %}${{ row.espn_bid }}{% endif %}</td>
+            <td class="num">{% if row.delta is none %}—{% else %}{{ row.delta }}{% endif %}</td>
+            <td class="small">
+              {% if row.state == 'agrees' %}
+                <span class="tag-inline ok">agrees</span>
+              {% elif row.state == 'mismatch' %}
+                <span class="tag-inline bad">ESPN disagrees</span>
+              {% elif row.state == 'not_in_espn' %}
+                <span class="tag-inline">not entered in ESPN</span>
+              {% else %}
+                <span class="tag-inline bad">in ESPN, not declared here</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if result.mismatches %}
+    <div class="flag bad">
+      <span class="tag">{{ result.mismatches | length }} price(s) disagree</span>
+      <div>
+        Fix ESPN to match the recorded salary, or record an override if cash actually changed hands.
+        Left alone, ESPN's figure becomes next season's base and every season after inherits it.
+      </div>
+    </div>
+  {% endif %}
+  {% if result.espn_only %}
+    <div class="flag bad">
+      <span class="tag">{{ result.espn_only | length }} keeper(s) in ESPN are not declared here</span>
+      <div>
+        ESPN is holding a keeper this tool has no claim for. Either the claim was never recorded, or
+        somebody kept a player they had not declared.
+      </div>
+    </div>
+  {% endif %}
+  {% if result.missing_from_espn %}
+    <div class="flag">
+      <span class="tag">{{ result.missing_from_espn | length }} declared keeper(s) not in ESPN</span>
+      <div>Expected until you enter them into the auction.</div>
+    </div>
+  {% endif %}
+{% elif not result.error %}
+  <p class="muted">
+    No claims recorded for {{ year }} and no keeper picks in ESPN, so there is nothing to compare.
+  </p>
+{% endif %}
+
+<h2>What ESPN cannot tell us</h2>
+<p class="small">
+  ESPN never records which keeper filled which slot: <code>keeperCount</code> is 4 and all four
+  picks come back marked as keepers with nothing distinguishing the prospect. That gap is what
+  taxed a prospect $5 in the old spreadsheet, and it is why the slot is entered by hand here and
+  can never be imported.
+</p>
+{% endblock %}

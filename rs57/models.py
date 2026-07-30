@@ -363,6 +363,31 @@ class Payout(Base):
     paid: bool = False
 
 
+class Payment(Base):
+    """That a prize has actually been handed over, recorded by the admin tool.
+
+    ``Payout`` rows carry a ``paid`` flag, but they are **derived**: ``stats.award_prizes``
+    computes them and the nightly Action rewrites ``data/derived/{year}-stats.json`` every run,
+    so a flag set there would vanish on the next sync. Payment is a human fact about the real
+    world, so it lives in ``data/manual/`` and is joined to the derived rows on
+    ``(season, label, winner_manager_id)``.
+
+    All three parts of that key are needed: a tie splits one label across several winners, so
+    ``(season, label)`` alone would mark both halves paid when only one had been.
+
+    **No amount field, deliberately.** What a prize pays is already in
+    ``data/manual/payouts.json`` and the split is ``stats``'s to compute; a second copy here
+    could disagree with the first. And **no payment method, handle, or note** — this row is
+    committed to a public repo.
+    """
+
+    season: int
+    label: str
+    winner_manager_id: str
+    paid: bool = False
+    paid_at: datetime | None = None
+
+
 def _jsonable(obj: Any) -> Any:
     if isinstance(obj, BaseModel):
         return obj.model_dump(mode="json")

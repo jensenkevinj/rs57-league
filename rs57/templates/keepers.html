@@ -54,14 +54,25 @@
     </p>
   </div>
 
-  <div class="flag">
-    <span class="tag">Prices, not declarations</span>
-    <div>
-      Nobody has declared a keeper yet. Every player below is priced as though he could be
-      kept; none of this means anyone has claimed him. The tool that records declarations is
-      not built.
+  {% if not current.any_declared %}
+    <div class="flag">
+      <span class="tag">Prices, not declarations</span>
+      <div>
+        Nobody has declared a keeper yet. Every player below is priced as though he could be
+        kept; none of this means anyone has claimed him.
+      </div>
     </div>
-  </div>
+  {% else %}
+    <div class="flag plain">
+      <span class="tag">Declared keepers are marked</span>
+      <div>
+        A row marked <strong>kept</strong> is a recorded declaration, with the fee its manager
+        allocated and the salary they were told they owe. Every other row is only a price — what
+        that player <em>would</em> cost, with no fee in it, and it does not mean anyone has
+        claimed him.
+      </div>
+    </div>
+  {% endif %}
 
   {% if current.waiver_manager_id %}
     <div class="flag">
@@ -100,6 +111,10 @@
       <p class="small muted">
         {{ team.manager_id }} · {{ team.lines | length }} players ·
         {{ team.taxed }} carrying the ${{ keeper_tax }} tax
+        {% if team.declared_count %}
+          · <strong>{{ team.declared_count }} declared</strong>, ${{ team.declared_fees }} in fees,
+          ${{ team.declared_salary }} owed
+        {% endif %}
       </p>
       <div class="scroll">
         <table>
@@ -112,6 +127,9 @@
               <th class="num">Base</th>
               <th class="num">Tax</th>
               <th class="num">Keeper price</th>
+              <th>Declared</th>
+              <th class="num">Fee</th>
+              <th class="num">Owed</th>
             </tr>
           </thead>
           <tbody>
@@ -126,6 +144,23 @@
                   {% if line.kept_prior_year %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
                 </td>
                 <td class="num money">${{ line.price }}</td>
+                <td class="small">
+                  {% if line.declared %}
+                    <span class="tag-inline">kept · {{ line.slot }}</span>
+                  {% else %}
+                    <span class="muted">not declared</span>
+                  {% endif %}
+                </td>
+                <td class="num">
+                  {% if line.declared %}${{ line.fee }}{% else %}<span class="muted">—</span>{% endif %}
+                </td>
+                <td class="num money">
+                  {% if line.salary is not none %}
+                    ${{ line.salary }}
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>

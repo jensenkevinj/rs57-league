@@ -1,0 +1,180 @@
+{# The admin shell.
+
+   Autoescaping is on and no template in this directory calls the "safe" filter — there is a
+   test asserting both, and a second one asserting no template does arithmetic on money.
+   SalaryOverride.reason is free text a human types here and it ends up on a public site, so
+   escaping is the whole defence.
+
+   htmx is served from static/ rather than a CDN: this runs on localhost and should render
+   without the network. #}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}RS57 Admin{% endblock %}</title>
+<script src="{{ url_for('static', filename='htmx.min.js') }}"></script>
+<style>
+  :root {
+    --ink: #1b1f24; --muted: #5b6470; --line: #dfe3e8; --bg: #ffffff; --panel: #f6f8fa;
+    --accent: #0b5cad; --flag: #8a5a00; --flag-bg: #fff8e6; --flag-line: #e8c96a;
+    --bad: #96200f; --bad-bg: #fdf0ee; --bad-line: #e4a99e;
+    --ok: #14532d; --ok-bg: #eefaf1; --ok-line: #9ed3b0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header.top { border-bottom: 1px solid var(--line); margin-bottom: 1.75rem; background: var(--panel); }
+  header.top .wrap { padding-top: 1.1rem; padding-bottom: 0; }
+  .brand { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand a { color: var(--ink); text-decoration: none; }
+  .brand .where { color: var(--muted); font-weight: 400; font-size: 0.85rem; margin-left: 0.5rem; }
+  nav { margin: 0.7rem 0 0; display: flex; flex-wrap: wrap; gap: 1.15rem; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding-bottom: 0.7rem;
+    border-bottom: 2px solid transparent; font-size: 0.93rem;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { font-size: 1.7rem; letter-spacing: -0.02em; margin: 0 0 0.35rem; }
+  h2 { font-size: 1.18rem; margin: 2rem 0 0.6rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1rem; margin: 1.4rem 0 0.45rem; }
+  p { margin: 0.6rem 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); max-width: 46rem; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.87rem; }
+  code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.05rem 0.3rem; font-size: 0.88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0.7rem 0 1.3rem; font-size: 0.94rem; }
+  caption { text-align: left; color: var(--muted); font-size: 0.87rem; padding-bottom: 0.4rem; }
+  th, td { text-align: left; padding: 0.4rem 0.55rem; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--panel); }
+  tfoot td { font-weight: 600; border-top: 2px solid var(--line); border-bottom: none; }
+  .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.9rem 1.1rem; margin: 1.1rem 0;
+  }
+  .flag {
+    background: var(--flag-bg); border: 1px solid var(--flag-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.7rem 0.95rem; margin: 0.55rem 0;
+  }
+  .flag.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+  .flag.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+  .flag.plain { background: var(--panel); border-color: var(--line); }
+  .flag .tag {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--flag); margin-bottom: 0.2rem;
+  }
+  .flag.bad .tag { color: var(--bad); }
+  .flag.ok .tag { color: var(--ok); }
+  .flag.plain .tag { color: var(--muted); }
+  .tag-inline {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
+    border-radius: 3px; padding: 0.05rem 0.3rem; white-space: nowrap;
+  }
+  .tag-inline.bad { color: var(--bad); background: var(--bad-bg); border-color: var(--bad-line); }
+  .tag-inline.ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
+  .tag-inline.flat { color: var(--muted); background: var(--bg); border-color: var(--line); }
+  input[type="number"], input[type="text"], select, textarea {
+    font: inherit; font-size: 0.92rem; padding: 0.25rem 0.4rem; border: 1px solid var(--line);
+    border-radius: 5px; background: var(--bg); color: var(--ink); max-width: 100%;
+  }
+  input[type="number"] { width: 5.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+  select { padding: 0.25rem 0.3rem; }
+  textarea { width: 100%; }
+  label { font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.92rem; font-weight: 600; padding: 0.4rem 0.9rem;
+    border-radius: 6px; border: 1px solid var(--accent); background: var(--accent);
+    color: #fff; cursor: pointer;
+  }
+  button.quiet { background: var(--bg); color: var(--accent); }
+  button.danger { background: var(--bg); color: var(--bad); border-color: var(--bad-line); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 0.2rem; }
+  .actions { display: flex; gap: 0.7rem; align-items: center; margin: 1rem 0 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.8rem; }
+  .card {
+    border: 1px solid var(--line); border-radius: 8px; padding: 0.8rem 0.9rem;
+    display: flex; flex-direction: column; gap: 0.25rem;
+  }
+  .card.blocked { border-color: var(--bad-line); background: var(--bad-bg); }
+  .card h3 { margin: 0; font-size: 0.98rem; }
+  .card .figure { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stats { display: flex; flex-wrap: wrap; gap: 1.6rem; margin: 0.9rem 0 0; }
+  .stat .figure { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  pre.diff {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.8rem 0.9rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.45;
+  }
+  pre.diff .add { color: var(--ok); }
+  pre.diff .del { color: var(--bad); }
+  pre.diff .hunk { color: var(--accent); }
+  tr.claimed { background: #f2f7fd; }
+  tr.claimed:hover { background: #e8f1fb; }
+  .htmx-request .spin { visibility: visible; }
+  .spin { visibility: hidden; color: var(--muted); font-size: 0.85rem; }
+  footer { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 0.9rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <a href="{{ url_for('home') }}">RS57 Admin</a>
+      <span class="where">localhost &middot; writes data/manual/</span>
+    </div>
+    <nav>
+      {% if current_season %}
+        <a href="{{ url_for('season', year=current_season) }}"
+           class="{% if page == 'season' %}on{% endif %}">Keepers {{ current_season }}</a>
+        <a href="{{ url_for('settings', year=current_season) }}"
+           class="{% if page == 'settings' %}on{% endif %}">Season settings</a>
+        <a href="{{ url_for('payouts', year=prior_season) }}"
+           class="{% if page == 'payouts' %}on{% endif %}">Payouts</a>
+        <a href="{{ url_for('reconcile_espn', year=current_season) }}"
+           class="{% if page == 'reconcile' %}on{% endif %}">Reconcile with ESPN</a>
+      {% endif %}
+      <a href="{{ url_for('overrides') }}" class="{% if page == 'overrides' %}on{% endif %}">Overrides</a>
+      <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">Commit</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flag {% if category == 'error' %}bad{% elif category == 'ok' %}ok{% endif %}">
+      <div>{{ message }}</div>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<footer class="small muted">
+  <p>
+    Writes <code>data/manual/</code> and nothing else. <code>data/derived/</code> and
+    <code>site/</code> belong to the nightly Action; <code>data/history/</code> is frozen.
+  </p>
+  <p>
+    Every salary here comes from <code>keeper_rules.compute_team_keepers</code>. Nothing on
+    these pages recomputes one.
+  </p>
+</footer>
+</div>
+</body>
+</html>

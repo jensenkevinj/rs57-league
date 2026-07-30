@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% set page = 'season' %}
+{% block title %}{{ screen.name }} — keepers {{ screen.season }}{% endblock %}
+
+{% block content %}
+<h1>{{ screen.name }}</h1>
+<p class="lede">
+  Keeper claims for {{ screen.season }}. {{ limits_help }}
+</p>
+<p class="small muted">
+  <a href="{{ url_for('season', year=screen.season) }}">← all teams</a>
+  &middot; team id <code>{{ screen.manager_id }}</code>
+  &middot; base read from ESPN's <code>{{ source.base_salary_field }}</code>
+  {% if not source.drafted %}(this season has not drafted){% endif %}
+</p>
+
+<div class="panel small">
+  <p style="margin-top:0">{{ fee_help }}</p>
+  <p style="margin-bottom:0">
+    A prospect is kept at his base with no fee and no tax — and his keep does not set the tax
+    flag for next season either.
+  </p>
+</div>
+
+{% include "_claim_form.html" %}
+
+<h2>What happens after you record this</h2>
+<p class="small">
+  Recording writes <code>data/manual/claims.json</code> on this machine only. The
+  <a href="{{ url_for('commit') }}">commit button</a> is what publishes it: the nightly Action
+  rebuilds the site from what is committed. Then enter each keeper into ESPN's auction at the
+  salary above — ESPN reports that number back as next season's base, so
+  <a href="{{ url_for('reconcile_espn', year=screen.season) }}">reconcile</a> once you have.
+</p>
+{% endblock %}

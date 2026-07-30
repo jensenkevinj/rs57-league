@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% set page = 'commit' %}
+{% block title %}Commit data/manual/{% endblock %}
+
+{% block content %}
+<h1>Commit</h1>
+<p class="lede">
+  Nothing recorded in this tool reaches the league until it is committed — the site is rebuilt from
+  what is in the repo. This is the diff that will land.
+</p>
+
+{% if log %}
+  <div class="flag ok">
+    <span class="tag">Committed</span>
+    <div>
+      {% for line in log %}<div><code>{{ line }}</code></div>{% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% if preview.error %}
+  <div class="flag bad">
+    <span class="tag">git failed</span>
+    <div><code>{{ preview.error }}</code></div>
+  </div>
+{% endif %}
+
+<div class="panel small">
+  <div>Branch <code>{{ preview.branch }}</code>{% if not push %} · <strong>--no-push</strong>: commits locally, never pushes{% endif %}</div>
+  <div>
+    Remote
+    {% if preview.remote %}<code>{{ preview.remote }}</code>{% else %}none — commits stay local{% endif %}
+  </div>
+  <div>Staging <code>data/manual/</code> only. Every other path is left alone.</div>
+</div>
+
+{% if not preview.has_changes %}
+  <div class="flag plain">
+    <span class="tag">Nothing to commit</span>
+    <div><code>data/manual/</code> matches the last commit.</div>
+  </div>
+{% else %}
+  <h2>{{ preview.file_count }} file(s) in data/manual/</h2>
+  <ul class="small">
+    {% for change in preview.changes %}
+      <li><code>{{ change.path }}</code> — {{ change.label }}</li>
+    {% endfor %}
+  </ul>
+
+  <div class="scroll">
+    <pre class="diff">{% for line in preview.diff.splitlines() %}{% if line.startswith('+++') or line.startswith('---') %}<span class="hunk">{{ line }}</span>
+{% elif line.startswith('@@') %}<span class="hunk">{{ line }}</span>
+{% elif line.startswith('+') %}<span class="add">{{ line }}</span>
+{% elif line.startswith('-') %}<span class="del">{{ line }}</span>
+{% else %}{{ line }}
+{% endif %}{% endfor %}</pre>
+  </div>
+
+  {% if preview.other_changes %}
+    <div class="flag">
+      <span class="tag">Left alone, deliberately</span>
+      <div>
+        {{ preview.other_changes | length }} change(s) outside <code>data/manual/</code> are in the
+        working tree and will <strong>not</strong> be committed by this button — a local
+        <code>rs57.sync</code> leaves <code>data/derived/</code> dirty and that directory belongs to
+        the nightly Action.
+        <ul class="small">
+          {% for change in preview.other_changes %}
+            <li><code>{{ change.path }}</code> — {{ change.label }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('do_commit') }}">
+    <div class="field">
+      <label for="summary">What changed</label>
+      <input type="text" id="summary" name="summary" size="60"
+             placeholder="record keeper claims" required>
+    </div>
+    <div class="actions">
+      <button type="submit">
+        {% if push %}Commit and push{% else %}Commit locally{% endif %}
+      </button>
+      <span class="small muted">
+        {% if push %}
+          This pushes to <code>{{ preview.branch }}</code> on a public repo. The diff above is the
+          review step — there is no second one.
+        {% else %}
+          Commits to <code>{{ preview.branch }}</code> and stops.
+        {% endif %}
+      </span>
+    </div>
+  </form>
+{% endif %}
+
+<h2>Why this only ever stages one directory</h2>
+<p class="small">
+  The nightly Action owns <code>data/derived/</code> and <code>site/</code> and fails its own run if
+  anything else wrote them; this stages <code>data/manual/</code> and refuses to commit if anything
+  outside it reaches the index. Neither side trusts the other to have behaved. NO FILE HAS TWO
+  WRITERS.
+</p>
+{% endblock %}

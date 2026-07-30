@@ -8,15 +8,15 @@ transactions stay on ESPN.**
 
 ## Status
 
-**Phase 3** — the static site and the nightly deploy. Phases 0-2 built the models, the keeper
-rules engine, the ESPN pipeline, and the derived stats and prizes. See
+**Phase 4** — the local admin tool. Phases 0-3 built the models, the keeper rules engine, the
+ESPN pipeline, the derived stats and prizes, and the static site with its nightly deploy. See
 [`rs57-league-app-plan.md`](rs57-league-app-plan.md) for the full build plan and phase list.
 
 ## Layout
 
 | Path | Written by | Contents |
 |---|---|---|
-| `data/manual/` | Laptop only | Prize amounts, prospect keeps, salary overrides |
+| `data/manual/` | The admin tool only | Keeper claims, salary overrides, season settings, payments, prize amounts |
 | `data/derived/<year>.json` | Nightly Action only | Rosters, players, franchise names |
 | `data/derived/<year>-stats.json` | Nightly Action only | Standings, prizes, payouts |
 | `data/history/<year>.json` | Written once, then frozen | Completed seasons |
@@ -47,6 +47,27 @@ a gitignored scratch directory rather than to `site/`:
 `rs57/keeper_rules.py` and `rs57/stats.py` are pure — no I/O, no web imports, no ESPN, no
 Jinja. They are the tested core, and they stay that way; `tests/test_purity.py` walks their
 imports to keep it true.
+
+## The admin tool
+
+```bash
+.venv/bin/python -m rs57.sync --year 2026    # the tool reads data/derived/, so sync first
+.venv/bin/python -m rs57.admin               # http://127.0.0.1:5057
+.venv/bin/python -m rs57.admin --no-push     # the commit button commits but never pushes
+```
+
+Keeper claim entry with live salary math, salary overrides, payout tracking, season settings,
+and one button that shows the `data/manual/` diff and then commits and pushes it. Binds
+`127.0.0.1` — there are no accounts, and the commit button publishes to a public repo.
+
+It is the **only** writer of `data/manual/`. Every write goes through one guarded function, and
+the commit button re-checks the git index after staging: the nightly Action fails its run if
+anything wrote `data/manual/`, and this refuses to commit if anything outside it is staged.
+Neither side trusts the other to have behaved.
+
+Every salary on every screen comes out of `keeper_rules.compute_team_keepers`. Nothing in a
+view, a template, or a line of browser JavaScript prices a keeper — `tests/test_admin.py` greps
+the templates for arithmetic on money, and for the `safe` filter on the one field a human types.
 
 ## The nightly build
 

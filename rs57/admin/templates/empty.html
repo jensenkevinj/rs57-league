@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Nothing synced yet{% endblock %}
+
+{% block content %}
+<h1>Nothing synced yet</h1>
+<p class="lede">
+  There are no season files in <code>data/derived/</code>, and a keeper cannot be priced without the
+  roster ESPN reports.
+</p>
+<div class="panel">
+  <p style="margin-top:0">Sync a season first:</p>
+  <p><code>python -m rs57.sync --year 2026</code></p>
+  <p class="small muted" style="margin-bottom:0">
+    That writes <code>data/derived/2026.json</code>, which this tool reads and never writes. On a
+    fresh clone the directory is empty because the nightly Action is what fills it.
+  </p>
+</div>
+{% endblock %}

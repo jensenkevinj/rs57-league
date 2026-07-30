@@ -15,15 +15,22 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# The local admin tool only. Deliberately NOT a base dependency: the nightly Action installs
+# this package to run the syncs and the site generator, and neither has any business pulling
+# in a web framework.
+admin = [
+    "flask>=3.0",
+]
 dev = [
     "pytest>=8.0",
+    "flask>=3.0",
 ]
 
 [tool.setuptools.packages.find]
 include = ["rs57*"]
 
 [tool.setuptools.package-data]
-rs57 = ["templates/*.html"]
+rs57 = ["templates/*.html", "admin/templates/*.html", "admin/static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

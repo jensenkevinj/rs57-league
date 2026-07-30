@@ -1,0 +1,81 @@
+{# Payout tracking. The amounts and winners are derived; only "paid" is a human fact.
+
+   Keyed on season, label AND winner: a tie splits one prize across two managers, so marking
+   one paid must not mark the other. #}
+<div id="payout-table">
+  <div class="panel">
+    <div class="stats">
+      <div class="stat">
+        <div class="figure">${{ totals.pot }}</div>
+        <div class="label">Pot</div>
+      </div>
+      <div class="stat">
+        <div class="figure">${{ totals.paid }}</div>
+        <div class="label">Paid</div>
+      </div>
+      <div class="stat">
+        <div class="figure">${{ totals.outstanding }}</div>
+        <div class="label">Outstanding</div>
+      </div>
+      <div class="stat">
+        <div class="figure">${{ totals.unawarded }}</div>
+        <div class="label">Unawarded</div>
+      </div>
+      <div class="spin">saving…</div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Prize</th>
+          <th>Winner</th>
+          <th class="num">Amount</th>
+          <th>Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.label }}</td>
+            <td>
+              {% if row.winner_manager_id %}
+                {{ row.winner }}
+              {% else %}
+                <span class="tag-inline flat">unawarded</span>
+              {% endif %}
+            </td>
+            <td class="num money">${{ row.amount }}</td>
+            <td>
+              {% if row.winner_manager_id %}
+                <form hx-post="{{ url_for('toggle_paid', year=year) }}"
+                      hx-target="#payout-table"
+                      hx-swap="outerHTML">
+                  <input type="hidden" name="label" value="{{ row.label }}">
+                  <input type="hidden" name="winner_manager_id" value="{{ row.winner_manager_id }}">
+                  <input type="hidden" name="paid" value="{% if row.paid %}0{% else %}1{% endif %}">
+                  <button type="submit" class="quiet">
+                    {% if row.paid %}paid{% else %}mark paid{% endif %}
+                  </button>
+                </form>
+                {% if row.paid_at %}
+                  <span class="small muted">{{ row.paid_at.strftime('%Y-%m-%d') }}</span>
+                {% endif %}
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Total</td>
+          <td class="num">${{ totals.pot }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

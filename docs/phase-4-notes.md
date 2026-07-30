@@ -1,5 +1,16 @@
 # Phase 4 handoff — the admin tool
 
+> **CLOSED 2026-07-29.** Every question in "Still open" below is answered; the answers are in
+> "Found during Phase 4" in the Corrections log of `rs57-league-app-plan.md`, and what Phase 5
+> inherits is in `docs/phase-5-notes.md`. The acceptance criterion **was run**: the tool was
+> driven in a browser against the real 2026 rosters, a real claim was submitted for t9 (three
+> keepers and a prospect, $88), and driving it found four real bugs — a stale roster cache, a
+> settings route that blanked a field it was not sent, an ESPN deadline converted in local time,
+> and an untracked-directory listing that named a directory instead of its files. Two items below
+> turned out to be wrong rather than open: `prospects.json` **cannot** be deleted in this phase,
+> and feeding the claims does **not** by itself audit the ratchet. The section is kept as the
+> record of what was open.
+
 Written at the end of Phase 3. Everything here is context a fresh session cannot recover from
 the repo alone. Read `CLAUDE.md` first; it holds the rules. `docs/phase-3-notes.md` records
 what the site and the nightly Action settled and why. This holds what Phase 4 needs and what is

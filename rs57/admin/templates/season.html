@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% set page = 'season' %}
+{% block title %}Keepers {{ screen.season }}{% endblock %}
+
+{% block content %}
+{% import "_notes.html" as show %}
+<h1>Keepers {{ screen.season }}</h1>
+<p class="lede">
+  Every team's declared keepers, priced by the engine. This is the report to read before
+  releasing anything to the league.
+</p>
+
+<div class="panel">
+  <div class="stats">
+    <div class="stat">
+      <div class="figure">{{ screen.declared_count }}</div>
+      <div class="label">Teams declared</div>
+    </div>
+    <div class="stat">
+      <div class="figure">${{ screen.league_salary }}</div>
+      <div class="label">Salary committed</div>
+    </div>
+    <div class="stat">
+      <div class="figure">${{ screen.league_fees }}</div>
+      <div class="label">Fees allocated</div>
+    </div>
+    <div class="stat">
+      <div class="figure">{{ screen.blocked_count }}</div>
+      <div class="label">Teams blocked</div>
+    </div>
+  </div>
+  <p class="small muted" style="margin-bottom:0">
+    Keeper deadline:
+    {% if screen.keeper_deadline %}
+      {{ screen.keeper_deadline.strftime('%Y-%m-%d %H:%M') }}
+      {% if screen.deadline_passed %}<span class="tag-inline">passed</span>{% endif %}
+    {% else %}
+      not recorded — <a href="{{ url_for('settings', year=screen.season) }}">record it</a>
+    {% endif %}
+    &middot; Fees waived:
+    {% if not screen.waiver_recorded %}
+      unknown, {{ screen.prior_season }} not recorded
+    {% elif screen.waiver_manager_id %}
+      {{ screen.waiver_name }}
+    {% else %}
+      nobody
+    {% endif %}
+  </p>
+</div>
+
+<div class="scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Franchise</th>
+        <th class="num">Keepers</th>
+        <th class="num">Prospect</th>
+        <th class="num">Fees</th>
+        <th class="num">Salary</th>
+        <th>State</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in screen.teams %}
+        <tr>
+          <td>
+            <a href="{{ url_for('team', year=screen.season, manager_id=team.manager_id) }}">{{ team.name }}</a>
+            {% if team.fees_waived %}<span class="tag-inline ok">fees waived</span>{% endif %}
+          </td>
+          <td class="num">{{ team.keeper_count }}</td>
+          <td class="num">{{ team.prospect_count }}</td>
+          <td class="num">${{ team.total_fees }}</td>
+          <td class="num money">${{ team.total_salary }}</td>
+          <td class="small">
+            {% if not team.declared %}
+              <span class="tag-inline flat">nothing declared</span>
+            {% elif team.blocked %}
+              <span class="tag-inline bad">{{ team.error_count }} error(s)</span>
+            {% else %}
+              <span class="tag-inline ok">recorded</span>
+            {% endif %}
+            {% if team.review_count %}
+              <span class="tag-inline">{{ team.review_count }} unverified</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>League</td>
+        <td class="num"></td>
+        <td class="num"></td>
+        <td class="num">${{ screen.league_fees }}</td>
+        <td class="num">${{ screen.league_salary }}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+{{ show.notes(screen.notes) }}
+
+<h2>Where the numbers come from</h2>
+<p class="small">
+  Base is ESPN's <code>{{ source.base_salary_field }}</code> for {{ screen.season }} — what the
+  player cost his manager this season, with every prior fee and tax already inside it. The engine
+  adds the allocated fee and the ${{ keeper_tax }} tax for a player kept last season. There is no
+  salary cap.
+</p>
+{% endblock %}

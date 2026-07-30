@@ -1,0 +1,159 @@
+{# The claim screen. This fragment is the whole interaction.
+
+   Every number here arrived already computed from keeper_rules.compute_team_keepers — the
+   engine prices the team and validates it in one pass, so the live math is: post the form,
+   call the function, swap this fragment. Nothing below multiplies, adds or taxes anything.
+
+   The fee inputs carry NO min attribute, deliberately. A negative fee is a rule violation the
+   engine reports as NEGATIVE_FEE, not something for a browser to refuse — hiding it behind a
+   form error would teach nobody which rule they broke. #}
+{% import "_notes.html" as show %}
+{% set players = {} %}
+{% for row in screen.rows %}{% set _ = players.update({row.espn_player_id: row.name}) %}{% endfor %}
+
+<form id="claim-form"
+      hx-post="{{ url_for('preview', year=screen.season, manager_id=screen.manager_id) }}"
+      hx-trigger="change"
+      hx-target="#claim-form"
+      hx-swap="outerHTML">
+
+  {% if screen.saved %}
+    <div class="flag ok">
+      <span class="tag">Recorded</span>
+      <div>
+        Saved to <code>data/manual/claims.json</code>. Nothing is published until you commit —
+        <a href="{{ url_for('commit') }}">read the diff and commit</a>.
+      </div>
+    </div>
+  {% endif %}
+
+  {% for problem in problems %}
+    <div class="flag bad">
+      <span class="tag">Cannot read the form</span>
+      <div>{{ problem }}</div>
+    </div>
+  {% endfor %}
+
+  <div class="panel">
+    <div class="stats">
+      <div class="stat">
+        <div class="figure">${{ screen.total_salary }}</div>
+        <div class="label">Total salary</div>
+      </div>
+      <div class="stat">
+        <div class="figure">${{ screen.total_fees }}</div>
+        <div class="label">Fees allocated</div>
+      </div>
+      <div class="stat">
+        <div class="figure">
+          {% if screen.fee_expected is none %}—{% else %}${{ screen.fee_expected }}{% endif %}
+        </div>
+        <div class="label">Fee owed{% if screen.fees_waived %} (waived){% endif %}</div>
+      </div>
+      <div class="stat">
+        <div class="figure">{{ screen.keeper_count }}</div>
+        <div class="label">Keepers of {{ max_keepers }}</div>
+      </div>
+      <div class="stat">
+        <div class="figure">{{ screen.prospect_count }}</div>
+        <div class="label">Prospects of {{ max_prospects }}</div>
+      </div>
+      <div class="spin">recomputing…</div>
+    </div>
+    {% if screen.fee_shortfall %}
+      <p class="small muted">
+        Fees allocated do not match the tier yet — see the issues below.
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>
+        Salaries come from the engine. “Would cost” is base plus the ${{ keeper_tax }} tax with
+        no fee — what he costs before the manager splits the tier across his keepers.
+      </caption>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Pos</th>
+          <th class="num">Base</th>
+          <th class="num">Tax</th>
+          <th class="num">Would cost</th>
+          <th>Slot</th>
+          <th class="num">Fee</th>
+          <th class="num">Salary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in screen.rows %}
+          <tr class="{% if row.claimed %}claimed{% endif %}">
+            <td>
+              {{ row.name }}
+              {% if row.overridden %}
+                <span class="tag-inline" title="An override is live: ESPN holds ${{ row.espn_base }}">override</span>
+              {% endif %}
+            </td>
+            <td class="small muted">{{ row.position }} · {{ row.nfl_team }}</td>
+            <td class="num">${{ row.base }}</td>
+            <td class="num">
+              {% if row.kept_prior_year %}${{ row.tax }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td class="num">${{ row.candidate_price }}</td>
+            <td>
+              <select name="slot_{{ row.espn_player_id }}" aria-label="Slot for {{ row.name }}">
+                <option value="">not kept</option>
+                {% for slot in slot_choices %}
+                  <option value="{{ slot.value }}" {% if row.slot == slot.value %}selected{% endif %}>
+                    {{ slot.value }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td class="num">
+              <input type="number" step="1" name="fee_{{ row.espn_player_id }}"
+                     value="{{ row.fee }}" aria-label="Fee for {{ row.name }}">
+            </td>
+            <td class="num money">
+              {% if row.salary is none %}
+                <span class="muted">—</span>
+              {% else %}
+                ${{ row.salary }}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6">Declared</td>
+          <td class="num">${{ screen.total_fees }}</td>
+          <td class="num">${{ screen.total_salary }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  {{ show.issues(screen.issues, players) }}
+  {{ show.notes(screen.notes) }}
+
+  <div class="actions">
+    <button type="submit"
+            hx-post="{{ url_for('save', year=screen.season, manager_id=screen.manager_id) }}"
+            hx-target="#claim-form"
+            hx-swap="outerHTML"
+            {% if screen.blocked %}disabled{% endif %}>
+      {% if screen.blocked %}Fix the errors to record{% else %}Record these claims{% endif %}
+    </button>
+    <span class="small muted">
+      {% if screen.blocked %}
+        An error blocks the record. The salaries above are still priced so you can see what the
+        fix costs.
+      {% elif screen.submitted_at %}
+        Last recorded {{ screen.submitted_at.strftime('%Y-%m-%d %H:%M') }}.
+      {% else %}
+        Nothing recorded for this team yet.
+      {% endif %}
+    </span>
+  </div>
+</form>

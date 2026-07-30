@@ -1,0 +1,44 @@
+{# Unverified items, and the engine's own issues.
+
+   An ERROR blocks a claim. A REVIEW never blocks, but it must never render as though it had
+   been checked — that is the failure this project keeps guarding against, so every one of
+   these carries a label saying nobody has checked it. #}
+
+{% macro notes(items) %}
+  {% for note in items %}
+    {% if note.kind == 'info' %}
+      <div class="flag plain">
+        <span class="tag">For information</span>
+        <div>{{ note.message }}</div>
+      </div>
+    {% else %}
+      <div class="flag {% if note.kind == 'error' %}bad{% endif %}">
+        <span class="tag">
+          {% if note.kind == 'error' %}Error{% else %}Unverified — nobody has checked this{% endif %}
+        </span>
+        <div>{{ note.message }}</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro issues(items, players) %}
+  {% for issue in items %}
+    <div class="flag {% if issue.severity.value == 'error' %}bad{% endif %}">
+      <span class="tag">
+        {% if issue.severity.value == 'error' %}
+          Error — this blocks the claim
+        {% else %}
+          Unverified — nobody has checked this
+        {% endif %}
+        &middot; {{ issue.code.value }}
+      </span>
+      <div>
+        {% if issue.espn_player_id and players.get(issue.espn_player_id) %}
+          <strong>{{ players[issue.espn_player_id] }}</strong> —
+        {% endif %}
+        {{ issue.message }}
+      </div>
+    </div>
+  {% endfor %}
+{% endmacro %}

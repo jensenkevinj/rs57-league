@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% set page = 'settings' %}
+{% block title %}Season settings {{ year }}{% endblock %}
+
+{% block content %}
+<h1>Season settings {{ year }}</h1>
+<p class="lede">
+  The dates and the consolation winner for {{ year }}. Recording the winner is what turns a
+  derived guess into a decision.
+</p>
+
+<div class="flag">
+  <span class="tag">Read this before choosing a winner</span>
+  <div>
+    The consolation winner recorded here has their keeper <strong>fees waived in
+    {{ waiver_year }}</strong> — the year after the bracket was won. Their salaries are still
+    owed in full; only the fee on top is waived. Recorded against the wrong year, the waiver
+    lands on the wrong team for a whole season.
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('save_settings', year=year) }}">
+  <div class="row">
+    <div class="field">
+      <label for="season_start">Season start</label>
+      <input type="text" id="season_start" name="season_start" placeholder="2026-09-04 17:00"
+             value="{{ espn.season_start if espn and espn.season_start else (settings.season_start.isoformat(' ', 'minutes') if settings and settings.season_start else '') }}">
+    </div>
+    <div class="field">
+      <label for="trade_deadline">Trade deadline</label>
+      <input type="text" id="trade_deadline" name="trade_deadline" placeholder="2026-12-02 17:00"
+             value="{{ espn.trade_deadline if espn and espn.trade_deadline else (settings.trade_deadline.isoformat(' ', 'minutes') if settings and settings.trade_deadline else '') }}">
+    </div>
+    <div class="field">
+      <label for="keeper_deadline">Keeper deadline</label>
+      <input type="text" id="keeper_deadline" name="keeper_deadline" placeholder="2026-08-30 17:00"
+             value="{{ espn.keeper_deadline if espn and espn.keeper_deadline else (settings.keeper_deadline.isoformat(' ', 'minutes') if settings and settings.keeper_deadline else '') }}">
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:1rem">
+    <div class="field">
+      <label for="consolation_winner_id">{{ year }} consolation bracket winner</label>
+      <select id="consolation_winner_id" name="consolation_winner_id">
+        <option value="">nobody recorded</option>
+        {% for manager_id, name in managers %}
+          <option value="{{ manager_id }}"
+                  {% if settings and settings.consolation_winner_id == manager_id %}selected{% endif %}>
+            {{ name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="submit">Record {{ year }} settings</button>
+    <span class="small muted">Dates are <code>YYYY-MM-DD HH:MM</code>. Blank leaves one unset.</span>
+  </div>
+</form>
+
+<form method="post" action="{{ url_for('settings_from_espn', year=year) }}" style="margin-top:0.5rem">
+  <button type="submit" class="quiet">Read the deadlines from ESPN</button>
+  <span class="small muted">
+    Fills the form from the league's own <code>draftSettings</code>. Saves nothing until you
+    submit above.
+  </span>
+</form>
+
+{% if derived_winners %}
+  <h2>What the stats engine derived</h2>
+  <div class="flag">
+    <span class="tag">Unverified — nobody has checked this</span>
+    <div>
+      <code>stats</code> reads {{ year }}'s consolation winner as
+      {% for manager_id, name in derived_winners %}<strong>{{ name }}</strong>{% if not loop.last %}, {% endif %}{% endfor %}.
+      It is a suggestion to confirm, not a value this tool will apply on its own: a 12-team league
+      runs two consolation ladders and ESPN does not say which one the league means. Choose it
+      above if it is right.
+    </div>
+  </div>
+{% endif %}
+
+<h2>The deadline is recorded, never enforced</h2>
+<p class="small">
+  A claim stays editable after the keeper deadline passes. The tool stamps every submission and
+  says on the report when the deadline has gone by, so a late change is visible as a deliberate
+  correction — rather than being something to work around by editing JSON by hand.
+</p>
+{% endblock %}
