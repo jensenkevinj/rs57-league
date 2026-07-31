@@ -23,6 +23,9 @@
     --bad: #96200f;
     --bad-bg: #fdf0ee;
     --bad-line: #e4a99e;
+    --gold: #b8860b;
+    --silver: #98a0aa;
+    --bronze: #a2704a;
   }
   * { box-sizing: border-box; }
   body {
@@ -89,6 +92,127 @@
   .team table { margin-bottom: 0; }
   .team tbody tr:last-child td { border-bottom: none; }
   footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+
+  /* --- the home page: a prize board ------------------------------------- */
+
+  .page-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; }
+  .page-head h1 { margin-bottom: 0; }
+  .pill {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    border-radius: 999px; padding: 0.15rem 0.6rem; white-space: nowrap;
+  }
+  .pill.done { color: var(--accent); border-color: var(--accent); background: transparent; }
+
+  .tiles {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 0.7rem; margin: 1.4rem 0;
+  }
+  .tile {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.75rem 0.9rem;
+  }
+  .tile-value {
+    font-size: 1.55rem; font-weight: 700; letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums; line-height: 1.15;
+  }
+  .tile-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted); margin-top: 0.15rem;
+  }
+
+  .podium {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.7rem; margin: 0.75rem 0 1.5rem;
+  }
+  .spot {
+    border: 1px solid var(--line); border-top: 3px solid var(--line);
+    border-radius: 8px; padding: 0.8rem 1rem;
+  }
+  .spot-1 { border-top-color: var(--gold); }
+  .spot-2 { border-top-color: var(--silver); }
+  .spot-3 { border-top-color: var(--bronze); }
+  .spot-place {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .spot-team {
+    font-size: 1.08rem; font-weight: 650; letter-spacing: -0.01em; margin: 0.2rem 0 0.1rem;
+  }
+  .spot-meta { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .spot-money {
+    margin-top: 0.55rem; font-size: 1.15rem; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .board tr.group th {
+    background: var(--panel); color: var(--ink); font-size: 0.74rem; font-weight: 700;
+    padding-top: 0.6rem; padding-bottom: 0.6rem;
+  }
+  .board .group-note {
+    display: block; margin-top: 0.2rem; font-weight: 400; font-size: 0.82rem;
+    text-transform: none; letter-spacing: 0; color: var(--muted);
+  }
+  .board td.why { color: var(--muted); font-size: 0.88rem; font-variant-numeric: tabular-nums; }
+
+  .leaders { list-style: none; margin: 0.75rem 0 1.5rem; padding: 0; }
+  .leaders li {
+    display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    align-items: center; gap: 0.2rem 0.7rem;
+    padding: 0.5rem 0; border-bottom: 1px solid var(--line);
+  }
+  .leaders li:last-child { border-bottom: none; }
+  .leader-rank {
+    grid-row: span 2; color: var(--muted); font-size: 0.85rem;
+    font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .leader-money {
+    grid-row: span 2; text-align: right; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .leader-bar {
+    grid-column: 2; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden;
+  }
+  .leader-bar span { display: block; height: 100%; background: var(--accent); }
+
+  .now {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 0.5rem 1.25rem; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 0.85rem 1.1rem; margin: 0.75rem 0 1.5rem;
+  }
+  .now p { margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.75rem 0 1.5rem; padding: 0; }
+  .chips a {
+    display: inline-block; border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.2rem 0.75rem; font-size: 0.9rem; text-decoration: none;
+  }
+  .chips a:hover { border-color: var(--accent); }
+
+  /* On a phone the board stops being four columns and becomes one card per prize. Four
+     columns squeezed into 390px wraps "Week 1 High Score" onto three lines, and most of the
+     league reads this page on a phone. */
+  @media (max-width: 40rem) {
+    .board thead { display: none; }
+    .board tbody, .board tfoot, .board tr, .board th, .board td { display: block; }
+    .board tr.group th { border-bottom: none; padding-left: 0.6rem; }
+    .board tbody tr:not(.group), .board tfoot tr {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.05rem 0.7rem; padding: 0.55rem 0.6rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .board tbody tr:not(.group) td, .board tfoot th, .board tfoot td {
+      border-bottom: none; padding: 0;
+    }
+    .board tbody tr:not(.group) td:first-child {
+      font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .board tbody tr:not(.group) td:nth-child(2) { font-weight: 600; }
+    .board tbody tr:not(.group) td:nth-child(4) {
+      grid-column: 2; grid-row: 1 / span 3; align-self: center; text-align: right;
+    }
+    .board tfoot td { text-align: right; }
+  }
 </style>
 </head>
 <body>

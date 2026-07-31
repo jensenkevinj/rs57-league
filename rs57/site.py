@@ -231,6 +231,10 @@ class StatsSeason:
 
     season: int
     regular_season_weeks: int
+    weeks_played: int
+    final: bool
+    """Whether the playoffs have decided a final rank. A season still being played has none,
+    and the home page must not present its prize board as settled."""
     names_known: bool
     standings: tuple[StandingLine, ...]
     season_points: tuple[PointsLine, ...]
@@ -247,6 +251,88 @@ class StatsSeason:
     waiver_season: int
     """The season this season's consolation winner would have their fees waived in."""
     notes: tuple[Note, ...]
+
+
+# ---------------------------------------------------------------------------
+# The home page
+# ---------------------------------------------------------------------------
+#
+# The league ran on a spreadsheet of prizes, so that is what the home page is: every prize,
+# who won it, what it paid, and the number that won it. Everything on it is assembled here.
+# The template lays it out and formats it; it decides nothing.
+
+
+@dataclass(frozen=True)
+class StatTile:
+    """One headline figure. ``value`` is already a display string — money is formatted in
+    Python so no template ever has to know how a dollar is written."""
+
+    value: str
+    label: str
+
+
+@dataclass(frozen=True)
+class PodiumSpot:
+    """A placing prize. ``winners`` is empty when nobody was identified, which renders as
+    unawarded rather than as a blank."""
+
+    rank: int
+    place: str
+    winners: tuple[Named, ...]
+    amount: int
+    recorded: bool
+    """Whether an amount is on record. A season with no recorded prize money shows no
+    figure at all — ``$0`` would be a claim that it paid nothing."""
+    detail: str
+
+
+@dataclass(frozen=True)
+class BoardRow:
+    """One line of the prize board: the prize, who won it, why, and what it pays."""
+
+    label: str
+    winners: tuple[Named, ...]
+    amount: int
+    recorded: bool
+    split: bool
+    """A tie. The amount shown is the whole prize; the split is what each winner took."""
+    detail: str
+
+
+@dataclass(frozen=True)
+class BoardSection:
+    title: str
+    caption: str
+    rows: tuple[BoardRow, ...]
+
+
+@dataclass(frozen=True)
+class LeaderLine:
+    """A franchise's take for the season, with the bar width the template draws."""
+
+    rank: int
+    team: Named
+    total: int
+    share: int
+    """Percent of the season's biggest single take, for the bar. Display only."""
+
+
+@dataclass(frozen=True)
+class Home:
+    """Everything the home page shows about the most recent season with results."""
+
+    season: int
+    status: str
+    final: bool
+    money_recorded: bool
+    tiles: tuple[StatTile, ...]
+    podium: tuple[PodiumSpot, ...]
+    sections: tuple[BoardSection, ...]
+    leaders: tuple[LeaderLine, ...]
+    pot: int
+    unawarded: int
+    notes: tuple[Note, ...]
+    other_seasons: tuple[int, ...]
 
 
 # ---------------------------------------------------------------------------
@@ -630,9 +716,16 @@ def build_stats_season(derived_dir: Path, season: int) -> StatsSeason:
     )
     unawarded = sum(p.amount for p in payouts if not p.winner_manager_id)
 
+    # A season is final when the bracket has produced a rank, not when the weeks have run out.
+    # Reading it off the calendar would call a season settled while its final was still being
+    # played, and the placing prizes are exactly the ones that decides.
+    weeks_with_results = [int(week) for week in source.get("weeks_with_results") or []]
+
     return StatsSeason(
         season=season,
         regular_season_weeks=int(source.get("regular_season_weeks") or 0),
+        weeks_played=max(weeks_with_results) if weeks_with_results else 0,
+        final=any(row.final_rank for row in standings),
         names_known=bool(names),
         standings=tuple(
             StandingLine(
@@ -696,19 +789,253 @@ def build_stats_season(derived_dir: Path, season: int) -> StatsSeason:
 
 
 # ---------------------------------------------------------------------------
+# Home page
+# ---------------------------------------------------------------------------
+
+
+def money(amount: int) -> str:
+    """Integer dollars, written the way a person writes them.
+
+    Display only, and the only place the site decides what a dollar looks like. Registered as
+    a Jinja filter so a template can print money without doing arithmetic on it.
+    """
+    return f"${amount:,}"
+
+
+def _points(value: float) -> str:
+    """A fantasy score. Points are the one number here that is not money, so they are the one
+    number that may carry decimals."""
+    return f"{value:,.2f}"
+
+
+def _record(row: StandingLine) -> str:
+    return f"{row.wins}-{row.losses}-{row.ties}" if row.ties else f"{row.wins}-{row.losses}"
+
+
+def build_home(season: StatsSeason | None, *, other_seasons: Sequence[int] = ()) -> Home | None:
+    """The prize board for the most recent season with results.
+
+    **The board is driven by what was won, not by what was paid.** Every prize is assembled
+    from the derived stats — the studs, the weekly highs, the survivor, the standings — and the
+    money is then joined onto it by label. Building it the other way round would leave 2019
+    through 2023 with a blank home page, because those seasons have no recorded prize amounts;
+    the prizes were still won, the money is just not on record. Those rows show a dash rather
+    than ``$0``, which would be a claim that the league paid nothing.
+
+    Any payout label the stats do not explain still reaches the page, in a trailing section.
+    A prize that quietly vanished between the engine and the page is exactly the kind of
+    silence this project treats as a bug.
+    """
+    if season is None:
+        return None
+
+    groups = {group.label: group for group in season.prizes}
+    claimed: set[str] = set()
+
+    def resolve(label: str, fallback: Sequence[Named]) -> tuple[tuple[Named, ...], int, bool]:
+        """Winners, money, and whether any money is on record, for one prize label."""
+        claimed.add(label)
+        group = groups.get(label)
+        if group is None:
+            return tuple(fallback), 0, False
+        # A prize nobody won still has a group and still carries its money, so the winners
+        # come back empty and the amount does not.
+        return (
+            tuple(row.winner for row in group.rows if row.winner),
+            sum(row.amount for row in group.rows),
+            True,
+        )
+
+    def line(label: str, fallback: Sequence[Named], detail: str) -> BoardRow:
+        winners, amount, recorded = resolve(label, fallback)
+        return BoardRow(
+            label=label,
+            winners=winners,
+            amount=amount,
+            recorded=recorded,
+            split=len(winners) > 1,
+            detail=detail,
+        )
+
+    standing = {row.team.manager_id: row for row in season.standings}
+    by_rank = {row.final_rank: row for row in season.standings if row.final_rank}
+
+    podium: list[PodiumSpot] = []
+    for rank, place in ((1, "Champion"), (2, "2nd Place"), (3, "3rd Place")):
+        placed = by_rank.get(rank)
+        winners, amount, recorded = resolve(place, (placed.team,) if placed else ())
+        # Described from the franchise actually shown as the winner, not from the rank — so a
+        # payout and the standings disagreeing shows up as a missing record, not a wrong one.
+        described = standing.get(winners[0].manager_id) if len(winners) == 1 else None
+        podium.append(
+            PodiumSpot(
+                rank=rank,
+                place=place,
+                winners=winners,
+                amount=amount,
+                recorded=recorded,
+                detail=f"{_record(described)} · {_points(described.points_for)} points"
+                if described
+                else "",
+            )
+        )
+
+    awards: list[BoardRow] = []
+
+    best = max((row.points for row in season.season_points), default=None)
+    leaders_by_points = tuple(row.team for row in season.season_points if row.points == best)
+    awards.append(
+        line(
+            "Most Points (Season)",
+            leaders_by_points,
+            f"{_points(best)} points, weeks 1–{season.regular_season_weeks}"
+            if best is not None
+            else "",
+        )
+    )
+
+    survived = len(season.survivor_eliminations)
+    awards.append(
+        line(
+            "Survivor",
+            season.survivor_winners,
+            f"last standing after {survived} eliminations" if survived else "last team standing",
+        )
+    )
+
+    if season.unlucky is not None or "Unlucky" in groups:
+        awards.append(
+            line(
+                "Unlucky",
+                season.unlucky.teams if season.unlucky else (),
+                f"{_points(season.unlucky.points)} in week {season.unlucky.week} — and lost"
+                if season.unlucky
+                else "",
+            )
+        )
+
+    studs = [
+        line(
+            f"{stud.position} Stud",
+            stud.teams,
+            f"{stud.player_name} · {_points(stud.points)} in week {stud.week}",
+        )
+        for stud in season.studs
+    ]
+
+    weekly = [
+        line(f"Week {high.week} High Score", high.teams, _points(high.points))
+        for high in season.weekly_highs
+    ]
+
+    leftover = [
+        BoardRow(
+            label=label,
+            winners=tuple(row.winner for row in group.rows if row.winner),
+            amount=sum(row.amount for row in group.rows),
+            recorded=True,
+            split=len([row for row in group.rows if row.winner]) > 1,
+            detail="",
+        )
+        for label, group in groups.items()
+        if label not in claimed
+    ]
+
+    sections = tuple(
+        BoardSection(title=title, caption=caption, rows=tuple(rows))
+        for title, caption, rows in (
+            (
+                "Season awards",
+                "Most points is the regular season only. Unlucky is the single highest score "
+                "that still lost — once a season, not once a week.",
+                awards,
+            ),
+            (
+                "Positional studs",
+                "The best single week by a started player at each position, across the whole "
+                "season including the playoff weeks. Defense wins nothing.",
+                studs,
+            ),
+            (
+                "Weekly high scores",
+                f"Top score of the week, weeks 1–{season.regular_season_weeks}. "
+                "The playoff weeks do not pay a weekly high score.",
+                weekly,
+            ),
+            (
+                "Other prizes",
+                "Recorded as paid, but not explained by this season's derived stats.",
+                leftover,
+            ),
+        )
+        if rows
+    )
+
+    # Standard competition ranking: franchises on the same money share a place.
+    top = max((earning.total for earning in season.earnings), default=0)
+    leaders: list[LeaderLine] = []
+    place_number = 0
+    previous: int | None = None
+    for index, earning in enumerate(season.earnings, start=1):
+        if earning.total != previous:
+            place_number, previous = index, earning.total
+        leaders.append(
+            LeaderLine(
+                rank=place_number,
+                team=earning.team,
+                total=earning.total,
+                share=round(earning.total * 100 / top) if top else 0,
+            )
+        )
+
+    tiles = [
+        StatTile(money(season.pot), "In prizes"),
+        StatTile(str(len(groups)), "Prizes"),
+        StatTile(f"{len(season.earnings)} of {len(season.standings)}", "In the money"),
+    ]
+    if season.unawarded:
+        tiles.append(StatTile(money(season.unawarded), "Unawarded"))
+
+    if season.final:
+        status = "Final"
+    elif season.weeks_played:
+        status = f"In progress — through week {season.weeks_played}"
+    else:
+        status = "No results yet"
+
+    return Home(
+        season=season.season,
+        status=status,
+        final=season.final,
+        money_recorded=bool(season.prizes),
+        tiles=tuple(tiles),
+        podium=tuple(podium),
+        sections=sections,
+        leaders=tuple(leaders),
+        pot=season.pot,
+        unawarded=season.unawarded,
+        notes=season.notes,
+        other_seasons=tuple(other_seasons),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Rendering
 # ---------------------------------------------------------------------------
 
 
 def environment(templates: Path = TEMPLATES) -> Environment:
     """Jinja with autoescaping on. It stays on — the templates never call ``|safe``."""
-    return Environment(
+    env = Environment(
         loader=FileSystemLoader(templates),
         autoescape=select_autoescape(default_for_string=True, default=True),
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
+    # Formatting money is Python's job. A template that could format it could also compute it.
+    env.filters["money"] = money
+    return env
 
 
 FEE_TIER_ROWS = tuple(
@@ -759,9 +1086,17 @@ def build_site(
     )
     seasons = [build_stats_season(derived_dir, year) for year in sorted(stats_years, reverse=True)]
 
+    # The home page is the most recent season with results — the one being played, or the one
+    # just finished. Everything older is a link.
+    home = build_home(
+        seasons[0] if seasons else None,
+        other_seasons=[season.season for season in seasons[1:]],
+    )
+
     shared = {
         "current": current,
         "seasons": seasons,
+        "home": home,
         "fee_tiers": FEE_TIER_ROWS,
         "keeper_tax": KEEPER_TAX,
         "max_keepers": MAX_KEEPERS,

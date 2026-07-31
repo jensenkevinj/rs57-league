@@ -18,6 +18,7 @@ from rs57.keeper_rules import KEEPER_TAX, keeper_salary
 from rs57.models import KeeperSlot
 from rs57.site import (
     TEMPLATES,
+    build_home,
     build_keeper_season,
     build_site,
     build_stats_season,
@@ -454,6 +455,170 @@ def test_a_season_with_stats_and_no_payouts_still_renders(tmp_path: Path):
 def test_franchise_earnings_add_up_to_the_pot(tmp_path: Path, derived: Path):
     season = build_stats_season(derived, PRIOR)
     assert sum(e.total for e in season.earnings) + season.unawarded == season.pot
+
+
+# ---------------------------------------------------------------------------
+# The home page — the prize board
+# ---------------------------------------------------------------------------
+
+
+def one_stats_season(tmp_path: Path, doc: dict) -> Path:
+    """A ``derived/`` holding one stats season and the keeper file its names come from."""
+    out = tmp_path / "derived"
+    out.mkdir(exist_ok=True)
+    (out / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    (out / f"{PRIOR}.json").write_text(json.dumps(keeper_doc(season=PRIOR)), encoding="utf-8")
+    return out
+
+
+def board_labels(home) -> set[str]:
+    """Every prize the home page actually shows, placings included."""
+    return {spot.place for spot in home.podium} | {
+        row.label for section in home.sections for row in section.rows
+    }
+
+
+def test_home_is_the_most_recent_season_with_results(tmp_path: Path, derived: Path):
+    page = render(tmp_path, derived)["index.html"]
+    assert f"{PRIOR} prizes" in text(page)
+
+
+def test_no_prize_disappears_between_the_payouts_and_the_board(tmp_path: Path):
+    """A payout the derived stats cannot explain still reaches the page.
+
+    The board is assembled from what was won and the money is joined on by label, so a label
+    the stats do not produce has nowhere to land unless the trailing section catches it.
+    Dropping that section must fail here — a prize that silently vanished is the failure this
+    project keeps guarding against.
+    """
+    doc = stats_doc()
+    doc["payouts"] = doc["payouts"] + [
+        {
+            "season": PRIOR,
+            "label": "Toilet Bowl",
+            "amount": 15,
+            "winner_manager_id": "t2",
+            "paid": False,
+        }
+    ]
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert {payout["label"] for payout in doc["payouts"]} <= board_labels(home)
+    assert "Toilet Bowl" in board_labels(home)
+    assert home.pot == 515
+
+    page = render(tmp_path, derived)["index.html"]
+    assert "Toilet Bowl" in page
+
+
+def test_a_season_with_no_recorded_money_shows_no_amount_rather_than_zero(tmp_path: Path):
+    """2019 through 2023 have no recorded prize amounts. The prizes were still won.
+
+    ``$0`` would be a claim that the league paid nothing that season, which is a different
+    statement from having no record of what it paid.
+    """
+    doc = stats_doc(payouts=[])
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert not home.money_recorded
+    assert home.pot == 0
+    rows = [row for section in home.sections for row in section.rows]
+    assert rows, "the board went blank when the money did"
+    assert not any(row.recorded for row in rows)
+    assert any(row.winners for row in rows), "the prizes were still won"
+
+    page = render(tmp_path, derived)["index.html"]
+    assert "$0" not in page
+    assert "No prize money on record" in page
+
+
+def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
+    """Mid-season the nightly still derives a stats file. Nothing in it is decided yet."""
+    doc = stats_doc()
+    doc["source"]["weeks_with_results"] = list(range(1, 10))
+    doc["standings"][0]["final_rank"] = None
+    doc["standings"][0]["playoff_seed"] = None
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert not home.final
+    assert home.status == "In progress — through week 9"
+
+    body = text(render(tmp_path, derived)["index.html"])
+    assert "In progress — through week 9" in body
+    assert "still being played" in body
+    assert "Final" not in body
+
+
+def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.final and home.status == "Final"
+    assert "still being played" not in text(render(tmp_path, derived)["index.html"])
+
+
+def test_a_tie_on_the_board_shows_both_winners_and_the_whole_prize(tmp_path: Path):
+    """The split is what each winner took; the board's ``Pays`` column is the prize itself."""
+    doc = stats_doc()
+    doc["weekly_high_scores"] = [
+        {"season": PRIOR, "week": 1, "manager_ids": ["t1", "t2"], "points": 129.62}
+    ]
+    doc["payouts"] = [
+        {"season": PRIOR, "label": "Week 1 High Score", "amount": 5,
+         "winner_manager_id": "t1", "paid": False},
+        {"season": PRIOR, "label": "Week 1 High Score", "amount": 5,
+         "winner_manager_id": "t2", "paid": False},
+    ]
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    row = next(
+        row
+        for section in home.sections
+        for row in section.rows
+        if row.label == "Week 1 High Score"
+    )
+    assert row.split and row.amount == 10 and len(row.winners) == 2
+
+    page = render(tmp_path, derived)["index.html"]
+    assert "split" in page
+    # Both winners are named, and the double space in the second one survives verbatim.
+    assert "Fake News" in page
+    assert "Belichick&#39;s  Spy" in page
+
+
+def test_the_home_leaderboard_and_the_unawarded_money_add_up_to_the_pot(
+    tmp_path: Path, derived: Path
+):
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert sum(line.total for line in home.leaders) + home.unawarded == home.pot
+
+
+def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
+    doc = stats_doc()
+    doc["payouts"] = [
+        {"season": PRIOR, "label": "Champion", "amount": 100,
+         "winner_manager_id": "t1", "paid": False},
+        {"season": PRIOR, "label": "Survivor", "amount": 100,
+         "winner_manager_id": "t2", "paid": False},
+    ]
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert [line.rank for line in home.leaders] == [1, 1]
+    assert {line.share for line in home.leaders} == {100}
+
+
+def test_the_home_page_survives_a_season_with_no_stats_at_all(tmp_path: Path):
+    """Before the first stats sync there is no board. The page still renders and says so."""
+    derived = tmp_path / "derived"
+    derived.mkdir()
+    (derived / f"{SEASON}.json").write_text(json.dumps(keeper_doc()), encoding="utf-8")
+
+    assert build_home(None) is None
+    body = text(render(tmp_path, derived)["index.html"])
+    assert "no prizes to show" in body
 
 
 # ---------------------------------------------------------------------------
