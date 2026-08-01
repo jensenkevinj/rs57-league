@@ -14,8 +14,11 @@ from pathlib import Path
 
 import pytest
 
+from rs57.espn import SyncedScoring
 from rs57.keeper_rules import KEEPER_TAX, keeper_salary
 from rs57.models import KeeperSlot
+from rs57.stats import SeasonStats
+from rs57.stats_sync import stats_document
 from rs57.site import (
     TEMPLATES,
     build_home,
@@ -474,13 +477,13 @@ def one_stats_season(tmp_path: Path, doc: dict) -> Path:
 def board_labels(home) -> set[str]:
     """Every prize the home page actually shows, placings included."""
     return {spot.place for spot in home.podium} | {
-        row.label for section in home.sections for row in section.rows
+        row.label for column in home.columns for block in column for row in block.rows
     }
 
 
 def test_home_is_the_most_recent_season_with_results(tmp_path: Path, derived: Path):
     page = render(tmp_path, derived)["index.html"]
-    assert f"{PRIOR} prizes" in text(page)
+    assert f"{PRIOR} Final Results" in text(page)
 
 
 def test_no_prize_disappears_between_the_payouts_and_the_board(tmp_path: Path):
@@ -524,14 +527,13 @@ def test_a_season_with_no_recorded_money_shows_no_amount_rather_than_zero(tmp_pa
     home = build_home(build_stats_season(derived, PRIOR))
     assert not home.money_recorded
     assert home.pot == 0
-    rows = [row for section in home.sections for row in section.rows]
+    rows = [row for column in home.columns for block in column for row in block.rows]
     assert rows, "the board went blank when the money did"
     assert not any(row.recorded for row in rows)
     assert any(row.winners for row in rows), "the prizes were still won"
 
     page = render(tmp_path, derived)["index.html"]
     assert "$0" not in page
-    assert "No prize money on record" in page
 
 
 def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
@@ -545,17 +547,370 @@ def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
     home = build_home(build_stats_season(derived, PRIOR))
     assert not home.final
     assert home.status == "In progress — through week 9"
+    assert home.heading == f"{PRIOR} Week 9"
 
     body = text(render(tmp_path, derived)["index.html"])
     assert "In progress — through week 9" in body
-    assert "still being played" in body
+    # Not in the heading, not in a pill, not anywhere: nothing here is settled.
     assert "Final" not in body
+
+
+@pytest.mark.parametrize(
+    ("weeks", "final", "expected"),
+    [
+        ([], False, f"{PRIOR} Preseason"),
+        ([1], False, f"{PRIOR} Week 1"),
+        # Week 14 is the last regular-season week, so it is not yet the playoffs.
+        (list(range(1, 15)), False, f"{PRIOR} Week 14"),
+        (list(range(1, 16)), False, f"{PRIOR} Playoffs"),
+        (list(range(1, 18)), True, f"{PRIOR} Final Results"),
+    ],
+)
+def test_the_heading_names_the_phase_of_the_season(
+    tmp_path: Path, weeks: list[int], final: bool, expected: str
+):
+    """The header walks preseason → regular season → playoffs → final across the year.
+
+    The boundary is the one worth pinning: ``regular_season_weeks`` is 14 here, so week 14 is
+    still the regular season and week 15 is the playoffs. Off by one and the page announces
+    the playoffs while the regular season is still being played.
+    """
+    doc = stats_doc()
+    doc["source"]["weeks_with_results"] = weeks
+    if not final:
+        doc["standings"][0]["final_rank"] = None
+        doc["standings"][0]["playoff_seed"] = None
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.heading == expected
+    assert expected in text(render(tmp_path, derived)["index.html"])
+
+
+@pytest.mark.parametrize(
+    ("teams", "week", "expected"),
+    [
+        # Six teams take three rounds: two byes, then a semifinal, then the final. Six is not
+        # a power of two, so the opening week is a play-in.
+        (6, 15, f"{PRIOR} Wild Card"),
+        (6, 16, f"{PRIOR} Semifinals"),
+        (6, 17, f"{PRIOR} Championship"),
+        # Eight fills its bracket, so there are no byes and no wild card round at all.
+        (8, 15, f"{PRIOR} Quarterfinals"),
+        (8, 16, f"{PRIOR} Semifinals"),
+        (8, 17, f"{PRIOR} Championship"),
+        # Four teams take two, so the first playoff week is already the semifinal.
+        (4, 15, f"{PRIOR} Semifinals"),
+        (4, 16, f"{PRIOR} Championship"),
+        # A week past the bracket names no round rather than inventing one.
+        (4, 17, f"{PRIOR} Playoffs"),
+        # Seasons synced before playoff_team_count was recorded carry 0.
+        (0, 16, f"{PRIOR} Playoffs"),
+    ],
+)
+def test_the_playoff_round_is_named_from_the_bracket(
+    tmp_path: Path, teams: int, week: int, expected: str
+):
+    """The bracket's size is what says how many rounds it takes.
+
+    Hardcoding three rounds would be right today and wrong the moment the league changes its
+    playoff team count — the same shape of mistake as hardcoding a 14-week regular season.
+    """
+    doc = stats_doc()
+    doc["source"]["playoff_team_count"] = teams
+    doc["source"]["weeks_with_results"] = list(range(1, week + 1))
+    doc["standings"][0]["final_rank"] = None
+    doc["standings"][0]["playoff_seed"] = None
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.heading == expected
+    assert expected in text(render(tmp_path, derived)["index.html"])
+
+
+def test_the_sync_writes_the_bracket_size_the_site_reads(tmp_path: Path):
+    """The two ends of the same field, checked against each other.
+
+    ``build_home`` can only name a playoff round if ``stats_sync`` writes the bracket size
+    out. If the writer drops it the site does not break — it quietly says "Playoffs" forever,
+    which is the kind of silence this project treats as a bug, so it is asserted here.
+    """
+    scoring = SyncedScoring(
+        season=PRIOR,
+        regular_season_weeks=14,
+        playoff_team_count=6,
+        scores=(),
+        matchups=(),
+        player_weeks=(),
+    )
+    stats = SeasonStats(
+        season=PRIOR,
+        regular_season_weeks=tuple(range(1, 15)),
+        standings=(),
+        weekly_highs=(),
+        season_points=(),
+        studs=(),
+        survivor_eliminations=(),
+        survivor_winner_ids=(),
+        unlucky=None,
+        consolation_winner_ids=(),
+        issues=(),
+    )
+
+    doc = json.loads(json.dumps(stats_document(stats, scoring, payouts=[], issues=[]), default=str))
+    assert doc["source"]["playoff_team_count"] == 6
+
+    # And the site reads it back off exactly that key.
+    derived = one_stats_season(tmp_path, doc)
+    assert build_stats_season(derived, PRIOR).playoff_team_count == 6
+
+
+def test_a_phase_is_not_guessed_when_the_season_length_is_unknown(tmp_path: Path):
+    """Without ``regular_season_weeks`` a playoff week cannot be told from a regular one.
+
+    Guessing here would announce the playoffs on the strength of a missing field.
+    """
+    doc = stats_doc()
+    doc["source"]["regular_season_weeks"] = 0
+    doc["source"]["weeks_with_results"] = list(range(1, 16))
+    doc["standings"][0]["final_rank"] = None
+    doc["standings"][0]["playoff_seed"] = None
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.heading == f"{PRIOR} Season"
+    assert "Playoffs" not in text(render(tmp_path, derived)["index.html"])
+
+
+def test_every_season_prize_explains_itself(tmp_path: Path, derived: Path):
+    """The rules moved off the page and behind an "i", so nothing shows them by default.
+
+    A prize whose note went empty would render an unexplained row and look completely
+    normal — the rule would simply have stopped being told anywhere.
+    """
+    home = build_home(build_stats_season(derived, PRIOR))
+
+    page = render(tmp_path, derived)["index.html"]
+    for column in home.columns:
+        for block in column:
+            assert block.caption, f"{block.title} has no rule behind its i"
+            assert block.caption in page, f"{block.title}'s rule never reached the page"
+
+
+def test_what_won_each_prize_survives_the_column_layout(tmp_path: Path, derived: Path):
+    """Every row carries the number that won it and the context for that number.
+
+    They render in two different cells — the number on the right, its context under the
+    winner — and either could be dropped from the row shape while the page still looked
+    finished. The prize would just no longer say what won it.
+    """
+    home = build_home(build_stats_season(derived, PRIOR))
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert any(row.value for row in rows), "no prize has a number, so this checks nothing"
+    assert any(row.detail for row in rows), "no prize has context, so this checks nothing"
+
+    page = render(tmp_path, derived)["index.html"]
+    for row in rows:
+        if row.value:
+            assert row.value in page, f"{row.label} no longer shows the number that won it"
+        if row.detail:
+            assert row.detail in page, f"{row.label} lost the context for its number"
+
+
+def _block(home, title: str):
+    """The board block with this heading, wherever on the board it sits."""
+    return next(b for column in home.columns for b in column if b.title == title)
+
+
+def _blocks(home) -> list[str]:
+    return [b.title for column in home.columns for b in column]
+
+
+def _money_shown(home) -> int:
+    """Every dollar the home page puts on screen, wherever it puts it."""
+    return (
+        sum(row.amount for column in home.columns for block in column for row in block.rows)
+        + sum(spot.amount for spot in home.podium)
+        + (home.survivor.amount if home.survivor else 0)
+    )
+
+
+def test_most_points_leads_the_season_awards_and_is_not_a_placing(tmp_path: Path, derived: Path):
+    """It pays what third place pays, but the podium is what the playoff bracket decided.
+
+    A team can lead the league in points and miss the playoffs entirely, so putting it in the
+    top row would make it read as a fourth place. Like Survivor it has two possible homes and
+    must occupy exactly one: in both, the pot is over by its own amount; in neither, the money
+    leaves the page.
+    """
+    home = build_home(build_stats_season(derived, PRIOR))
+
+    assert [spot.rank for spot in home.podium] == [1, 2, 3], "the podium is placings only"
+    assert not [spot for spot in home.podium if "Points" in spot.place]
+
+    points = _block(home, "Most Points")
+    assert _blocks(home)[0] == "Most Points", "it leads the first column"
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert len([row for row in rows if row.label == "Most Points (Season)"]) == 1
+    assert _money_shown(home) == home.pot
+
+    # Its regular-season window has to stay stated somewhere, and that is its heading's "i".
+    page = render(tmp_path, derived)["index.html"]
+    assert points.caption in page
+    assert "weeks 1–14" in points.caption
+
+
+def test_a_prize_a_season_never_awarded_leaves_no_empty_subheading(tmp_path: Path):
+    """A group with nothing in it would render its subheading over nothing at all.
+
+    Not every season has every prize — 2019 through 2022 have no recorded money, and a season
+    can finish with no Unlucky award. The subheading has to go with the rows.
+    """
+    doc = stats_doc()
+    doc["unlucky"] = None
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert all(
+        block.rows for column in home.columns for block in column
+    ), "a heading with no prizes under it"
+    assert "Unlucky" not in _blocks(home)
+
+    assert "Unlucky" not in text(render(tmp_path, derived)["index.html"])
+
+
+def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path):
+    """"$10 each" is a claim about every row under it, so it has to be true of every row.
+
+    A column that says it wrongly also stops printing the individual amounts, so the figures
+    it is misreporting are no longer on the page to contradict it.
+    """
+    doc = stats_doc()
+    doc["weekly_high_scores"] = [
+        {"season": PRIOR, "week": 1, "manager_ids": ["t1"], "points": 129.62},
+        {"season": PRIOR, "week": 2, "manager_ids": ["t2"], "points": 126.00},
+    ]
+    # Survivor moves to its own column, so the season awards are exactly the three below —
+    # every one of them recorded, so it is the amounts differing that has to do the work here.
+    doc["survivor"] = {
+        "eliminations": [{"season": PRIOR, "week": 1, "manager_ids": ["t2"], "points": 43.62}],
+        "winner_manager_ids": ["t1"],
+    }
+    # Two studs paying different amounts: the group is recorded throughout, so it is the
+    # amounts differing — not a missing one — that has to stop it claiming a shared figure.
+    doc["positional_studs"] = [
+        dict(doc["positional_studs"][0]),
+        {
+            "season": PRIOR,
+            "position": "RB",
+            "espn_player_id": 10,
+            "player_name": "Jahmyr Gibbs",
+            "week": 12,
+            "points": 49.90,
+            "manager_ids": ["t2"],
+        },
+    ]
+    doc["payouts"] += [
+        {"season": PRIOR, "label": "Week 1 High Score", "amount": 10, "winner_manager_id": "t1", "paid": False},
+        {"season": PRIOR, "label": "Week 2 High Score", "amount": 10, "winner_manager_id": "t2", "paid": False},
+        {"season": PRIOR, "label": "Most Points (Season)", "amount": 100, "winner_manager_id": "t1", "paid": False},
+        {"season": PRIOR, "label": "Unlucky", "amount": 20, "winner_manager_id": "t2", "paid": False},
+        {"season": PRIOR, "label": "QB Stud", "amount": 25, "winner_manager_id": "t1", "paid": False},
+        {"season": PRIOR, "label": "RB Stud", "amount": 30, "winner_manager_id": "t2", "paid": False},
+        {"season": PRIOR, "label": "Survivor", "amount": 40, "winner_manager_id": "t1", "paid": False},
+    ]
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+
+    # Every weekly prize pays $10, so that block says it once.
+    weekly = _block(home, "Weekly top score")
+    assert weekly.each_recorded and weekly.each == 10
+
+    # The two studs pay $25 and $30, so theirs says nothing.
+    studs = _block(home, "Stud")
+    assert all(row.recorded for row in studs.rows), "the recorded check must not be what fires"
+    assert {row.amount for row in studs.rows} == {25, 30}
+    assert not studs.each_recorded and studs.each == 0
+
+    # So each of those rows still prints its own amount.
+    page = render(tmp_path, derived)["index.html"]
+    assert "$25" in page and "$30" in page
+    assert _money_shown(home) == home.pot
+
+
+def test_survivor_is_shown_once_and_paid_once(tmp_path: Path):
+    """Survivor is its own column, so it is NOT also a row in the season awards.
+
+    It has two possible homes and has to occupy exactly one. Shown in both, the pot would be
+    over by $40; shown in neither, the money would silently leave the page. Both failures look
+    completely normal on screen, so the arithmetic is what catches them.
+    """
+    doc = stats_doc()
+    doc["survivor"] = {
+        "eliminations": [
+            {"season": PRIOR, "week": 1, "manager_ids": ["t2"], "points": 43.62},
+            {"season": PRIOR, "week": 2, "manager_ids": ["t3"], "points": 61.10},
+        ],
+        "winner_manager_ids": ["t1"],
+    }
+    doc["payouts"].append(
+        {
+            "season": PRIOR,
+            "label": "Survivor",
+            "amount": 40,
+            "winner_manager_id": "t1",
+            "paid": False,
+        }
+    )
+    derived = one_stats_season(tmp_path, doc)
+
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.survivor is not None
+    assert len(home.survivor.eliminations) == 2
+
+    # The column is the prize, so it carries the money and there is no row beside the others.
+    assert home.survivor.amount == 40 and home.survivor.recorded
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert not [row for row in rows if row.label == "Survivor"]
+
+    assert _money_shown(home) == home.pot, "the page shows money the pot does not account for"
+
+    body = text(render(tmp_path, derived)["index.html"])
+    assert "Winner" in body
+    assert "$40" in body
+    for elimination in home.survivor.eliminations:
+        assert f"Week {elimination.week}" in body
+
+
+def test_a_season_with_no_survivor_ladder_keeps_the_prize_in_the_season_awards(
+    tmp_path: Path, derived: Path
+):
+    """With no ladder there is no column to hold the prize, so it stays a row.
+
+    The fixture has a Survivor winner but no eliminations. Dropping the row here because the
+    column normally takes it would take the prize off the page entirely.
+    """
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.survivor is None
+
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert len([row for row in rows if row.label == "Survivor"]) == 1
+    assert _money_shown(home) == home.pot
+
+    body = text(render(tmp_path, derived)["index.html"])
+    assert "Survivor" in body
+    assert "Winner" not in body
 
 
 def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.final and home.status == "Final"
-    assert "still being played" not in text(render(tmp_path, derived)["index.html"])
+    assert home.heading == f"{PRIOR} Final Results"
+    body = text(render(tmp_path, derived)["index.html"])
+    # The heading carries this now — a finished season shows no pill at all.
+    assert f"{PRIOR} Final Results" in body
+    assert "In progress" not in body
 
 
 def test_a_tie_on_the_board_shows_both_winners_and_the_whole_prize(tmp_path: Path):
@@ -575,8 +930,9 @@ def test_a_tie_on_the_board_shows_both_winners_and_the_whole_prize(tmp_path: Pat
     home = build_home(build_stats_season(derived, PRIOR))
     row = next(
         row
-        for section in home.sections
-        for row in section.rows
+        for column in home.columns
+        for block in column
+        for row in block.rows
         if row.label == "Week 1 High Score"
     )
     assert row.split and row.amount == 10 and len(row.winners) == 2
@@ -607,7 +963,11 @@ def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert [line.rank for line in home.leaders] == [1, 1]
-    assert {line.share for line in home.leaders} == {100}
+    assert {line.total for line in home.leaders} == {100}
+
+    # Neither is shown as second on a board whose ordering is the only thing saying who led.
+    body = text(render(tmp_path, derived)["index.html"])
+    assert " 2 " not in body.split("Moneylist")[1][:200]
 
 
 def test_the_home_page_survives_a_season_with_no_stats_at_all(tmp_path: Path):

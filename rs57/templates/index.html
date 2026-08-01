@@ -6,41 +6,19 @@
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{% block title %}RS57 League{% endblock %}
+{% block title %}RS57 — Home{% endblock %}
 
 {% block content %}
 {% if home %}
   <div class="page-head">
-    <h1>{{ home.season }} prizes</h1>
-    <span class="pill {% if home.final %}done{% endif %}">{{ home.status }}</span>
-  </div>
-  <p class="lede">
-    Every prize the league plays for, who won it and what it paid.
+    <h1>{{ home.heading }}</h1>
+    {# The heading already says a finished season is finished. The pill is what warns that
+       one is not, so it renders only when there is something to warn about. #}
     {% if not home.final %}
-      This season is still being played, so nothing below is settled.
+      <span class="pill">{{ home.status }}</span>
     {% endif %}
-  </p>
-
+  </div>
   {{ ui.flags(home.notes) }}
-
-  {% if home.money_recorded %}
-    <div class="tiles">
-      {% for tile in home.tiles %}
-        <div class="tile">
-          <div class="tile-value">{{ tile.value }}</div>
-          <div class="tile-label">{{ tile.label }}</div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="flag">
-      <span class="tag">No prize money on record</span>
-      <div>
-        This season's results are derived, but no prize amounts are recorded for it. Everything
-        below was won; what it paid is not on record, so no figure is shown.
-      </div>
-    </div>
-  {% endif %}
 
   <div class="podium">
     {% for spot in home.podium %}
@@ -55,81 +33,101 @@
     {% endfor %}
   </div>
 
-  <h2>Every prize</h2>
-  <div class="scroll">
-    <table class="board">
-      <thead>
-        <tr>
-          <th>Prize</th>
-          <th>Winner</th>
-          <th>What won it</th>
-          <th class="num">Pays</th>
-        </tr>
-      </thead>
-      {% for section in home.sections %}
-        <tbody>
-          <tr class="group">
-            <th colspan="4">
-              {{ section.title }}
-              <span class="group-note">{{ section.caption }}</span>
-            </th>
-          </tr>
-          {% for row in section.rows %}
-            <tr>
-              <td>{{ row.label }}</td>
-              <td>
-                {{ ui.teams(row.winners) }}
-                {% if row.split %}
-                  <span class="tag-inline" title="A tie — the prize was split evenly">split</span>
+  <div class="boards">
+    {% for column in home.columns %}
+      <section class="board-col">
+        {% for group in column %}
+          <h2 class="col-head">
+            {{ group.title }}{{ ui.info(group.caption) }}
+            {%- if group.each_recorded %}
+              <span class="col-money">
+                {{- group.each | money }}{% if group.each_is_per_row %} each{% endif -%}
+              </span>
+            {%- endif %}
+          </h2>
+          <ol class="prizes">
+            {% for row in group.rows %}
+              {# One row shape everywhere on the board: a key, a name, and the number that won
+                 it. A prize whose heading already names it has no key. #}
+              <li class="thin {% if not group.show_labels %}nokey{% endif %}">
+                {% if group.show_labels %}
+                  <span class="thin-key">
+                    {%- if row.short_label %}{{ row.short_label }}{% else %}{{ row.label }}{% endif -%}
+                  </span>
                 {% endif %}
-              </td>
-              <td class="why">{{ row.detail }}</td>
-              <td class="num money">
-                {% if row.recorded %}
-                  {{ row.amount | money }}
-                {% else %}
-                  <span class="muted">&mdash;</span>
-                {% endif %}
-              </td>
-            </tr>
+                <span class="thin-name">
+                  {{ ui.teams(row.winners) }}
+                  {%- if row.split %}<span class="tag-inline" title="A tie — the prize was split evenly">split</span>{% endif %}
+                  {%- if row.detail %}<span class="thin-why">{{ row.detail }}</span>{% endif %}
+                </span>
+                <span class="thin-num">{{ row.value }}</span>
+                {%- if not group.each_recorded %}
+                  <span class="thin-pays">
+                    {%- if row.recorded %}{{ row.amount | money }}{% else %}<span class="muted">&mdash;</span>{% endif -%}
+                  </span>
+                {%- endif %}
+              </li>
+            {% endfor %}
+          </ol>
+        {% endfor %}
+      </section>
+    {% endfor %}
+
+    {% if home.survivor %}
+      {# Survivor is this column, not a row in the season awards — the money is here. #}
+      <section class="board-col">
+        <h2 class="col-head">
+          Survivor
+          {{- ui.info(home.survivor.caption) }}
+          {%- if home.survivor.recorded %}
+            <span class="col-money">{{ home.survivor.amount | money }}</span>
+          {%- endif %}
+        </h2>
+        <div class="survivor-won">
+          <div class="spot-place">Winner</div>
+          <div class="spot-team">{{ ui.teams(home.survivor.winners) }}</div>
+        </div>
+        <ol class="prizes">
+          {% for out in home.survivor.eliminations %}
+            <li class="thin">
+              <span class="thin-key">Week {{ out.week }}</span>
+              <span class="thin-name muted">{{ ui.teams(out.teams) }}</span>
+              <span class="thin-num">{{ "%.2f" | format(out.points) }}</span>
+            </li>
           {% endfor %}
-        </tbody>
-      {% endfor %}
-      {% if home.money_recorded %}
-        <tfoot>
-          <tr>
-            <th colspan="3">Season pot, including the three placings above</th>
-            <td class="num money">{{ home.pot | money }}</td>
-          </tr>
-          {% if home.unawarded %}
-            <tr>
-              <th colspan="3">Of which nobody was awarded</th>
-              <td class="num money">{{ home.unawarded | money }}</td>
-            </tr>
-          {% endif %}
-        </tfoot>
-      {% endif %}
-    </table>
+        </ol>
+      </section>
+    {% endif %}
   </div>
 
+  {% if home.unawarded %}
+    <dl class="pot">
+      <div>
+        <dt>Prize money nobody was awarded</dt>
+        <dd>{{ home.unawarded | money }}</dd>
+      </div>
+    </dl>
+  {% endif %}
+
   {% if home.leaders %}
-    <h2>Who is in the money</h2>
-    <p class="small muted">
-      What each franchise won in {{ home.season }}, every prize added together.
-    </p>
+    <h2>Moneylist</h2>
     <ol class="leaders">
       {% for line in home.leaders %}
-        <li>
+        <li {% if line.rank == 1 %}class="top"{% endif %}>
           <span class="leader-rank">{{ line.rank }}</span>
-          <span>{{ ui.team(line.team) }}</span>
+          {# The dots run the width of the cell and the name sits on top of them, masking the
+             ones it covers — a printed results sheet's leader rule. #}
+          <span class="leader-name">
+            <span class="leader-dots"></span>
+            <span class="leader-team">{{ ui.team(line.team) }}</span>
+          </span>
           <span class="leader-money">{{ line.total | money }}</span>
-          <span class="leader-bar"><span style="width: {{ line.share }}%"></span></span>
         </li>
       {% endfor %}
     </ol>
   {% endif %}
 {% else %}
-  <h1>RS57 League</h1>
+  <h1>RS57</h1>
   <p class="lede">
     A 12-team keeper auction league. This site is the prize board, what your keepers will cost,
     and the rules.
@@ -138,38 +136,4 @@
     No season has been synced yet, so there are no prizes to show.
   </p>
 {% endif %}
-
-<h2>{% if current %}{{ current.season }} keepers{% else %}Keepers{% endif %}</h2>
-<div class="now">
-  {% if current %}
-    <p>
-      {% if current.any_declared %}
-        Keepers are being declared for {{ current.season }} — every roster is priced, and the
-        teams that have committed show their fee and salary.
-      {% else %}
-        Nobody has declared a {{ current.season }} keeper yet. Every rostered player is priced
-        anyway: base plus the ${{ keeper_tax }} tax where it applies.
-      {% endif %}
-    </p>
-    <p><a href="keepers.html">See the keeper prices &rarr;</a></p>
-  {% else %}
-    <p class="muted">No season has been synced yet, so there are no keeper prices to show.</p>
-  {% endif %}
-</div>
-
-{% if home and home.other_seasons %}
-  <h2>Earlier seasons</h2>
-  <div class="chips">
-    {% for year in home.other_seasons %}
-      <a href="season-{{ year }}.html">{{ year }}</a>
-    {% endfor %}
-    <a href="seasons.html">All seasons &rarr;</a>
-  </div>
-{% endif %}
-
-<h2>Rules</h2>
-<p>
-  Keeper limits, the salary formula, the ${{ keeper_tax }} tax, prospects, and how every prize
-  above is decided. <a href="rules.html">Read the rules &rarr;</a>
-</p>
 {% endblock %}

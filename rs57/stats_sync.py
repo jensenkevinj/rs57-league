@@ -69,6 +69,9 @@ def stats_document(
         "source": {
             "regular_season_weeks": scoring.regular_season_weeks,
             "weeks_with_results": sorted({score.week for score in scoring.scores}),
+            # The bracket's size, which is what says how many rounds the playoffs take. The
+            # site names the round from it; without it the page says only "Playoffs".
+            "playoff_team_count": scoring.playoff_team_count,
         },
         "standings": list(stats.standings),
         "weekly_high_scores": list(stats.weekly_highs),
