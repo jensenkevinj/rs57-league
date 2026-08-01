@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2024 season — RS57 League</title>
+<title>RS57 — 2024 Season</title>
 <style>
   :root {
     --ink: #1b1f24;
@@ -18,6 +18,9 @@
     --bad: #96200f;
     --bad-bg: #fdf0ee;
     --bad-line: #e4a99e;
+    --gold: #b8860b;
+    --silver: #98a0aa;
+    --bronze: #a2704a;
   }
   * { box-sizing: border-box; }
   body {
@@ -83,13 +86,154 @@
   .team h3 { margin-top: 0; }
   .team table { margin-bottom: 0; }
   .team tbody tr:last-child td { border-bottom: none; }
-  footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; }
+
+  /* --- the home page: a prize board ------------------------------------- */
+
+  .page-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; }
+  .page-head h1 { margin-bottom: 0; }
+  .pill {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    border-radius: 999px; padding: 0.15rem 0.6rem; white-space: nowrap;
+  }
+
+  .podium {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.7rem; margin: 0.75rem 0 1.5rem;
+  }
+  .spot {
+    border: 1px solid var(--line); border-top: 3px solid var(--line);
+    border-radius: 8px; padding: 0.8rem 1rem;
+  }
+  /* The champion is the prize the league plays for. It gets the gold. */
+  .spot-1 {
+    border-top-color: var(--gold); border-top-width: 4px;
+    background:
+      linear-gradient(180deg, rgba(184, 134, 11, 0.09), rgba(184, 134, 11, 0) 62%),
+      var(--bg);
+    box-shadow: 0 1px 4px rgba(184, 134, 11, 0.22);
+  }
+  .spot-1 .spot-place { color: var(--gold); letter-spacing: 0.13em; }
+  .spot-1 .spot-team { font-size: 1.22rem; font-weight: 700; }
+  .spot-1 .spot-money { font-size: 1.35rem; color: var(--gold); }
+  .spot-2 { border-top-color: var(--silver); }
+  .spot-3 { border-top-color: var(--bronze); }
+  .spot-place {
+    display: flex; align-items: center;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .spot-team {
+    font-size: 1.08rem; font-weight: 650; letter-spacing: -0.01em; margin: 0.2rem 0 0.1rem;
+  }
+  .spot-meta { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .spot-money {
+    margin-top: 0.55rem; font-size: 1.15rem; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Three columns of prizes: season, weekly, survivor. They are lists rather than a table
+     because a column this narrow cannot carry four columns of its own — each prize stacks
+     its winner and the number that won it instead. Columns are independent, so they end at
+     different heights and start at the top rather than stretching. */
+  .boards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.6rem; align-items: start; margin: 1.5rem 0;
+  }
+  .col-head {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin: 0 0 0.6rem; padding-bottom: 0.5rem;
+    /* Blocks stack inside a column; each heading after the first needs air above it. */
+    border-bottom: 2px solid var(--ink);
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .col-money {
+    margin-left: auto; font-size: 0.8rem; letter-spacing: 0; text-transform: none;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .prizes + .col-head { margin-top: 1.9rem; }
+  .prizes { list-style: none; margin: 0; padding: 0; }
+
+  /* One row shape for the whole board: a key, a name, and a number. `nokey` is for a prize
+     whose heading already names it, so nothing sits in the key column. */
+  li.thin {
+    display: grid; grid-template-columns: 3.4rem minmax(0, 1fr) auto auto;
+    align-items: baseline; column-gap: 0.55rem;
+    padding: 0.3rem 0; font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  li.thin.nokey { grid-template-columns: minmax(0, 1fr) auto auto; }
+  li.thin:last-child { border-bottom: none; }
+  li.thin .thin-key {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+  }
+  li.thin .thin-name { font-weight: 600; }
+  li.thin .thin-why {
+    display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  li.thin .thin-num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  li.thin .thin-pays {
+    text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+
+  .pot {
+    margin: 0 0 1.75rem; padding-top: 0.75rem; border-top: 2px solid var(--ink);
+  }
+  .pot > div { display: flex; gap: 0.75rem; padding: 0.15rem 0; }
+  .pot dt { font-weight: 600; }
+  .pot dd {
+    margin: 0 0 0 auto; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .info {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.05rem; height: 1.05rem; padding: 0; margin-left: 0.35rem;
+    border: 1px solid var(--line); border-radius: 50%; background: var(--panel);
+    color: var(--muted); font-family: inherit; font-size: 0.66rem; font-weight: 700;
+    line-height: 1; cursor: help; vertical-align: 0.05em; flex: none;
+  }
+  .info:hover, .info:focus-visible { border-color: var(--accent); color: var(--accent); }
+  .info-bubble {
+    position: absolute; left: 50%; bottom: calc(100% + 0.4rem); transform: translateX(-50%);
+    width: max-content; max-width: 17rem;
+    background: var(--ink); color: #fff; border-radius: 6px; padding: 0.5rem 0.65rem;
+    font-size: 0.8rem; font-weight: 400; line-height: 1.45; text-align: left;
+    text-transform: none; letter-spacing: 0;
+    opacity: 0; visibility: hidden; transition: opacity 0.12s ease; z-index: 5;
+  }
+  .info:hover .info-bubble, .info:focus .info-bubble { opacity: 1; visibility: visible; }
+  .survivor-won { padding: 0.1rem 0 0.6rem; border-bottom: 1px solid var(--line); }
+
+  /* A printed results sheet's leader board: one line each, a dotted rule running from the
+     franchise to what it won. No bar — the ordering and the figures carry it. */
+  .leaders { list-style: none; margin: 0.75rem 0 1.5rem; padding: 0; max-width: 26rem; }
+  .leaders li {
+    display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    align-items: baseline; gap: 0.6rem;
+    padding: 0.34rem 0; border-bottom: 1px solid var(--line); font-size: 0.95rem;
+  }
+  .leaders li:last-child { border-bottom: none; }
+  .leader-rank {
+    color: var(--muted); font-size: 0.75rem; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .leader-name { position: relative; overflow: hidden; }
+  .leader-dots {
+    position: absolute; left: 0; right: 0; bottom: 0.15em;
+    border-bottom: 1px dotted var(--line);
+  }
+  .leader-team {
+    position: relative; background: var(--bg); padding-right: 0.35rem; font-weight: 600;
+  }
+  .leader-money { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .leaders li.top .leader-money { color: var(--gold); }
+
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="brand"><a href="index.html">RS57 League</a></div>
+    <div class="brand"><a href="index.html">RS57</a></div>
     <nav>
       <a href="index.html" class="">Home</a>
       <a href="keepers.html" class="">Keepers</a>
@@ -768,16 +912,6 @@
     </div>
   </div>
 
-<footer class="small muted">
-  <p>
-    Built nightly from ESPN. Live scoring stays on ESPN — this site is keeper salaries, prize
-    history, and the rules.
-  </p>
-  <p>
-    Teams are identified by their ESPN team id. Franchise names change every season, so a
-    season's names come from that season's own record.
-  </p>
-</footer>
 </div>
 </body>
 </html>
