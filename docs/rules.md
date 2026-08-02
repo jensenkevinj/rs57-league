@@ -1,135 +1,164 @@
-# RS57 League Rules
+These Rules govern keeper eligibility, keeper salaries, and prize distribution in the RS57
+League. They remain in force until amended.
 
-The keeper and prize rules, written for league members. This file is the source for the
-site's rules page — edit it here and the nightly build picks it up.
+Matters not addressed here — including scoring, waivers, in-season transactions, and lineup
+administration — are governed by the League's ESPN settings. The Commissioner administers
+these Rules and decides all questions arising under them.
 
-`CLAUDE.md` in this repo says the same things in the form the code needs them. Where the two
-disagree, `CLAUDE.md` is the one the engine follows and this file is the one that needs fixing.
+# 1. Definitions
 
-## Keepers
+In these Rules:
 
-You may keep up to **three keepers plus one prospect**. Nobody is required to keep anyone.
+- **League** — the RS57 League, consisting of twelve Franchises and conducted by annual
+  auction draft.
+- **Franchise** — a team in the League, identified by its ESPN team id rather than by its
+  display name.
+- **Manager** — the person responsible for a Franchise's roster and lineup decisions.
+- **Claim** — a Manager's declaration that a player be retained for the coming season, as
+  either a Keeper or a Prospect.
+- **Qualifying Season** — the season immediately preceding the season to which a Claim
+  applies.
+- **Keeper Deadline** — the trade deadline of the Qualifying Season.
+- **Computed Salary** — the amount determined under §2.2.
+- **Base Salary** — the player's Computed Salary for the Qualifying Season.
+- **Rookie** — a player whose first NFL season is the Qualifying Season, as determined under
+  §2.5.
 
-There is **no salary cap**. Keep whoever you can afford to keep; the only limit is the count.
+# 2. Keepers and Prospects
 
-### What a keeper costs
+## 2.1 Retention Limits
 
-A keeper's salary is three things added together:
+A Franchise may retain up to three Keepers and one Prospect each season. Retention is
+optional. There is no salary cap.
 
-`salary = base + your allocated fee + $5 if you kept him last year`
+## 2.2 Computation of Salary
 
-**Base** is what the player cost you *this* season — not what you originally paid for him
-years ago. Keepers go back into the auction at their keeper price, so ESPN's per-season value
-already carries every fee and tax you have ever paid on that player. Next season's base is
-this season's salary.
+A retained player's salary for the coming season is the sum of:
 
-Puka Nacua is the clearest example. Picked up off waivers for $0. Kept for $0 the following
-season, because a first keep is untaxed. Kept for $5 the season after that, once the tax
-applied. He goes for $10 next season.
+- his Base Salary;
+- the Keeper Fee allocated to him under §2.3; and
+- the Retention Surcharge under §2.4, where applicable.
 
-That compounding is the point of the system, and it is why a player you have held for four
-years is expensive even though you got him for nothing.
+Because Base Salary is the prior season's Computed Salary, it carries forward all Fees and
+Surcharges previously charged against the player.
 
-### The keeper fee
+## 2.3 Keeper Fee
 
-The fee depends on **how many keepers you declare**, not on who they are:
+A Franchise incurs a Keeper Fee determined by the number of Keepers it declares, without
+regard to which players are declared:
 
-- 1 keeper — **$0**
-- 2 keepers — **$5** total
-- 3 keepers — **$15** total
+- One Keeper — $0
+- Two Keepers — $5
+- Three Keepers — $15
 
-The total is for your whole keeper group, and you split it across your keepers however you
-like. Put all $15 on one player or spread it evenly; the total is what matters.
+The Manager allocates the Fee among the declared Keepers at their discretion, in whole
+dollars. A Prospect is not a Keeper for purposes of this section and incurs no Fee.
 
-Prospects never carry a fee and never count toward the keeper count.
+## 2.4 Retention Surcharge
 
-### The $5 tax
+A player retained in the season immediately preceding is subject to a surcharge of $5,
+commonly called the tax. The surcharge:
 
-If you kept a player last season, he costs $5 more this season. Three things about it catch
-people out:
+- follows the player through a trade, being an incident of the player's retention history
+  rather than of his current Franchise;
+- is extinguished by a drop, upon which the player's Base Salary resets to the value at which
+  he is subsequently re-acquired; and
+- does not attach to a player retained as a Prospect.
 
-- **Trading a player does not clear the tax.** It follows him to his new team, because it is a
-  fact about the player's history and not about who currently holds him.
-- **Dropping him does clear it** — completely. If you drop a player and pick him back up, the
-  tax is gone *and* his base resets to whatever you paid to re-acquire him.
-- **A prospect keep never sets the tax.** Keep someone in the prospect slot and he starts the
-  next season untaxed.
+## 2.5 Prospects
 
-### Prospects
+A Claim in the Prospect slot requires that the player be a Rookie and that he have been
+rostered by the claiming Franchise before the Keeper Deadline. A Prospect is retained at his
+acquisition value and incurs neither a Fee nor a Surcharge.
 
-A prospect must meet both of these:
+No player may be claimed as a Prospect more than once. A Prospect may be started without
+affecting his eligibility.
 
-- **He must be a rookie.**
-- **Rostered before the trade deadline** — the site calls this the *keeper deadline*, since it
-  is the date by which you must already hold a player to keep him. It is the same date.
+Rookie status is determined by the player's draft class as published by ESPN or, where no
+draft class is recorded, by his first NFL season. Because that determination relies on
+information originating outside the League, it is advisory and subject to review under §5.2.
+A repeat Prospect Claim is determined from League records alone and is not subject to review.
 
-He is kept at his acquisition value, with **no fee** and **no tax**.
+## 2.6 Waiver of Keeper Fee
 
-A player can only ever be kept as a prospect once — he has one rookie season, so the second
-claim is never legal. After that he is an ordinary keeper.
+The winner of the consolation bracket shall have its Keeper Fee waived for the following
+season. Salaries remain payable in full; only the Fee under §2.3 is waived.
 
-**Prospects may be started.** The old rule that a prospect must never have been started by any
-team in the league was dropped, and so was the allowance for second-year players. Both changes
-are already in force; this page was simply behind.
+The winner is the highest finisher, by final standing, among Franchises that did not qualify
+for the playoffs.
 
-**The keeper page marks who is eligible.** "Rookie" means his first NFL season was the one just
-finished, taken from ESPN's draft class, and the mark covers all three rules — rookie, rostered
-before the deadline, and never prospected before.
+## 2.7 Trades of Draft Cash
 
-It shows as a small **P** beside the player's name: filled blue for eligible, dashed amber for a
-player ESPN has no first season for at all. No badge means checked and not eligible. Team
-defences never get one — a D/ST has no rookie season and can never be a prospect. Hover it for
-the reason, or tick **Prospects only** to see nothing else.
+Managers may trade auction draft cash. Such a trade takes effect only when reported to the
+Commissioner and recorded, and each record shall identify both Franchises and the amount. The
+Commissioner adjusts the affected salaries accordingly, and recorded amounts govern over any
+figure ESPN displays.
 
-**Every row shows when that manager acquired the player**, and the keeper deadline it is measured
-against is in red above the grid. A player picked up *after* that deadline is shown in red too —
-his date and his whole row, and both are greyed so they recede whether or not you can see the
-colour.
+# 3. Prizes
 
-The grid arrives sorted dearest first, so the expensive end of the league reads at a glance.
+## 3.1 General
 
-Note what the red mark is and is not: being rostered before the deadline is the **prospect**
-rule's third test. Whether it also bars an ordinary keeper is a separate question, and nothing
-here decides it.
+Prize amounts are fixed and published for each season and are not constant across seasons. All
+amounts are payable in whole dollars.
 
-### The consolation bracket winner
+## 3.2 Final Standing
 
-The consolation bracket winner has their **keeper fees waived for one year**. Salaries are
-still owed in full — it is the fee on top that goes away, not the price of the players.
+Awarded to the Champion, runner-up, and third-place Franchise by final standing.
 
-The winner is the **top finisher among the teams that missed the playoffs**. It is not
-whoever won the last game of the consolation ladder, and it is not whoever went undefeated in
-it; in most seasons those questions have several answers and this one has exactly one.
+## 3.3 Most Points
 
-## Prizes
+Awarded to the Franchise scoring the most points during the regular season.
 
-Prize amounts are set per season, so the figures on the site are the ones actually recorded
-for that season rather than fixed constants.
+## 3.4 Weekly High Score
 
-- **Champion, 2nd, 3rd** — final standings.
-- **Most Points (Season)** — most total points across the **regular season**, weeks 1-14.
-- **Weekly High Score** — top score of the week, for each of the **14 regular-season weeks**.
-  Playoff weeks do not pay a weekly high score.
-- **Positional Stud** — the single best week by a **started** player at each of QB, RB, WR and
-  TE, across the **whole season including the playoff weeks**. It is one great week, not a
-  season total, and a player who put it up on your bench wins nothing. Defenses do not
-  compete for it.
-- **Survivor** — the lowest score among the teams still alive is eliminated each week. Last
-  team standing wins.
-- **Unlucky** — the **single highest score in the regular season that still lost its
-  matchup**, awarded once for the whole season. A tie is not a loss.
+Awarded for each week of the regular season to the Franchise posting the highest score that
+week. Playoff weeks carry no award under this section.
 
-If two teams tie for a prize, the money is **split evenly** between them. Prizes are whole
-dollars, so a split that does not divide evenly pays the floor and the remainder is left for
-the commissioner to place.
+## 3.5 Positional Stud
 
-## How the site gets its numbers
+Awarded for each of quarterback, running back, wide receiver, and tight end to the Franchise
+recording the highest single-week score by a player started at that position, across the full
+season including the playoffs. Players not in the starting lineup are excluded. Team defenses
+are not eligible.
 
-Everything on this site is read from ESPN each night and recomputed from the rules above.
-Nothing is typed in by hand except the prize amounts for each season and the record of which
-players were kept in a prospect slot, neither of which ESPN stores.
+## 3.6 Survivor
 
-Teams are tracked by their ESPN team id, not by their team name — names change every year.
+Each week, the lowest-scoring Franchise among those remaining is eliminated. The award is made
+to the last Franchise remaining.
 
-Where a number could not be verified, the site says so rather than showing it as though it
-had been checked.
+## 3.7 Unlucky
+
+Awarded once per season to the Franchise posting the highest regular-season score in a
+matchup it lost. A tied matchup is not a loss.
+
+## 3.8 Ties
+
+Where two or more Franchises tie for an award, the prize is divided equally among them. Where
+the division does not yield whole dollars, each receives the whole-dollar remainder of its
+share and the Commissioner assigns the balance.
+
+# 4. Records
+
+Standings, scores, rosters, and transaction dates are taken from ESPN. Prize amounts, Prospect
+designations, and trades recorded under §2.7 are entered by the Commissioner.
+
+A figure that cannot be verified against these sources is published as unverified rather than
+as settled.
+
+# 5. Compliance
+
+## 5.1 Invalid Claims
+
+A Claim that does not conform to these Rules is invalid and shall be corrected before the
+auction.
+
+## 5.2 Review
+
+Where a determination under these Rules depends on information originating outside the League,
+it is advisory, and the Commissioner may sustain or overrule it on the record of the
+individual Claim. Where a determination rests on League records alone, it is binding and no
+review lies.
+
+## 5.3 Finality
+
+The Commissioner's decision on any question arising under these Rules is final.
