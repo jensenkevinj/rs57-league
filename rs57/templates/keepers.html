@@ -97,6 +97,9 @@
                   title="Prospect eligible — first NFL season was {{ current.qualifying_season }}">P</span>{%
                 elif line.prospect_state == "unknown" %}<span class="pbadge is-unknown"
                   title="Prospect eligibility unknown — ESPN has no first season for him">P</span>{%
+                endif %}{%
+                if line.overridden %}<span class="wbadge"
+                  title="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value.">!</span>{%
                 endif %}</span><span
               class="sub"><span class="franchise">{{ line.team_name }}</span><span
                 class="acq-sub{% if line.after_deadline %} late-date{% endif %}"> · {{ line.acquired_at | mdy }}</span></span></td>
