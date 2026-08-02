@@ -94,6 +94,10 @@ Commissioner and recorded, and each record shall identify both Franchises and th
 Commissioner adjusts the affected salaries accordingly, and recorded amounts govern over any
 figure ESPN displays.
 
+Where an adjustment has been recorded but not yet restored in ESPN, the keeper page marks the
+affected player and states: *Manually Overridden Salary. Contact League Commissioner to update
+ESPN keeper value.* The salary shown on that page is the operative one.
+
 # 3. Prizes
 
 ## 3.1 General

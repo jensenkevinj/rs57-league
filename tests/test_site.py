@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -1690,3 +1691,148 @@ def test_an_ineligible_row_is_greyed_as_well_as_tinted(tmp_path: Path, derived: 
     assert ".grid tbody tr.late { background: var(--bad-bg); }" in style, (
         "the tint was dropped when the grey went in — the ask was to keep both"
     )
+
+
+# ---------------------------------------------------------------------------
+# Draft-cash overrides: the page shows the true salary, ESPN does not
+# ---------------------------------------------------------------------------
+
+
+def override_row(player_id: int, season: int, actual: int, **kw) -> dict:
+    return {
+        "espn_player_id": player_id, "season": season, "actual_salary": actual,
+        "reason": kw.pop("reason", "draft-cash trade, not yet reverted"),
+        "created_at": "2026-08-01T12:00:00", **kw,
+    }
+
+
+def player_row(page: str, name: str) -> str:
+    """One <tr>. Negative assertions MUST be scoped to a row, never to the page.
+
+    ``.wbadge { … }`` lives in every page's style block, so "wbadge" not in page is true of
+    nothing — it matches the CSS and passes whatever the rows do.
+    """
+    return next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if name in r)
+
+
+def with_overrides(tmp_path: Path, derived: Path, rows: list[dict]) -> str:
+    history = tmp_path / "history"
+    history.mkdir(parents=True, exist_ok=True)
+    (history / f"{PRIOR}.json").write_text(
+        json.dumps({"season": PRIOR, "claims": [], "overrides": rows}), encoding="utf-8"
+    )
+    out = tmp_path / "ov"
+    build_site(out, derived_dir=derived, history_dir=history)
+    return (out / "keepers.html").read_text(encoding="utf-8")
+
+
+def test_a_live_override_is_flagged_beside_the_player(tmp_path: Path, derived: Path):
+    """A manager comparing this page with ESPN will see two different numbers.
+
+    The page shows the true salary — that is what an override means — so the row says so and
+    names ESPN's figure, which is the thing that actually resolves the confusion.
+    """
+    page = with_overrides(tmp_path, derived, [override_row(1, SEASON, 99)])
+    row = player_row(page, "Puka Nacua")
+
+    assert 'class="wbadge"' in row, "a corrected salary is not flagged"
+    assert "Manually Overridden Salary" in row, "the badge does not say what it means"
+    assert "Contact League Commissioner" in row, "the badge does not say what to do about it"
+    assert ">$99<" in row or "$104" in row, "the corrected base is not being used"
+    assert "wbadge" not in player_row(page, "James Cook"), "an untouched salary was flagged"
+
+
+def test_a_reverted_override_is_not_flagged(tmp_path: Path, derived: Path):
+    """Once ESPN is put back, the two agree and there is nothing to warn about.
+
+    The flag is derived from the numbers actually differing, not from a row existing — so a
+    reverted override, or one that happens to equal ESPN, correctly says nothing.
+    """
+    reverted = with_overrides(tmp_path, derived, [override_row(1, SEASON, 99, reverted=True)])
+    assert "wbadge" not in player_row(reverted, "Puka Nacua"), "a reverted override is flagged"
+
+    same = with_overrides(tmp_path / "b", derived, [override_row(1, SEASON, 5)])
+    assert "wbadge" not in player_row(same, "Puka Nacua"), "an override equal to ESPN is flagged"
+
+
+def test_an_override_is_filed_against_the_season_whose_base_is_wrong(tmp_path: Path, derived: Path):
+    """The trap. The commissioner edits ESPN *during* one season; the base it corrupts is the
+    NEXT season's, because the keeper price carries forward.
+
+    ``effective_base_salary`` matches ``override.season == entry.season``, so a row filed
+    against the season the edit happened in silently does nothing at all — no correction, no
+    flag, and the ratchet audit still reports the player every run.
+    """
+    right = with_overrides(tmp_path, derived, [override_row(1, SEASON, 99)])
+    assert "wbadge" in player_row(right, "Puka Nacua")
+
+    wrong = with_overrides(tmp_path / "b", derived, [override_row(1, SEASON - 1, 99)])
+    row = player_row(wrong, "Puka Nacua")
+    assert "wbadge" not in row, "an override for the wrong season appeared to work"
+    assert ">$5<" in row, "the wrong-season override changed the base anyway"
+
+
+def test_the_commissioners_reason_is_not_published(tmp_path: Path, derived: Path):
+    """``SalaryOverride.reason`` is free text a human types, and the documented injection path.
+
+    It is kept off the public page entirely — a manager needs ESPN's number, not the
+    commissioner's shorthand — so the escaping question never arises here at all.
+    """
+    page = with_overrides(
+        tmp_path, derived,
+        [override_row(1, SEASON, 99, reason="<script>alert(1)</script> swap with t10")],
+    )
+    assert "alert(1)" not in page
+    assert "swap with t10" not in page, "the commissioner's reason reached the public page"
+
+
+def test_an_override_recorded_in_the_admin_tool_reaches_the_grid(tmp_path: Path, derived: Path):
+    """The commissioner's own flow, end to end — and it was broken.
+
+    The admin tool writes ``data/manual/overrides.json``; the site read only
+    ``data/history/*.json``. So an override could be recorded, ``validate`` would count it —
+    it reads ``history.overrides + manual_overrides`` — and the public page would go on
+    publishing ESPN's distorted figure with nothing to say so.
+
+    This walks the real path: ``ManualStore.add_override``, then ``build_site``.
+    """
+    from rs57.admin.store import ManualStore
+    from rs57.models import SalaryOverride
+
+    data = tmp_path / "data"
+    (data / "manual").mkdir(parents=True)
+    (data / "history").mkdir()
+    ManualStore(data_dir=data).add_override(
+        SalaryOverride(
+            espn_player_id=1, season=SEASON, actual_salary=99,
+            reason="draft-cash trade", created_at=datetime(2026, 8, 2),
+        )
+    )
+
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=data / "history", manual_dir=data / "manual")
+    page = (out / "keepers.html").read_text(encoding="utf-8")
+
+    row = player_row(page, "Puka Nacua")
+    assert 'class="wbadge"' in row, "an override recorded in the admin tool never reached the grid"
+    assert 'data-v="99"' in row, "the corrected base is not being published"
+    assert "Manually Overridden Salary" in row
+
+
+def test_both_override_sources_are_read(tmp_path: Path, derived: Path):
+    """Frozen seasons and the live admin file. Reading one and not the other prices with half."""
+    from rs57.site import load_overrides
+
+    data = tmp_path / "data"
+    (data / "manual").mkdir(parents=True)
+    (data / "history").mkdir()
+    (data / "history" / f"{PRIOR}.json").write_text(
+        json.dumps({"season": PRIOR, "claims": [], "overrides": [override_row(7, PRIOR, 4)]}),
+        encoding="utf-8",
+    )
+    (data / "manual" / "overrides.json").write_text(
+        json.dumps({"seasons": {str(SEASON): [override_row(8, SEASON, 9)]}}), encoding="utf-8"
+    )
+
+    found = {o.espn_player_id for o in load_overrides(data / "history", data / "manual")}
+    assert found == {7, 8}, f"a source was dropped: {found}"

@@ -152,6 +152,11 @@ class KeeperLine:
     """When this manager got him, straight off the roster entry."""
     team_name: str = ""
     """The franchise holding him, so a flat row needs no enclosing team to read itself."""
+    overridden: bool = False
+    """A live draft-cash override is correcting this base, so ESPN currently disagrees.
+
+    Derived from the numbers rather than from the presence of a row: a reverted override, or
+    one that happens to match ESPN, is not a discrepancy and must not be flagged."""
     after_deadline: bool = False
     """Acquired after the qualifying season's trade deadline.
 
@@ -542,23 +547,44 @@ def _rows(model: type, raw: Iterable[Any], notes: list[Note], where: str) -> lis
         return []
 
 
-def load_overrides(history_dir: Path = HISTORY) -> list[SalaryOverride]:
-    """Salary overrides recorded in ``data/history/``, read-only.
+def load_overrides(
+    history_dir: Path = HISTORY, manual_dir: Path = MANUAL
+) -> list[SalaryOverride]:
+    """Every salary override the site should price with. Read-only, from **both** sources.
 
-    Empty until the Phase 5 backfill writes it. Read anyway: an un-reverted draft-cash
-    override is the difference between the published price and the true one, and the day
-    those rows appear the site should already be using them.
+    An override lives in one of two places depending on who recorded it, and the site needs
+    both or it prices with half of them:
+
+    * ``data/history/{year}.json`` — frozen into a completed season by the backfill.
+    * ``data/manual/overrides.json`` — recorded in the admin tool, which is where the
+      commissioner enters a draft-cash trade *while it is still live*. This is the file that
+      matters for the season being decided, and it is the one the site used to ignore.
+
+    Reading only ``history/`` was a real hole: the admin tool would accept an override,
+    ``validate`` would count it — it reads ``history.overrides + manual_overrides`` — and the
+    public page would go on publishing ESPN's distorted figure with nothing to say so. The two
+    readers must agree about what is on record.
+
+    A malformed file is skipped rather than allowed to take the nightly build down;
+    ``validate.py`` is the place that reports it.
     """
     overrides: list[SalaryOverride] = []
-    if not history_dir.exists():
-        return overrides
-    for path in sorted(history_dir.glob("*.json")):
+    if history_dir.exists():
+        for path in sorted(history_dir.glob("*.json")):
+            try:
+                overrides += [
+                    SalaryOverride(**row) for row in _load(path).get("overrides") or []
+                ]
+            except (ValidationError, TypeError, json.JSONDecodeError):
+                continue
+
+    live = manual_dir / "overrides.json"
+    if live.exists():
         try:
-            overrides += [SalaryOverride(**row) for row in _load(path).get("overrides") or []]
+            for rows in (_load(live).get("seasons") or {}).values():
+                overrides += [SalaryOverride(**row) for row in rows]
         except (ValidationError, TypeError, json.JSONDecodeError):
-            # validate.py is the place that reports a malformed history file. The site
-            # renders without it rather than failing the nightly build.
-            continue
+            pass
     return overrides
 
 
@@ -803,6 +829,7 @@ def build_keeper_season(
         lines.setdefault(entry.manager_id, []).append(
             KeeperLine(
                 team_name=_named(entry.manager_id, names).name,
+                overridden=base != entry.base_salary,
                 player_name=player.name,
                 position=str(player.position),
                 nfl_team=player.nfl_team,
@@ -1426,7 +1453,7 @@ def build_site(
     """Render every page into ``out_dir``. Returns the files written."""
     env = environment(templates)
     keeper_years, stats_years = season_files(derived_dir)
-    overrides = load_overrides(history_dir)
+    overrides = load_overrides(history_dir, manual_dir)
 
     # The most recent keeper file is the season a manager is deciding about.
     current_year = keeper_years[-1] if keeper_years else None
