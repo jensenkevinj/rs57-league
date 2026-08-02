@@ -271,18 +271,96 @@ def test_player_not_on_roster():
     assert IssueCode.PLAYER_NOT_ON_ROSTER in codes(validate_team_claims(claims, []))
 
 
-def test_prospect_with_too_many_nfl_seasons():
-    roster = [entry(1, 3)]
-    claims = [claim(1, KeeperSlot.PROSPECT)]
-    issues = validate_team_claims(claims, roster, seasons_played={1: 2})
-    assert IssueCode.PROSPECT_TOO_MANY_SEASONS in codes(issues)
+# --- prospect rule 1: must be a rookie -------------------------------------------------
+#
+# SEASON is 2026 throughout, so a player who began in 2025 was a rookie in the season the
+# 2026 keep is made from, and one who began in 2024 was not.
 
 
-def test_prospect_within_one_nfl_season_is_fine():
-    roster = [entry(1, 3)]
-    claims = [claim(1, KeeperSlot.PROSPECT)]
-    issues = validate_team_claims(claims, roster, seasons_played={1: 1})
+def test_a_player_drafted_last_season_is_a_legal_prospect():
+    """The Cam Skattebo shape, and the one the arithmetic is easiest to break on.
+
+    He began in 2025 and was kept as a 2026 prospect — ``2026 - 2025 == 1``, legal. Write the
+    count as ``claim.season - began + 1`` and it comes out 2, and the check rejects the single
+    claim in the league's history we have the strongest evidence for.
+    """
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={1: SEASON - 1}
+    )
+    assert codes(issues) == set(), f"a genuine rookie was rejected: {issues}"
+
+
+def test_a_second_year_player_is_not_a_prospect():
+    """The Jawhar Jordan shape: began 2024, so by 2026 he is a second-year player.
+
+    ESPN reports ``experience.years == 1`` for him because he accrued only one season. Reading
+    that field instead of the draft class is what would let him through.
+    """
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={1: SEASON - 2}
+    )
+    found = [i for i in issues if i.code is IssueCode.PROSPECT_TOO_MANY_SEASONS]
+    assert len(found) == 1
+    assert str(SEASON - 2) in found[0].message
+    assert "second-year" in found[0].message
+
+
+def test_the_rookie_rule_flags_rather_than_blocks():
+    """Commissioner's call, 2026-08-01: the draft class comes from outside the league, so the
+    final word stays with a human. Contrast the repeat-claim check, which stays ERROR."""
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={1: SEASON - 2}
+    )
+    rookie = next(i for i in issues if i.code is IssueCode.PROSPECT_TOO_MANY_SEASONS)
+    assert rookie.severity is Severity.REVIEW
+
+    blocks = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], prior_prospect_ids={1}
+    )
+    repeat = next(i for i in blocks if i.code is IssueCode.PROSPECT_REPEAT_CLAIM)
+    assert repeat.severity is Severity.ERROR, "the league's own record still blocks"
+
+
+def test_no_mapping_means_the_rule_is_not_applied():
+    """``None`` is how a pre-2026 season, and every older test, opts out of rule 1 entirely."""
+    issues = validate_team_claims([claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)])
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED not in codes(issues)
     assert IssueCode.PROSPECT_TOO_MANY_SEASONS not in codes(issues)
+
+
+def test_an_empty_mapping_means_the_rule_is_applied():
+    """An empty mapping is "checking, and nothing is known" — not "not checking".
+
+    Collapse the two and a season with no origins file on disk passes every prospect in
+    silence, which is the exact hole this replaced.
+    """
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={}
+    )
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED in codes(issues)
+
+
+def test_an_unknown_draft_class_is_reported_not_passed():
+    """A prospect ESPN cannot answer for is unverified, never assumed fine."""
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={999: 2025}
+    )
+    found = [i for i in issues if i.code is IssueCode.PROSPECT_ROOKIE_UNVERIFIED]
+    assert len(found) == 1
+    assert found[0].severity is Severity.REVIEW
+    assert "could not be checked" in found[0].message
+
+
+def test_a_first_season_that_cannot_have_happened_is_reported():
+    """A player cannot have been on last season's roster before his career began.
+
+    Impossible data, not an illegal claim — reported as unverified rather than as the manager's
+    mistake, and never passed over just because it is not the shape the check expected.
+    """
+    issues = validate_team_claims(
+        [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], first_nfl_season={1: SEASON}
+    )
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED in codes(issues)
 
 
 def test_prospect_acquired_after_the_trade_deadline():
@@ -308,9 +386,13 @@ def test_a_prospect_who_has_been_started_is_fine_now():
 
 
 def test_a_repeat_prospect_claim_is_how_the_rookie_rule_is_enforced():
-    """Rule 1 is "must be a rookie" and ESPN carries no rookie year, so it cannot be checked
-    directly. A player has exactly one rookie season, which makes a repeat claim the one
-    detectable form of the violation — and the reason this check outlived rule 2."""
+    """Rule 1 is "must be a rookie", and this is the form of it derivable from the league's
+    OWN records: a player has exactly one rookie season, so a repeat claim is a violation with
+    no outside source needed. It was the only detectable form until ESPN's draft class arrived;
+    it is now the independent cross-check, and it is why this outlived rule 2.
+
+    It stays ERROR while the draft-class check is REVIEW. The league's own record blocks; an
+    outside data source flags."""
     issues = validate_team_claims(
         [claim(1, KeeperSlot.PROSPECT)], [entry(1, 3)], prior_prospect_ids={1}
     )

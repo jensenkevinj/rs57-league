@@ -1,0 +1,1314 @@
+{
+  "_about": [
+    "Real responses from ESPN's core athlete API, recorded whole.",
+    "",
+    "RECORDED WHOLE, NOT TRIMMED, AND THAT IS THE POINT. tests/data/espn_2025.json was",
+    "trimmed to the four player keys the mapper reads, and a later session read that",
+    "fixture as if it were the API and concluded in six places that ESPN carries no",
+    "rookie year. A trimmed fixture is evidence about the mapper, never about the API.",
+    "If you ever trim this file, list here exactly what you dropped.",
+    "",
+    "endpoint: https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/",
+    "          seasons/{season}/athletes/{espn_player_id}?lang=en&region=us",
+    "recorded: season 2026",
+    "",
+    "not_found holds ids ESPN answers 404 for. -16033 is a D/ST: their ids are negative",
+    "and no athlete record exists, which is why callers filter them out before fetching."
+  ],
+  "_cases": {
+    "2468609": "Taysom Hill — undrafted, debutYear only",
+    "4426515": "Puka Nacua — drafted 2023, an ordinary veteran",
+    "4429939": "Jawhar Jordan — THE TRAP: drafted 2024, experience.years == 1",
+    "4569987": "Jaylen Warren — undrafted, no debutYear: ESPN carries no first season",
+    "4696981": "Cam Skattebo — drafted 2025, the recorded 2026 prospect claim"
+  },
+  "athletes": {
+    "2468609": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2468609?lang=en&region=us",
+      "active": true,
+      "age": 35,
+      "alternateIds": {
+        "sdr": "2468609"
+      },
+      "birthPlace": {
+        "city": "Pocatello",
+        "country": "USA",
+        "state": "ID"
+      },
+      "college": {
+        "$ref": "http://sports.core.api.espn.com/v2/colleges/252?lang=en&region=us"
+      },
+      "collegeAthlete": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/athletes/482594?lang=en&region=us"
+      },
+      "contract": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/2468609/contracts/2026?lang=en&region=us",
+        "active": true,
+        "bonus": 0,
+        "optionType": 0,
+        "salary": 0,
+        "season": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026?lang=en&region=us"
+        },
+        "signedThrough": 2026,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/18?lang=en&region=us"
+        },
+        "yearsRemaining": 0
+      },
+      "contracts": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/2468609/contracts?lang=en&region=us"
+      },
+      "dateOfBirth": "1990-08-23T07:00Z",
+      "debutYear": 2017,
+      "displayHeight": "6' 2\"",
+      "displayName": "Taysom Hill",
+      "displayWeight": "221 lbs",
+      "eventLog": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2468609/eventlog?lang=en&region=us"
+      },
+      "experience": {
+        "years": 9
+      },
+      "firstName": "Taysom",
+      "fullName": "Taysom Hill",
+      "guid": "b4348fe9-fd28-0531-ad90-dbc8d5e0d11e",
+      "headshot": {
+        "alt": "Taysom Hill",
+        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/2468609.png"
+      },
+      "height": 74.0,
+      "id": "2468609",
+      "injuries": [],
+      "jersey": "7",
+      "lastName": "Hill",
+      "linked": true,
+      "links": [
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "playercard",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Player Card",
+          "text": "Player Card"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/stats/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:2468609&section=stats",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/splits/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "splits",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Splits",
+          "text": "Splits"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/gamelog/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:2468609&section=gamelog",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/news/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:2468609&section=news",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/bio/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:2468609&section=bio",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/2468609/taysom-hill",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:2468609",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        }
+      ],
+      "notes": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2468609/notes?lang=en&region=us"
+      },
+      "position": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/8?lang=en&region=us",
+        "abbreviation": "QB",
+        "displayName": "Quarterback",
+        "id": "8",
+        "leaf": true,
+        "name": "Quarterback",
+        "parent": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/70?lang=en&region=us"
+        }
+      },
+      "shortName": "T. Hill",
+      "slug": "taysom-hill",
+      "status": {
+        "abbreviation": "FA",
+        "id": "9",
+        "name": "Free Agent",
+        "type": "free-agent"
+      },
+      "team": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/18?lang=en&region=us"
+      },
+      "type": "football",
+      "uid": "s:20~l:28~a:2468609",
+      "weight": 221.0
+    },
+    "4426515": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4426515?lang=en&region=us",
+      "active": true,
+      "age": 25,
+      "alternateIds": {
+        "sdr": "4426515"
+      },
+      "birthPlace": {
+        "city": "Provo",
+        "country": "USA",
+        "state": "UT"
+      },
+      "college": {
+        "$ref": "http://sports.core.api.espn.com/v2/colleges/252?lang=en&region=us"
+      },
+      "collegeAthlete": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/athletes/4426515?lang=en&region=us"
+      },
+      "contract": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4426515/contracts/2026?lang=en&region=us",
+        "active": true,
+        "bonus": 0,
+        "optionType": 0,
+        "salary": 5658000,
+        "season": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026?lang=en&region=us"
+        },
+        "signedThrough": 2026,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/14?lang=en&region=us"
+        },
+        "yearsRemaining": 0
+      },
+      "contracts": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4426515/contracts?lang=en&region=us"
+      },
+      "dateOfBirth": "2001-05-29T07:00Z",
+      "displayHeight": "6' 2\"",
+      "displayName": "Puka Nacua",
+      "displayWeight": "216 lbs",
+      "draft": {
+        "displayText": "Year: 2023 Round: 5 Pick: 177",
+        "round": 5,
+        "selection": 177,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2023/teams/14?lang=en&region=us"
+        },
+        "year": 2023
+      },
+      "eventLog": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4426515/eventlog?lang=en&region=us"
+      },
+      "experience": {
+        "years": 4
+      },
+      "firstName": "Puka",
+      "fullName": "Puka Nacua",
+      "guid": "05861488-1bb7-7c32-83eb-d0658a6e2b89",
+      "headshot": {
+        "alt": "Puka Nacua",
+        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/4426515.png"
+      },
+      "height": 74.0,
+      "id": "4426515",
+      "injuries": [],
+      "jersey": "12",
+      "lastName": "Nacua",
+      "linked": true,
+      "links": [
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "playercard",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Player Card",
+          "text": "Player Card"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/stats/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4426515&section=stats",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/splits/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "splits",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Splits",
+          "text": "Splits"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/gamelog/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4426515&section=gamelog",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/news/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4426515&section=news",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/bio/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4426515&section=bio",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4426515/puka-nacua",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4426515",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        }
+      ],
+      "notes": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4426515/notes?lang=en&region=us"
+      },
+      "position": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/1?lang=en&region=us",
+        "abbreviation": "WR",
+        "displayName": "Wide Receiver",
+        "id": "1",
+        "leaf": true,
+        "name": "Wide Receiver",
+        "parent": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/70?lang=en&region=us"
+        }
+      },
+      "shortName": "P. Nacua",
+      "slug": "puka-nacua",
+      "status": {
+        "abbreviation": "Active",
+        "id": "1",
+        "name": "Active",
+        "type": "active"
+      },
+      "team": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/14?lang=en&region=us"
+      },
+      "type": "football",
+      "uid": "s:20~l:28~a:4426515",
+      "weight": 216.0
+    },
+    "4429939": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4429939?lang=en&region=us",
+      "active": true,
+      "age": 26,
+      "alternateIds": {
+        "sdr": "4429939"
+      },
+      "birthPlace": {
+        "city": "Long Island",
+        "country": "USA",
+        "state": "NY"
+      },
+      "college": {
+        "$ref": "http://sports.core.api.espn.com/v2/colleges/97?lang=en&region=us"
+      },
+      "collegeAthlete": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/athletes/4429939?lang=en&region=us"
+      },
+      "contract": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4429939/contracts/2026?lang=en&region=us",
+        "bonus": 0,
+        "optionType": 0,
+        "salary": 1075000,
+        "salaryRemaining": 1190000,
+        "season": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026?lang=en&region=us"
+        },
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/34?lang=en&region=us"
+        }
+      },
+      "contracts": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4429939/contracts?lang=en&region=us"
+      },
+      "dateOfBirth": "1999-08-18T07:00Z",
+      "displayHeight": "5' 10\"",
+      "displayName": "Jawhar Jordan",
+      "displayWeight": "185 lbs",
+      "draft": {
+        "displayText": "Year: 2024 Round: 6 Pick: 205",
+        "round": 6,
+        "selection": 205,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2024/teams/34?lang=en&region=us"
+        },
+        "year": 2024
+      },
+      "eventLog": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4429939/eventlog?lang=en&region=us"
+      },
+      "experience": {
+        "years": 1
+      },
+      "firstName": "Jawhar",
+      "fullName": "Jawhar Jordan",
+      "guid": "5e38f07e-8963-dcdf-28ef-5ec46f3ff481",
+      "headshot": {
+        "alt": "Jawhar Jordan",
+        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/4429939.png"
+      },
+      "height": 70.0,
+      "id": "4429939",
+      "injuries": [],
+      "jersey": "25",
+      "lastName": "Jordan",
+      "linked": true,
+      "links": [
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "playercard",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Player Card",
+          "text": "Player Card"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/stats/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4429939&section=stats",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/splits/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "splits",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Splits",
+          "text": "Splits"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/gamelog/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4429939&section=gamelog",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/news/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4429939&section=news",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/bio/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4429939&section=bio",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4429939/jawhar-jordan",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4429939",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        }
+      ],
+      "notes": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4429939/notes?lang=en&region=us"
+      },
+      "position": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/9?lang=en&region=us",
+        "abbreviation": "RB",
+        "displayName": "Running Back",
+        "id": "9",
+        "leaf": true,
+        "name": "Running Back",
+        "parent": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/70?lang=en&region=us"
+        }
+      },
+      "shortName": "J. Jordan",
+      "slug": "jawhar-jordan",
+      "status": {
+        "abbreviation": "Active",
+        "id": "1",
+        "name": "Active",
+        "type": "active"
+      },
+      "team": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/34?lang=en&region=us"
+      },
+      "type": "football",
+      "uid": "s:20~l:28~a:4429939",
+      "weight": 185.0
+    },
+    "4569987": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4569987?lang=en&region=us",
+      "active": true,
+      "age": 27,
+      "alternateIds": {
+        "sdr": "4569987"
+      },
+      "birthPlace": {
+        "city": "Salt Lake City",
+        "country": "USA",
+        "state": "UT"
+      },
+      "college": {
+        "$ref": "http://sports.core.api.espn.com/v2/colleges/197?lang=en&region=us"
+      },
+      "collegeAthlete": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/athletes/4569987?lang=en&region=us"
+      },
+      "contract": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4569987/contracts/2026?lang=en&region=us",
+        "active": true,
+        "bonus": 0,
+        "optionType": 0,
+        "salary": 5050000,
+        "salaryRemaining": 5150000,
+        "season": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026?lang=en&region=us"
+        },
+        "signedThrough": 2027,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/23?lang=en&region=us"
+        },
+        "yearsRemaining": 1
+      },
+      "contracts": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4569987/contracts?lang=en&region=us"
+      },
+      "dateOfBirth": "1998-11-01T08:00Z",
+      "displayHeight": "5' 8\"",
+      "displayName": "Jaylen Warren",
+      "displayWeight": "215 lbs",
+      "eventLog": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4569987/eventlog?lang=en&region=us"
+      },
+      "experience": {
+        "years": 5
+      },
+      "firstName": "Jaylen",
+      "fullName": "Jaylen Warren",
+      "guid": "224e4c1e-625d-b1b2-b8ea-1316942fa7ac",
+      "headshot": {
+        "alt": "Jaylen Warren",
+        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/4569987.png"
+      },
+      "height": 68.0,
+      "id": "4569987",
+      "injuries": [],
+      "jersey": "30",
+      "lastName": "Warren",
+      "linked": true,
+      "links": [
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "playercard",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Player Card",
+          "text": "Player Card"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/stats/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4569987&section=stats",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/splits/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "splits",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Splits",
+          "text": "Splits"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/gamelog/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4569987&section=gamelog",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/news/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4569987&section=news",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/bio/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4569987&section=bio",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4569987/jaylen-warren",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4569987",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        }
+      ],
+      "notes": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4569987/notes?lang=en&region=us"
+      },
+      "position": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/9?lang=en&region=us",
+        "abbreviation": "RB",
+        "displayName": "Running Back",
+        "id": "9",
+        "leaf": true,
+        "name": "Running Back",
+        "parent": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/70?lang=en&region=us"
+        }
+      },
+      "shortName": "J. Warren",
+      "slug": "jaylen-warren",
+      "status": {
+        "abbreviation": "Active",
+        "id": "1",
+        "name": "Active",
+        "type": "active"
+      },
+      "team": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/23?lang=en&region=us"
+      },
+      "type": "football",
+      "uid": "s:20~l:28~a:4569987",
+      "weight": 215.0
+    },
+    "4696981": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4696981?lang=en&region=us",
+      "active": true,
+      "age": 24,
+      "alternateIds": {
+        "sdr": "4696981"
+      },
+      "birthPlace": {
+        "city": "Rio Linda",
+        "country": "USA",
+        "state": "CA"
+      },
+      "college": {
+        "$ref": "http://sports.core.api.espn.com/v2/colleges/9?lang=en&region=us"
+      },
+      "collegeAthlete": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/athletes/4696981?lang=en&region=us"
+      },
+      "contract": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4696981/contracts/2026?lang=en&region=us",
+        "active": true,
+        "bonus": 0,
+        "optionType": 0,
+        "salary": 1005000,
+        "salaryRemaining": 2355000,
+        "season": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026?lang=en&region=us"
+        },
+        "signedThrough": 2028,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/19?lang=en&region=us"
+        },
+        "yearsRemaining": 2
+      },
+      "contracts": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/4696981/contracts?lang=en&region=us"
+      },
+      "dateOfBirth": "2002-02-05T08:00Z",
+      "displayHeight": "5' 11\"",
+      "displayName": "Cam Skattebo",
+      "displayWeight": "215 lbs",
+      "draft": {
+        "displayText": "Year: 2025 Round: 4 Pick: 105",
+        "round": 4,
+        "selection": 105,
+        "team": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2025/teams/19?lang=en&region=us"
+        },
+        "year": 2025
+      },
+      "eventLog": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4696981/eventlog?lang=en&region=us"
+      },
+      "experience": {
+        "years": 2
+      },
+      "firstName": "Cam",
+      "fullName": "Cam Skattebo",
+      "guid": "0be760c4-3eb7-338a-9b0b-20de5895543c",
+      "headshot": {
+        "alt": "Cam Skattebo",
+        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/4696981.png"
+      },
+      "height": 71.0,
+      "id": "4696981",
+      "injuries": [],
+      "jersey": "44",
+      "lastName": "Skattebo",
+      "linked": true,
+      "links": [
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "playercard",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Player Card",
+          "text": "Player Card"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/stats/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4696981&section=stats",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Stats",
+          "text": "Stats"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/splits/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "splits",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Splits",
+          "text": "Splits"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/gamelog/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4696981&section=gamelog",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "gamelog",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Game Log",
+          "text": "Game Log"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/news/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4696981&section=news",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "news",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "News",
+          "text": "News"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/bio/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4696981&section=bio",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "bio",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Bio",
+          "text": "Bio"
+        },
+        {
+          "href": "https://www.espn.com/nfl/player/_/id/4696981/cam-skattebo",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "desktop",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        },
+        {
+          "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:28~a:4696981",
+          "isExternal": false,
+          "isPremium": false,
+          "language": "en-US",
+          "rel": [
+            "overview",
+            "sportscenter",
+            "app",
+            "athlete"
+          ],
+          "shortText": "Overview",
+          "text": "Overview"
+        }
+      ],
+      "notes": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4696981/notes?lang=en&region=us"
+      },
+      "position": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/9?lang=en&region=us",
+        "abbreviation": "RB",
+        "displayName": "Running Back",
+        "id": "9",
+        "leaf": true,
+        "name": "Running Back",
+        "parent": {
+          "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/positions/70?lang=en&region=us"
+        }
+      },
+      "shortName": "C. Skattebo",
+      "slug": "cam-skattebo",
+      "status": {
+        "abbreviation": "Active",
+        "id": "1",
+        "name": "Active",
+        "type": "active"
+      },
+      "team": {
+        "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/19?lang=en&region=us"
+      },
+      "type": "football",
+      "uid": "s:20~l:28~a:4696981",
+      "weight": 215.0
+    }
+  },
+  "not_found": [
+    -16033
+  ],
+  "season": 2026
+}

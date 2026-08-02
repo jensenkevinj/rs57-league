@@ -422,6 +422,36 @@ def test_a_review_never_renders_as_checked(client):
     assert "nobody has checked this" in body
 
 
+def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path):
+    """The nightly's own warnings surface here, because they surface nowhere else.
+
+    The public keeper page used to publish them too and no longer does — see
+    ``test_site.test_a_sync_warning_stays_off_the_public_page``. This screen is now the only
+    place a ``review.warnings`` entry is ever read by a human, so it must arrive labelled as
+    unchecked rather than folded in beside the prices as though somebody had looked at it.
+    """
+    doc = keeper_doc()
+    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
+    (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    app = create_app(
+        data_dir=data_dir,
+        derived_dir=data_dir / "derived",
+        repo=tmp_path / "norepo",
+        push=False,
+        clock=lambda: NOW,
+    )
+    page = app.test_client().get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+
+    warned = [
+        (label, message) for label, message in tagged_flags(page) if "has not been drafted" in message
+    ]
+    assert warned, "the sync's warning is not on the commissioner's screen at all"
+    assert all("Unverified" in label for label in (label for label, _ in warned)), (
+        f"the sync warning is labelled {[label for label, _ in warned]} — it has not been checked"
+    )
+
+
 def tagged_flags(html: str) -> list[tuple[str, str]]:
     """Every rendered flag as ``(label, message)``, so a test can check what a note is called."""
     return [
@@ -547,6 +577,94 @@ def test_a_repeat_prospect_claim_is_caught_from_frozen_history(
         SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store, claims=claims
     )
     assert IssueCode.PROSPECT_REPEAT_CLAIM in {issue.code for issue in screen.issues}
+
+
+def test_a_verified_rookie_stops_saying_the_rule_is_unchecked(data_dir: Path, store: ManualStore):
+    """Rule 1 can be checked now, so a screen that checked it must not claim otherwise.
+
+    A blanket "NOT checked" note left in place would go on shouting over a prospect that had
+    in fact been verified, which is precisely how a real warning stops being read.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=LATE,
+                    slot=KeeperSlot.PROSPECT, fee_allocated=0)
+    ]
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        claims=claims, first_nfl_season={LATE: SEASON - 1},
+    )
+
+    assert IssueCode.PROSPECT_TOO_MANY_SEASONS not in {i.code for i in screen.issues}
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED not in {i.code for i in screen.issues}
+    assert not any("NOT checked" in note.message for note in screen.unverified)
+    assert any(
+        "rule 1 is checked" in note.message and str(SEASON - 1) in note.message
+        for note in screen.notes
+    ), "a verified prospect should say which season it verified"
+
+
+def test_an_ineligible_prospect_is_flagged_but_still_saves(data_dir: Path, store: ManualStore):
+    """Commissioner's call: flag, do not block.
+
+    The draft class comes from outside the league, so the final word stays with a human who
+    can overrule ESPN or record a voted exception. It renders as unverified — never as though
+    somebody had approved it — and the claim is still allowed onto the file.
+
+    TAXED rather than LATE: LATE was acquired after the trade deadline, so rule 3 blocks him
+    for a different reason and the test would pass without proving anything about rule 1.
+    """
+    origins = {TAXED: SEASON - 2}  # began two seasons ago — a second-year player
+    derived = Derived(derived_dir=data_dir / "derived")
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                    slot=KeeperSlot.PROSPECT, fee_allocated=0)
+    ]
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        claims=claims, first_nfl_season=origins,
+    )
+
+    flagged = [i for i in screen.issues if i.code is IssueCode.PROSPECT_TOO_MANY_SEASONS]
+    assert len(flagged) == 1
+    assert flagged[0].severity is Severity.REVIEW
+    assert str(SEASON - 2) in flagged[0].message, "the draft class must be spelled out"
+    assert not screen.blocked, "a REVIEW must never block the save"
+
+
+def test_an_unresolved_draft_class_renders_as_unverified(data_dir: Path, store: ManualStore):
+    """ESPN having nothing for a player is reported, never quietly treated as a pass."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=LATE,
+                    slot=KeeperSlot.PROSPECT, fee_allocated=0)
+    ]
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        claims=claims, first_nfl_season={},
+    )
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED in {i.code for i in screen.issues}
+    assert any("prospect rule 1" in note.message.lower() for note in screen.unverified)
+
+
+def test_the_rookie_rule_is_not_applied_before_it_tightened(data_dir: Path, store: ManualStore):
+    """A pre-2026 season is judged by the rule in force then, in this tool as in validate.
+
+    The repeat check used to be passed here unconditionally and was correct only because
+    nobody opens an old season — an implicit gate. Tyjae Spears' 2025 claim was legal.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    claims = [
+        KeeperClaim(season=PRIOR, manager_id="t1", espn_player_id=EX_PROSPECT,
+                    slot=KeeperSlot.PROSPECT, fee_allocated=0)
+    ]
+    screen = build_team_screen(
+        PRIOR, "t1", derived.load(PRIOR), derived.load(PRIOR - 1), store,
+        claims=claims, first_nfl_season={EX_PROSPECT: PRIOR - 3},
+    )
+    codes = {issue.code for issue in screen.issues}
+    assert IssueCode.PROSPECT_TOO_MANY_SEASONS not in codes
+    assert IssueCode.PROSPECT_REPEAT_CLAIM not in codes
 
 
 def test_a_prospect_is_priced_at_base_with_no_fee_and_no_tax(data_dir: Path, store: ManualStore):

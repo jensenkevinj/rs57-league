@@ -108,6 +108,62 @@ class Player(Base):
     nfl_team: str
 
 
+class OriginSource(StrEnum):
+    """Which ESPN field said when a player's NFL career began.
+
+    Recorded rather than inferred, so a reader never has to guess which one answered — the
+    same discipline as ``source.base_salary_field`` on a derived season.
+
+    **Two of these are exact and one is a bound, and the difference decides what may be
+    concluded from it.** ``draft.year`` and ``debutYear`` state when a career began.
+    ``FIRST_STATS_SEASON`` is the earliest season ESPN has statistics for, which is an upper
+    bound: a player who was on a roster but recorded nothing shows up a year late. Measured
+    across the league it agreed with the draft class 159 times out of 162, and all three
+    disagreements were late by exactly one season — Jauan Jennings, Calvin Austin III and John
+    Metchie III, each of whom missed his rookie year.
+
+    So a bound can prove somebody is **not** a rookie, and can never prove that he is. See
+    ``EXACT_SOURCES``.
+    """
+
+    DRAFT_YEAR = "draft_year"
+    DEBUT_YEAR = "debut_year"
+    FIRST_STATS_SEASON = "first_stats_season"
+
+
+EXACT_SOURCES = frozenset({OriginSource.DRAFT_YEAR, OriginSource.DEBUT_YEAR})
+"""Sources that state a first season rather than bounding it.
+
+Only these may decide that a player **is** a rookie. A bound is allowed to rule him out, which
+is the safe direction: being wrong late marks a veteran unknown, being wrong early would make a
+second-year player prospect-eligible and cost somebody money.
+"""
+
+
+class PlayerOrigin(Base):
+    """The season a player's NFL career began — the fact the prospect rule turns on.
+
+    ``first_nfl_season`` is **required and not nullable, deliberately**. A player ESPN cannot
+    answer for is absent from the list rather than present with a null: "we do not know" is
+    then the absence of a row, not a value that reads like one. That is the three-state model
+    (eligible / not eligible / unknown) expressed in the schema, and it is why no caller can
+    accidentally treat an unknown player as a rookie.
+
+    The value is immutable — a draft class does not change — which is what makes the file
+    merge-only and a player fetched once ever. (A ``FIRST_STATS_SEASON`` bound is immutable in
+    the same way: the earliest season a player has statistics for cannot move backwards.)
+    """
+
+    espn_player_id: int
+    first_nfl_season: int
+    source: OriginSource
+
+    @property
+    def exact(self) -> bool:
+        """Whether this states the first season or merely bounds it. See ``EXACT_SOURCES``."""
+        return self.source in EXACT_SOURCES
+
+
 class RosterEntry(Base):
     """One player on one manager's roster for one season.
 

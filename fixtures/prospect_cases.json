@@ -1,0 +1,124 @@
+{
+  "_about": [
+    "Every PROSPECT claim the league has ever recorded, against ESPN's draft class.",
+    "",
+    "Hand-reviewed ground truth. If the engine disagrees with this table, the engine is wrong",
+    "or a rule is undocumented -- chase it down, do not adjust the fixture.",
+    "",
+    "first_nfl_season is draft.year from ESPN's core athlete API, or debutYear for undrafted",
+    "players. elapsed = kept_in_season - first_nfl_season; a legal prospect has elapsed == 1,",
+    "because a prospect is kept FROM the season just completed. NOT elapsed + 1.",
+    "",
+    "Nine of the ten match. The tenth is Tyjae Spears kept in 2025, who was legal under the",
+    "second-year rule in force at the time -- rule_one_applies is False for him, and that is",
+    "what PROSPECT_RULES_TIGHTENED (2026) encodes. An outside data source independently",
+    "confirms both the rule and the threshold, which is why this table is worth keeping."
+  ],
+  "_reviewed": {
+    "by": "commissioner",
+    "on": "2026-08-01",
+    "what": "prospect claims cross-checked against ESPN draft classes"
+  },
+  "claims": [
+    {
+      "elapsed": 1,
+      "espn_player_id": 4429084,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Anthony Richardson",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4429025,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Quentin Johnston",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4426386,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Roschon Johnson",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4429013,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Tank Bigsby",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4366031,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Tank Dell",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4428557,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Tyjae Spears",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4426385,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2024,
+      "player": "Zach Charbonnet",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4685247,
+      "expect_flagged": false,
+      "first_nfl_season": 2024,
+      "kept_in_season": 2025,
+      "player": "Braelon Allen",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 2,
+      "espn_player_id": 4428557,
+      "expect_flagged": false,
+      "first_nfl_season": 2023,
+      "kept_in_season": 2025,
+      "player": "Tyjae Spears",
+      "rule_one_applies": false,
+      "source": "draft_year"
+    },
+    {
+      "elapsed": 1,
+      "espn_player_id": 4696981,
+      "expect_flagged": false,
+      "first_nfl_season": 2025,
+      "kept_in_season": 2026,
+      "player": "Cam Skattebo",
+      "rule_one_applies": true,
+      "source": "draft_year"
+    }
+  ]
+}

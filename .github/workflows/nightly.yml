@@ -93,6 +93,9 @@ jobs:
             exit 1
           fi
           echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
+          # Exported separately: the origins sync wants the season being decided, never the
+          # backfill list a manual run may have passed in.
+          echo "current=$current" >> "$GITHUB_OUTPUT"
           echo "Syncing: $seasons (current season is $current)"
 
       # The two syncs write two different files and fail for different reasons. They are kept
@@ -146,6 +149,33 @@ jobs:
               echo "stats $year: no completed games yet, nothing to derive" | tee -a notes.txt
             fi
           done
+
+      # When each player's NFL career began, for prospect rule 1. A THIRD ESPN endpoint on a
+      # different host, and deliberately its own step: the core API going down must not be
+      # able to touch a season of salaries, which is only guaranteed if it never shares a run
+      # with the keeper sync.
+      #
+      # Merge-only, so a failure costs nothing already recorded — the committed file simply
+      # stands and this run adds nobody. Only players not yet on record are fetched, so the
+      # steady-state cost is the week's waiver adds rather than the league.
+      - name: Sync player origins
+        if: always()
+        run: |
+          set -uo pipefail
+          file="data/derived/player-origins.json"
+          had_one=no
+          git ls-files --error-unmatch "$file" >/dev/null 2>&1 && had_one=yes
+
+          if python -m rs57.origins_sync --year "${{ steps.seasons.outputs.current }}"; then
+            echo "origins: written"
+          else
+            git checkout -- "$file" 2>/dev/null || rm -f "$file"
+            if [ "$had_one" = yes ]; then
+              echo "origins: FAILED, though it wrote on a previous run" | tee -a failures.txt
+            else
+              echo "origins: not yet populated" | tee -a notes.txt
+            fi
+          fi
 
       # After the syncs and before the commit, so a bad sync is caught before it lands.
       - name: Validate data/

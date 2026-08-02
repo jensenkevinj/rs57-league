@@ -1,59 +1,28 @@
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{% block title %}RS57 — Keepers{% endblock %}
+{# The page carries no heading: the nav names it and the title bar carries the season, which
+   is the only fact a bare grid cannot show for itself. Everything the commissioner has to
+   check — the sync's own warnings, the derived consolation waiver — lives in the admin tool,
+   which is the thing he actually works in. An ERROR still surfaces here, because an error is
+   a row missing from the grid below and nothing else on this page would say so.
+
+   Every roster in the league is one flat table with a Team column, sorted and filtered in the
+   browser. Nothing is serialised into a script tag: the sort reads the numbers off `data-v`
+   attributes Jinja already escaped, so franchise names and player names never leave the DOM
+   and never become code. #}
+{# The title names the season the page is ABOUT, which after the auction is the season after
+   the one the file is named for — the bases are then what a player carries forward. See
+   site.build_keeper_season. #}
+{% block title %}RS57 — {% if current %}{{ current.decision_season }} {% endif %}Keepers{% endblock %}
 
 {% block content %}
 {% if not current %}
-  <h1>Keeper prices</h1>
   <p class="lede">
     No season has been synced yet, so there are no keeper prices to show. The nightly build
     writes them.
   </p>
 {% else %}
-  <h1>{{ current.season }} keeper prices</h1>
-  <p class="lede">
-    What every player on every roster would cost to keep in {{ current.season }}. Find your
-    team, add up the players you want, then add the keeper fee for that many keepers.
-  </p>
-
-  <div class="panel">
-    <h3 style="margin-top:0">How to read this</h3>
-    <p>
-      A keeper's price is <strong>his base plus the ${{ keeper_tax }} tax</strong> if you kept
-      him last season. Base is what he cost you this season, not what you originally paid —
-      every fee and tax you have paid on him is already inside it, which is why a player you
-      have held for years is expensive.
-    </p>
-    {% if not current.drafted %}
-      <p>
-        {{ current.season }} has not been drafted yet, so a base here is last season's salary
-        carried forward. That is the right number to make a keeper decision on; it is re-read
-        after the auction.
-      </p>
-    {% endif %}
-    <p>
-      <strong>The keeper fee is not in these prices.</strong> The fee depends on how many
-      keepers you declare and you choose how to split it, so it cannot be worked out per
-      player. Add it yourself:
-    </p>
-    <table style="max-width:22rem">
-      <thead><tr><th>Keepers declared</th><th class="num">Fee, in total</th></tr></thead>
-      <tbody>
-        {% for count, fee in fee_tiers %}
-          <tr>
-            <td>{{ count }}</td>
-            <td class="num money">${{ fee }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <p class="small muted">
-      Maximum {{ max_keepers }} keepers plus {{ max_prospects }} prospect. A prospect is kept
-      at his base with no fee and no tax. There is no salary cap.
-    </p>
-  </div>
-
   {% if not current.any_declared %}
     <div class="flag">
       <span class="tag">Prices, not declarations</span>
@@ -62,111 +31,275 @@
         kept; none of this means anyone has claimed him.
       </div>
     </div>
-  {% else %}
-    <div class="flag plain">
-      <span class="tag">Declared keepers are marked</span>
-      <div>
-        A row marked <strong>kept</strong> is a recorded declaration, with the fee its manager
-        allocated and the salary they were told they owe. Every other row is only a price — what
-        that player <em>would</em> cost, with no fee in it, and it does not mean anyone has
-        claimed him.
-      </div>
-    </div>
   {% endif %}
 
-  {% if current.waiver_manager_id %}
-    <div class="flag">
-      <span class="tag">Unverified — nobody has checked this</span>
-      <div>
-        {% if current.waiver_name %}{{ current.waiver_name }}{% else %}{{ current.waiver_manager_id }}{% endif %}
-        appears to have won the {{ current.waiver_from_season }} consolation bracket, which
-        would waive their keeper fees for {{ current.season }}. Salaries would still be owed
-        in full — only the fee is waived. This is derived from the final standings and has
-        <strong>not</strong> been confirmed by the commissioner, so it is not applied to
-        anything on this page.
-      </div>
-    </div>
-  {% endif %}
+  {{ ui.flags(current.notes | selectattr("kind", "equalto", "error")) }}
 
-  {{ ui.flags(current.notes) }}
-
-  <h2>Rosters</h2>
-  <p class="small muted">
-    {{ current.teams | length }} franchises, cheapest player first. Jump to a team:
-  </p>
-  <p class="jump">
-    {% for team in current.teams %}
-      <a href="#{{ team.manager_id }}">{% if team.name_known %}{{ team.name }}{% else %}{{ team.manager_id }}{% endif %}</a>
-    {% endfor %}
+  {# The deadline the Acquired column is measured against, stated once so a reader is not
+     asked to remember it down 188 rows. When it is not on disk the page says that instead of
+     printing nothing, because a missing line reads as "there is no deadline". #}
+  <p class="deadline">
+    <span class="deadline-i" aria-hidden="true">i</span>
+    {% if current.qualifying_deadline %}
+      Keeper Deadline: <strong>{{ current.qualifying_deadline | mdy }}</strong>
+    {% else %}
+      {{ current.qualifying_season }}'s keeper deadline is not on file — no row is marked
+      against it
+    {% endif %}
   </p>
 
-  {% for team in current.teams %}
-    <div class="team" id="{{ team.manager_id }}">
-      <h3>
-        {% if team.name_known %}{{ team.name }}{% else %}{{ team.manager_id }}{% endif %}
-        {% if team.fees_waived %}
-          <span class="tag-inline" title="Derived from the standings, not confirmed by the commissioner">fees waived?</span>
-        {% endif %}
-      </h3>
-      <p class="small muted">
-        {{ team.manager_id }} · {{ team.lines | length }} players ·
-        {{ team.taxed }} carrying the ${{ keeper_tax }} tax
-        {% if team.declared_count %}
-          · <strong>{{ team.declared_count }} declared</strong>, ${{ team.declared_fees }} in fees,
-          ${{ team.declared_salary }} owed
-        {% endif %}
-      </p>
-      <div class="scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Player</th>
-              <th>Pos</th>
-              <th>NFL</th>
-              <th>Acquired</th>
-              <th class="num">Base</th>
-              <th class="num">Tax</th>
-              <th class="num">Keeper price</th>
-              <th>Declared</th>
-              <th class="num">Fee</th>
-              <th class="num">Owed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for line in team.lines %}
-              <tr>
-                <td>{{ line.player_name }}</td>
-                <td>{{ line.position }}</td>
-                <td class="muted">{{ line.nfl_team }}</td>
-                <td class="muted small">{{ line.source }}</td>
-                <td class="num">${{ line.base }}</td>
-                <td class="num">
-                  {% if line.kept_prior_year %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
-                </td>
-                <td class="num money">${{ line.price }}</td>
-                <td class="small">
-                  {% if line.declared %}
-                    <span class="tag-inline">kept · {{ line.slot }}</span>
-                  {% else %}
-                    <span class="muted">not declared</span>
-                  {% endif %}
-                </td>
-                <td class="num">
-                  {% if line.declared %}${{ line.fee }}{% else %}<span class="muted">—</span>{% endif %}
-                </td>
-                <td class="num money">
-                  {% if line.salary is not none %}
-                    ${{ line.salary }}
-                  {% else %}
-                    <span class="muted">—</span>
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  {% endfor %}
+  {# Hidden until the script runs. Controls that cannot filter anything are worse than none. #}
+  <div class="controls" id="controls" hidden>
+    <input type="search" id="q" placeholder="Filter by player name"
+           aria-label="Filter by player name" autocomplete="off">
+    <select id="f-pos" aria-label="Filter by position"></select>
+    <select id="f-team" aria-label="Filter by franchise"></select>
+    <label class="check"><input type="checkbox" id="f-prospect"> Prospects only</label>
+    <button type="button" id="reset">Clear</button>
+    <span class="count" id="count" role="status" hidden></span>
+  </div>
+
+  <div class="grid-scroll">
+    <table class="grid" id="keepers">
+      <thead>
+        {# Pos, Team and NFL are folded into the Player cell and their columns are hidden at
+           every width. The cells stay in the table because the dropdowns and the search read
+           them, and because a hidden column is still a column the sort can be pointed at.
+           Nothing is displayed twice: what is shown here is not shown there. #}
+        <tr>
+          <th data-sort="text">Player</th>
+          <th data-sort="text">Pos</th>
+          <th data-sort="text">Team</th>
+          <th data-sort="text">NFL</th>
+          <th data-sort="text">Prospect</th>
+          <th data-sort="text">Acquired</th>
+          <th data-sort="num" class="num">Base</th>
+          <th data-sort="num" class="num">Tax</th>
+          <th data-sort="num" class="num" aria-sort="descending">Salary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {# Flat and dearest first — `current.rows` arrives in that order from site.py, so a
+           browser running no JavaScript gets the same default the script starts in. #}
+        {% for line in current.rows %}
+          <tr{% if line.after_deadline %} class="late"{% endif %}>
+            {# Two lines. The name carries the position and club inline beside it, because those
+               three are one thought — who he is — and the prospect badge sits with them, since
+               it is a fact about the player rather than a column of its own. The franchise is a
+               separate thought and gets line two.
+
+               `data-k` is the name on its own. Without it the sort would read "Jahmyr Gibbs RB
+               DET Calling Audibles" and quietly order the league by position and franchise
+               while still calling itself Player. #}
+            <td data-k="{{ line.player_name }}"><span class="who">{{ line.player_name }}<span
+              class="pos">{{ line.position }} · {{ line.nfl_team }}</span>{%
+                if line.prospect_state == "eligible" %}<span class="pbadge is-eligible"
+                  title="Prospect eligible — first NFL season was {{ current.qualifying_season }}">P</span>{%
+                elif line.prospect_state == "unknown" %}<span class="pbadge is-unknown"
+                  title="Prospect eligibility unknown — ESPN has no first season for him">P</span>{%
+                endif %}</span><span
+              class="sub"><span class="franchise">{{ line.team_name }}</span><span
+                class="acq-sub{% if line.after_deadline %} late-date{% endif %}"> · {{ line.acquired_at | mdy }}</span></span></td>
+            <td class="muted">{{ line.position }}</td>
+            <td class="team-cell">{{ line.team_name }}</td>
+            <td class="muted">{{ line.nfl_team }}</td>
+            {# Hidden, and read only by the "prospects only" checkbox. The badge above is what a
+               reader sees; this is the word the filter matches on. #}
+            <td class="pstate">{% if line.prospect_state == "eligible" %}Eligible{%
+              elif line.prospect_state == "unknown" %}Unknown{% else %}Not eligible{% endif %}</td>
+            {# ISO, so the text sort is chronological and needs no date parsing in the script —
+               the same reason money sorts off `data-v` rather than off "$12". #}
+            <td class="acq" data-k="{{ line.acquired_at.strftime('%Y-%m-%d') }}">
+              <span{% if line.after_deadline %} class="late-date"
+                title="Acquired after the {{ current.qualifying_season }} keeper deadline"{% endif
+                %}>{{ line.acquired_at | mdy }}</span>
+            </td>
+            <td class="num" data-v="{{ line.base }}">${{ line.base }}</td>
+            <td class="num" data-v="{{ line.tax }}">
+              {% if line.kept_prior_year %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td class="num money" data-v="{{ line.price }}">${{ line.price }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="empty" id="empty" hidden>Nothing matches that filter.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if current %}
+<script>
+/* Sorting and filtering for the keeper grid.
+
+   This script reads the table that is already on the page and never receives data from the
+   template, so there is no second copy of the league to fall out of step and no manual text
+   crossing into JavaScript. Money is read from `data-v` rather than parsed back out of "$12":
+   a parser is a second implementation of what a dollar is, and this project has been bitten by
+   second implementations. Without JavaScript the table renders complete and unsorted, which is
+   the whole grid in a sensible order — the controls simply never appear. */
+(function () {
+  var table = document.getElementById("keepers");
+  if (!table) return;
+
+  var body = table.tBodies[0];
+  var rows = Array.prototype.slice.call(body.rows);
+  var headers = Array.prototype.slice.call(table.tHead.rows[0].cells);
+  var q = document.getElementById("q");
+  var byPos = document.getElementById("f-pos");
+  var byTeam = document.getElementById("f-team");
+  var byProspect = document.getElementById("f-prospect");
+  var count = document.getElementById("count");
+  var empty = document.getElementById("empty");
+
+  var PLAYER = 0, POS = 1, TEAM = 2, NFL = 3, PROSPECT = 4, SALARY = 8;
+  /* The server's order is Team, then cheapest first. Every sort runs off this copy, and
+     Array.sort is stable, so sorting by Team returns exactly the page you started on. */
+  var original = rows.slice();
+  /* The server already emitted the rows dearest first, so this is a description of the order
+     on screen rather than an instruction to produce it — nothing is re-sorted on load. If the
+     two ever disagreed, the first click on Salary would appear to do nothing. */
+  var sortColumn = SALARY;
+  var ascending = false;
+
+  /* `data-k` wins where a cell has one. The Player cell carries the position and NFL club as
+     subtext on a phone, and its key is the name alone — sorting and filtering must not see
+     what is only there to be read. */
+  function cellText(row, index) {
+    var cell = row.cells[index];
+    var key = cell.getAttribute("data-k");
+    return key === null ? (cell.textContent || "").trim() : key;
+  }
+
+  function cellValue(row, index) {
+    return Number(row.cells[index].getAttribute("data-v"));
+  }
+
+  /* The box says player name, so it searches the player name and nothing else. Franchise and
+     position have dropdowns of their own, and searching the whole row would make "5" match
+     every price on the page. */
+  function haystack(row) {
+    var cached = row.getAttribute("data-find");
+    if (cached === null) {
+      cached = cellText(row, PLAYER).toLowerCase();
+      row.setAttribute("data-find", cached);
+    }
+    return cached;
+  }
+
+  function fill(select, label, index) {
+    var seen = {};
+    var values = [];
+    rows.forEach(function (row) {
+      var value = cellText(row, index);
+      if (value && !seen[value]) {
+        seen[value] = true;
+        values.push(value);
+      }
+    });
+    values.sort(function (a, b) { return a.localeCompare(b); });
+    select.appendChild(new Option(label, ""));
+    values.forEach(function (value) { select.appendChild(new Option(value, value)); });
+  }
+
+  function sort() {
+    var numeric = headers[sortColumn].getAttribute("data-sort") === "num";
+    var ordered = original.slice().sort(function (a, b) {
+      var result = numeric
+        ? cellValue(a, sortColumn) - cellValue(b, sortColumn)
+        : cellText(a, sortColumn).localeCompare(cellText(b, sortColumn));
+      return ascending ? result : -result;
+    });
+    ordered.forEach(function (row) { body.appendChild(row); });
+    headers.forEach(function (header, index) {
+      if (index === sortColumn) {
+        header.setAttribute("aria-sort", ascending ? "ascending" : "descending");
+      } else {
+        header.removeAttribute("aria-sort");
+      }
+    });
+  }
+
+  function filter() {
+    var needle = q.value.trim().toLowerCase();
+    var pos = byPos.value;
+    var team = byTeam.value;
+    var prospectsOnly = byProspect.checked;
+    var shown = 0;
+    rows.forEach(function (row) {
+      var hit =
+        (!pos || cellText(row, POS) === pos) &&
+        (!team || cellText(row, TEAM) === team) &&
+        (!prospectsOnly || cellText(row, PROSPECT) === "Eligible") &&
+        (!needle || haystack(row).indexOf(needle) !== -1);
+      row.hidden = !hit;
+      if (hit) shown += 1;
+    });
+    /* Only while something is actually being narrowed. A bare "188 players" sitting there
+       permanently is a label, not feedback. */
+    count.textContent = shown + " of " + rows.length + " players";
+    count.hidden = shown === rows.length;
+    empty.hidden = shown !== 0;
+  }
+
+  headers.forEach(function (header, index) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "sort";
+    button.textContent = header.textContent.trim();
+    /* A one-character header reads as "P" to a screen reader too, so the column that can
+       afford no width borrows its accessible name from the markup instead. */
+    button.setAttribute(
+      "aria-label", header.getAttribute("data-label") || header.textContent.trim()
+    );
+    header.textContent = "";
+    header.appendChild(button);
+    button.addEventListener("click", function () {
+      /* A new column starts ascending — text A to Z, money cheapest first. Clicking the
+         column you are already on is the only thing that reverses it. */
+      ascending = index === sortColumn ? !ascending : true;
+      sortColumn = index;
+      sort();
+    });
+  });
+
+  fill(byPos, "All positions", POS);
+  fill(byTeam, "All teams", TEAM);
+  q.addEventListener("input", filter);
+  byPos.addEventListener("change", filter);
+  byTeam.addEventListener("change", filter);
+  byProspect.addEventListener("change", filter);
+  document.getElementById("reset").addEventListener("click", function () {
+    q.value = "";
+    byPos.value = "";
+    byTeam.value = "";
+    byProspect.checked = false;
+    filter();
+  });
+
+  var controls = document.getElementById("controls");
+  controls.hidden = false;
+
+  /* The column header sticks below the controls, and the controls wrap to a second row on a
+     narrow window. Hard-coding the offset leaves the header hiding under them at exactly the
+     widths nobody tests, so it is measured instead. */
+  function measure() {
+    /* Rounded down, never up. A fractional height rounded up leaves a hairline between the two
+       sticky bars, and rows scroll through the gap; rounded down they overlap by half a pixel
+       and the controls, which sit above, cover it. */
+    var height = Math.floor(controls.getBoundingClientRect().height);
+    document.documentElement.style.setProperty("--head-top", height + "px");
+  }
+  measure();
+  if (window.ResizeObserver) {
+    new ResizeObserver(measure).observe(controls);
+  } else {
+    window.addEventListener("resize", measure);
+  }
+
+  filter();
+})();
+</script>
 {% endif %}
 {% endblock %}

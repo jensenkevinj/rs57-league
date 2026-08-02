@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 from rs57.models import FranchiseName, Payout, Player, RosterEntry
+from rs57.origins import ORIGINS_FILENAME, load_player_origins
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 DERIVED = ROOT / "data" / "derived"
@@ -71,6 +72,12 @@ class Derived:
     the first page loaded, and say nothing about it.
     """
 
+    _origins_cache: dict[str, tuple[float, dict[int, int]]] = field(
+        default_factory=dict, repr=False
+    )
+    """The same mtime discipline, for ``player-origins.json``. Running the origins sync while
+    the tool is open is normal when a waiver add needs a draft class."""
+
     def seasons(self) -> list[int]:
         """Years with a keeper file, ascending. Ignores the ``-stats`` companion files."""
         if not self.derived_dir.exists():
@@ -113,6 +120,29 @@ class Derived:
             waiver_base_mismatches=tuple(review.get("waiver_base_mismatches") or []),
         )
         self._cache[season] = (mtime, loaded)
+        return loaded
+
+    def first_nfl_seasons(self) -> dict[int, int]:
+        """``espn_player_id -> first NFL season``, for prospect rule 1.
+
+        Cached on the file's mtime for the same reason ``load`` is: the tool runs for hours,
+        and running the origins sync while it is open is a normal thing to do when a waiver
+        add needs a draft class. A cache that ignored mtime would keep saying "ESPN has
+        nothing for him" after the sync had answered.
+
+        An empty dict is returned for a missing file, and the caller passes it through as an
+        empty mapping rather than ``None`` — so every prospect reports unverified instead of
+        the rule quietly not running.
+        """
+        path = self.derived_dir / ORIGINS_FILENAME
+        if not path.exists():
+            return {}
+        mtime = path.stat().st_mtime
+        cached = self._origins_cache.get(ORIGINS_FILENAME)
+        if cached is not None and cached[0] == mtime:
+            return cached[1]
+        loaded = load_player_origins(self.derived_dir)
+        self._origins_cache[ORIGINS_FILENAME] = (mtime, loaded)
         return loaded
 
     def payouts(self, season: int) -> list[Payout]:

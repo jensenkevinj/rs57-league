@@ -46,10 +46,17 @@ prospects may now be started.
 The date matters because the record contains claims made under the old rule that the new one
 would reject — Tyjae Spears was kept as a prospect in both 2024 and 2025, legally. Applying
 today's rule backwards would turn a correct historical record into a wall of errors, so callers
-pass ``prior_prospect_ids`` only for seasons from here on.
+pass ``prior_prospect_ids`` **and** ``first_nfl_season`` only for seasons from here on. This
+gate now governs two checks rather than one; both express the same rule and both must be gated,
+or the pre-2026 record starts failing under half of it.
 
 Set to 2026 because the 2025 declarations still include a second-year prospect. If the change
 actually landed mid-2025, this is the one line to move.
+
+Independently corroborated. Checking every recorded prospect claim against ESPN's draft class
+puts nine of ten at ``first_nfl_season == keeper_season - 1``; the single exception is Spears'
+2025 claim. An outside source reproducing the league's record *and* its one documented
+exception is about as good as evidence for a threshold gets — see ``fixtures/prospect_cases.json``.
 """
 
 KEEPER_SLOTS = (KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3)
@@ -74,6 +81,7 @@ class IssueCode(StrEnum):
     DUPLICATE_SLOT = "duplicate_slot"
     PLAYER_NOT_ON_ROSTER = "player_not_on_roster"
     PROSPECT_TOO_MANY_SEASONS = "prospect_too_many_seasons"
+    PROSPECT_ROOKIE_UNVERIFIED = "prospect_rookie_unverified"
     PROSPECT_ACQUIRED_AFTER_DEADLINE = "prospect_acquired_after_deadline"
     PROSPECT_REPEAT_CLAIM = "prospect_repeat_claim"
     BASE_DISCONTINUITY = "base_discontinuity"
@@ -290,33 +298,71 @@ def check_override_balance(
     ]
 
 
+def _ordinal(n: int) -> str:
+    """``2 -> 'second'``. For the prospect message, which a manager reads and acts on.
+
+    Falls back to digits past the range that ever comes up, because a message is not worth
+    a lookup table and "his 14th-year" reads fine.
+    """
+    words = {2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth"}
+    return words.get(n, f"{n}th")
+
+
 def validate_team_claims(
     claims: Sequence[KeeperClaim],
     roster: Sequence[RosterEntry],
     *,
     fees_waived: bool = False,
-    seasons_played: Mapping[int, int] | None = None,
+    first_nfl_season: Mapping[int, int] | None = None,
     trade_deadline: datetime | None = None,
     prior_prospect_ids: Collection[int] = (),
 ) -> list[ValidationIssue]:
     """Everything the spreadsheet's ``VALID`` column used to mean, and then some.
 
-    ``seasons_played`` maps ``espn_player_id`` to NFL seasons played, for prospect rule 1 —
-    **a prospect must be a rookie**. Nothing in ``data/`` populates it: ESPN's player payload
-    carries no rookie year and no seasons-played field, so rule 1 cannot be checked directly.
+    ``first_nfl_season`` maps ``espn_player_id`` to the season that player's NFL career began,
+    for prospect rule 1 — **a prospect must be a rookie**. It comes from
+    ``data/derived/player-origins.json``, which ``rs57.origins_sync`` fills from ESPN's core
+    API; ``draft.year`` is the draft class and is immutable.
 
-    ``prior_prospect_ids`` is what makes it enforceable anyway. A player has exactly one rookie
-    year, so **a repeat prospect claim is a rookie-rule violation you can actually detect**:
-    if he was a prospect last season he is not a rookie this one. That indirection is the only
-    reason the check exists, and it is why it stays even though ``seasons_played`` never
-    arrives.
+    **The arithmetic, because it is easy to get wrong and it fails quietly.** A prospect is
+    kept *from the season just completed*, so the count that matters runs to ``claim.season - 1``
+    inclusive::
+
+        elapsed = claim.season - first_nfl_season      # NOT ... + 1
+
+    Cam Skattebo began in 2025 and was kept as a 2026 prospect: ``2026 - 2025 == 1``, legal.
+    Add one and that becomes 2, and the check rejects the single claim we have the best
+    evidence for. This must agree with ``trade_deadline``, which the caller passes for the same
+    ``claim.season - 1`` — if the two ever judge different seasons they will disagree about the
+    same player.
+
+    **The mapping's presence is itself the switch**, following the convention
+    ``sync.prior_prospect_ids`` set (``None`` means unknown, empty means checked-and-none):
+
+    * ``None``  — rule 1 is not being applied at all. No issue either way.
+    * a mapping, **even an empty one** — rule 1 *is* being applied, and a prospect who is not
+      in it yields ``PROSPECT_ROOKIE_UNVERIFIED`` at REVIEW. ESPN could not answer for him, so
+      the rule could not run, and a check that cannot run is reported rather than passed.
+
+    Rule 1 is REVIEW rather than ERROR **by decision** (commissioner, 2026-08-01): the draft
+    class comes from outside the league, so the final call stays with a human who can overrule
+    ESPN or record a voted exception. Contrast ``PROSPECT_REPEAT_CLAIM`` below, which stays
+    ERROR — *the league's own record blocks; an outside data source flags.*
+
+    ``prior_prospect_ids`` is the older, indirect form of the same rule, and it stays. A player
+    has exactly one rookie year, so a repeat prospect claim is a rookie-rule violation
+    detectable from the league's own claims with no external source at all. It is now a
+    cross-check on rule 1 rather than a substitute for it.
 
     Pass ``prior_prospect_ids`` only for seasons the *current* rule governs. The league once
     allowed second-year players to be prospected too, so the same player legitimately appears
     twice in the historical record — see ``PROSPECT_RULES_TIGHTENED``. The threshold is the
     caller's to know, which is why this takes the ids rather than deriving them.
     """
-    seasons_played = seasons_played or {}
+    # Deliberately not ``or {}``: an empty mapping is not the same as no mapping, and
+    # collapsing them would turn "we checked and know nothing" into "we are not checking".
+    rule_one_applies = first_nfl_season is not None
+    first_nfl_season = first_nfl_season if first_nfl_season is not None else {}
     manager_id = claims[0].manager_id if claims else None
     issues: list[ValidationIssue] = []
 
@@ -410,18 +456,50 @@ def validate_team_claims(
                 )
             )
 
-        played = seasons_played.get(claim.espn_player_id)
-        if played is not None and played > 1:
-            issues.append(
-                ValidationIssue(
-                    IssueCode.PROSPECT_TOO_MANY_SEASONS,
-                    Severity.ERROR,
-                    f"prospect has played {played} NFL seasons, max is 1",
-                    manager_id=claim.manager_id,
-                    espn_player_id=claim.espn_player_id,
-                    slot=claim.slot,
+        if rule_one_applies:
+            began = first_nfl_season.get(claim.espn_player_id)
+            if began is None:
+                issues.append(
+                    ValidationIssue(
+                        IssueCode.PROSPECT_ROOKIE_UNVERIFIED,
+                        Severity.REVIEW,
+                        "ESPN has no draft class or debut year on record for this player, so "
+                        "prospect rule 1 (must be a rookie) could not be checked",
+                        manager_id=claim.manager_id,
+                        espn_player_id=claim.espn_player_id,
+                        slot=claim.slot,
+                    )
                 )
-            )
+            else:
+                # Kept FROM the season just completed, so the count runs to claim.season - 1
+                # inclusive: (claim.season - 1) - began + 1. Not claim.season - began + 1,
+                # which rejects a genuine rookie.
+                elapsed = claim.season - began
+                if elapsed > 1:
+                    issues.append(
+                        ValidationIssue(
+                            IssueCode.PROSPECT_TOO_MANY_SEASONS,
+                            Severity.REVIEW,
+                            f"first NFL season was {began}, so he was not a rookie in "
+                            f"{claim.season - 1} — {_ordinal(elapsed)}-year player",
+                            manager_id=claim.manager_id,
+                            espn_player_id=claim.espn_player_id,
+                            slot=claim.slot,
+                        )
+                    )
+                elif elapsed < 1:
+                    issues.append(
+                        ValidationIssue(
+                            IssueCode.PROSPECT_ROOKIE_UNVERIFIED,
+                            Severity.REVIEW,
+                            f"first NFL season is recorded as {began}, which is not before "
+                            f"{claim.season} — he could not have been on a {claim.season - 1} "
+                            f"roster, so this is bad data rather than a bad claim",
+                            manager_id=claim.manager_id,
+                            espn_player_id=claim.espn_player_id,
+                            slot=claim.slot,
+                        )
+                    )
 
         entry = rostered.get(claim.espn_player_id)
         if entry is not None and trade_deadline is not None:
@@ -478,7 +556,7 @@ def compute_team_keepers(
     *,
     manager_id: str | None = None,
     fees_waived: bool = False,
-    seasons_played: Mapping[int, int] | None = None,
+    first_nfl_season: Mapping[int, int] | None = None,
     trade_deadline: datetime | None = None,
     prior_prospect_ids: Collection[int] = (),
 ) -> TeamKeeperResult:
@@ -492,7 +570,7 @@ def compute_team_keepers(
         claims,
         roster,
         fees_waived=fees_waived,
-        seasons_played=seasons_played,
+        first_nfl_season=first_nfl_season,
         trade_deadline=trade_deadline,
         prior_prospect_ids=prior_prospect_ids,
     )

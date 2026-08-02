@@ -85,12 +85,199 @@
     color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
     border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
   }
-  .jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.5rem; }
-  .jump a { font-size: 0.9rem; }
-  .team { border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.15rem; margin: 1.5rem 0; }
-  .team h3 { margin-top: 0; }
-  .team table { margin-bottom: 0; }
-  .team tbody tr:last-child td { border-bottom: none; }
+  /* --- the keeper page: one grid, every roster ---------------------------- */
+
+  /* Every roster in the league in one flat table, sorted and filtered in the browser. The
+     controls sit above it and stick with the column header, so a filter is never scrolled
+     off while you are reading the rows it produced. */
+  .controls {
+    position: sticky; top: 0; z-index: 3; background: var(--bg);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 0 0.6rem; border-bottom: 1px solid var(--line);
+  }
+  .controls input, .controls select, .controls button {
+    font: inherit; font-size: 0.9rem; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 6px; background: var(--bg);
+    padding: 0.3rem 0.5rem;
+  }
+  .controls input { flex: 1 1 9rem; min-width: 0; }
+  .controls select { flex: 0 1 auto; max-width: 9rem; }
+  .controls button { background: var(--panel); cursor: pointer; }
+  .controls button:hover { border-color: var(--accent); color: var(--accent); }
+  .controls input:focus-visible, .controls select:focus-visible,
+  .controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .controls .check {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.9rem; color: var(--ink); white-space: nowrap; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.55rem;
+  }
+  .controls .check:hover { border-color: var(--accent); }
+  .controls .check input { width: 0.95rem; height: 0.95rem; accent-color: var(--accent); margin: 0; }
+  .count { margin-left: auto; color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+  .empty { color: var(--muted); padding: 1.25rem 0; }
+
+  /* The salary column is deliberately UNSTYLED beyond `.money`. Three encodings were tried
+     and dropped — a tinted cell, a bar under the figure, and the figure itself coloured green
+     to red — for two reasons worth keeping written down.
+
+     Red already means something here: acquired after the keeper deadline, a row you cannot act
+     on. A second, unrelated meaning on the same colour makes the one that carries a rule
+     harder to trust.
+
+     And the grid arrives sorted dearest first, so magnitude is already encoded by position. A
+     scale on the column you are sorted by mostly restates the row order. */
+
+  /* Four columns across a 62rem page leaves an inch of white between a player's name and his
+     salary, and the eye loses the row crossing it. The grid is capped instead, and the
+     controls are capped with it so the two read as one block. */
+  .grid, .controls { max-width: 44rem; }
+  /* Fixed, so the money columns keep a width of their own and Player takes what is left. On
+     `auto` the un-wrappable subtext sets the Player column's width from its longest franchise
+     name and shoulders Salary off the side of a phone — the clip below never gets to run. */
+  .grid { margin: 0; table-layout: fixed; }
+  .grid th:nth-child(6) { width: 6.6rem; }              /* Acquired */
+  .grid th:nth-child(7), .grid th:nth-child(8) { width: 4.6rem; }  /* Base, Tax */
+  .grid th:nth-child(9) { width: 5.6rem; }              /* Salary */
+  /* Deliberately NOT `.scroll`. `overflow-x: auto` makes this div the scroll container, and a
+     sticky header then sticks to a box that never scrolls — the header stops working. The
+     grid fits a desktop column, so the scroller only comes back where it is needed. */
+  .grid-scroll { overflow-x: visible; }
+  .grid thead th {
+    /* Parks directly under the controls. Their height is not a constant — they wrap onto a
+       second line on a narrow window — so the script measures them and sets `--head-top`.
+       The fallback is what one unwrapped row comes to, for the moment before it runs. */
+    position: sticky; top: var(--head-top, 3.55rem); z-index: 2; background: var(--bg);
+    /* A collapsed border does not travel with a sticky cell, so the rule is drawn on. */
+    box-shadow: inset 0 -1px 0 var(--line);
+    padding: 0;
+  }
+  /* The header is a button so the sort is reachable by keyboard and announced as a control.
+     It has to fill the cell, or the clickable part is only as wide as the word. */
+  .grid .sort {
+    display: block; width: 100%; font: inherit; font-size: 0.78rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+    background: none; border: 0; border-radius: 0; padding: 0.45rem 0.6rem;
+    text-align: inherit; cursor: pointer;
+  }
+  .grid .sort:hover { color: var(--ink); }
+  .grid th.num .sort { text-align: right; }
+  .grid th[aria-sort] .sort { color: var(--accent); }
+  /* The arrow marks the sorted column. It is decorative — `aria-sort` on the th is what a
+     screen reader reads, and it says ascending or descending in words. */
+  .grid th[aria-sort] .sort::after { content: " \25B2"; font-size: 0.75em; }
+  .grid th[aria-sort="descending"] .sort::after { content: " \25BC"; }
+  /* Position, NFL club and franchise are folded into the Player cell; their columns stay in
+     the table for the dropdowns and the sort, and are hidden at every width. Twelve rows of
+     the same franchise repeated down a column is a wall, and it is the longest text here. */
+  .grid tr > :nth-child(2), .grid tr > :nth-child(3), .grid tr > :nth-child(4),
+  .grid tr > :nth-child(5) {
+    display: none;
+  }
+
+  /* The player cell, in two lines. Line one is who he is — name, then position and club
+     inline beside it, because those are one thought. Line two is whose he is. */
+  .grid .who { display: block; }
+  .grid .pos {
+    margin-left: 0.45rem; font-size: 0.8rem; color: var(--muted);
+    white-space: nowrap; letter-spacing: 0.01em;
+  }
+
+  .grid .acq { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+  /* The same date, folded onto line two. Off wherever Acquired is a column of its own — it is
+     never shown twice, the same arrangement as position, club and franchise. */
+  .grid .acq-sub, .grid .prospect-sub { display: none; }
+  .tag-prospect { color: var(--accent); font-weight: 600; }
+  .tag-unknown { color: var(--flag); }
+
+  /* Prospect eligibility, as a badge in a one-character column. Only the two states worth
+     seeing get one: filled for eligible, dashed for unknown. The ordinary case — checked, not
+     eligible — is an empty cell, because 165 dashes down a column is noise that hides the 23
+     rows somebody is actually looking for. The words are still in `data-k` for the filter. */
+  .pbadge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.4rem;
+    font-size: 0.62rem; font-weight: 700; line-height: 1; cursor: help;
+    vertical-align: 0.08em; flex: none;
+  }
+  .pbadge.is-eligible { background: var(--accent); color: #fff; }
+  .pbadge.is-unknown {
+    border: 1px dashed var(--flag-line); background: var(--flag-bg); color: var(--flag);
+  }
+
+  /* Acquired after the qualifying season's trade deadline — the same red the alert above the
+     grid uses, so the note and the rows it is about read as one thing. Marked on the date it is
+     a fact about, plus a left edge so it is findable while scanning rather than only readable
+     once found. Deliberately not called "invalid": the deadline is the prospect rule's third
+     test, and whether it also bars an ordinary keeper is the commissioner's to say. */
+  .grid tbody tr.late { background: var(--bad-bg); }
+  .grid tbody tr.late:hover { background: var(--bad-bg); }
+  .grid tbody tr.late .late-date { color: var(--bad); font-weight: 700; }
+  .grid tbody tr.late > :first-child { box-shadow: inset 3px 0 0 var(--bad-line); }
+  /* Greyed as well as tinted. Colour alone would leave these reading as ordinary rows for
+     anyone who cannot see it, and a keeper somebody cannot keep should recede on any screen.
+     The date keeps its red — it is the reason the row is greyed, so it stays legible. */
+  .grid tbody tr.late td { color: var(--muted); }
+  .grid tbody tr.late .who { color: var(--muted); font-weight: 400; }
+  .grid tbody tr.late .money { color: var(--muted); }
+
+  /* The alert. Red rather than a muted aside: it is the one number on the page that decides
+     whether a row below it counts, and the rows that fail it are red too. */
+  /* Sized to its content rather than stretched across the container — it is one short fact,
+     and a full-width bar promises more than it says. Same red as the rows it is about. */
+  .deadline {
+    display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 0 0.75rem;
+    background: var(--bad-bg); border: 1px solid var(--bad-line); border-left-width: 4px;
+    border-radius: 6px; padding: 0.45rem 0.75rem;
+    color: var(--bad); font-size: 0.9rem; font-weight: 600;
+  }
+  .deadline strong { font-variant-numeric: tabular-nums; }
+  .deadline-i {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 1.15rem; height: 1.15rem; border-radius: 50%;
+    background: var(--bad); color: var(--bad-bg);
+    font-size: 0.72rem; font-weight: 700; font-style: italic; line-height: 1;
+  }
+  /* One line, always. "Aiyukiddinme? I'm Odunze here" is long enough to wrap the subtext on a
+     phone, and a grid where half the rows are two lines and half are three is harder to read
+     than one that clips. It clips only where there is no room; a desktop shows all of it. */
+  /* Line two is a flex row so the *franchise* is what gives way when it runs out of room. It
+     is the longest text on the page, it repeats down every roster and it has its own filter;
+     the acquisition date is unique to the row and was asked for, so it must not be the thing
+     that gets clipped. Letting the whole line ellipsize clipped the date on 79 rows. */
+  .grid .sub {
+    display: flex; font-size: 0.82rem; color: var(--muted); letter-spacing: 0.01em;
+    white-space: nowrap; overflow: hidden;
+  }
+  .grid .franchise { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .grid .acq-sub, .grid .prospect-sub { flex: none; }
+
+  /* A phone fits three money-ish columns beside the player, not six. This was measured, not
+     guessed: with six, the table overflowed by 30px, 164 of 188 names wrapped and every single
+     subtext was clipped, because the Player column had been squeezed to 146px against the
+     ~220px its two lines need.
+
+     So Acquired, Prospect and Tax fold into the row instead. Nothing is removed from the page
+     — the date and the prospect tag join line two, and Tax is the gap between Base and Salary,
+     which both stay. `.grid-scroll` still never becomes a scroll container: the moment it does,
+     the sticky header sticks to a box that never scrolls and quietly stops working. */
+  @media (max-width: 34rem) {
+    /* Two stacked sticky bars is a third of a phone screen. The header wins the top spot and
+       the filters scroll away, so `--head-top` is overridden back to zero here. */
+    .controls { position: static; }
+    .grid thead th { top: 0; }
+    .grid { font-size: 0.9rem; }
+    .grid td, .grid .sort { padding: 0.4rem 0.3rem; }
+    .grid .sub { font-size: 0.78rem; }
+    .grid .acq-sub { display: inline; }
+    /* Acquired and Tax fold away; the P column stays, because a badge costs 2.4rem and is the
+       one thing here somebody scans a phone for. */
+    .grid tr > :nth-child(6), .grid tr > :nth-child(8) { display: none; }
+    .grid th:nth-child(7) { width: 2.9rem; }
+    .grid th:nth-child(9) { width: 4.1rem; }
+    .grid td, .grid .sort { padding: 0.4rem 0.22rem; }
+    .pbadge { width: 1rem; height: 1rem; font-size: 0.56rem; margin-left: 0.3rem; }
+    .count { margin-left: 0; }
+  }
 
   /* --- the home page: a prize board ------------------------------------- */
 
@@ -252,5 +439,6 @@
 {% block content %}{% endblock %}
 
 </div>
+{% block scripts %}{% endblock %}
 </body>
 </html>

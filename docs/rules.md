@@ -60,7 +60,8 @@ people out:
 A prospect must meet both of these:
 
 - **He must be a rookie.**
-- **Rostered before the trade deadline.**
+- **Rostered before the trade deadline** — the site calls this the *keeper deadline*, since it
+  is the date by which you must already hold a player to keep him. It is the same date.
 
 He is kept at his acquisition value, with **no fee** and **no tax**.
 
@@ -70,6 +71,26 @@ claim is never legal. After that he is an ordinary keeper.
 **Prospects may be started.** The old rule that a prospect must never have been started by any
 team in the league was dropped, and so was the allowance for second-year players. Both changes
 are already in force; this page was simply behind.
+
+**The keeper page marks who is eligible.** "Rookie" means his first NFL season was the one just
+finished, taken from ESPN's draft class, and the mark covers all three rules — rookie, rostered
+before the deadline, and never prospected before.
+
+It shows as a small **P** beside the player's name: filled blue for eligible, dashed amber for a
+player ESPN has no first season for at all. No badge means checked and not eligible. Team
+defences never get one — a D/ST has no rookie season and can never be a prospect. Hover it for
+the reason, or tick **Prospects only** to see nothing else.
+
+**Every row shows when that manager acquired the player**, and the keeper deadline it is measured
+against is in red above the grid. A player picked up *after* that deadline is shown in red too —
+his date and his whole row, and both are greyed so they recede whether or not you can see the
+colour.
+
+The grid arrives sorted dearest first, so the expensive end of the league reads at a glance.
+
+Note what the red mark is and is not: being rostered before the deadline is the **prospect**
+rule's third test. Whether it also bars an ordinary keeper is a separate question, and nothing
+here decides it.
 
 ### The consolation bracket winner
 

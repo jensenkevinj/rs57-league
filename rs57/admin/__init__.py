@@ -145,7 +145,12 @@ def create_app(
         if manager_id not in current.manager_ids:
             abort(404, f"{manager_id} has no roster in {year}")
         screen = build_team_screen(
-            year, manager_id, current, derived.load(year - 1), store
+            year,
+            manager_id,
+            current,
+            derived.load(year - 1),
+            store,
+            first_nfl_season=derived.first_nfl_seasons(),
         )
         return render_template("team.html", screen=screen, source=current)
 
@@ -155,7 +160,13 @@ def create_app(
         current = season_or_404(year)
         claims, problems = claims_from_form(year, manager_id, request.form.to_dict())
         screen = build_team_screen(
-            year, manager_id, current, derived.load(year - 1), store, claims=claims
+            year,
+            manager_id,
+            current,
+            derived.load(year - 1),
+            store,
+            claims=claims,
+            first_nfl_season=derived.first_nfl_seasons(),
         )
         return render_template(
             "_claim_form.html", screen=screen, source=current, problems=problems
@@ -173,7 +184,13 @@ def create_app(
             price_with=(current, store),
         )
         screen = build_team_screen(
-            year, manager_id, current, derived.load(year - 1), store, claims=claims
+            year,
+            manager_id,
+            current,
+            derived.load(year - 1),
+            store,
+            claims=claims,
+            first_nfl_season=derived.first_nfl_seasons(),
         )
 
         if problems or screen.blocked:
@@ -186,7 +203,13 @@ def create_app(
 
         store.save_team_claims(year, manager_id, claims)
         saved = build_team_screen(
-            year, manager_id, current, derived.load(year - 1), store, saved=True
+            year,
+            manager_id,
+            current,
+            derived.load(year - 1),
+            store,
+            saved=True,
+            first_nfl_season=derived.first_nfl_seasons(),
         )
         return render_template("_claim_form.html", screen=saved, source=current, problems=[])
 

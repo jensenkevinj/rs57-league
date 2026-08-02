@@ -8,6 +8,7 @@ each permanent once they ship.
 
 from __future__ import annotations
 
+import html
 import json
 import re
 from pathlib import Path
@@ -142,9 +143,12 @@ def derived(tmp_path: Path) -> Path:
     out = tmp_path / "derived"
     out.mkdir()
     (out / f"{SEASON}.json").write_text(json.dumps(keeper_doc()), encoding="utf-8")
-    (out / f"{PRIOR}.json").write_text(
-        json.dumps(keeper_doc(season=PRIOR, roster=[], players=[])), encoding="utf-8"
-    )
+    # The prior season carries its OWN deadline. Inheriting 2026's was unrealistic and made
+    # every prospect deadline check pass for free — 2026's deadline is in December 2026, which
+    # every player on a 2025 roster clears.
+    prior = keeper_doc(season=PRIOR, roster=[], players=[])
+    prior["source"]["trade_deadline"] = "2025-11-26T17:00:00"
+    (out / f"{PRIOR}.json").write_text(json.dumps(prior), encoding="utf-8")
     (out / f"{PRIOR}-stats.json").write_text(json.dumps(stats_doc()), encoding="utf-8")
     return out
 
@@ -156,8 +160,15 @@ def render(tmp_path: Path, derived: Path) -> dict[str, str]:
 
 
 def text(html: str) -> str:
-    """The page with its tags removed, for asserting on what a reader actually sees."""
-    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+    """The page with its tags removed, for asserting on what a reader actually sees.
+
+    ``<style>`` and ``<script>`` bodies are dropped first. Stripping tags alone leaves their
+    *contents* behind, so a CSS comment or a line of JavaScript counted as page text — which
+    fails an assertion for the wrong reason and, worse, would let one pass for the wrong
+    reason. A reader sees neither.
+    """
+    stripped = re.sub(r"<(style|script)\b.*?</\1>", " ", html, flags=re.S | re.I)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", stripped))
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +304,14 @@ def test_error_issue_renders_too_and_is_not_silently_dropped(tmp_path: Path):
     assert "no scores recorded for week 3" in page
 
 
-def test_keeper_sync_warnings_reach_the_page(tmp_path: Path):
+def test_a_sync_warning_stays_off_the_public_page(tmp_path: Path):
+    """A REVIEW is the commissioner's to clear, and the admin tool is where he clears it.
+
+    Publishing it asks twelve managers to check something none of them can act on. It is not
+    dropped: ``admin.screens`` raises every ``review.warnings`` entry on the team screen, and
+    ``test_admin.test_a_sync_warning_reaches_the_commissioner`` is the assertion that it does.
+    Delete that test and this one becomes a warning that reaches nobody.
+    """
     derived = tmp_path / "derived"
     derived.mkdir()
     doc = keeper_doc()
@@ -301,16 +319,150 @@ def test_keeper_sync_warnings_reach_the_page(tmp_path: Path):
     (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
 
     page = render(tmp_path, derived)["keepers.html"]
-    assert "has not been drafted" in page
-    assert "unverified" in text(page).lower()
+    assert "has not been drafted" not in page
+    assert "unverified" not in text(page).lower()
 
 
-def test_derived_consolation_winner_is_not_rendered_as_settled(tmp_path: Path, derived: Path):
-    """Nothing records the consolation winner yet, so a fee waiver is derived, not decided."""
+def test_an_error_still_reaches_the_public_page(tmp_path: Path):
+    """An ERROR is a row missing from the grid, and only this flag says the grid is short.
+
+    The page filters its notes down to errors. Filtering them down to nothing would look
+    identical on today's data, which has no errors — so this drops a roster entry whose player
+    record is absent and insists the reader is told.
+    """
+    derived = tmp_path / "derived"
+    derived.mkdir()
+    doc = keeper_doc()
+    doc["players"] = [row for row in doc["players"] if row["espn_player_id"] != 2]
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    body = text(render(tmp_path, derived)["keepers.html"]).lower()
+    assert "no matching player record" in body
+    assert "error" in body
+
+
+def test_the_derived_consolation_waiver_is_not_published_at_all(tmp_path: Path, derived: Path):
+    """Nothing records the consolation winner, so the page must not hint that anything does.
+
+    It used to publish the derivation under an "unverified" flag. Half the league read the flag
+    as the answer, so the whole question moved to the admin tool's settings screen, where the
+    commissioner records the winner and the waiver becomes a fact rather than a guess.
+    """
+    body = text(render(tmp_path, derived)["keepers.html"]).lower()
+    for hint in ("waive", "waived", "consolation", "commissioner", "unverified"):
+        assert hint not in body, f"the public keeper page still mentions {hint!r}"
+
+
+# ---------------------------------------------------------------------------
+# The grid: one flat table, sorted and filtered in the browser
+# ---------------------------------------------------------------------------
+
+
+def grid_rows(page: str) -> list[list[str]]:
+    """Every ``<tbody>`` row of the keeper grid, as a list of stripped cell texts."""
+    body = re.search(r"<tbody>(.*?)</tbody>", page, re.S)
+    assert body, "the keeper page has no table body"
+    return [
+        [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
+         for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body.group(1), re.S)
+    ]
+
+
+def test_the_grid_is_one_row_per_rostered_player(tmp_path: Path, derived: Path):
+    """Twelve tables became one, so a franchise is a column and never a heading row.
+
+    A heading row carries no franchise for the row below it once the table is re-sorted, which
+    is what the browser does the moment anyone clicks a column.
+    """
+    season = build_keeper_season(derived, SEASON)
+    rows = grid_rows(render(tmp_path, derived)["keepers.html"])
+
+    assert len(rows) == sum(len(team.lines) for team in season.teams)
+    assert all(len(row) == 9 for row in rows), f"a row is not nine cells: {rows}"
+    # ``Belichick's  Spy`` carries a real double space. It survives into the HTML; only this
+    # test's own whitespace-collapsing needs undoing, so collapse the expected names too.
+    named = {re.sub(r"\s+", " ", team.name) for team in season.teams}
+    for row in rows:
+        assert row[2] in named, f"row {row} carries no franchise of its own"
+
+
+def test_the_grid_does_not_publish_declarations(tmp_path: Path, derived: Path):
     page = render(tmp_path, derived)["keepers.html"]
-    body = text(page).lower()
-    assert "not been confirmed by the commissioner" in body
-    assert "unverified" in body
+    head = re.search(r"<thead>(.*?)</thead>", page, re.S).group(1)
+    assert [re.sub(r"<[^>]+>", "", cell).strip()
+            for cell in re.findall(r"<th[^>]*>(.*?)</th>", head, re.S)] == [
+        "Player", "Pos", "Team", "NFL", "Prospect", "Acquired", "Base", "Tax", "Salary"
+    ]
+
+
+def test_the_whole_grid_is_served_without_javascript(tmp_path: Path, derived: Path):
+    """Sorting and filtering are an enhancement. The rows are HTML the server wrote.
+
+    If the script ever became the thing that builds the table, a browser that blocks it — or a
+    syntax error in one line of it — would serve a league of empty rosters and look fine doing it.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    served = page[: page.index("<script>")]
+    assert "Puka Nacua" in served and "James Cook III" in served
+    assert len(grid_rows(served)) == len(grid_rows(page))
+
+
+def test_the_sort_reads_money_from_an_attribute_not_from_the_dollars(
+    tmp_path: Path, derived: Path
+):
+    """``data-v`` is why the script never parses "$12" back into a number.
+
+    A parser in the script would be a second implementation of what a dollar is, and it would
+    sort $100 below $9 the first time somebody wrote one that split on the wrong character.
+    """
+    season = build_keeper_season(derived, SEASON)
+    lines = {line.player_name: line for line in
+             [line for team in season.teams for line in team.lines]}
+    page = render(tmp_path, derived)["keepers.html"]
+
+    row = next(row for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S)
+               if "Puka Nacua" in row)
+    nacua = lines["Puka Nacua"]
+    for amount in (nacua.base, nacua.tax, nacua.price):
+        assert f'data-v="{amount}"' in row, f"${amount} is rendered with no sortable value"
+
+
+def test_the_player_cell_keeps_a_sort_key_apart_from_what_it_displays(
+    tmp_path: Path, derived: Path
+):
+    """Position, NFL club and franchise fold under the name, inside the same cell.
+
+    The cell then reads "Puka Nacua WR LAR Fake News", and a sort that took the cell's text
+    would order the league by name-then-position-then-franchise while still calling itself
+    Player. ``data-k`` is the name on its own, and the script prefers it where a cell has one.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(row for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S)
+               if "Puka Nacua" in row)
+    cell = re.search(r"<td[^>]*data-k=\"([^\"]*)\"[^>]*>(.*?)</td>", row, re.S)
+
+    assert cell, "the player cell carries no sort key"
+    assert cell.group(1) == "Puka Nacua", "the sort key is not the name on its own"
+    folded = cell.group(2)
+    for detail in ("WR", "LAR", "Fake News"):
+        assert detail in folded, (
+            f"{detail!r} is not folded into the player cell, and its own column is hidden — "
+            f"so it appears nowhere on the page"
+        )
+
+
+def test_a_franchise_name_is_escaped_inside_the_title_attribute(tmp_path: Path):
+    """The franchise name is now in an attribute as well as in text — a second escape path."""
+    derived = tmp_path / "derived"
+    derived.mkdir()
+    doc = keeper_doc()
+    doc["franchises"][0]["name"] = '" onmouseover="alert(1)'
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    page = render(tmp_path, derived)["keepers.html"]
+    assert 'onmouseover="alert(1)"' not in page
+    assert "&#34;" in page or "&quot;" in page
 
 
 # ---------------------------------------------------------------------------
@@ -1034,3 +1186,507 @@ def test_the_rules_page_is_built_from_the_repo_markdown(tmp_path: Path, derived:
     body = text(page)
     assert "keeper" in body.lower()
     assert f"${KEEPER_TAX}" in body
+
+
+# ---------------------------------------------------------------------------
+# Prospect eligibility, and the season the page is actually about
+# ---------------------------------------------------------------------------
+
+
+def origins_doc(seasons: dict[int, int]) -> str:
+    return json.dumps(
+        {
+            "players": [
+                {"espn_player_id": pid, "first_nfl_season": began, "source": "draft_year"}
+                for pid, began in seasons.items()
+            ],
+            "unresolved": [],
+            "review": {"warnings": []},
+        }
+    )
+
+
+def test_a_rookie_from_last_season_is_prospect_eligible(tmp_path: Path, derived: Path):
+    """Player 1 began in 2025 and the 2026 file has not drafted, so 2025 is the qualifying season."""
+    (derived / "player-origins.json").write_text(origins_doc({1: PRIOR}), encoding="utf-8")
+    season = build_keeper_season(derived, SEASON, first_nfl_season={1: PRIOR})
+
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Puka Nacua"].prospect_state == "eligible"
+    assert season.any_eligible
+
+    body = text(render(tmp_path, derived)["keepers.html"])
+    assert "eligible" in body.lower()
+
+
+def test_a_veteran_is_marked_not_eligible_rather_than_left_blank(derived: Path):
+    """"Not eligible" is a checked answer. It must be distinguishable from "we do not know"."""
+    season = build_keeper_season(derived, SEASON, first_nfl_season={1: PRIOR - 4, 2: PRIOR})
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Puka Nacua"].prospect_state == "ineligible"
+    assert lines["James Cook III"].prospect_state == "eligible"
+
+
+def test_an_unknown_draft_class_says_unknown_on_the_page(tmp_path: Path, derived: Path):
+    """Absence of a mark would read as a quiet no. It gets its own words instead."""
+    season = build_keeper_season(derived, SEASON, first_nfl_season={})
+    assert all(
+        line.prospect_state == "unknown" for team in season.teams for line in team.lines
+    )
+    assert not season.any_eligible
+
+    (derived / "player-origins.json").write_text(origins_doc({}), encoding="utf-8")
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    assert "Unknown" in row, "an unresolved player must say so in his own row"
+
+
+def test_a_player_kept_as_a_prospect_before_is_never_eligible_again(derived: Path):
+    """Rule 3 beats the draft class: a definite no outranks anything ESPN says."""
+    season = build_keeper_season(
+        derived, SEASON, first_nfl_season={1: PRIOR}, prior_prospect_ids={1}
+    )
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Puka Nacua"].prospect_state == "ineligible"
+
+
+def test_a_player_acquired_after_the_deadline_is_not_eligible(tmp_path: Path):
+    """Rule 2, against the QUALIFYING season's deadline — not the coming season's.
+
+    The 2026 file's own deadline is in December 2026, which every player on a 2025 roster
+    clears. Reading that one would mark the whole league eligible.
+    """
+    out = tmp_path / "derived"
+    out.mkdir()
+    doc = keeper_doc()
+    doc["roster"][0]["acquired_at"] = "2025-12-19T12:00:00"  # after 2025's deadline
+    (out / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    prior = keeper_doc(season=PRIOR, roster=[], players=[])
+    prior["source"]["trade_deadline"] = "2025-11-26T17:00:00"
+    (out / f"{PRIOR}.json").write_text(json.dumps(prior), encoding="utf-8")
+
+    season = build_keeper_season(out, SEASON, first_nfl_season={1: PRIOR, 2: PRIOR})
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Puka Nacua"].prospect_state == "ineligible", "acquired after the deadline"
+    assert lines["James Cook III"].prospect_state == "eligible"
+
+
+def test_a_drafted_season_marks_next_years_rookies(tmp_path: Path):
+    """The phase pivot. Once a season has drafted, the page is about the NEXT keep decision.
+
+    Before the auction the bases are what a player costs to keep into ``season``; after it they
+    are ``keeperValueFuture``, which is what he carries into ``season + 1``. The eligibility
+    mark has to move with the money, or the page marks the wrong draft class from the day the
+    auction ends — mid-2026 it is 2026's rookies who are eligible, not 2025's.
+    """
+    out = tmp_path / "derived"
+    out.mkdir()
+    doc = keeper_doc(season=PRIOR)
+    doc["source"]["drafted"] = True
+    doc["source"]["base_salary_field"] = "keeperValueFuture"
+    doc["source"]["trade_deadline"] = "2025-11-26T17:00:00"
+    for row in doc["roster"]:
+        row["season"] = PRIOR
+    (out / f"{PRIOR}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    season = build_keeper_season(out, PRIOR, first_nfl_season={1: PRIOR, 2: PRIOR - 1})
+
+    assert season.drafted
+    assert season.decision_season == PRIOR + 1, "a drafted season decides the following year"
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    # Player 1 began in 2025 — the qualifying season for a 2026 decision made mid-2025.
+    assert lines["Puka Nacua"].prospect_state == "eligible"
+    # Player 2 began in 2024, a rookie for the 2025 decision but not this one.
+    assert lines["James Cook III"].prospect_state == "ineligible"
+
+
+def test_both_phases_agree_about_the_same_decision(tmp_path: Path, derived: Path):
+    """2025 (drafted) and 2026 (not) both decide the 2026 keeps, so both name the same season.
+
+    Two routes to one answer is what shows the pivot is right rather than merely present.
+    """
+    undrafted = build_keeper_season(derived, SEASON, first_nfl_season={})
+    assert undrafted.decision_season == SEASON
+
+    out = tmp_path / "d2"
+    out.mkdir()
+    doc = keeper_doc(season=PRIOR)
+    doc["source"]["drafted"] = True
+    for row in doc["roster"]:
+        row["season"] = PRIOR
+    (out / f"{PRIOR}.json").write_text(json.dumps(doc), encoding="utf-8")
+    drafted = build_keeper_season(out, PRIOR, first_nfl_season={})
+
+    assert drafted.decision_season == undrafted.decision_season == SEASON
+
+
+def test_the_title_names_the_season_being_decided(tmp_path: Path):
+    """Post-auction the file is named 2025 but the page is about 2026. The tab must say so."""
+    out = tmp_path / "derived"
+    out.mkdir()
+    doc = keeper_doc(season=PRIOR)
+    doc["source"]["drafted"] = True
+    for row in doc["roster"]:
+        row["season"] = PRIOR
+    (out / f"{PRIOR}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    page = render(tmp_path, out)["keepers.html"]
+    assert f"<title>RS57 — {SEASON} Keepers</title>" in page
+    assert f"<title>RS57 — {PRIOR} Keepers</title>" not in page
+
+
+def test_the_prospect_mark_does_not_pollute_the_player_sort_key(tmp_path: Path, derived: Path):
+    """The tag rides in the Player cell, and ``data-k`` is still the bare name."""
+    (derived / "player-origins.json").write_text(origins_doc({1: PRIOR}), encoding="utf-8")
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    cell = re.search(r"<td[^>]*data-k=\"([^\"]*)\"", row)
+    assert cell.group(1) == "Puka Nacua"
+
+
+def test_no_review_note_reaches_the_public_page_from_eligibility(tmp_path: Path, derived: Path):
+    """The unknown state is carried per row, never as a page-level unverified banner."""
+    body = text(render(tmp_path, derived)["keepers.html"]).lower()
+    assert "unverified" not in body
+    assert "nobody has checked" not in body
+
+
+def test_a_defence_is_never_marked_unknown(tmp_path: Path):
+    """A D/ST has no draft class because the question does not apply, not because it is missing.
+
+    ESPN 404s on every negative id by construction, so before this they all rendered "draft
+    class unknown" — twelve rows telling the reader to go and check something uncheckable, and
+    unprospectable anyway. A settled no, not an open question.
+    """
+    out = tmp_path / "derived"
+    out.mkdir()
+    doc = keeper_doc()
+    doc["players"].append(
+        {"espn_player_id": -16033, "name": "Ravens D/ST", "position": "DEF", "nfl_team": "BAL"}
+    )
+    doc["roster"].append({**doc["roster"][0], "espn_player_id": -16033})
+    (out / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    season = build_keeper_season(out, SEASON, first_nfl_season={})
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Ravens D/ST"].prospect_state == "ineligible"
+
+    # Scoped to the D/ST's own row — the other fixture players genuinely are unknown here,
+    # and asserting over the whole page would pass or fail for the wrong reason.
+    page = render(tmp_path, out)["keepers.html"]
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Ravens D/ST" in r)
+    assert "Unknown" not in row
+    assert "Eligible" not in row
+
+
+def test_a_bound_before_the_qualifying_season_rules_a_player_out(derived: Path):
+    """An undrafted veteran ESPN states nothing about is still provably not a rookie.
+
+    The statistics log says he was recording numbers in 2022. It can only run late, so his
+    true first season is 2022 or earlier — either way, not 2025.
+    """
+    season = build_keeper_season(
+        derived, SEASON, first_nfl_season={}, first_season_bounds={1: 2022, 2: 2022}
+    )
+    assert all(
+        line.prospect_state == "ineligible" for team in season.teams for line in team.lines
+    )
+
+
+def test_a_bound_can_never_prove_a_player_is_a_rookie(derived: Path):
+    """The asymmetry, and the reason the two mappings are kept apart.
+
+    A bound equal to the qualifying season is exactly the ambiguous case: he may be a genuine
+    rookie, or he may have spent the prior season on a roster recording nothing, which is how
+    the statistics log comes out a season late. Unknown is the honest answer; "eligible" would
+    eventually hand somebody a second-year player at a prospect price.
+    """
+    season = build_keeper_season(
+        derived, SEASON, first_nfl_season={}, first_season_bounds={1: PRIOR, 2: PRIOR}
+    )
+    states = {line.prospect_state for team in season.teams for line in team.lines}
+    assert states == {"unknown"}, "a bound was allowed to confer eligibility"
+
+    # The same year from an exact source does confer it.
+    exact = build_keeper_season(derived, SEASON, first_nfl_season={1: PRIOR, 2: PRIOR})
+    assert {line.prospect_state for team in exact.teams for line in team.lines} == {"eligible"}
+
+
+# ---------------------------------------------------------------------------
+# Acquisition dates, the deadline reference, and the late marking
+# ---------------------------------------------------------------------------
+
+
+def test_the_deadline_is_stated_above_the_grid(tmp_path: Path, derived: Path):
+    """The Acquired column is measured against a date, so the page says which date.
+
+    Asking a reader to hold it in their head down 188 rows is how a marked row becomes
+    a mystery rather than a warning.
+    """
+    body = text(render(tmp_path, derived)["keepers.html"])
+    assert "11/26/2025" in body, "the qualifying season's keeper deadline is not on the page"
+    assert "keeper deadline" in body.lower()
+
+
+def test_a_missing_deadline_says_so_rather_than_printing_nothing(tmp_path: Path):
+    """No line at all would read as "there is no deadline", which is a different claim."""
+    out = tmp_path / "derived"
+    out.mkdir()
+    (out / f"{SEASON}.json").write_text(json.dumps(keeper_doc()), encoding="utf-8")
+
+    body = text(render(tmp_path, out)["keepers.html"])
+    assert "not on file" in body
+    assert "no row is marked against it" in body
+
+
+def test_a_player_acquired_after_the_deadline_is_marked_on_the_row(tmp_path: Path):
+    """The fact lives on the date it is a fact about, and the row carries an edge to find it."""
+    out = tmp_path / "derived"
+    out.mkdir()
+    doc = keeper_doc()
+    doc["roster"][0]["acquired_at"] = "2025-12-19T12:00:00"  # after 2025's deadline
+    (out / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    prior = keeper_doc(season=PRIOR, roster=[], players=[])
+    prior["source"]["trade_deadline"] = "2025-11-26T17:00:00"
+    (out / f"{PRIOR}.json").write_text(json.dumps(prior), encoding="utf-8")
+
+    season = build_keeper_season(out, SEASON)
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
+    assert lines["Puka Nacua"].after_deadline is True
+    assert lines["James Cook III"].after_deadline is False
+
+    page = render(tmp_path, out)["keepers.html"]
+    late = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    ontime = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "James Cook" in r)
+    assert 'class="late' in late or ' late"' in late or "late" in late.split(">")[0]
+    assert "late-date" in late, "the date itself is not marked"
+    assert "late-date" not in ontime, "an on-time acquisition was marked"
+
+
+def test_the_acquired_column_sorts_chronologically(tmp_path: Path, derived: Path):
+    """ISO in ``data-k`` so a text sort is a date sort, and the script parses no dates.
+
+    Same reasoning as money sorting off ``data-v``: a date parser in the script would be a
+    second implementation of what a date is, and "02 Sep 2025" sorts before "08 Oct 2025"
+    alphabetically only by luck.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    cell = re.search(r'<td class="acq" data-k="([^"]+)"', row)
+    assert cell, "the acquired cell carries no sort key"
+    assert cell.group(1) == "2025-08-05", "the sort key is not an ISO date"
+    assert "8/5/2025" in row, "the displayed date is not the page's format"
+
+
+def test_prospect_status_is_a_column_of_its_own(tmp_path: Path, derived: Path):
+    """Hidden, and read only by the checkbox — but still a column, with clean words in it.
+
+    Both players get a first season, so the two states under test are *eligible* and *not
+    eligible*. Leave player 2 out and he is **unknown**, which is a third state and would make
+    this test pass for the wrong reason.
+    """
+    (derived / "player-origins.json").write_text(
+        origins_doc({1: PRIOR, 2: PRIOR - 3}), encoding="utf-8"
+    )
+    page = render(tmp_path, derived)["keepers.html"]
+
+    head = re.search(r"<thead>(.*?)</thead>", page, re.S).group(1)
+    headers = [re.sub(r"<[^>]+>", "", c).strip() for c in re.findall(r"<th[^>]*>(.*?)</th>", head, re.S)]
+    assert headers.index("Prospect") == 4, "the prospect state is not where the filter reads it"
+    assert headers.index("Acquired") == 5
+
+    eligible = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    veteran = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "James Cook" in r)
+    assert '<td class="pstate">Eligible</td>' in eligible
+    # The badge is what a reader sees; the hidden cell still carries the word the filter matches.
+    assert '<td class="pstate">Not eligible</td>' in veteran
+
+
+def test_the_folded_row_details_are_present_for_the_narrow_layout(tmp_path: Path, derived: Path):
+    """A phone drops the Acquired, Prospect and Tax columns and folds the first two into the
+    row. They have to be *in* the row for CSS to reveal them — six columns do not fit 375px."""
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    assert "acq-sub" in row, "the date is not folded into the row for the narrow layout"
+    assert "franchise" in row, "the franchise is not the element that gives way when clipped"
+
+
+def test_the_search_box_matches_player_names_and_nothing_else(tmp_path: Path, derived: Path):
+    """It says "player name", so that is what it searches.
+
+    Franchise and position have dropdowns of their own; leaving them in the box meant typing a
+    franchise silently did a different job from picking it, and searching the whole row would
+    make "5" match every price on the page.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    script = page[page.index("<script>"):]
+
+    assert 'placeholder="Filter by player name"' in page
+    assert "cellText(row, PLAYER).toLowerCase()" in script, "the haystack is not the name alone"
+    assert "cellText(row, TEAM)" not in script.split("function haystack")[1].split("}")[0]
+
+
+def test_every_displayed_date_uses_one_format(tmp_path: Path, derived: Path):
+    """mm/dd/yyyy on the deadline, in the Acquired column and on the folded phone line.
+
+    Three places that must never disagree, so the template sets the format once. The ISO sort
+    key is deliberately not this: it is for ordering, and a text sort over mm/dd/yyyy would put
+    every January before every February regardless of year.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    body = text(page)
+
+    assert "11/26/2025" in body, "the deadline is not in the page's date format"
+    assert "8/5/2025" in body, "an acquisition date is not in the page's date format"
+    for old in ("26 Nov 2025", "05 Aug 2025", "08/05/2025", "2025-08-05 "):
+        assert old not in body, f"{old!r} is a second date format on the page"
+
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    assert 'data-k="2025-08-05"' in row, "the sort key stopped being ISO"
+
+
+def test_prospect_eligibility_renders_as_a_badge_not_a_word(tmp_path: Path, derived: Path):
+    """A one-character column, because the header sets the width and this table has none spare.
+
+    The ordinary case is an empty cell on purpose: 165 dashes down a column hide the 23 rows
+    somebody is looking for. The words stay in ``data-k``, so the filter is unaffected.
+    """
+    # Player 2 needs a first season of his own, or he is *unknown* rather than not eligible —
+    # and those are the two states this test is here to keep apart.
+    (derived / "player-origins.json").write_text(
+        origins_doc({1: PRIOR, 2: PRIOR - 3}), encoding="utf-8"
+    )
+    page = render(tmp_path, derived)["keepers.html"]
+
+    eligible = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    veteran = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "James Cook" in r)
+
+    assert 'class="pbadge is-eligible"' in eligible
+    assert "pbadge" not in veteran, "a checked-and-not-eligible row should carry no badge"
+    assert '<td class="pstate">Not eligible</td>' in veteran, "the filter key went with the badge"
+    # The badge says "P"; the tooltip says what it means.
+    assert "Prospect eligible" in eligible
+
+
+def test_the_grid_arrives_sorted_dearest_first(tmp_path: Path, derived: Path):
+    """The server emits the default order, not the script.
+
+    A browser running no JavaScript gets the same grid everyone else starts on, and the
+    script's initial sort state describes that order rather than producing it — if the two
+    disagreed, the first click on Salary would appear to do nothing.
+    """
+    season = build_keeper_season(derived, SEASON)
+    prices = [line.price for line in season.rows]
+    assert prices == sorted(prices, reverse=True), "rows are not dearest first"
+    assert len(season.rows) == sum(len(t.lines) for t in season.teams)
+
+    page = render(tmp_path, derived)["keepers.html"]
+    body = re.search(r"<tbody>(.*?)</tbody>", page, re.S).group(1)
+    served = [int(v) for v in re.findall(r'class="num money sal s\d" data-v="(\d+)"', body)]
+    assert served == sorted(served, reverse=True), "the served HTML is not in the default order"
+
+    script = page[page.index("<script>"):]
+    assert "var sortColumn = SALARY;" in script
+    assert "var ascending = false;" in script
+
+
+def test_the_salary_column_carries_no_colour_scale(tmp_path: Path, derived: Path):
+    """Deliberately plain, and this is the test that keeps it that way.
+
+    Three encodings were tried and dropped — a tinted cell, a bar under the figure, and the
+    figure coloured green to red. The reasons are worth defending rather than rediscovering:
+    **red already means "acquired after the keeper deadline"** on this page, and a second
+    unrelated meaning on the same colour weakens the one that carries a rule; and the grid
+    arrives sorted dearest first, so magnitude is already encoded by position.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+
+    for gone in ("sal-bar", "price_band", 'class="num money sal'):
+        assert gone not in page, f"a salary encoding came back: {gone!r}"
+
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "James Cook" in r)
+    assert '<td class="num money" data-v="42">$42</td>' in row
+
+    # `.money` — tabular figures and one weight — and nothing at all keyed to the amount.
+    style = page[page.index("<style>"):page.index("</style>")]
+    assert not re.search(r"\.sal[.\s{]", style), "a salary-specific style survived"
+
+
+def test_prospects_only_is_a_checkbox_not_a_dropdown(tmp_path: Path, derived: Path):
+    page = render(tmp_path, derived)["keepers.html"]
+    assert '<input type="checkbox" id="f-prospect">' in page
+    assert '<select id="f-prospect"' not in page
+
+    script = page[page.index("<script>"):]
+    assert "byProspect.checked" in script
+    assert 'cellText(row, PROSPECT) === "Eligible"' in script, (
+        "the checkbox does not filter to eligible players"
+    )
+
+
+def test_the_prospect_badge_sits_with_the_player_not_in_a_column(tmp_path: Path, derived: Path):
+    """A column costs its header's width; a badge beside the name costs almost nothing.
+
+    That width is what the phone layout was short of — it is the whole reason this moved.
+    """
+    (derived / "player-origins.json").write_text(
+        origins_doc({1: PRIOR, 2: PRIOR - 3}), encoding="utf-8"
+    )
+    page = render(tmp_path, derived)["keepers.html"]
+
+    head = re.search(r"<thead>(.*?)</thead>", page, re.S).group(1)
+    assert ">P</th>" not in head, "the badge is back in a column of its own"
+
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    name_cell = row[row.index("<td data-k="):row.index("</td>")]
+    assert "pbadge" in name_cell, "the badge is not inside the player cell"
+
+
+def test_a_declared_keeper_is_not_highlighted(tmp_path: Path, derived: Path):
+    """The yellow wash explained a "Declared" column that no longer exists.
+
+    Once the column went, four rows were tinted with nothing on the page saying why — a marker
+    that raises a question it cannot answer is worse than no marker. Declarations live in the
+    admin console now.
+    """
+    claims = tmp_path / "manual"
+    claims.mkdir()
+    (claims / "claims.json").write_text(
+        json.dumps({"seasons": {str(SEASON): [
+            {"season": SEASON, "manager_id": "t1", "espn_player_id": 1,
+             "slot": "K1", "fee_allocated": 0, "computed_salary": 10}
+        ]}}),
+        encoding="utf-8",
+    )
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=claims)
+    page = (out / "keepers.html").read_text(encoding="utf-8")
+
+    row = next(r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S) if "Puka Nacua" in r)
+    assert "kept" not in row.split(">")[0], "a declared keeper is still being highlighted"
+    assert ".kept" not in page, "the declared-row style outlived the column it explained"
+
+
+def test_the_deadline_banner_is_sized_to_its_content(tmp_path: Path, derived: Path):
+    """One short fact. A full-width bar promises more than it says, and it carries the mark."""
+    page = render(tmp_path, derived)["keepers.html"]
+    assert 'class="deadline-i"' in page, "the banner has no information mark"
+    assert "display: inline-flex" in page.split(".deadline {")[1].split("}")[0]
+
+
+def test_the_player_count_only_appears_while_filtering(tmp_path: Path, derived: Path):
+    """Feedback while something is being narrowed, not a label sitting there permanently."""
+    page = render(tmp_path, derived)["keepers.html"]
+    assert '<span class="count" id="count" role="status" hidden></span>' in page
+    script = page[page.index("<script>"):]
+    assert "count.hidden = shown === rows.length;" in script
+
+
+def test_an_ineligible_row_is_greyed_as_well_as_tinted(tmp_path: Path, derived: Path):
+    """Colour alone leaves these reading as ordinary rows for anyone who cannot see it."""
+    page = render(tmp_path, derived)["keepers.html"]
+    style = page[page.index("<style>"):page.index("</style>")]
+    assert ".grid tbody tr.late td { color: var(--muted); }" in style
+    assert ".grid tbody tr.late { background: var(--bad-bg); }" in style, (
+        "the tint was dropped when the grey went in — the ask was to keep both"
+    )

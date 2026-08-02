@@ -6,138 +6,472 @@
     "against old declared fees. They are not a record of what anyone actually paid.",
     "Every expected value here is a literal. Do not compute it from a formula in a test."
   ],
-
   "_reviewed": {
     "by": "commissioner",
-    "on": "2026-07-28",
     "confirmed": [
       "A keeper fee sticks to the base permanently — it is paid again every season the player is kept, not once.",
       "Zero keepers owes $0. The rules doc only enumerates 1/2/3.",
       "Every sheet-anchored value below matches the commissioner's own reading of the workbook."
-    ]
+    ],
+    "on": "2026-07-28"
   },
-
   "chains": [
     {
       "case": "multi-year keep, no fees ever",
-      "player": "Puka Nacua",
       "expects_ratchet": true,
-      "why": "Confirmed by Kevin. Acquired off waivers at $0. No tax on a first keep, so 2024 is free; the tax then rolls into the base each year. Today's ESPN base of $5 is his 2025 salary, which is the whole point of the ratchet.",
       "links": [
-        {"season": 2024, "base": 0, "fee": 0, "kept_prior": false, "slot": "K3", "expected": 0},
-        {"season": 2025, "base": 0, "fee": 0, "kept_prior": true,  "slot": "K1", "expected": 5},
-        {"season": 2026, "base": 5, "fee": 0, "kept_prior": true,  "slot": "K1", "expected": 10}
-      ]
+        {
+          "base": 0,
+          "expected": 0,
+          "fee": 0,
+          "kept_prior": false,
+          "season": 2024,
+          "slot": "K3"
+        },
+        {
+          "base": 0,
+          "expected": 5,
+          "fee": 0,
+          "kept_prior": true,
+          "season": 2025,
+          "slot": "K1"
+        },
+        {
+          "base": 5,
+          "expected": 10,
+          "fee": 0,
+          "kept_prior": true,
+          "season": 2026,
+          "slot": "K1"
+        }
+      ],
+      "player": "Puka Nacua",
+      "why": "Confirmed by Kevin. Acquired off waivers at $0. No tax on a first keep, so 2024 is free; the tax then rolls into the base each year. Today's ESPN base of $5 is his 2025 salary, which is the whole point of the ratchet."
     },
     {
       "case": "fees compound through the base",
-      "player": "synthetic",
       "expects_ratchet": true,
-      "why": "A fee paid in year 1 is not a one-off charge: it becomes part of the base and is paid again every year after. This is the case the spreadsheet could never show, because it re-read the base from ESPN each year.",
       "links": [
-        {"season": 2024, "base": 20, "fee": 10, "kept_prior": false, "slot": "K1", "expected": 30},
-        {"season": 2025, "base": 30, "fee": 0,  "kept_prior": true,  "slot": "K1", "expected": 35},
-        {"season": 2026, "base": 35, "fee": 5,  "kept_prior": true,  "slot": "K2", "expected": 45}
-      ]
+        {
+          "base": 20,
+          "expected": 30,
+          "fee": 10,
+          "kept_prior": false,
+          "season": 2024,
+          "slot": "K1"
+        },
+        {
+          "base": 30,
+          "expected": 35,
+          "fee": 0,
+          "kept_prior": true,
+          "season": 2025,
+          "slot": "K1"
+        },
+        {
+          "base": 35,
+          "expected": 45,
+          "fee": 5,
+          "kept_prior": true,
+          "season": 2026,
+          "slot": "K2"
+        }
+      ],
+      "player": "synthetic",
+      "why": "A fee paid in year 1 is not a one-off charge: it becomes part of the base and is paid again every year after. This is the case the spreadsheet could never show, because it re-read the base from ESPN each year."
     },
     {
       "case": "drop and re-add resets everything",
-      "player": "synthetic",
       "expects_ratchet": false,
-      "why": "Kept at $30, dropped mid-season, re-added off waivers for $4. The tax is cleared and the base becomes the new acquisition value. The chain deliberately does NOT ratchet across the drop.",
       "links": [
-        {"season": 2025, "base": 25, "fee": 0, "kept_prior": true,  "slot": "K1", "expected": 30},
-        {"season": 2026, "base": 4,  "fee": 0, "kept_prior": false, "slot": "K3", "expected": 4}
-      ]
+        {
+          "base": 25,
+          "expected": 30,
+          "fee": 0,
+          "kept_prior": true,
+          "season": 2025,
+          "slot": "K1"
+        },
+        {
+          "base": 4,
+          "expected": 4,
+          "fee": 0,
+          "kept_prior": false,
+          "season": 2026,
+          "slot": "K3"
+        }
+      ],
+      "player": "synthetic",
+      "why": "Kept at $30, dropped mid-season, re-added off waivers for $4. The tax is cleared and the base becomes the new acquisition value. The chain deliberately does NOT ratchet across the drop."
     },
     {
       "case": "prospect keep does not tax the following year",
-      "player": "Quentin Johnston",
       "expects_ratchet": true,
-      "why": "Kept as a 2024 prospect at $12. In 2025 he shows Kept=FALSE and is absent from the kept_last_year list, so no tax follows — same pattern as Tyjae Spears. NOTE: the 2025 link is hypothetical. Belichick's Spy kept ARSB/McLaurin/LaPorta + Braelon Allen that year, so Johnston was rostered but not claimed. The $12 base is real and is what he would have cost.",
       "links": [
-        {"season": 2024, "base": 12, "fee": 0, "kept_prior": false, "slot": "PROSPECT", "expected": 12},
-        {"season": 2025, "base": 12, "fee": 0, "kept_prior": false, "slot": "K3", "expected": 12}
-      ]
+        {
+          "base": 12,
+          "expected": 12,
+          "fee": 0,
+          "kept_prior": false,
+          "season": 2024,
+          "slot": "PROSPECT"
+        },
+        {
+          "base": 12,
+          "expected": 12,
+          "fee": 0,
+          "kept_prior": false,
+          "season": 2025,
+          "slot": "K3"
+        }
+      ],
+      "player": "Quentin Johnston",
+      "why": "Kept as a 2024 prospect at $12. In 2025 he shows Kept=FALSE and is absent from the kept_last_year list, so no tax follows — same pattern as Tyjae Spears. NOTE: the 2025 link is hypothetical. Belichick's Spy kept ARSB/McLaurin/LaPorta + Braelon Allen that year, so Johnston was rostered but not claimed. The $12 base is real and is what he would have cost."
     }
   ],
-
-  "salaries": [
-    {"case": "first keep, no fee",          "base": 25, "fee": 0,  "kept_prior": false, "slot": "K1", "expected": 25},
-    {"case": "first keep with fee",         "base": 25, "fee": 5,  "kept_prior": false, "slot": "K1", "expected": 30},
-    {"case": "repeat keep, no fee",         "base": 24, "fee": 0,  "kept_prior": true,  "slot": "K1", "expected": 29,
-     "why": "Drake London's 2026 number: $24 base carries his 2024 fee already."},
-    {"case": "repeat keep with fee",        "base": 30, "fee": 15, "kept_prior": true,  "slot": "K2", "expected": 50,
-     "why": "Michael Pittman Jr. shape."},
-    {"case": "traded, previously kept",     "base": 16, "fee": 0,  "kept_prior": true,  "slot": "K1", "expected": 21,
-     "why": "Brian Thomas Jr., acquired by trade Oct 29 2025 and still taxed. The tax follows the player, not the roster."},
-    {"case": "zero-dollar waiver pickup",   "base": 0,  "fee": 0,  "kept_prior": false, "slot": "K3", "expected": 0},
-    {"case": "prospect at acquisition value","base": 3, "fee": 0,  "kept_prior": false, "slot": "PROSPECT", "expected": 3,
-     "why": "Zach Charbonnet / Tyjae Spears / Tank Bigsby all kept at $3."},
-    {"case": "prospect, higher value",      "base": 12, "fee": 0,  "kept_prior": false, "slot": "PROSPECT", "expected": 12,
-     "why": "Quentin Johnston, 2024."},
-    {"case": "prospect ignores kept flag",  "base": 3,  "fee": 0,  "kept_prior": true,  "slot": "PROSPECT", "expected": 3},
-    {"case": "prospect ignores stray fee",  "base": 3,  "fee": 5,  "kept_prior": false, "slot": "PROSPECT", "expected": 3,
-     "why": "Priced at bare base regardless. The stray fee is reported as FEE_ON_PROSPECT rather than silently charged."}
-  ],
-
-  "overrides": [
-    {"case": "live override wins over ESPN", "player": "Saquon Barkley",
-     "espn_base": 68, "override": 71, "reverted": false, "unpaired_ok": true,
-     "fee": 0, "kept_prior": true, "expected": 76,
-     "why": "Keepers tab shows $76, which only reconciles as 71+5. Counterparty of this +$3 cash trade is unrecoverable, hence unpaired_ok."},
-    {"case": "live override, upward leg", "player": "Jaxon Smith-Njigba",
-     "espn_base": 18, "override": 19, "reverted": false, "unpaired_ok": false,
-     "fee": 0, "kept_prior": true, "expected": 24,
-     "why": "Keepers tab shows $24 = 19+5. The +$1 leg of a cash trade against Jonathan Taylor."},
-    {"case": "live override, downward leg", "player": "Jonathan Taylor",
-     "espn_base": 33, "override": 32, "reverted": false, "unpaired_ok": false,
-     "fee": 0, "kept_prior": true, "expected": 37,
-     "why": "Keepers tab shows $37 = 32+5. The -$1 leg. Nets to zero against JSN."},
-    {"case": "reverted override falls back to ESPN", "player": "Saquon Barkley",
-     "espn_base": 68, "override": 71, "reverted": true, "unpaired_ok": false,
-     "fee": 0, "kept_prior": true, "expected": 73,
-     "why": "Once ESPN is restored the override is history and ESPN's value wins again."}
-  ],
-
-  "fee_tiers": [
-    {"case": "no keepers",                  "n_keepers": 0, "fees_waived": false, "expected_total": 0},
-    {"case": "one keeper",                  "n_keepers": 1, "fees_waived": false, "expected_total": 0},
-    {"case": "two keepers",                 "n_keepers": 2, "fees_waived": false, "expected_total": 5},
-    {"case": "three keepers",               "n_keepers": 3, "fees_waived": false, "expected_total": 15},
-    {"case": "consolation winner, two",     "n_keepers": 2, "fees_waived": true,  "expected_total": 0,
-     "why": "Bijan's Mustard 2025: Taylor $0, McConkey $0. Salaries still owed in full."},
-    {"case": "consolation winner, three",   "n_keepers": 3, "fees_waived": true,  "expected_total": 0}
-  ],
-
   "fee_splits": [
-    {"case": "even split",        "fees": [5, 5, 5],  "fees_waived": false, "valid": true},
-    {"case": "uneven split",      "fees": [7, 8, 0],  "fees_waived": false, "valid": true,
-     "why": "Brosh Chaylor, 2024 allocations."},
-    {"case": "lopsided split",    "fees": [13, 2, 0], "fees_waived": false, "valid": true,
-     "why": "The rules doc's own worked example."},
-    {"case": "all on one",        "fees": [15, 0, 0], "fees_waived": false, "valid": true},
-    {"case": "two keepers",       "fees": [0, 5],     "fees_waived": false, "valid": true},
-    {"case": "under-allocated",   "fees": [5, 5, 0],  "fees_waived": false, "valid": false},
-    {"case": "over-allocated",    "fees": [10, 10, 0],"fees_waived": false, "valid": false},
-    {"case": "waived, all zero",  "fees": [0, 0, 0],  "fees_waived": true,  "valid": true},
-    {"case": "waived but charged","fees": [5, 5, 5],  "fees_waived": true,  "valid": false}
+    {
+      "case": "even split",
+      "fees": [
+        5,
+        5,
+        5
+      ],
+      "fees_waived": false,
+      "valid": true
+    },
+    {
+      "case": "uneven split",
+      "fees": [
+        7,
+        8,
+        0
+      ],
+      "fees_waived": false,
+      "valid": true,
+      "why": "Brosh Chaylor, 2024 allocations."
+    },
+    {
+      "case": "lopsided split",
+      "fees": [
+        13,
+        2,
+        0
+      ],
+      "fees_waived": false,
+      "valid": true,
+      "why": "The rules doc's own worked example."
+    },
+    {
+      "case": "all on one",
+      "fees": [
+        15,
+        0,
+        0
+      ],
+      "fees_waived": false,
+      "valid": true
+    },
+    {
+      "case": "two keepers",
+      "fees": [
+        0,
+        5
+      ],
+      "fees_waived": false,
+      "valid": true
+    },
+    {
+      "case": "under-allocated",
+      "fees": [
+        5,
+        5,
+        0
+      ],
+      "fees_waived": false,
+      "valid": false
+    },
+    {
+      "case": "over-allocated",
+      "fees": [
+        10,
+        10,
+        0
+      ],
+      "fees_waived": false,
+      "valid": false
+    },
+    {
+      "case": "waived, all zero",
+      "fees": [
+        0,
+        0,
+        0
+      ],
+      "fees_waived": true,
+      "valid": true
+    },
+    {
+      "case": "waived but charged",
+      "fees": [
+        5,
+        5,
+        5
+      ],
+      "fees_waived": true,
+      "valid": false
+    }
   ],
-
+  "fee_tiers": [
+    {
+      "case": "no keepers",
+      "expected_total": 0,
+      "fees_waived": false,
+      "n_keepers": 0
+    },
+    {
+      "case": "one keeper",
+      "expected_total": 0,
+      "fees_waived": false,
+      "n_keepers": 1
+    },
+    {
+      "case": "two keepers",
+      "expected_total": 5,
+      "fees_waived": false,
+      "n_keepers": 2
+    },
+    {
+      "case": "three keepers",
+      "expected_total": 15,
+      "fees_waived": false,
+      "n_keepers": 3
+    },
+    {
+      "case": "consolation winner, two",
+      "expected_total": 0,
+      "fees_waived": true,
+      "n_keepers": 2,
+      "why": "Bijan's Mustard 2025: Taylor $0, McConkey $0. Salaries still owed in full."
+    },
+    {
+      "case": "consolation winner, three",
+      "expected_total": 0,
+      "fees_waived": true,
+      "n_keepers": 3
+    }
+  ],
+  "overrides": [
+    {
+      "case": "live override wins over ESPN",
+      "espn_base": 68,
+      "expected": 76,
+      "fee": 0,
+      "kept_prior": true,
+      "override": 71,
+      "player": "Saquon Barkley",
+      "reverted": false,
+      "unpaired_ok": true,
+      "why": "Keepers tab shows $76, which only reconciles as 71+5. Counterparty of this +$3 cash trade is unrecoverable, hence unpaired_ok."
+    },
+    {
+      "case": "live override, upward leg",
+      "espn_base": 18,
+      "expected": 24,
+      "fee": 0,
+      "kept_prior": true,
+      "override": 19,
+      "player": "Jaxon Smith-Njigba",
+      "reverted": false,
+      "unpaired_ok": false,
+      "why": "Keepers tab shows $24 = 19+5. The +$1 leg of a cash trade against Jonathan Taylor."
+    },
+    {
+      "case": "live override, downward leg",
+      "espn_base": 33,
+      "expected": 37,
+      "fee": 0,
+      "kept_prior": true,
+      "override": 32,
+      "player": "Jonathan Taylor",
+      "reverted": false,
+      "unpaired_ok": false,
+      "why": "Keepers tab shows $37 = 32+5. The -$1 leg. Nets to zero against JSN."
+    },
+    {
+      "case": "reverted override falls back to ESPN",
+      "espn_base": 68,
+      "expected": 73,
+      "fee": 0,
+      "kept_prior": true,
+      "override": 71,
+      "player": "Saquon Barkley",
+      "reverted": true,
+      "unpaired_ok": false,
+      "why": "Once ESPN is restored the override is history and ESPN's value wins again."
+    }
+  ],
+  "salaries": [
+    {
+      "base": 25,
+      "case": "first keep, no fee",
+      "expected": 25,
+      "fee": 0,
+      "kept_prior": false,
+      "slot": "K1"
+    },
+    {
+      "base": 25,
+      "case": "first keep with fee",
+      "expected": 30,
+      "fee": 5,
+      "kept_prior": false,
+      "slot": "K1"
+    },
+    {
+      "base": 24,
+      "case": "repeat keep, no fee",
+      "expected": 29,
+      "fee": 0,
+      "kept_prior": true,
+      "slot": "K1",
+      "why": "Drake London's 2026 number: $24 base carries his 2024 fee already."
+    },
+    {
+      "base": 30,
+      "case": "repeat keep with fee",
+      "expected": 50,
+      "fee": 15,
+      "kept_prior": true,
+      "slot": "K2",
+      "why": "Michael Pittman Jr. shape."
+    },
+    {
+      "base": 16,
+      "case": "traded, previously kept",
+      "expected": 21,
+      "fee": 0,
+      "kept_prior": true,
+      "slot": "K1",
+      "why": "Brian Thomas Jr., acquired by trade Oct 29 2025 and still taxed. The tax follows the player, not the roster."
+    },
+    {
+      "base": 0,
+      "case": "zero-dollar waiver pickup",
+      "expected": 0,
+      "fee": 0,
+      "kept_prior": false,
+      "slot": "K3"
+    },
+    {
+      "base": 3,
+      "case": "prospect at acquisition value",
+      "expected": 3,
+      "fee": 0,
+      "kept_prior": false,
+      "slot": "PROSPECT",
+      "why": "Zach Charbonnet / Tyjae Spears / Tank Bigsby all kept at $3."
+    },
+    {
+      "base": 12,
+      "case": "prospect, higher value",
+      "expected": 12,
+      "fee": 0,
+      "kept_prior": false,
+      "slot": "PROSPECT",
+      "why": "Quentin Johnston, 2024."
+    },
+    {
+      "base": 3,
+      "case": "prospect ignores kept flag",
+      "expected": 3,
+      "fee": 0,
+      "kept_prior": true,
+      "slot": "PROSPECT"
+    },
+    {
+      "base": 3,
+      "case": "prospect ignores stray fee",
+      "expected": 3,
+      "fee": 5,
+      "kept_prior": false,
+      "slot": "PROSPECT",
+      "why": "Priced at bare base regardless. The stray fee is reported as FEE_ON_PROSPECT rather than silently charged."
+    }
+  ],
   "validation": [
-    {"case": "four keepers",                  "expect_code": "too_many_keepers",            "severity": "error"},
-    {"case": "two prospects",                 "expect_code": "too_many_prospects",          "severity": "error"},
-    {"case": "fees do not sum to tier",       "expect_code": "fee_total_mismatch",          "severity": "error"},
-    {"case": "negative fee",                  "expect_code": "negative_fee",                "severity": "error"},
-    {"case": "fee allocated to prospect",     "expect_code": "fee_on_prospect",             "severity": "error"},
-    {"case": "same player in two slots",      "expect_code": "duplicate_player",            "severity": "error"},
-    {"case": "two claims on one slot",        "expect_code": "duplicate_slot",              "severity": "error"},
-    {"case": "player not on season-end roster","expect_code": "player_not_on_roster",       "severity": "error"},
-    {"case": "prospect with two NFL seasons", "expect_code": "prospect_too_many_seasons",   "severity": "error"},
-    {"case": "prospect acquired after deadline","expect_code": "prospect_acquired_after_deadline", "severity": "error"},
-    {"case": "prospect claimed twice",        "expect_code": "prospect_repeat_claim",       "severity": "error",
-     "why": "A player has ONE rookie season, so a repeat prospect claim is the only detectable form of rule 1 (must be a rookie) -- ESPN carries no rookie year. Applied from 2026 only: the league previously allowed second-year prospects, which is why Tyjae Spears is legitimately a prospect in both 2024 and 2025 (commissioner, 2026-07-30)."},
-    {"case": "base does not match prior salary","expect_code": "base_discontinuity",        "severity": "review"},
-    {"case": "cash trade missing a leg",      "expect_code": "overrides_unbalanced",        "severity": "review"}
+    {
+      "case": "base does not match prior salary",
+      "expect_code": "base_discontinuity",
+      "severity": "review"
+    },
+    {
+      "case": "same player in two slots",
+      "expect_code": "duplicate_player",
+      "severity": "error"
+    },
+    {
+      "case": "two claims on one slot",
+      "expect_code": "duplicate_slot",
+      "severity": "error"
+    },
+    {
+      "case": "fee allocated to prospect",
+      "expect_code": "fee_on_prospect",
+      "severity": "error"
+    },
+    {
+      "case": "fees do not sum to tier",
+      "expect_code": "fee_total_mismatch",
+      "severity": "error"
+    },
+    {
+      "case": "negative fee",
+      "expect_code": "negative_fee",
+      "severity": "error"
+    },
+    {
+      "case": "cash trade missing a leg",
+      "expect_code": "overrides_unbalanced",
+      "severity": "review"
+    },
+    {
+      "case": "player not on season-end roster",
+      "expect_code": "player_not_on_roster",
+      "severity": "error"
+    },
+    {
+      "case": "prospect acquired after deadline",
+      "expect_code": "prospect_acquired_after_deadline",
+      "severity": "error"
+    },
+    {
+      "case": "prospect claimed twice",
+      "expect_code": "prospect_repeat_claim",
+      "severity": "error",
+      "why": "A player has ONE rookie season, so a repeat prospect claim is a rule 1 violation detectable from the league's OWN claims, with no external source. It is now a cross-check on the draft-class rule rather than a substitute for it, and it stays ERROR while that one is REVIEW: the league's own record blocks, an outside data source flags. Applied from 2026 only -- the league previously allowed second-year prospects, which is why Tyjae Spears is legitimately a prospect in both 2024 and 2025 (commissioner, 2026-07-30)."
+    },
+    {
+      "case": "prospect ESPN has no draft class for",
+      "expect_code": "prospect_rookie_unverified",
+      "severity": "review",
+      "why": "Rule 1 was applied and could not be answered: ESPN carries neither draft.year nor debutYear for this player. A check that cannot run is reported, never passed -- silence reads exactly like success. Distinct from passing no mapping at all, which means the rule is not being applied (a pre-2026 season)."
+    },
+    {
+      "case": "prospect whose NFL career began before last season",
+      "expect_code": "prospect_too_many_seasons",
+      "severity": "review",
+      "why": "Rule 1: a prospect must be a rookie. first_nfl_season comes from ESPN's core API (draft.year, the draft class; debutYear for the undrafted). elapsed = claim.season - first_nfl_season, and > 1 is the violation -- NOT + 1, which would reject a genuine rookie like Cam Skattebo (began 2025, kept 2026). REVIEW rather than ERROR because the draft class comes from outside the league, so the final call is the commissioner's (commissioner, 2026-08-01)."
+    },
+    {
+      "case": "four keepers",
+      "expect_code": "too_many_keepers",
+      "severity": "error"
+    },
+    {
+      "case": "two prospects",
+      "expect_code": "too_many_prospects",
+      "severity": "error"
+    }
   ]
 }

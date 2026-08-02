@@ -17,14 +17,38 @@ acceptance check that was tempting to wave through, and each one was hiding a re
 
   Each refuses to write outside its own directory and the nightly fails its run if
   anything else wrote one. Never commit derived/ or site/ from the laptop. Locally use
-  `python -m rs57.sync --year <yr> --dry-run` (keepers) and
-  `python -m rs57.stats_sync --year <yr> --dry-run` (stats), which report without writing.
-  They write separate files — `{year}.json` and `{year}-stats.json` — so a broken box
-  score cannot blank a season of salaries.
+  `python -m rs57.sync --year <yr> --dry-run` (keepers),
+  `python -m rs57.stats_sync --year <yr> --dry-run` (stats) and
+  `python -m rs57.origins_sync --year <yr> --dry-run` (draft classes), which report without
+  writing. **Three writers, three files** — `{year}.json`, `{year}-stats.json` and
+  `player-origins.json` — so a broken box score cannot blank a season of salaries, and a
+  core-API outage cannot touch either. `player-origins.json` is merge-only on top of that:
+  a failed run adds nobody and removes nobody.
 - `python -m rs57.validate` reads data/ and reports. It is never a writer. CI runs it.
 - ESPN reads need no credentials — public league, historical seasons included.
   **2019 is the oldest season served**; 2018 answers 401 and earlier 404.
   `rs57/espn.py` does the I/O; `keeper_rules.py` must never import it.
+- **Two ESPN hosts.** The fantasy API (`lm-api-reads.fantasy.espn.com`) for everything about
+  the league, and the **core** API (`sports.core.api.espn.com/v2/.../athletes/{id}`) for one
+  fact the fantasy API does not carry in any view: when a player's NFL career began.
+  - `draft.year` is the **draft class** — immutable, authoritative, ~93% of rostered players.
+    `debutYear` is the fallback for the undrafted. Both public, no auth; the core client
+    deliberately has nowhere to put a cookie.
+  - **Two of the three sources are exact and one is a bound, and they must not be mixed.**
+    `.../athletes/{id}/statisticslog` gives the earliest season a player has statistics for.
+    It agreed with the draft class 159 times of 162 and every miss was **late by one** — a
+    player rostered without recording anything shows up a season after he arrived. So a bound
+    proves somebody is **not** a rookie and can never prove that he is. `EXACT_SOURCES` in
+    `models.py` is the split; `load_player_origins()` returns exact only and is what the
+    engine takes, `load_first_season_bounds()` returns everything and may only rule players out.
+  - **A D/ST is never prospectable.** Negative id, 404 by construction — the question does not
+    apply, so it is a settled "not eligible", never an unknown.
+  - **`experience.years` is a trap and is never read.** It counts *accrued* seasons, not a
+    draft class — Jawhar Jordan was drafted in 2024 and reports 1 — and it ignores the season
+    in the request URL entirely. Reading it makes third-year players prospect-eligible.
+  - Written to `data/derived/player-origins.json` by `python -m rs57.origins_sync`, which is
+    its **only** writer and the only module that touches the core host. Merge-only: a value is
+    never overwritten, so an outage costs nothing already recorded. Locally use `--dry-run`.
 - Serialize with `dump_json()` from rs57.models — sort_keys=True, stable ordering,
   trailing newline. Diffs must stay readable.
 
@@ -65,9 +89,16 @@ and **from 2026 on the admin tool is the record** and its rows are copied across
 - Prospects: **must be a rookie**, rostered before the trade deadline, kept at
   acquisition value, no fee allocation. **Prospects may be started** — the old
   "never started by any league team" rule is retired, as is the allowance for
-  second-year players (commissioner, 2026-07-30). Nothing in data/ records a rookie
-  year, so the enforceable form is a repeat claim: nobody has two rookie seasons.
-  Not applied before `PROSPECT_RULES_TIGHTENED`; the record holds legal repeats.
+  second-year players (commissioner, 2026-07-30).
+  - **The rookie rule is checked**, from ESPN's draft class — see below. It is REVIEW, not
+    ERROR: the draft class comes from outside the league, so the final call is the
+    commissioner's, in the admin console (commissioner, 2026-08-01).
+  - A **repeat claim** stays ERROR and is the independent cross-check: nobody has two rookie
+    seasons, and that is derivable from the league's own claims with no outside source.
+    *The league's own record blocks; an outside data source flags.*
+  - Neither applies before `PROSPECT_RULES_TIGHTENED`; the record holds legal repeats.
+  - `elapsed = claim.season - first_nfl_season`, and `> 1` is the violation. **Not `+ 1`** —
+    a prospect is kept *from the season just completed*, so a genuine rookie gives exactly 1.
 - There is NO salary cap. Don't add one, don't leave a disabled one lying around.
 
 ### The ratchet — the thing most likely to be got wrong
