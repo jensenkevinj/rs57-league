@@ -734,3 +734,76 @@ the old rule, and applying today's rule backwards would turn a correct record in
 **The box-score history is frozen and now reads by nothing.** It was collected for rule 2. It is
 retained as league history rather than deleted — the seasons are frozen with it — and the
 docstrings say plainly that no rule consumes it.
+
+**"ESPN has no rookie data" was read off a trimmed fixture, and it is wrong (2026-08-01).**
+The correction directly above says rule 1 has no data source, "confirmed rather than assumed".
+It was confirmed against `tests/data/espn_2025.json`, whose player objects had been trimmed
+from ESPN's eighteen keys down to the four the mapper reads. **A trimmed fixture is evidence
+about the mapper, never about the API.** The live `view=mRoster` payload does indeed carry no
+rookie signal in any of its eighteen keys, and `kona_player_info` adds none — but ESPN's
+**core** API does, at a different host:
+`sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/{y}/athletes/{id}`.
+
+- `draft.year` is the draft class: immutable, authoritative, present for 162 of the 174
+  rostered non-DEF players. `debutYear` covers about half the undrafted and agreed with
+  `draft.year` in all 54 cases where both exist.
+- **`experience.years` is a trap.** It counts *accrued* seasons, not a draft class — Jawhar
+  Jordan was drafted in 2024 and reports 1 — so reading it would make a third-year player
+  prospect-eligible. It also ignores the season in the request URL, returning the same value
+  for `seasons/2023` through `seasons/2026`, so it cannot answer about any season but today's.
+- Validated against **every PROSPECT claim in league history**: 9 of 10 satisfy
+  `first_nfl_season == keeper_season - 1`. The tenth is Tyjae Spears kept in 2025, legal under
+  the second-year rule then in force. An outside source reproduces the league's record
+  *including its one exception*, which is independent evidence that
+  `PROSPECT_RULES_TIGHTENED = 2026` is set where it belongs.
+
+`seasons_played` is replaced by `first_nfl_season` and the engine now owns the subtraction:
+`elapsed = claim.season - first_nfl_season`, **not `+ 1`**. Written with the `+ 1` it rejects
+Cam Skattebo, the one claim the evidence is strongest for — a prospect is kept *from the season
+just completed*, so a genuine rookie gives exactly 1. Planning caught that off-by-one before
+any code was written, which is the only reason it is a footnote rather than a Correction.
+
+**Rule 1 is REVIEW, not ERROR (commissioner, 2026-08-01).** The draft class comes from outside
+the league, so an ineligible prospect is flagged in the admin console and **still saves** — the
+commissioner can overrule ESPN or record a voted exception. `PROSPECT_REPEAT_CLAIM` stays ERROR.
+*The league's own record blocks; an outside data source flags.*
+
+**The public keeper page marks eligibility against `decision_season`, not `season`.** The same
+`drafted` flag that switches `base_salary_field` also switches which keep decision the page is
+about: before the auction it prices keeps into `season`, after it the bases are
+`keeperValueFuture` and it is already about `season + 1`. Eligibility keys off
+`qualifying_season = decision_season - 1` so the mark and the money beside it describe the same
+year. Read as a bare `season - 1` it marks the wrong draft class from the day the auction ends.
+
+**Two guards that only showed up by running it twice.** The degraded-response check counts
+players *never asked about before*, not everyone asked: the retry set is players ESPN has
+already said it has nothing for, they resolve nothing by definition, and counting them failed
+the second run and would have failed the nightly every night thereafter. And
+`validate._season_files` globbed every `*.json` in `data/derived/` with no `isdigit()` filter,
+so `player-origins.json` was about to be loaded as a season — `site.season_files` had always
+filtered correctly and `validate` never had.
+
+**A third source, and the first that is only a bound (2026-08-01, same day).** Twelve rostered
+players and eight D/STs were rendering "draft class unknown". The D/STs were the question being
+wrong rather than the answer missing — negative ids, 404 by construction, and never prospectable
+— so they are a settled "not eligible" now. The other twelve are undrafted players ESPN states
+nothing about: no `draft.year`, no `debutYear`.
+
+`.../athletes/{id}/statisticslog` resolves them. It gives the earliest season a player has
+statistics for, and measured across the whole roster it agreed with `draft.year` **159 times out
+of 162** — with all three misses late by exactly one season (Jauan Jennings, Calvin Austin III,
+John Metchie III, each of whom missed his rookie year). That asymmetry is the whole finding:
+**the earliest recorded season is an upper bound on the true first season. It can be late and
+never early**, so it proves a player is *not* a rookie and can never prove that he is.
+
+Recorded under its own `OriginSource.FIRST_STATS_SEASON`, and the mappings are split rather than
+merged: `load_player_origins()` returns exact sources only and is what decides eligibility, while
+`load_first_season_bounds()` returns everything and may only rule a player out. Collapsing the
+two would let a value that came out a season late hand somebody a second-year player at a
+prospect price — the Jawhar Jordan failure by a different route.
+
+All twelve resolve to seasons before the qualifying one, so the grid now marks **zero** players
+unknown. The single remaining unresolved id league-wide is Zach Ertz, who is retired: ESPN has
+purged him from the core API entirely, and the season-less and older-season paths 404 as well.
+He is on no current roster, and "nothing at all is known about when he started" is the correct
+and honest answer for him.

@@ -35,7 +35,9 @@ import math
 import re
 import shutil
 import sys
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -68,6 +70,8 @@ from rs57.models import (
     UnluckyAward,
     WeeklyHigh,
 )
+from rs57.history import HistoryStore
+from rs57.origins import load_first_season_bounds, load_player_origins
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -139,6 +143,20 @@ class KeeperLine:
     fee: int = 0
     salary: int | None = None
     """The salary recorded at declaration — the figure the manager was told they owed."""
+    first_nfl_season: int | None = None
+    """From ESPN's draft class, or ``None`` when ESPN has nothing for him."""
+    prospect_state: str = "unknown"
+    """``eligible`` | ``ineligible`` | ``unknown``. All three rules, never just the rookie one —
+    see ``build_keeper_season``. ``unknown`` says so on the page rather than reading as a no."""
+    acquired_at: datetime | None = None
+    """When this manager got him, straight off the roster entry."""
+    team_name: str = ""
+    """The franchise holding him, so a flat row needs no enclosing team to read itself."""
+    after_deadline: bool = False
+    """Acquired after the qualifying season's trade deadline.
+
+    A **fact**, not a verdict. It is the prospect rule's third test, and the page marks it so a
+    manager can see it, but the engine applies it to prospects only — see the template."""
 
 
 @dataclass(frozen=True)
@@ -168,6 +186,24 @@ class KeeperSeason:
     waiver_from_season: int | None
     any_declared: bool = False
     """Whether any team has recorded a claim. Until one has, the page says so in as many words."""
+    decision_season: int = 0
+    """The season this page's prices and eligibility marks are *about*, which is not always
+    ``season`` — see ``build_keeper_season``. Set there; the default is never used."""
+    any_eligible: bool = False
+    """Whether any player is prospect-eligible. Before an NFL draft class reaches the rosters
+    the honest answer is none, and the page says that rather than showing an empty filter."""
+    qualifying_season: int = 0
+    """The completed season keepers are chosen from — ``decision_season - 1``."""
+    qualifying_deadline: datetime | None = None
+    """That season's trade deadline, printed above the grid. ``None`` when it is not on disk,
+    in which case the page says so rather than showing a date it does not have."""
+    rows: tuple[KeeperLine, ...] = ()
+    """Every rostered player in the league, flat, **dearest first**.
+
+    The grid's default order, and it is produced here rather than by the script so the page a
+    browser with no JavaScript receives is already in it. The script's initial sort state is
+    set to match; if the two ever disagree, the first click on Salary would appear to do
+    nothing."""
 
 
 @dataclass(frozen=True)
@@ -590,6 +626,55 @@ def load_claims(season: int, manual_dir: Path = MANUAL) -> list[KeeperClaim]:
         return []
 
 
+def _trade_deadline(derived_dir: Path, season: int) -> datetime | None:
+    """``season``'s trade deadline, or ``None`` when that season is not on disk."""
+    path = derived_dir / f"{season}.json"
+    if not path.exists():
+        return None
+    raw = (_load(path).get("source") or {}).get("trade_deadline")
+    return datetime.fromisoformat(raw) if raw else None
+
+
+def _prospect_state(
+    *,
+    position: str,
+    began: int | None,
+    bound: int | None,
+    qualifying_season: int,
+    acquired_at: datetime,
+    deadline: datetime | None,
+    already_prospected: bool,
+) -> str:
+    """All three prospect rules for one player: ``eligible`` | ``ineligible`` | ``unknown``.
+
+    Order matters, and it is "every definite no first". A player already kept as a prospect is
+    ineligible whatever ESPN says about his draft class; one who arrived after the deadline
+    likewise; a **D/ST is never a person and never prospectable at all**. Only a player nothing
+    rules out and nothing confirms is genuinely unknown.
+
+    ``began`` is an exact first season and decides either way. ``bound`` is the earliest season
+    his career can have begun and may only rule him **out** — it comes from the statistics log,
+    which runs a season late for anyone who was rostered without recording anything, so
+    treating it as exact would eventually mark a second-year player eligible. It still settles
+    most of what would otherwise be unknown: a bound before the qualifying season means he was
+    provably already in the league.
+    """
+    if position == "DEF":
+        # A team defence has no draft class, no rookie season and no way to be a prospect.
+        # Asking ESPN about it returns 404 by construction — the question is the wrong one,
+        # not the answer missing, so this is a settled "no" rather than an unknown.
+        return "ineligible"
+    if already_prospected:
+        return "ineligible"
+    if deadline is not None and acquired_at > deadline:
+        return "ineligible"
+    if began is not None:
+        return "eligible" if began == qualifying_season else "ineligible"
+    if bound is not None and bound < qualifying_season:
+        return "ineligible"
+    return "unknown"
+
+
 def build_keeper_season(
     derived_dir: Path,
     season: int,
@@ -598,8 +683,41 @@ def build_keeper_season(
     waiver_manager_id: str | None = None,
     waiver_from_season: int | None = None,
     claims: Sequence[KeeperClaim] = (),
+    first_nfl_season: Mapping[int, int] | None = None,
+    first_season_bounds: Mapping[int, int] | None = None,
+    prior_prospect_ids: Collection[int] = (),
 ) -> KeeperSeason:
-    """What every rostered player would cost to keep in ``season``, and who has been declared.
+    """What every rostered player would cost to keep, who has been declared, and who is eligible.
+
+    Which season is this page about?
+    ---------------------------------
+
+    Not always ``season``, and the difference is the same one that decides ``base_salary_field``.
+    Before the auction, ``{season}.json`` holds last season's roster carried forward and its
+    bases are what a player costs to keep **into** ``season``. After the auction those bases are
+    ``keeperValueFuture`` — what he would carry into ``season + 1`` — so the page is already
+    about next season's decision whether it says so or not::
+
+        decision_season   = season + 1 if drafted else season
+        qualifying_season = decision_season - 1
+
+    ``qualifying_season`` is the most recently completed season, and **every prospect rule keys
+    off it**. Read it as a bare ``season - 1`` and the page marks the wrong draft class from the
+    moment the auction ends: mid-2026 it is 2026's rookies who are eligible, not 2025's. The
+    eligibility mark has to describe the same season as the money beside it, or the page has two
+    columns quietly answering different questions.
+
+    What "prospect eligible" means here
+    -----------------------------------
+
+    All three rules, because that is what the words say. Rookie (``first_nfl_season``), rostered
+    before ``qualifying_season``'s trade deadline, and never kept as a prospect before. Checking
+    only the first and still printing "eligible" is the silent-wrong-answer failure this repo is
+    built around avoiding.
+
+    Rule 2 is **provisional until that deadline has passed**: mid-season every rostered player
+    trivially satisfies a deadline that has not happened yet. It settles on its own — the mark is
+    re-derived nightly — but it is not a final answer in week 3.
 
     Two different numbers live in this function and they must not be confused.
 
@@ -639,7 +757,30 @@ def build_keeper_season(
 
     declared = {(claim.manager_id, claim.espn_player_id): claim for claim in claims}
 
+    # The phase pivot, computed once. Everything below reads these two rather than doing the
+    # arithmetic again, so no rule can end up judging a different season from its neighbours.
+    drafted = bool(source.get("drafted"))
+    decision_season = season + 1 if drafted else season
+    qualifying_season = decision_season - 1
+    origins = first_nfl_season or {}
+    bounds = first_season_bounds or {}
+
+    # Rule 2 needs the trade deadline of the season the player was rostered through, which is
+    # the qualifying season — never the coming season's, which every prospect would clear.
+    deadline = _trade_deadline(derived_dir, qualifying_season)
+    if deadline is None:
+        notes.append(
+            Note(
+                "review",
+                f"{qualifying_season}'s trade deadline is not on disk, so prospect eligibility "
+                f"below reflects the rookie and repeat-claim rules only",
+                where=f"{season} keepers",
+            )
+        )
+
     by_id = {player.espn_player_id: player for player in players}
+    # Needed inside the loop now: a flat row carries its own franchise name.
+    names = {row.manager_id: row.name for row in franchises}
     lines: dict[str, list[KeeperLine]] = {}
     for entry in roster:
         player = by_id.get(entry.espn_player_id)
@@ -658,8 +799,10 @@ def build_keeper_season(
         base = effective_base_salary(entry, overrides)
         price = keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
         claim = declared.get((entry.manager_id, entry.espn_player_id))
+        began = origins.get(entry.espn_player_id)
         lines.setdefault(entry.manager_id, []).append(
             KeeperLine(
+                team_name=_named(entry.manager_id, names).name,
                 player_name=player.name,
                 position=str(player.position),
                 nfl_team=player.nfl_team,
@@ -672,10 +815,21 @@ def build_keeper_season(
                 slot=str(claim.slot) if claim else "",
                 fee=claim.fee_allocated if claim else 0,
                 salary=claim.computed_salary if claim else None,
+                first_nfl_season=began,
+                acquired_at=entry.acquired_at,
+                after_deadline=deadline is not None and entry.acquired_at > deadline,
+                prospect_state=_prospect_state(
+                    position=str(player.position),
+                    began=began,
+                    bound=bounds.get(entry.espn_player_id),
+                    qualifying_season=qualifying_season,
+                    acquired_at=entry.acquired_at,
+                    deadline=deadline,
+                    already_prospected=entry.espn_player_id in prior_prospect_ids,
+                ),
             )
         )
 
-    names = {row.manager_id: row.name for row in franchises}
     teams: list[TeamKeepers] = []
     for manager_id in sorted(lines, key=lambda mid: (len(mid), mid)):
         # Declared keepers first, then the rest by price. Somebody reading their own team wants
@@ -704,7 +858,21 @@ def build_keeper_season(
 
     return KeeperSeason(
         season=season,
-        drafted=bool(source.get("drafted")),
+        drafted=drafted,
+        decision_season=decision_season,
+        qualifying_season=qualifying_season,
+        qualifying_deadline=deadline,
+        # Dearest first, then by name so equal salaries have a stable order rather than one
+        # that depends on which franchise happened to be read first.
+        rows=tuple(
+            sorted(
+                (line for team in teams for line in team.lines),
+                key=lambda line: (-line.price, line.player_name),
+            )
+        ),
+        any_eligible=any(
+            line.prospect_state == "eligible" for team in teams for line in team.lines
+        ),
         base_field=str(source.get("base_salary_field") or "unknown"),
         teams=tuple(teams),
         notes=tuple(notes),
@@ -880,6 +1048,22 @@ def money(amount: int) -> str:
     a Jinja filter so a template can print money without doing arithmetic on it.
     """
     return f"${amount:,}"
+
+
+def mdy(when: datetime | None) -> str:
+    """A date the way the league writes one: ``8/5/2025``. Display only.
+
+    Built from the parts rather than with ``strftime``. The no-pad directive that would do this
+    in one go is ``%-m`` on Linux and macOS but ``%#m`` on Windows and absent from the C
+    standard, so a format string here is a portability bug waiting for whoever next runs the
+    site generator somewhere new.
+
+    One filter, so the deadline banner, the Acquired column and the folded phone line cannot
+    drift into three formats — which is exactly what they had done before this existed.
+    """
+    if when is None:
+        return ""
+    return f"{when.month}/{when.day}/{when.year}"
 
 
 def _points(value: float) -> str:
@@ -1220,6 +1404,7 @@ def environment(templates: Path = TEMPLATES) -> Environment:
     )
     # Formatting money is Python's job. A template that could format it could also compute it.
     env.filters["money"] = money
+    env.filters["mdy"] = mdy
     return env
 
 
@@ -1265,6 +1450,19 @@ def build_site(
             waiver_manager_id=waiver_id,
             waiver_from_season=waiver_from,
             claims=load_claims(current_year, manual_dir),
+            first_nfl_season=load_player_origins(derived_dir),
+            first_season_bounds=load_first_season_bounds(derived_dir),
+            # Both records of who has already been kept as a prospect: the frozen seasons and
+            # the live claims file. A player in either is out, whatever his draft class says.
+            prior_prospect_ids=(
+                HistoryStore(data_dir=history_dir.parent).prospect_ids(current_year)
+                | {
+                    claim.espn_player_id
+                    for year in range(current_year - 6, current_year)
+                    for claim in load_claims(year, manual_dir)
+                    if claim.slot is KeeperSlot.PROSPECT
+                }
+            ),
         )
         if current_year is not None
         else None

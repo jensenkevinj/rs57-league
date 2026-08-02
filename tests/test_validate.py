@@ -397,11 +397,14 @@ class TestTheFeeWaiverIsApplied:
 
 
 class TestTheRookieRuleIsEnforcedThroughRepeatClaims:
-    """A prospect must be a rookie. ESPN carries no rookie year, so the only detectable form
-    of that rule is a repeat claim: a player has exactly one rookie season, so if he was a
-    prospect before, he is not a rookie now.
+    """A prospect must be a rookie, and a repeat claim is the form of that rule derivable from
+    the league's own records: a player has exactly one rookie season, so if he was a prospect
+    before, he is not a rookie now.
 
-    It is applied only from the season the rule tightened. The league previously allowed
+    Since 2026-08-01 it is no longer the *only* form — ESPN's draft class checks rule 1
+    directly — but it remains the independent cross-check, and the one that blocks.
+
+    Both are applied only from the season the rule tightened. The league previously allowed
     second-year prospects, and the record holds one — Tyjae Spears, 2024 and 2025, legally.
     """
 

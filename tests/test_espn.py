@@ -4,27 +4,42 @@ Everything here replays payloads recorded from the live league into ``tests/data
 ESPN responses, trimmed to the fields the mapper reads. CI never touches the network, and the
 recordings are what stop the field semantics from drifting back.
 
+**That trimming cost the project a wrong conclusion, so read this before adding a fixture.**
+``espn_2025.json``'s player objects were trimmed from ESPN's eighteen keys down to the four
+the mapper reads. A later session read the fixture as if it were the API and concluded, in six
+places, that ESPN carries no rookie year — and built the prospect rules around the gap. It
+does carry one, on a different host. A trimmed fixture is evidence about the mapper, never
+about the API. ``espn_athletes.json`` is therefore recorded **whole**.
+
 The reasoning behind the field choice is in ``docs/espn-field-semantics.md``. These tests are
 the executable half of it.
 """
 
 from __future__ import annotations
 
+import ast
+import inspect
 import json
+import textwrap
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
 from rs57.espn import (
+    CORE_HOST,
+    AthleteNotFound,
+    HOST,
     LEAGUE_SIZE,
     AcquisitionSource,
+    EspnCoreClient,
     EspnError,
     Position,
     acquisition_source,
     base_salary_field,
     bid_season_for,
     build_season,
+    first_nfl_season,
     keeper_pick_ids,
     winning_bids,
 )
@@ -522,3 +537,162 @@ def test_written_file_round_trips(season_2026, tmp_path):
     reloaded = json.loads(path.read_text())
     assert len(reloaded["roster"]) == len(season_2026.roster)
     assert reloaded["source"]["base_salary_field"] == "keeperValue"
+
+
+# ---------------------------------------------------------------------------
+# The core API: the draft class, and the field that must never be read
+# ---------------------------------------------------------------------------
+
+ATHLETES = json.loads((DATA / "espn_athletes.json").read_text())
+
+SKATTEBO = 4696981  # drafted 2025 — the recorded 2026 prospect claim
+NACUA = 4426515  # drafted 2023
+TAYSOM_HILL = 2468609  # undrafted, debutYear 2017
+JAWHAR_JORDAN = 4429939  # drafted 2024, experience.years == 1 — the trap
+JAYLEN_WARREN = 4569987  # undrafted, no debutYear
+RAVENS_DST = -16033  # negative id, 404
+
+
+class ReplayCoreClient:
+    """Stands in for ``EspnCoreClient`` against recorded athlete records. No network."""
+
+    def __init__(self, doc: dict | None = None):
+        self._doc = doc if doc is not None else ATHLETES
+        self.asked: list[int] = []
+
+    def fetch_athlete(self, espn_player_id: int, season: int):
+        self.asked.append(espn_player_id)
+        if espn_player_id in self._doc["not_found"]:
+            return None
+        record = self._doc["athletes"].get(str(espn_player_id))
+        if record is None:
+            raise KeyError(f"no recorded athlete {espn_player_id} — record it first")
+        return record
+
+
+def athlete(espn_player_id: int) -> dict:
+    return ATHLETES["athletes"][str(espn_player_id)]
+
+
+def _code_of(obj) -> str:
+    """The executable source of ``obj``, with every docstring removed.
+
+    A test that greps source for a forbidden word otherwise fails on the docstring that
+    explains why the word is forbidden — which teaches the next reader to delete the
+    explanation rather than keep the guard.
+    """
+    tree = ast.parse(textwrap.dedent(inspect.getsource(obj)))
+    for node in ast.walk(tree):
+        body = getattr(node, "body", None)
+        if not isinstance(body, list) or not body:
+            continue
+        first = body[0]
+        if (
+            isinstance(first, ast.Expr)
+            and isinstance(first.value, ast.Constant)
+            and isinstance(first.value.value, str)
+        ):
+            body.pop(0)
+    return ast.unparse(tree)
+
+
+def test_the_draft_class_is_read_from_draft_year():
+    assert first_nfl_season(athlete(SKATTEBO)) == (2025, "draft_year")
+    assert first_nfl_season(athlete(NACUA)) == (2023, "draft_year")
+
+
+def test_an_undrafted_player_falls_back_to_debut_year():
+    """No draft class exists for an undrafted player, so ``debutYear`` is the first season."""
+    assert first_nfl_season(athlete(TAYSOM_HILL)) == (2017, "debut_year")
+
+
+def test_a_player_with_neither_field_has_no_first_season():
+    """Where a number cannot be known, record no number — the caller marks him unresolved."""
+    assert first_nfl_season(athlete(JAYLEN_WARREN)) is None
+
+
+def test_experience_years_is_never_read():
+    """The trap, replayed from the real payload.
+
+    Jawhar Jordan was drafted in 2024 and ESPN reports ``experience.years == 1``, because that
+    field counts *accrued* seasons rather than a draft class. A parser that reached for it
+    would call a third-year player a rookie and make him prospect-eligible.
+    """
+    record = athlete(JAWHAR_JORDAN)
+    assert record["experience"]["years"] == 1, "fixture no longer holds the trap"
+    assert record["draft"]["year"] == 2024
+
+    assert first_nfl_season(record) == (2024, "draft_year")
+    assert first_nfl_season(record) != (2026, "experience")
+
+
+def test_the_recorded_athlete_payload_is_not_trimmed():
+    """The fixture is whole. Trimming one is what produced the wrong conclusion before.
+
+    If this fails because ESPN dropped a field, that is worth knowing. If it fails because
+    somebody pruned the file to what the parser reads, read this module's docstring.
+    """
+    record = athlete(JAWHAR_JORDAN)
+    assert len(record) > 20, f"the recorded payload has been trimmed to {len(record)} keys"
+    for untouched in ("college", "displayHeight", "jersey", "status", "experience"):
+        assert untouched in record, f"{untouched} is gone — the payload was trimmed"
+
+
+def test_a_404_is_an_answer_not_an_outage(monkeypatch):
+    """``None`` means ESPN has no such athlete. An outage must never look like that.
+
+    Conflating the two would record "ESPN has no draft class for anyone" the first time the
+    core API returned 503, and every prospect in the league would silently go unverified.
+
+    Exercised through the **real** ``fetch_athlete``, with the transport stubbed. Asserting
+    this against ``ReplayCoreClient`` proves only that the test double behaves — the first
+    version of this test did exactly that and survived a mutation that made 404 raise.
+    """
+    import rs57.espn as espn_module
+
+    def transport(url, *, timeout, cookies=None):
+        if "/athletes/-16033" in url:
+            raise AthleteNotFound(url)
+        if "/athletes/999" in url:
+            raise EspnError(f"could not reach ESPN for {url}: timed out")
+        return {"draft": {"year": 2025}}
+
+    monkeypatch.setattr(espn_module, "_get_json", transport)
+    client = EspnCoreClient()
+
+    assert client.fetch_athlete(RAVENS_DST, 2026) is None, "a 404 must be an answer"
+    assert client.fetch_athlete(SKATTEBO, 2026) == {"draft": {"year": 2025}}
+    with pytest.raises(EspnError):
+        client.fetch_athlete(999, 2026)  # an outage must stop the run, never return None
+
+
+def test_the_core_client_never_sends_credentials():
+    """``espn_s2``/``SWID`` belong to the fantasy host. This is a different, public host.
+
+    The guard is that the client has nowhere to put a cookie: no ``from_env``, no cookie
+    field, and nothing passed to ``_get_json``. Asserted on the surface so that adding one
+    back has to break a test.
+    """
+    client = EspnCoreClient()
+    assert not hasattr(client, "from_env")
+    assert not hasattr(client, "_cookies")
+    assert not hasattr(client, "authenticated")
+
+    # Scanned with docstrings stripped, so the prose explaining the absence cannot trip its
+    # own test. ``cookies=`` is the mechanism: it is the keyword ``_get_json`` takes, and the
+    # only route a credential has to the wire.
+    code = _code_of(EspnCoreClient)
+    assert "cookies=" not in code, "the core client passes cookies to _get_json"
+    assert "ESPN_S2" not in code and "SWID" not in code
+    assert "Cookie" not in code
+
+    url = client.athlete_url(SKATTEBO, 2026)
+    assert url.startswith(CORE_HOST), "the core client is pointed at the fantasy host"
+    for secret in ("espn_s2", "SWID", "Cookie"):
+        assert secret not in url
+
+
+def test_the_core_host_is_not_the_fantasy_host():
+    """Two hosts, two APIs. The keeper sync must never depend on the core one."""
+    assert CORE_HOST != HOST
+    assert "sports.core.api.espn.com" in CORE_HOST

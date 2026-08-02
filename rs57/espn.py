@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import urllib.error
 import urllib.request
 from collections.abc import Iterable, Mapping
@@ -50,6 +51,14 @@ from rs57.models import (
 )
 
 HOST = "https://lm-api-reads.fantasy.espn.com"
+CORE_HOST = "https://sports.core.api.espn.com"
+"""ESPN's core API — a different host and a different API from the fantasy one above.
+
+It is here for exactly one field, ``draft.year``, which is the only place ESPN publishes when
+a player's NFL career began. The fantasy API does not carry it in any view. Public, no auth,
+and read by ``rs57.origins_sync`` alone — never by the keeper sync, so a core-API outage can
+never touch a season of salaries."""
+
 LEAGUE_ID = 535631
 LEAGUE_SIZE = 12
 
@@ -91,6 +100,43 @@ TIER_BY_NAME: Mapping[str, PlayoffTier] = {
 
 class EspnError(RuntimeError):
     """A fetch failed, or a response was too degraded to write a season from."""
+
+
+class AthleteNotFound(LookupError):
+    """ESPN has no athlete record for an id — a 404, which is an answer, not an outage.
+
+    Kept distinct from ``EspnError`` because the two must never be conflated: a 404 means
+    "ESPN does not know this player", which is recorded and moved past, while a 503 means
+    "we do not know what ESPN says", which must stop the run before it writes anything.
+    Collapsing them would turn an outage into a league-wide "no draft class on record".
+    """
+
+
+def _get_json(url: str, *, timeout: int, cookies: str | None = None) -> Any:
+    """GET one URL and parse it as JSON.
+
+    Shared by both clients so the credential guard below exists exactly once. Two copies of
+    "report the URL, never the headers" is how a cookie eventually lands in an Actions log on
+    a public repo.
+
+    Raises ``AthleteNotFound`` on 404 and ``EspnError`` on anything else.
+    """
+    headers = {"User-Agent": _USER_AGENT, "Accept": "application/json"}
+    if cookies:
+        headers["Cookie"] = cookies
+    try:
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        # Report the URL, never the headers — the cookie lives in there.
+        if exc.code == 404:
+            raise AthleteNotFound(url) from None
+        raise EspnError(f"ESPN returned HTTP {exc.code} for {url}") from None
+    except (urllib.error.URLError, TimeoutError) as exc:
+        raise EspnError(f"could not reach ESPN for {url}: {exc.reason}") from None
+    except json.JSONDecodeError:
+        raise EspnError(f"ESPN returned non-JSON for {url}") from None
 
 
 def _epoch_ms(value: int | None) -> datetime | None:
@@ -144,20 +190,13 @@ class EspnClient:
                     parts.append(f"{key}={item}")
             url = f"{url}?{'&'.join(parts)}"
 
-        headers = {"User-Agent": _USER_AGENT, "Accept": "application/json"}
-        if self._cookies:
-            headers["Cookie"] = self._cookies
         try:
-            request = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            # Report the URL, never the headers — the cookie lives in there.
-            raise EspnError(f"ESPN returned HTTP {exc.code} for {url}") from None
-        except (urllib.error.URLError, TimeoutError) as exc:
-            raise EspnError(f"could not reach ESPN for {url}: {exc.reason}") from None
-        except json.JSONDecodeError:
-            raise EspnError(f"ESPN returned non-JSON for {url}") from None
+            return _get_json(url, timeout=self.timeout, cookies=self._cookies)
+        except AthleteNotFound:
+            # On the league endpoints a 404 is a broken path, not a fact worth recording —
+            # ``leagueHistory`` answers 404 for exactly that reason. Only the core athlete
+            # endpoint treats it as an answer, so it stays an error here, as it always was.
+            raise EspnError(f"ESPN returned HTTP 404 for {url}") from None
 
     def _league(self, **params: Any) -> Any:
         return self._get(
@@ -214,6 +253,96 @@ class EspnClient:
             for transaction in payload.get("transactions") or []:
                 found[transaction["id"]] = transaction
         return list(found.values())
+
+
+@dataclass(frozen=True)
+class EspnCoreClient:
+    """Read-only client for ESPN's **core** API, which is a different host and a different API.
+
+    It exists for one fact the fantasy API does not carry: the season a player's NFL career
+    began. The fantasy player object has eighteen keys and none of them is a draft class or a
+    rookie flag, and ``view=kona_player_info`` adds nothing on that front either.
+
+    **This client never sends credentials.** ``espn_s2``/``SWID`` are cookies for
+    ``lm-api-reads.fantasy.espn.com``; this is a different host, and the endpoint is public.
+    Sending them here would leak a credential to gain nothing, so there is no ``from_env`` and
+    no cookie parameter — the absence is the guard, and ``test_the_core_client_never_sends_
+    credentials`` is its witness.
+    """
+
+    timeout: int = 30
+    host: str = CORE_HOST
+
+    def athlete_url(self, espn_player_id: int, season: int) -> str:
+        return (
+            f"{self.host}/v2/sports/football/leagues/nfl/seasons/{season}"
+            f"/athletes/{espn_player_id}?lang=en&region=us"
+        )
+
+    def fetch_athlete(self, espn_player_id: int, season: int) -> dict[str, Any] | None:
+        """One athlete record, or ``None`` when ESPN has no such athlete.
+
+        ``None`` is only ever returned for a 404. Everything else — a timeout, a 503, a
+        non-JSON body — raises ``EspnError`` and stops the run, because "we could not ask"
+        must never be recorded as "ESPN says he has no draft class".
+
+        D/ST ids are negative and 404 by construction. Callers filter them out beforehand
+        rather than collecting a dozen meaningless misses every run.
+        """
+        try:
+            return _get_json(self.athlete_url(espn_player_id, season), timeout=self.timeout)
+        except AthleteNotFound:
+            return None
+
+    def statistics_log_url(self, espn_player_id: int) -> str:
+        return f"{self.host}/v2/sports/football/leagues/nfl/athletes/{espn_player_id}/statisticslog"
+
+    def fetch_first_stats_season(self, espn_player_id: int) -> int | None:
+        """The earliest season ESPN has statistics for, or ``None`` if it has none.
+
+        Only ever a **bound** on when a career began, never a statement of it — a player who
+        was rostered but recorded nothing appears a season late. Checked against the league:
+        it matched the draft class 159 times of 162, and all three misses were late by one.
+        Read ``OriginSource`` before using it for anything.
+
+        Same 404 rule as ``fetch_athlete``: no log is an answer, anything else is an outage.
+        """
+        try:
+            payload = _get_json(self.statistics_log_url(espn_player_id), timeout=self.timeout)
+        except AthleteNotFound:
+            return None
+        seasons: list[int] = []
+        for entry in (payload or {}).get("entries") or []:
+            ref = ((entry.get("season") or {}).get("$ref")) or ""
+            match = re.search(r"/seasons/(\d{4})", ref)
+            if match:
+                seasons.append(int(match.group(1)))
+        return min(seasons) if seasons else None
+
+
+def first_nfl_season(athlete: Mapping[str, Any]) -> tuple[int, str] | None:
+    """The season a player's NFL career began, and which field said so.
+
+    ``draft.year`` is the draft class: immutable, authoritative, and present for 162 of the
+    league's 174 rostered non-DEF players. ``debutYear`` is the fallback for the undrafted —
+    sparser, but where both are present they agreed in all 54 cases checked. Returns ``None``
+    when ESPN carries neither, which is recorded as unresolved rather than guessed.
+
+    **``experience.years`` is not read here and must never be.** It is *accrued* seasons, not
+    a draft class, and the two come apart exactly where it matters: Jawhar Jordan was drafted
+    in 2024 and reports ``experience.years == 1``, so reading it would make a third-year
+    player prospect-eligible. It is also unscoped — the same value comes back for
+    ``seasons/2023`` through ``seasons/2026`` regardless of the season in the URL — so it
+    cannot answer a question about any season but today's. ``test_experience_years_is_never_
+    read`` replays Jordan's real payload to keep it that way.
+    """
+    draft_year = (athlete.get("draft") or {}).get("year")
+    if isinstance(draft_year, int):
+        return draft_year, "draft_year"
+    debut = athlete.get("debutYear")
+    if isinstance(debut, int):
+        return debut, "debut_year"
+    return None
 
 
 def base_salary_field(drafted: bool) -> str:

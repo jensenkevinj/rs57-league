@@ -56,6 +56,13 @@ from rs57.models import (
     SalaryOverride,
     Season,
 )
+from rs57.origins import (
+    load_first_season_bounds,
+    load_player_origins,
+    origins_path,
+    unresolved_ids,
+)
+from rs57.origins import warnings as origins_warnings
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 
@@ -91,9 +98,22 @@ def _load(path: Path) -> Any:
 
 
 def _season_files(directory: Path, suffix: str = ".json") -> list[Path]:
+    """Files in ``directory`` that are a season, by the year in the name.
+
+    The ``isdigit`` filter is load-bearing and was missing. ``data/derived/`` holds files that
+    are not seasons — ``player-origins.json`` is the first — and without it one gets loaded as
+    a season, produces a ``LoadedSeason`` with a nonsense year, and is then dropped much later
+    by an ``int()`` that raises where nobody is looking. ``site.season_files`` has always
+    filtered this way; this did not.
+    """
     if not directory.exists():
         return []
-    return sorted(p for p in directory.glob(f"*{suffix}") if not p.name.startswith("."))
+    return sorted(
+        path
+        for path in directory.glob(f"*{suffix}")
+        if not path.name.startswith(".")
+        and path.stem.removesuffix("-stats").isdigit()
+    )
 
 
 @dataclass(frozen=True)
@@ -161,6 +181,47 @@ def validate_derived_season(path: Path, report: Report) -> LoadedSeason | None:
     )
 
 
+def _player_origins(report: Report) -> dict[int, int]:
+    """When each player's NFL career began, for prospect rule 1.
+
+    A missing file is reported as SKIPPED and returns ``{}``, not ``None``. The distinction is
+    the whole point: ``{}`` still applies the rule, so every prospect comes back UNVERIFIED and
+    the run says so out loud. Returning ``None`` would put rule 1 back to sleep silently the
+    first time the nightly failed to write the file.
+    """
+    path = origins_path(DATA / "derived")
+    if not path.exists():
+        report.skip(
+            f"{path.name} is not on disk, so prospect rule 1 (must be a rookie) has no draft "
+            f"classes to check against — every prospect claim below is reported unverified. "
+            f"Run `python -m rs57.origins_sync --year <yr>` to populate it."
+        )
+        return {}
+
+    origins = load_player_origins(DATA / "derived")
+    # REVIEW items the origins sync recorded are re-surfaced here rather than left sitting in
+    # the file, the same as for a stats season. A warning nobody reads is not a warning.
+    for warning in origins_warnings(DATA / "derived"):
+        report.review(f"{path.name}: {warning}")
+
+    unresolved = unresolved_ids(DATA / "derived")
+    if unresolved:
+        report.review(
+            f"{path.name}: ESPN has no draft class, no debut year and no statistics for "
+            f"{len(unresolved)} player(s) ({', '.join(str(i) for i in sorted(unresolved))}), so "
+            f"nothing at all is known about when they started and prospect rule 1 cannot be "
+            f"checked for them"
+        )
+    # Reported apart, because they license different conclusions. An exact first season can
+    # decide either way; a bound from the statistics log can only rule a player out.
+    bounded = len(load_first_season_bounds(DATA / "derived")) - len(origins)
+    report.ok(
+        f"{path.name}: {len(origins)} players have an exact first NFL season"
+        + (f", and {bounded} more are bounded by their earliest recorded season" if bounded else "")
+    )
+    return origins
+
+
 def validate_claims(
     claims: Sequence[KeeperClaim],
     eligible_roster: dict[int, list[RosterEntry]],
@@ -168,6 +229,7 @@ def validate_claims(
     report: Report,
     history: LoadedHistory | None = None,
     fees_waived: dict[int, str] | None = None,
+    first_nfl_season: dict[int, int] | None = None,
 ) -> None:
     """Run the keeper engine's own validation over recorded claims, season by season.
 
@@ -202,22 +264,31 @@ def validate_claims(
         waived_by = (history.fees_waived.get(season) if history else None) or fees_waived.get(
             season
         )
-        # A prospect must be a rookie, and a repeat claim is the only detectable form of that
-        # — ESPN carries no rookie year. It is applied only from the season the rule tightened:
-        # second-year prospects were legal before, and the record holds one.
+        # A prospect must be a rookie. Two independent checks now say so: the draft class from
+        # ESPN's core API, and a repeat claim, which is a rule-1 violation derivable from the
+        # league's own records alone. Both are applied only from the season the rule tightened
+        # — second-year prospects were legal before, and the record holds one.
         repeats: set[int] = set()
-        if history and season >= PROSPECT_RULES_TIGHTENED:
-            repeats = {
-                claim.espn_player_id
-                for claim in history.claims
-                if claim.slot is KeeperSlot.PROSPECT and claim.season < season
-            }
+        origins: dict[int, int] | None = None
+        if season >= PROSPECT_RULES_TIGHTENED:
+            if history:
+                repeats = {
+                    claim.espn_player_id
+                    for claim in history.claims
+                    if claim.slot is KeeperSlot.PROSPECT and claim.season < season
+                }
+            # An empty mapping, never None: for a governed season the rule IS being applied,
+            # so a prospect nobody has a draft class for is reported unverified rather than
+            # passed. None here would put the rule back to sleep the moment the file went
+            # missing, which is exactly the silence this replaced.
+            origins = first_nfl_season or {}
         for manager, team_claims in sorted(by_manager.items()):
             team_roster = [entry for entry in roster if entry.manager_id == manager]
             for issue in validate_team_claims(
                 team_claims,
                 team_roster,
                 fees_waived=manager == waived_by,
+                first_nfl_season=origins,
                 prior_prospect_ids=repeats,
             ):
                 message = f"{label}: {season}: {manager}: [{issue.code}] {issue.message}"
@@ -704,8 +775,17 @@ def run(report: Report | None = None) -> Report:
     # carry their own.
     manual_waivers = _recorded_waivers(report)
 
+    origins = _player_origins(report)
+
     if history.claims:
-        validate_claims(history.claims, eligible_roster, "data/history/", report, history)
+        validate_claims(
+            history.claims,
+            eligible_roster,
+            "data/history/",
+            report,
+            history,
+            first_nfl_season=origins,
+        )
     if manual_claims:
         validate_claims(
             manual_claims,
@@ -714,6 +794,7 @@ def run(report: Report | None = None) -> Report:
             report,
             history,
             fees_waived=manual_waivers,
+            first_nfl_season=origins,
         )
 
     # Called even with nothing to audit against: a ratchet that cannot run has to SAY it did

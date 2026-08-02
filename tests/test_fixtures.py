@@ -127,3 +127,74 @@ def test_fixture_codes_match_the_engine():
 )
 def test_fixture_severities_are_declared_correctly(case):
     assert case["severity"] in {Severity.ERROR.value, Severity.REVIEW.value}
+
+
+# ---------------------------------------------------------------------------
+# The prospect rule against every claim the league has ever made
+# ---------------------------------------------------------------------------
+
+PROSPECTS = json.loads(
+    (Path(__file__).resolve().parents[1] / "fixtures" / "prospect_cases.json").read_text(
+        encoding="utf-8"
+    )
+)
+
+
+@pytest.mark.parametrize(
+    "case",
+    [pytest.param(c, id=f"{c['player']}-{c['kept_in_season']}") for c in PROSPECTS["claims"]],
+)
+def test_every_recorded_prospect_claim(case):
+    """Ten claims, ten verdicts, checked against ESPN's draft class.
+
+    This is the table that says the feature is right rather than merely wired up. Nine claims
+    are rookies by ESPN's own record. The tenth — Tyjae Spears kept in 2025 — was legal under
+    the second-year rule then in force, and ``rule_one_applies`` is False for exactly that
+    reason. An outside source reproducing the league's record, including the one exception, is
+    the evidence ``PROSPECT_RULES_TIGHTENED`` is set where it is.
+    """
+    season = case["kept_in_season"]
+    player_id = case["espn_player_id"]
+    claims = [claim(player_id, KeeperSlot.PROSPECT, season=season)]
+    roster = [entry(player_id, 3, season=season)]
+
+    # Exactly what validate.py does: the mapping is passed only for governed seasons.
+    origins = {player_id: case["first_nfl_season"]} if case["rule_one_applies"] else None
+    issues = validate_team_claims(claims, roster, first_nfl_season=origins)
+    flagged = IssueCode.PROSPECT_TOO_MANY_SEASONS in {issue.code for issue in issues}
+
+    assert flagged is case["expect_flagged"], (
+        f"{case['player']} kept in {season}, began {case['first_nfl_season']}: "
+        f"expected flagged={case['expect_flagged']}, got {flagged}"
+    )
+
+
+def test_the_prospect_table_covers_the_whole_recorded_history():
+    """A fixture that quietly loses rows stops being ground truth.
+
+    Ten claims: seven prospects in 2024, two in 2025, one in 2026. If this count changes,
+    either a season was frozen or a claim was recorded — both fine, but the table has to be
+    rebuilt against ESPN rather than left behind.
+    """
+    by_season = {}
+    for case in PROSPECTS["claims"]:
+        by_season[case["kept_in_season"]] = by_season.get(case["kept_in_season"], 0) + 1
+    assert by_season == {2024: 7, 2025: 2, 2026: 1}
+    assert all(case["first_nfl_season"] for case in PROSPECTS["claims"]), (
+        "a recorded prospect has no draft class — the table cannot judge him"
+    )
+
+
+def test_the_one_historical_exception_is_the_one_we_know_about():
+    """Spears in 2025 is the single claim today's rule would reject. Named, not incidental."""
+    would_fail_today = [
+        case
+        for case in PROSPECTS["claims"]
+        if case["elapsed"] is not None and case["elapsed"] > 1
+    ]
+    assert [(c["player"], c["kept_in_season"]) for c in would_fail_today] == [
+        ("Tyjae Spears", 2025)
+    ]
+    assert not would_fail_today[0]["rule_one_applies"], (
+        "the pre-2026 exception is being judged by the post-2026 rule"
+    )

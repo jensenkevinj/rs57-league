@@ -5,22 +5,28 @@ screen: post the form, call the function, re-render the fragment. Nothing here r
 salary, a fee tier or a tax — those come from ``keeper_rules`` and are handed to the templates
 already computed, the same arrangement ``rs57.site`` uses. The templates loop and format.
 
-The other half of this module's job is saying what has **not** been checked. Two things
-cannot be verified from anything in ``data/``:
+The other half of this module's job is saying what has **not** been checked.
 
-* prospect rule 1 — **a prospect must be a rookie** — needs a rookie year or a seasons-played
-  count, and ESPN's player payload carries neither. The engine's check silently passes when
-  the mapping is empty, so this module adds the note. What *is* enforceable is a repeat
-  prospect claim: a player has one rookie season, so if he was a prospect before he is not a
-  rookie now, and ``PROSPECT_REPEAT_CLAIM`` catches that much.
+* prospect rule 1 — **a prospect must be a rookie** — *is* checked now, against ESPN's draft
+  class from ``data/derived/player-origins.json``. It is REVIEW rather than ERROR by decision
+  (commissioner, 2026-08-01): the draft class comes from outside the league, so this screen
+  flags an ineligible prospect and **still saves him**, leaving the final call to a human who
+  can overrule ESPN or record a voted exception. ``PROSPECT_REPEAT_CLAIM`` remains ERROR and
+  blocks — the league's own record blocks, an outside data source flags.
+* what cannot be checked is a player ESPN has **no** draft class or debut year for. That is a
+  per-claim note naming him, not a blanket one: a blanket "rule 1 is unchecked" would go on
+  shouting over prospects that had in fact been verified, and that is how a real warning stops
+  being read.
 * the fee waiver needs a recorded consolation winner. Until one exists, fees are priced in
   full and the screen says the waiver is unconfirmed.
 
-A prospect screen that looks clean is lying. Every one of those renders as unverified.
+A prospect screen that looks clean had better have checked something. Everything unverified
+renders as unverified.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -30,6 +36,7 @@ from rs57.keeper_rules import (
     KEEPER_TAX,
     MAX_KEEPERS,
     MAX_PROSPECTS,
+    PROSPECT_RULES_TIGHTENED,
     Severity,
     ValidationIssue,
     compute_team_keepers,
@@ -162,23 +169,60 @@ class SeasonScreen:
     waiver_recorded: bool
 
 
-def _prospect_notes(claims: list[KeeperClaim], deadline: datetime | None, prior: int) -> list[Note]:
-    """What a prospect claim cannot have checked, stated once per screen.
+def _prospect_notes(
+    season: int,
+    claims: list[KeeperClaim],
+    deadline: datetime | None,
+    prior: int,
+    first_nfl_season: Mapping[int, int] | None,
+    player_names: Mapping[int, str] | None = None,
+) -> list[Note]:
+    """What a prospect claim was and was not checked against, stated per claim.
 
     Only emitted when a prospect is actually claimed — a note about prospect rules on a screen
     with no prospect on it is noise, and noise is how the real ones stop being read.
+
+    Rule 1 used to be a single blanket REVIEW saying it could not be checked at all. It can
+    now, from ESPN's draft class, so the note is **per claim** instead: a screen with a
+    verified prospect says so, and one with an unresolved player says which player and why.
+    A blanket note would go on saying "unchecked" over a prospect that had in fact been
+    checked, and that is how a real warning stops being read.
     """
-    if not any(claim.slot is KeeperSlot.PROSPECT for claim in claims):
+    prospects = [claim for claim in claims if claim.slot is KeeperSlot.PROSPECT]
+    if not prospects:
         return []
-    notes = [
-        Note(
-            "review",
-            "Prospect rule 1 (must be a rookie) is NOT checked: ESPN carries no rookie year "
-            "and nothing in data/ records how many NFL seasons a player has played, so the "
-            "engine's check has no data to fail on. A repeat prospect claim IS caught, since "
-            "nobody has two rookie seasons. Confirm the rest by eye.",
-        )
-    ]
+    names = player_names or {}
+    notes: list[Note] = []
+
+    for claim in prospects:
+        who = names.get(claim.espn_player_id, f"player {claim.espn_player_id}")
+        began = (first_nfl_season or {}).get(claim.espn_player_id)
+        if first_nfl_season is None:
+            notes.append(
+                Note(
+                    "review",
+                    f"Prospect rule 1 (must be a rookie) is NOT checked for {who}: no draft "
+                    f"classes are loaded. Run `python -m rs57.origins_sync` and reload.",
+                )
+            )
+        elif began is None:
+            notes.append(
+                Note(
+                    "review",
+                    f"Prospect rule 1 (must be a rookie) is NOT checked for {who}: ESPN "
+                    f"carries neither a draft class nor a debut year for him. Confirm by eye.",
+                )
+            )
+        elif season - began == 1:
+            notes.append(
+                Note(
+                    "info",
+                    f"Prospect rule 1 is checked: {who}'s first NFL season was {began} "
+                    f"(ESPN draft class), so he was a rookie in {prior}.",
+                )
+            )
+        # The ineligible case is an engine issue, not a note — it renders with the claim.
+
     if deadline is None:
         notes.append(
             Note(
@@ -209,6 +253,7 @@ def build_team_screen(
     *,
     claims: list[KeeperClaim] | None = None,
     saved: bool = False,
+    first_nfl_season: Mapping[int, int] | None = None,
 ) -> TeamScreen:
     """Price and validate one team.
 
@@ -230,12 +275,22 @@ def build_team_screen(
     prospect_ids, used_legacy = store.prior_prospect_ids(season)
     deadline = prior.trade_deadline if prior else None
 
+    # Both forms of the rookie rule are gated on the season, EXPLICITLY. The repeat check used
+    # to be passed unconditionally and was correct only because nobody opens a pre-2026 season
+    # in this tool — an implicit gate, and the first time someone did open 2025 it would have
+    # flagged Tyjae Spears' legal claim as an error.
+    governed = season >= PROSPECT_RULES_TIGHTENED
+    origins = (first_nfl_season or {}) if governed else None
+    if not governed:
+        prospect_ids = set()
+
     result = compute_team_keepers(
         active,
         roster,
         overrides,
         manager_id=manager_id,
         fees_waived=fees_waived,
+        first_nfl_season=origins,
         trade_deadline=deadline,
         prior_prospect_ids=prospect_ids,
     )
@@ -302,7 +357,9 @@ def build_team_screen(
                 f"still owed in full — only the fee on top is waived.",
             )
         )
-    notes += _prospect_notes(active, deadline, season - 1)
+    notes += _prospect_notes(
+        season, active, deadline, season - 1, origins, {p.espn_player_id: p.name for p in players.values()}
+    )
 
     for claim in stored:
         keeper = priced.get(claim.espn_player_id)
