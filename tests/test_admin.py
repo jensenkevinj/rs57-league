@@ -759,6 +759,32 @@ def test_a_request_missing_a_field_does_not_blank_it(client, store: ManualStore)
     assert store.season(PRIOR).consolation_winner_id is None
 
 
+def test_draft_date_and_doodle_link_follow_the_same_omit_versus_blank_rule(
+    client, store: ManualStore
+):
+    """The two fields the pre-draft home page reads — same present/absent/blank rule as every
+    other setting here, checked separately because ``draft_doodle_url`` is a plain string, not
+    a date, and takes a different branch in ``save_settings``."""
+    client.post(
+        f"/season/{SEASON}/settings",
+        data={
+            "draft_date": "2026-08-31 19:00",
+            "draft_doodle_url": "https://doodle.com/rs57-2026",
+        },
+    )
+    recorded = store.season(SEASON)
+    assert recorded.draft_date == datetime(2026, 8, 31, 19, 0)
+    assert recorded.draft_doodle_url == "https://doodle.com/rs57-2026"
+
+    client.post(f"/season/{SEASON}/settings", data={})
+    recorded = store.season(SEASON)
+    assert recorded.draft_date == datetime(2026, 8, 31, 19, 0), "an absent field must be left alone"
+    assert recorded.draft_doodle_url == "https://doodle.com/rs57-2026"
+
+    client.post(f"/season/{SEASON}/settings", data={"draft_doodle_url": ""})
+    assert store.season(SEASON).draft_doodle_url is None
+
+
 def test_the_settings_screen_names_the_year_the_waiver_lands_in(client):
     page = client.get(f"/season/{PRIOR}/settings").get_data(as_text=True)
     assert f"fees waived in\n    {SEASON}" in page or f"waived in {SEASON}" in text(page)

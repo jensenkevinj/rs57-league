@@ -92,12 +92,18 @@ class Season(Base):
     Their keeper fees are waived for ``year + 1``. Read it off by one year and every waiver
     lands on the wrong team: the ``*`` beside ``Bijan's Mustard`` in the 2025 fee allocations
     comes from ``Season(year=2024).consolation_winner_id``.
+
+    ``draft_date`` and ``draft_doodle_url`` are shown on the public home page while the season
+    has not drafted yet (see ``site.build_site``) and, like ``keeper_deadline``, are recorded
+    and displayed only — nothing in the engine reads them.
     """
 
     year: int
     season_start: datetime | None = None
     trade_deadline: datetime | None = None
     keeper_deadline: datetime | None = None
+    draft_date: datetime | None = None
+    draft_doodle_url: str | None = None
     consolation_winner_id: str | None = None
 
 

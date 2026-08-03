@@ -266,12 +266,19 @@ def create_app(
         else:
             winner = existing.consolation_winner_id if existing else None
 
+        if "draft_doodle_url" in form:
+            doodle_url = (form.get("draft_doodle_url") or "").strip() or None
+        else:
+            doodle_url = existing.draft_doodle_url if existing else None
+
         store.save_season(
             Season(
                 year=year,
                 season_start=when("season_start"),
                 trade_deadline=when("trade_deadline"),
                 keeper_deadline=when("keeper_deadline"),
+                draft_date=when("draft_date"),
+                draft_doodle_url=doodle_url,
                 consolation_winner_id=winner,
             )
         )

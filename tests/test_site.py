@@ -154,7 +154,23 @@ def derived(tmp_path: Path) -> Path:
     return out
 
 
-def render(tmp_path: Path, derived: Path) -> dict[str, str]:
+def render(tmp_path: Path, derived: Path, *, drafted: bool = False) -> dict[str, str]:
+    """Render the whole site from ``derived`` and return every page's HTML by filename.
+
+    ``drafted`` leaves the CURRENT keeper season's file exactly as ``derived`` wrote it by
+    default — the fixture's own ``False`` matters to keepers.html (it decides which season's
+    deadline and rookies the grid is about). Pass ``drafted=True`` for a test that is really
+    about the home page's prize board, where SEASON's own draft status is incidental: a season
+    carrying real weekly stats has necessarily already had its auction, and the pre-draft home
+    page (see index.html) would otherwise stand in front of the board these tests check.
+    """
+    if drafted:
+        keeper_years, _ = season_files(derived)
+        if keeper_years:
+            keeper_path = derived / f"{keeper_years[-1]}.json"
+            doc = json.loads(keeper_path.read_text(encoding="utf-8"))
+            doc["source"]["drafted"] = True
+            keeper_path.write_text(json.dumps(doc), encoding="utf-8")
     out = tmp_path / "out"
     build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory")
     return {path.name: path.read_text(encoding="utf-8") for path in out.iterdir()}
@@ -664,8 +680,78 @@ def board_labels(home) -> set[str]:
 
 
 def test_home_is_the_most_recent_season_with_results(tmp_path: Path, derived: Path):
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert f"{PRIOR} Final Results" in text(page)
+    assert f"{SEASON} Preseason" not in text(page), "the drafted fixture must not show the preseason page"
+
+
+def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, derived: Path):
+    """Before SEASON drafts, home shows the draft's own info, not last season's finished board.
+
+    ``derived`` carries SEASON undrafted, which is today's actual state — this is the case
+    ``render()``'s default exists to paper over for every other test; this is the one test that
+    turns it back off to look at the page it produces.
+    """
+    manual = tmp_path / "manual"
+    manual.mkdir()
+    (manual / "seasons.json").write_text(
+        json.dumps(
+            {
+                "seasons": {
+                    str(SEASON): {
+                        "year": SEASON,
+                        "keeper_deadline": "2026-08-30T21:00:00",
+                        "draft_date": "2026-08-31T19:00:00",
+                        "draft_doodle_url": "https://doodle.com/rs57-2026",
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    page = (out / "index.html").read_text(encoding="utf-8")
+    body = text(page)
+
+    assert f"{SEASON} Preseason" in body
+    assert "8/31/2026" in body, "the draft date"
+    assert "8/30/2026" in body, "the keeper deadline"
+    assert 'href="https://doodle.com/rs57-2026"' in page
+    assert f"{PRIOR} Final Results" not in body, "last season's board must not also be showing"
+
+
+def test_the_preseason_page_says_tbd_with_nothing_recorded_yet(tmp_path: Path, derived: Path):
+    """No settings row at all — SEASON's own file, not the admin tool, decides the page shows."""
+    out = tmp_path / "out"
+    build_site(
+        out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=tmp_path / "manual"
+    )
+    body = text((out / "index.html").read_text(encoding="utf-8"))
+    assert f"{SEASON} Preseason" in body
+    assert "TBD" in body
+    assert "coming soon" in body.lower()
+
+
+def test_the_preseason_page_gives_way_to_the_board_once_drafted(tmp_path: Path, derived: Path):
+    """The one guard this whole feature rests on: flip ``drafted`` and the page must flip too."""
+    manual = tmp_path / "manual"
+    manual.mkdir()
+    out = tmp_path / "out"
+    keeper_path = derived / f"{SEASON}.json"
+
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    page_before = text((out / "index.html").read_text(encoding="utf-8"))
+    assert f"{SEASON} Preseason" in page_before
+
+    doc = json.loads(keeper_path.read_text(encoding="utf-8"))
+    doc["source"]["drafted"] = True
+    keeper_path.write_text(json.dumps(doc), encoding="utf-8")
+
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    page_after = text((out / "index.html").read_text(encoding="utf-8"))
+    assert f"{SEASON} Preseason" not in page_after
+    assert f"{PRIOR} Final Results" in page_after
 
 
 def test_no_prize_disappears_between_the_payouts_and_the_board(tmp_path: Path):
@@ -693,7 +779,7 @@ def test_no_prize_disappears_between_the_payouts_and_the_board(tmp_path: Path):
     assert "Toilet Bowl" in board_labels(home)
     assert home.pot == 515
 
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert "Toilet Bowl" in page
 
 
@@ -714,7 +800,7 @@ def test_a_season_with_no_recorded_money_shows_no_amount_rather_than_zero(tmp_pa
     assert not any(row.recorded for row in rows)
     assert any(row.winners for row in rows), "the prizes were still won"
 
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert "$0" not in page
 
 
@@ -731,7 +817,7 @@ def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
     assert home.status == "In progress — through week 9"
     assert home.heading == f"{PRIOR} Week 9"
 
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert "In progress — through week 9" in body
     # Not in the heading, not in a pill, not anywhere: nothing here is settled.
     assert "Final" not in body
@@ -766,7 +852,7 @@ def test_the_heading_names_the_phase_of_the_season(
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.heading == expected
-    assert expected in text(render(tmp_path, derived)["index.html"])
+    assert expected in text(render(tmp_path, derived, drafted=True)["index.html"])
 
 
 @pytest.mark.parametrize(
@@ -807,7 +893,7 @@ def test_the_playoff_round_is_named_from_the_bracket(
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.heading == expected
-    assert expected in text(render(tmp_path, derived)["index.html"])
+    assert expected in text(render(tmp_path, derived, drafted=True)["index.html"])
 
 
 def test_the_sync_writes_the_bracket_size_the_site_reads(tmp_path: Path):
@@ -861,7 +947,7 @@ def test_a_phase_is_not_guessed_when_the_season_length_is_unknown(tmp_path: Path
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.heading == f"{PRIOR} Season"
-    assert "Playoffs" not in text(render(tmp_path, derived)["index.html"])
+    assert "Playoffs" not in text(render(tmp_path, derived, drafted=True)["index.html"])
 
 
 def test_every_season_prize_explains_itself(tmp_path: Path, derived: Path):
@@ -872,7 +958,7 @@ def test_every_season_prize_explains_itself(tmp_path: Path, derived: Path):
     """
     home = build_home(build_stats_season(derived, PRIOR))
 
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     for column in home.columns:
         for block in column:
             assert block.caption, f"{block.title} has no rule behind its i"
@@ -891,7 +977,7 @@ def test_what_won_each_prize_survives_the_column_layout(tmp_path: Path, derived:
     assert any(row.value for row in rows), "no prize has a number, so this checks nothing"
     assert any(row.detail for row in rows), "no prize has context, so this checks nothing"
 
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     for row in rows:
         if row.value:
             assert row.value in page, f"{row.label} no longer shows the number that won it"
@@ -937,7 +1023,7 @@ def test_most_points_leads_the_season_awards_and_is_not_a_placing(tmp_path: Path
     assert _money_shown(home) == home.pot
 
     # Its regular-season window has to stay stated somewhere, and that is its heading's "i".
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert points.caption in page
     assert "weeks 1–14" in points.caption
 
@@ -958,7 +1044,7 @@ def test_a_prize_a_season_never_awarded_leaves_no_empty_subheading(tmp_path: Pat
     ), "a heading with no prizes under it"
     assert "Unlucky" not in _blocks(home)
 
-    assert "Unlucky" not in text(render(tmp_path, derived)["index.html"])
+    assert "Unlucky" not in text(render(tmp_path, derived, drafted=True)["index.html"])
 
 
 def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path):
@@ -1016,7 +1102,7 @@ def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path
     assert not studs.each_recorded and studs.each == 0
 
     # So each of those rows still prints its own amount.
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert "$25" in page and "$30" in page
     assert _money_shown(home) == home.pot
 
@@ -1058,7 +1144,7 @@ def test_survivor_is_shown_once_and_paid_once(tmp_path: Path):
 
     assert _money_shown(home) == home.pot, "the page shows money the pot does not account for"
 
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert "Winner" in body
     assert "$40" in body
     for elimination in home.survivor.eliminations:
@@ -1080,7 +1166,7 @@ def test_a_season_with_no_survivor_ladder_keeps_the_prize_in_the_season_awards(
     assert len([row for row in rows if row.label == "Survivor"]) == 1
     assert _money_shown(home) == home.pot
 
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert "Survivor" in body
     assert "Winner" not in body
 
@@ -1089,7 +1175,7 @@ def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.final and home.status == "Final"
     assert home.heading == f"{PRIOR} Final Results"
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     # The heading carries this now — a finished season shows no pill at all.
     assert f"{PRIOR} Final Results" in body
     assert "In progress" not in body
@@ -1119,7 +1205,7 @@ def test_a_tie_on_the_board_shows_both_winners_and_the_whole_prize(tmp_path: Pat
     )
     assert row.split and row.amount == 10 and len(row.winners) == 2
 
-    page = render(tmp_path, derived)["index.html"]
+    page = render(tmp_path, derived, drafted=True)["index.html"]
     assert "split" in page
     # Both winners are named, and the double space in the second one survives verbatim.
     assert "Fake News" in page
@@ -1148,7 +1234,7 @@ def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
     assert {line.total for line in home.leaders} == {100}
 
     # Neither is shown as second on a board whose ordering is the only thing saying who led.
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert " 2 " not in body.split("Moneylist")[1][:200]
 
 
@@ -1159,7 +1245,7 @@ def test_the_home_page_survives_a_season_with_no_stats_at_all(tmp_path: Path):
     (derived / f"{SEASON}.json").write_text(json.dumps(keeper_doc()), encoding="utf-8")
 
     assert build_home(None) is None
-    body = text(render(tmp_path, derived)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert "no prizes to show" in body
 
 

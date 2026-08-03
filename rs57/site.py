@@ -63,6 +63,7 @@ from rs57.models import (
     Player,
     RosterEntry,
     SalaryOverride,
+    Season,
     SeasonPoints,
     StandingRow,
     StudAward,
@@ -648,6 +649,24 @@ def load_claims(season: int, manual_dir: Path = MANUAL) -> list[KeeperClaim]:
         return [KeeperClaim(**row) for row in rows]
     except (ValidationError, TypeError, json.JSONDecodeError):
         return []
+
+
+def load_season_settings(season: int, manual_dir: Path = MANUAL) -> Season | None:
+    """One season's settings from ``data/manual/seasons.json``. Read-only.
+
+    The admin tool owns that file. The site reads it for the pre-draft home page — the draft
+    date, keeper deadline and Doodle link — and never writes it. A malformed file is skipped
+    rather than allowed to take the nightly build down; ``validate.py`` is the place that
+    reports it.
+    """
+    path = manual_dir / "seasons.json"
+    if not path.exists():
+        return None
+    try:
+        row = (_load(path).get("seasons") or {}).get(str(season))
+        return Season(**row) if row else None
+    except (ValidationError, TypeError, json.JSONDecodeError):
+        return None
 
 
 def _trade_deadline(derived_dir: Path, season: int) -> datetime | None:
@@ -1499,6 +1518,16 @@ def build_site(
         seasons[0] if seasons else None,
     )
 
+    # Before the auction, `current` is the season being drafted and there is nothing to award
+    # yet — showing last season's finished board there would read as this season's result.
+    # `predraft` carries the settings the pre-draft home page shows instead; it is None once
+    # `current.drafted` flips, at which point the page above reverts to `home` on its own.
+    predraft = (
+        load_season_settings(current.season, manual_dir)
+        if current is not None and not current.drafted
+        else None
+    )
+
     shared = {
         "current": current,
         "seasons": seasons,
@@ -1519,7 +1548,7 @@ def build_site(
         )
         written.append(path)
 
-    write("index.html", "index.html", page="home")
+    write("index.html", "index.html", page="home", predraft=predraft)
     write("keepers.html", "keepers.html", page="keepers")
     write("seasons.html", "seasons.html", page="seasons")
     # A past season's page is the home page, archived: same template, same prize board, just

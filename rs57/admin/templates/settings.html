@@ -40,6 +40,23 @@
 
   <div class="row" style="margin-top:1rem">
     <div class="field">
+      <label for="draft_date">Draft date</label>
+      <input type="text" id="draft_date" name="draft_date" placeholder="2026-08-31 19:00"
+             value="{{ settings.draft_date.isoformat(' ', 'minutes') if settings and settings.draft_date else '' }}">
+    </div>
+    <div class="field">
+      <label for="draft_doodle_url">Draft Doodle link</label>
+      <input type="text" id="draft_doodle_url" name="draft_doodle_url" placeholder="https://doodle.com/..."
+             value="{{ settings.draft_doodle_url if settings and settings.draft_doodle_url else '' }}">
+    </div>
+  </div>
+  <p class="small muted" style="margin-top:0.25rem">
+    Shown on the public home page while {{ year }} has not drafted yet. Nobody reads ESPN for
+    these — enter them by hand.
+  </p>
+
+  <div class="row" style="margin-top:1rem">
+    <div class="field">
       <label for="consolation_winner_id">{{ year }} consolation bracket winner</label>
       <select id="consolation_winner_id" name="consolation_winner_id">
         <option value="">nobody recorded</option>

@@ -6,14 +6,49 @@
 
    Also used, unchanged, for every past season's page (season-{year}.html) — an archived
    season is the same board, just built from that year's data instead of the most recent
-   one. `page` distinguishes them ("home" vs "seasons") for the title and the nav highlight. #}
+   one. `page` distinguishes them ("home" vs "seasons") for the title and the nav highlight.
+
+   Before the coming season's auction, `home` would still be last season's finished board —
+   showing it would read as this year's result. `predraft` (only ever set on the live home
+   page, never on an archived one) is site.build_site's signal to show the draft date, keeper
+   deadline and Doodle link instead; it clears itself once `current.drafted` flips, no
+   redeploy required. #}
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{% block title %}RS57 — {% if page == 'home' %}Home{% elif home %}{{ home.season }} Season{% else %}Season{% endif %}{% endblock %}
+{% block title %}RS57 — {% if page == 'home' and current and not current.drafted %}{{ current.season }} Preseason{% elif page == 'home' %}Home{% elif home %}{{ home.season }} Season{% else %}Season{% endif %}{% endblock %}
 
 {% block content %}
-{% if home %}
+{% if page == 'home' and current and not current.drafted %}
+  <div class="page-head">
+    <h1>{{ current.season }} Preseason</h1>
+  </div>
+
+  <div class="podium">
+    <div class="spot">
+      <div class="spot-place">Draft date</div>
+      <div class="spot-team">
+        {% if predraft and predraft.draft_date %}{{ predraft.draft_date | mdy }}
+        {%- else %}<span class="muted">TBD</span>{% endif %}
+      </div>
+    </div>
+    <div class="spot">
+      <div class="spot-place">Keeper deadline</div>
+      <div class="spot-team">
+        {% if predraft and predraft.keeper_deadline %}{{ predraft.keeper_deadline | mdy }}
+        {%- else %}<span class="muted">TBD</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <p>
+    {% if predraft and predraft.draft_doodle_url %}
+      <a href="{{ predraft.draft_doodle_url }}">Pick a draft time on Doodle &rarr;</a>
+    {% else %}
+      <span class="muted">Draft scheduling link coming soon.</span>
+    {% endif %}
+  </p>
+{% elif home %}
   <div class="page-head">
     <h1>{{ home.heading }}</h1>
     {# The heading already says a finished season is finished. The pill is what warns that
