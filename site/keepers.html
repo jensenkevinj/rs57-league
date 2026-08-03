@@ -199,6 +199,18 @@
     border: 1px dashed var(--flag-line); background: var(--flag-bg); color: var(--flag);
   }
 
+  /* A live draft-cash override: this page shows the true salary and ESPN does not. Amber
+     rather than red — red on this page means "acquired after the keeper deadline", and this
+     is not that. The tooltip names ESPN's figure, which is the thing a manager comparing the
+     two screens actually needs. The commissioner's free-text reason stays off a public page. */
+  .wbadge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.3rem;
+    background: var(--flag-bg); border: 1px solid var(--flag-line); color: var(--flag);
+    font-size: 0.66rem; font-weight: 800; line-height: 1; cursor: help;
+    vertical-align: 0.08em; flex: none;
+  }
+
   /* Acquired after the qualifying season's trade deadline — the same red the alert above the
      grid uses, so the note and the rows it is about read as one thing. Marked on the date it is
      a fact about, plus a left edge so it is findable while scanning rather than only readable
