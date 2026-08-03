@@ -188,11 +188,15 @@
      seeing get one: filled for eligible, dashed for unknown. The ordinary case — checked, not
      eligible — is an empty cell, because 165 dashes down a column is noise that hides the 23
      rows somebody is actually looking for. The words are still in `data-k` for the filter. */
+  /* Buttons, not spans with a `title` — a `title` tooltip only ever shows on mouse hover, so
+     it is unreachable by tap on a phone and that is most of this league checking the page.
+     Same disclosure pattern as `.info` below: a focusable trigger with an `.info-bubble` child,
+     which opens on tap (via `:focus`) as well as on hover. */
   .pbadge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.4rem;
-    font-size: 0.62rem; font-weight: 700; line-height: 1; cursor: help;
-    vertical-align: 0.08em; flex: none;
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.4rem; padding: 0;
+    border: none; font-family: inherit; font-size: 0.62rem; font-weight: 700; line-height: 1;
+    cursor: help; vertical-align: 0.08em; flex: none;
   }
   .pbadge.is-eligible { background: var(--accent); color: #fff; }
   .pbadge.is-unknown {
@@ -204,10 +208,10 @@
      is not that. The tooltip names ESPN's figure, which is the thing a manager comparing the
      two screens actually needs. The commissioner's free-text reason stays off a public page. */
   .wbadge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.3rem;
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.3rem; padding: 0;
     background: var(--flag-bg); border: 1px solid var(--flag-line); color: var(--flag);
-    font-size: 0.66rem; font-weight: 800; line-height: 1; cursor: help;
+    font-family: inherit; font-size: 0.66rem; font-weight: 800; line-height: 1; cursor: help;
     vertical-align: 0.08em; flex: none;
   }
 
@@ -400,7 +404,9 @@
     text-transform: none; letter-spacing: 0;
     opacity: 0; visibility: hidden; transition: opacity 0.12s ease; z-index: 5;
   }
-  .info:hover .info-bubble, .info:focus .info-bubble { opacity: 1; visibility: visible; }
+  .info:hover .info-bubble, .info:focus .info-bubble,
+  .pbadge:hover .info-bubble, .pbadge:focus .info-bubble,
+  .wbadge:hover .info-bubble, .wbadge:focus .info-bubble { opacity: 1; visibility: visible; }
   .survivor-won { padding: 0.1rem 0 0.6rem; border-bottom: 1px solid var(--line); }
 
   /* A printed results sheet's leader board: one line each, a dotted rule running from the
@@ -495,8 +501,10 @@
           </tr>
           <tr>
             <td data-k="Saquon Barkley"><span class="who">Saquon Barkley<span
-              class="pos">RB · PHI</span><span class="wbadge"
-                  title="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value.">!</span></span><span
+              class="pos">RB · PHI</span><button type="button" class="wbadge"
+                  aria-label="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value."><span
+                    aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
+                    Salary. Contact League Commissioner to update ESPN keeper value.</span></button></span><span
               class="sub"><span class="franchise">100yd Reverse Hurdles</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -547,8 +555,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Ashton Jeanty"><span class="who">Ashton Jeanty<span
-              class="pos">RB · LV</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · LV</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Aiyukiddinme? I&#39;m Odunze here</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -650,8 +660,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="TreVeyon Henderson"><span class="who">TreVeyon Henderson<span
-              class="pos">RB · NE</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · NE</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Belichick&#39;s Spy</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -685,8 +697,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Omarion Hampton"><span class="who">Omarion Hampton<span
-              class="pos">RB · LAC</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · LAC</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">The Infirmary</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -720,8 +734,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Jonathan Taylor"><span class="who">Jonathan Taylor<span
-              class="pos">RB · IND</span><span class="wbadge"
-                  title="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value.">!</span></span><span
+              class="pos">RB · IND</span><button type="button" class="wbadge"
+                  aria-label="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value."><span
+                    aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
+                    Salary. Contact League Commissioner to update ESPN keeper value.</span></button></span><span
               class="sub"><span class="franchise">Bijan&#39;s Mustard</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -1079,8 +1095,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Tetairoa McMillan"><span class="who">Tetairoa McMillan<span
-              class="pos">WR · CAR</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · CAR</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Bijan&#39;s Mustard</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">WR</td>
@@ -1199,8 +1217,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Jaxon Smith-Njigba"><span class="who">Jaxon Smith-Njigba<span
-              class="pos">WR · SEA</span><span class="wbadge"
-                  title="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value.">!</span></span><span
+              class="pos">WR · SEA</span><button type="button" class="wbadge"
+                  aria-label="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value."><span
+                    aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
+                    Salary. Contact League Commissioner to update ESPN keeper value.</span></button></span><span
               class="sub"><span class="franchise">Jaxian McJigberson</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">WR</td>
@@ -1371,8 +1391,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Emeka Egbuka"><span class="who">Emeka Egbuka<span
-              class="pos">WR · TB</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · TB</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Cooking Rice</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">WR</td>
@@ -1457,8 +1479,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="RJ Harvey"><span class="who">RJ Harvey<span
-              class="pos">RB · DEN</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · DEN</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Cooking Rice</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -1645,8 +1669,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Travis Hunter"><span class="who">Travis Hunter<span
-              class="pos">WR · JAX</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · JAX</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Too Much Moxie</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">WR</td>
@@ -1749,8 +1775,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Oronde Gadsden"><span class="who">Oronde Gadsden<span
-              class="pos">TE · LAC</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">TE · LAC</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Belichick&#39;s Spy</span><span
                 class="acq-sub"> · 10/22/2025</span></span></td>
             <td class="muted">TE</td>
@@ -1886,8 +1914,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Jayden Higgins"><span class="who">Jayden Higgins<span
-              class="pos">WR · HOU</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · HOU</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Purdy Good at Fantasy</span><span
                 class="acq-sub"> · 11/19/2025</span></span></td>
             <td class="muted">WR</td>
@@ -1904,8 +1934,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Quinshon Judkins"><span class="who">Quinshon Judkins<span
-              class="pos">RB · CLE</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · CLE</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Belichick&#39;s Spy</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -1922,8 +1954,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Colston Loveland"><span class="who">Colston Loveland<span
-              class="pos">TE · CHI</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">TE · CHI</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Jaxian McJigberson</span><span
                 class="acq-sub"> · 11/5/2025</span></span></td>
             <td class="muted">TE</td>
@@ -2044,8 +2078,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Cam Skattebo"><span class="who">Cam Skattebo<span
-              class="pos">RB · NYG</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · NYG</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Purdy Good at Fantasy</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">RB</td>
@@ -2130,8 +2166,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Tyler Warren"><span class="who">Tyler Warren<span
-              class="pos">TE · IND</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">TE · IND</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Too Much Moxie</span><span
                 class="acq-sub"> · 9/2/2025</span></span></td>
             <td class="muted">TE</td>
@@ -2854,8 +2892,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Chimere Dike"><span class="who">Chimere Dike<span
-              class="pos">WR · TEN</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · TEN</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">The Infirmary</span><span
                 class="acq-sub"> · 11/21/2025</span></span></td>
             <td class="muted">WR</td>
@@ -2996,8 +3036,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Elic Ayomanor"><span class="who">Elic Ayomanor<span
-              class="pos">WR · TEN</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · TEN</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Fake News</span><span
                 class="acq-sub"> · 10/23/2025</span></span></td>
             <td class="muted">WR</td>
@@ -3068,8 +3110,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Harold Fannin Jr."><span class="who">Harold Fannin Jr.<span
-              class="pos">TE · CLE</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">TE · CLE</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Fake News</span><span
                 class="acq-sub"> · 10/23/2025</span></span></td>
             <td class="muted">TE</td>
@@ -3139,8 +3183,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Jaxson Dart"><span class="who">Jaxson Dart<span
-              class="pos">QB · NYG</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">QB · NYG</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">The Infirmary</span><span
                 class="acq-sub"> · 9/28/2025</span></span></td>
             <td class="muted">QB</td>
@@ -3332,8 +3378,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Kyle Monangai"><span class="who">Kyle Monangai<span
-              class="pos">RB · CHI</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · CHI</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">100yd Reverse Hurdles</span><span
                 class="acq-sub"> · 10/8/2025</span></span></td>
             <td class="muted">RB</td>
@@ -3385,8 +3433,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Luther Burden III"><span class="who">Luther Burden III<span
-              class="pos">WR · CHI</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · CHI</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">100yd Reverse Hurdles</span><span
                 class="acq-sub"> · 11/12/2025</span></span></td>
             <td class="muted">WR</td>
@@ -3542,8 +3592,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Shedeur Sanders"><span class="who">Shedeur Sanders<span
-              class="pos">QB · CLE</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">QB · CLE</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">The Infirmary</span><span
                 class="acq-sub"> · 11/26/2025</span></span></td>
             <td class="muted">QB</td>
@@ -3612,8 +3664,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Tez Johnson"><span class="who">Tez Johnson<span
-              class="pos">WR · TB</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · TB</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Fake News</span><span
                 class="acq-sub"> · 11/26/2025</span></span></td>
             <td class="muted">WR</td>
@@ -3665,8 +3719,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Tre&#39; Harris"><span class="who">Tre&#39; Harris<span
-              class="pos">WR · LAC</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">WR · LAC</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">The Infirmary</span><span
                 class="acq-sub"> · 11/9/2025</span></span></td>
             <td class="muted">WR</td>
@@ -3718,8 +3774,10 @@ $5            </td>
           </tr>
           <tr>
             <td data-k="Woody Marks"><span class="who">Woody Marks<span
-              class="pos">RB · HOU</span><span class="pbadge is-eligible"
-                  title="Prospect eligible — first NFL season was 2025">P</span></span><span
+              class="pos">RB · HOU</span><button type="button" class="pbadge is-eligible"
+                  aria-label="Prospect eligible — first NFL season was 2025"><span
+                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    first NFL season was 2025</span></button></span><span
               class="sub"><span class="franchise">Jaxian McJigberson</span><span
                 class="acq-sub"> · 9/3/2025</span></span></td>
             <td class="muted">RB</td>
