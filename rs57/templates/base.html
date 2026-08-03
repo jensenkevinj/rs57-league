@@ -193,11 +193,15 @@
      seeing get one: filled for eligible, dashed for unknown. The ordinary case — checked, not
      eligible — is an empty cell, because 165 dashes down a column is noise that hides the 23
      rows somebody is actually looking for. The words are still in `data-k` for the filter. */
+  /* Buttons, not spans with a `title` — a `title` tooltip only ever shows on mouse hover, so
+     it is unreachable by tap on a phone and that is most of this league checking the page.
+     Same disclosure pattern as `.info` below: a focusable trigger with an `.info-bubble` child,
+     which opens on tap (via `:focus`) as well as on hover. */
   .pbadge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.4rem;
-    font-size: 0.62rem; font-weight: 700; line-height: 1; cursor: help;
-    vertical-align: 0.08em; flex: none;
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.4rem; padding: 0;
+    border: none; font-family: inherit; font-size: 0.62rem; font-weight: 700; line-height: 1;
+    cursor: help; vertical-align: 0.08em; flex: none;
   }
   .pbadge.is-eligible { background: var(--accent); color: #fff; }
   .pbadge.is-unknown {
@@ -209,10 +213,10 @@
      is not that. The tooltip names ESPN's figure, which is the thing a manager comparing the
      two screens actually needs. The commissioner's free-text reason stays off a public page. */
   .wbadge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.3rem;
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-left: 0.3rem; padding: 0;
     background: var(--flag-bg); border: 1px solid var(--flag-line); color: var(--flag);
-    font-size: 0.66rem; font-weight: 800; line-height: 1; cursor: help;
+    font-family: inherit; font-size: 0.66rem; font-weight: 800; line-height: 1; cursor: help;
     vertical-align: 0.08em; flex: none;
   }
 
@@ -405,7 +409,9 @@
     text-transform: none; letter-spacing: 0;
     opacity: 0; visibility: hidden; transition: opacity 0.12s ease; z-index: 5;
   }
-  .info:hover .info-bubble, .info:focus .info-bubble { opacity: 1; visibility: visible; }
+  .info:hover .info-bubble, .info:focus .info-bubble,
+  .pbadge:hover .info-bubble, .pbadge:focus .info-bubble,
+  .wbadge:hover .info-bubble, .wbadge:focus .info-bubble { opacity: 1; visibility: visible; }
   .survivor-won { padding: 0.1rem 0 0.6rem; border-bottom: 1px solid var(--line); }
 
   /* A printed results sheet's leader board: one line each, a dotted rule running from the
