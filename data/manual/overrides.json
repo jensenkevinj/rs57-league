@@ -1,0 +1,50 @@
+{
+  "_about": [
+    "Salary overrides, by season. Written by the admin tool and by nothing else.",
+    "",
+    "An override is a DRAFT-CASH TRADE, not a correction. Managers trade draft cash, ESPN",
+    "has no native support, so the commissioner hand-edits a few player salaries on the two",
+    "teams involved and changes them back before the next draft. actual_salary is the TRUE",
+    "value and ESPN holds the distorted one for as long as reverted is false.",
+    "",
+    "This is NOT the place to patch an ESPN value somebody thinks is wrong.",
+    "",
+    "Live overrides should net to zero league-wide, because a cash trade moves money",
+    "between two teams -- check_override_balance audits that. One historical row has an",
+    "unrecoverable counterparty and is flagged unpaired_ok.",
+    "",
+    "'reason' is free text typed by a human and rendered on a PUBLIC site. Autoescaping is",
+    "on and no template may pass it through the safe filter."
+  ],
+  "seasons": {
+    "2025": [
+      {
+        "actual_salary": 71,
+        "created_at": "2026-08-03T17:37:04Z",
+        "espn_player_id": 3929630,
+        "reason": "Draft-cash trade (2025 workbook 'Manually Changed Salaries'). Fourth-player counterparty unrecoverable.",
+        "reverted": false,
+        "season": 2025,
+        "unpaired_ok": true
+      },
+      {
+        "actual_salary": 32,
+        "created_at": "2026-08-03T17:37:04Z",
+        "espn_player_id": 4242335,
+        "reason": "Draft-cash trade (2025 workbook 'Manually Changed Salaries').",
+        "reverted": false,
+        "season": 2025,
+        "unpaired_ok": false
+      },
+      {
+        "actual_salary": 19,
+        "created_at": "2026-08-03T17:37:04Z",
+        "espn_player_id": 4430878,
+        "reason": "Draft-cash trade (2025 workbook 'Manually Changed Salaries').",
+        "reverted": false,
+        "season": 2025,
+        "unpaired_ok": false
+      }
+    ]
+  }
+}
