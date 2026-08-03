@@ -503,9 +503,31 @@ def test_no_template_does_arithmetic_on_money():
             )
 
 
-def test_page_never_implies_a_keeper_has_been_declared(tmp_path: Path, derived: Path):
-    page = text(render(tmp_path, derived)["keepers.html"]).lower()
-    assert "nobody has declared a keeper yet" in page
+def test_the_page_publishes_prices_and_never_declarations(tmp_path: Path, derived: Path):
+    """Every row is what a player *would* cost. Nothing here says anyone has claimed him.
+
+    The page used to carry a "Prices, not declarations" banner whenever no claim existed. It
+    was removed because it only ever appeared on the published site — the recorded claims live
+    in an untracked file, so the banner was permanently on and told managers nothing.
+
+    Rendered *with* claims on file, because that is the state a regression would show up in:
+    the risk is declaration language creeping back, not the banner returning.
+    """
+    manual = tmp_path / "manual"
+    manual.mkdir()
+    (manual / "claims.json").write_text(
+        json.dumps({"seasons": {str(SEASON): [
+            {"season": SEASON, "manager_id": "t1", "espn_player_id": 1,
+             "slot": "K1", "fee_allocated": 0, "computed_salary": 10}
+        ]}}),
+        encoding="utf-8",
+    )
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    body = text((out / "keepers.html").read_text(encoding="utf-8")).lower()
+
+    for word in ("declar", "claimed", "prices, not"):
+        assert word not in body, f"the keeper page is talking about declarations: {word!r}"
 
 
 # ---------------------------------------------------------------------------

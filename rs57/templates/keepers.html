@@ -23,16 +23,6 @@
     writes them.
   </p>
 {% else %}
-  {% if not current.any_declared %}
-    <div class="flag">
-      <span class="tag">Prices, not declarations</span>
-      <div>
-        Nobody has declared a keeper yet. Every player below is priced as though he could be
-        kept; none of this means anyone has claimed him.
-      </div>
-    </div>
-  {% endif %}
-
   {{ ui.flags(current.notes | selectattr("kind", "equalto", "error")) }}
 
   {# The deadline the Acquired column is measured against, stated once so a reader is not
