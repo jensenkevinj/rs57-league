@@ -189,8 +189,6 @@ class KeeperSeason:
     waiver_manager_id: str | None
     waiver_name: str | None
     waiver_from_season: int | None
-    any_declared: bool = False
-    """Whether any team has recorded a claim. Until one has, the page says so in as many words."""
     decision_season: int = 0
     """The season this page's prices and eligibility marks are *about*, which is not always
     ``season`` — see ``build_keeper_season``. Set there; the default is never used."""
@@ -906,7 +904,6 @@ def build_keeper_season(
         waiver_manager_id=waiver_manager_id,
         waiver_name=names.get(waiver_manager_id) if waiver_manager_id else None,
         waiver_from_season=waiver_from_season,
-        any_declared=any(team.declared_count for team in teams),
     )
 
 
