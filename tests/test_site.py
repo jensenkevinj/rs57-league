@@ -619,7 +619,11 @@ def test_an_unawarded_prize_keeps_its_money_and_says_so(tmp_path: Path):
 
 
 def test_a_season_with_stats_and_no_payouts_still_renders(tmp_path: Path):
-    """2023 is deliberately absent from payouts.json; its stats still compute."""
+    """2023 is deliberately absent from payouts.json; its stats still compute.
+
+    The page is the home template archived, so an unrecorded prize shows the same way it
+    already does on the home page: a dash, not a banner and not ``$0``.
+    """
     derived = tmp_path / "derived"
     derived.mkdir()
     doc = stats_doc(season=2023, payouts=[])
@@ -627,7 +631,10 @@ def test_a_season_with_stats_and_no_payouts_still_renders(tmp_path: Path):
 
     pages = render(tmp_path, derived)
     assert "season-2023.html" in pages
-    assert "No prize amounts recorded" in pages["season-2023.html"]
+    page = pages["season-2023.html"]
+    assert "$0" not in page
+    assert "Fake News" not in page  # no keeper file for 2023, so names are unknown
+    assert "t1" in page  # the champion still shows, by id, with no amount recorded
 
 
 def test_franchise_earnings_add_up_to_the_pot(tmp_path: Path, derived: Path):

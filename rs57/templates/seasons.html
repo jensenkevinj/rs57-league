@@ -6,8 +6,8 @@
 {% block content %}
 <h1>Seasons</h1>
 <p class="lede">
-  Every season that has been synced. Each page holds the final standings, every prize, and
-  what each franchise took home.
+  Every season that has been synced. Each page is that year's home page, archived — the same
+  prize board, podium and moneylist, built from that season's results.
 </p>
 
 {% if seasons %}
@@ -44,7 +44,7 @@
     <p class="small">
       Season pot <span class="money">${{ season.pot }}</span> ·
       {{ season.standings | length }} franchises ·
-      <a href="season-{{ season.season }}.html">weekly high scores, studs, survivor and standings &rarr;</a>
+      <a href="season-{{ season.season }}.html">full prize board and moneylist &rarr;</a>
     </p>
     {% if season.notes %}
       <p class="small muted">

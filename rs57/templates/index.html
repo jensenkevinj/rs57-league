@@ -2,11 +2,15 @@
 
    This is the spreadsheet the league used to keep, so it reads like one — every prize, who
    won it, the number that won it, and what it paid. Nothing here is computed: site.build_home
-   assembles the board and this template lays it out. #}
+   assembles the board and this template lays it out.
+
+   Also used, unchanged, for every past season's page (season-{year}.html) — an archived
+   season is the same board, just built from that year's data instead of the most recent
+   one. `page` distinguishes them ("home" vs "seasons") for the title and the nav highlight. #}
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{% block title %}RS57 — Home{% endblock %}
+{% block title %}RS57 — {% if page == 'home' %}Home{% elif home %}{{ home.season }} Season{% else %}Season{% endif %}{% endblock %}
 
 {% block content %}
 {% if home %}

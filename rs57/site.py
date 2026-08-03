@@ -1514,14 +1514,19 @@ def build_site(
 
     def write(name: str, template: str, **context: Any) -> None:
         path = out_dir / name
-        path.write_text(env.get_template(template).render(**shared, **context), encoding="utf-8")
+        path.write_text(
+            env.get_template(template).render(**{**shared, **context}), encoding="utf-8"
+        )
         written.append(path)
 
     write("index.html", "index.html", page="home")
     write("keepers.html", "keepers.html", page="keepers")
     write("seasons.html", "seasons.html", page="seasons")
+    # A past season's page is the home page, archived: same template, same prize board, just
+    # that year's data instead of the most recent one. `home` above is `build_home(seasons[0])`;
+    # this is that same function run over every other year.
     for season in seasons:
-        write(f"season-{season.season}.html", "season.html", page="seasons", season=season)
+        write(f"season-{season.season}.html", "index.html", page="seasons", home=build_home(season))
     write(
         "rules.html",
         "rules.html",
