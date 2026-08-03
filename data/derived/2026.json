@@ -1372,7 +1372,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 33,
+      "base_salary": 32,
       "espn_player_id": 4242335,
       "kept_prior_year": true,
       "manager_id": "t10",
@@ -1786,7 +1786,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 68,
+      "base_salary": 71,
       "espn_player_id": 3929630,
       "kept_prior_year": true,
       "manager_id": "t2",
@@ -1993,7 +1993,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 18,
+      "base_salary": 19,
       "espn_player_id": 4430878,
       "kept_prior_year": true,
       "manager_id": "t3",
