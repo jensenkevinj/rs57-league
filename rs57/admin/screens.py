@@ -49,6 +49,17 @@ from rs57.models import KeeperClaim, KeeperSlot, SalaryOverride
 
 SLOT_CHOICES = (KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3, KeeperSlot.PROSPECT)
 
+SLOT_LABELS = {"K1": "K1", "K2": "K2", "K3": "K3", "PROSPECT": "P"}
+"""Short labels for the card, which is narrow. Display only — the stored slot is unchanged."""
+
+ROSTER_IS_KEEPERS_ONLY = MAX_KEEPERS + MAX_PROSPECTS
+"""At or under this many rostered players, ESPN has pruned the team to its keepers.
+
+The same threshold ``espn.check_roster_sizes`` reads, for the same reason: it is a fact the
+payload announces rather than a mode anybody switches on. Once ESPN prunes, who was kept stops
+being a question — so the card stops asking it and shows names instead of pickers.
+"""
+
 
 @dataclass(frozen=True)
 class Note:
@@ -66,6 +77,107 @@ class Note:
     kind: str
     message: str
     team_specific: bool = True
+
+
+@dataclass(frozen=True)
+class OverrideRow:
+    """One salary override, joined to the player and franchise it moved money between."""
+
+    override: SalaryOverride
+    name: str
+    espn_base: int | None
+    manager: str | None
+
+    @property
+    def live(self) -> bool:
+        return not self.override.reverted
+
+    @property
+    def delta(self) -> int | None:
+        """True salary minus what ESPN holds — the leg of the cash trade, in dollars.
+
+        ``None`` when ESPN has no base for the player, because an unknowable figure is left
+        out rather than guessed at zero. A guessed zero would sum into a league total that
+        looked balanced while resting on a number nobody had.
+        """
+        if self.espn_base is None:
+            return None
+        return self.override.actual_salary - self.espn_base
+
+
+def override_row(override: SalaryOverride, season: DerivedSeason | None) -> OverrideRow:
+    """Join one override to its season's derived roster. Matched on id, never on name."""
+    player = season.player_by_id.get(override.espn_player_id) if season else None
+    entry = next(
+        (
+            e
+            for e in (season.roster if season else ())
+            if e.espn_player_id == override.espn_player_id
+        ),
+        None,
+    )
+    return OverrideRow(
+        override=override,
+        name=player.name if player else f"player {override.espn_player_id}",
+        espn_base=entry.base_salary if entry else None,
+        manager=season.name_of(entry.manager_id) if season and entry else None,
+    )
+
+
+@dataclass(frozen=True)
+class KeeperGate:
+    """Whether claims may be edited right now, and why.
+
+    **Three states, not two.** ``deadline`` is ``None`` for two entirely different reasons —
+    nobody has recorded one yet, or... no, only one reason, and that is the point. A future
+    deadline and an unrecorded deadline both used to collapse into ``deadline_passed = False``,
+    so gating on that single flag would freeze a freshly synced season solid, with nothing on
+    screen saying why and the way out — the settings page — not obviously connected. The
+    deadline is recorded in this same tool; a missing one cannot be the thing that locks it.
+
+    ``state`` is ``"locked"``, ``"open"`` or ``"unrecorded"``. Only ``"locked"`` refuses a write.
+
+    This object is presentation *and* an answer, but it is never the guard. The ``save`` route
+    computes its own gate from the store and the clock rather than trusting whatever a screen
+    was handed — a ``disabled`` attribute is a courtesy to the browser, and a tab left open
+    from before the deadline still posts.
+    """
+
+    deadline: datetime | None
+    state: str
+
+    @property
+    def editable(self) -> bool:
+        return self.state != "locked"
+
+    @property
+    def message(self) -> str:
+        if self.state == "locked":
+            return (
+                f"Claims are locked until the keeper deadline "
+                f"({self.deadline:%Y-%m-%d %H:%M}). Salaries are entered after it passes, so "
+                f"nothing is recorded while managers can still change their minds. Prices "
+                f"below are live — you can look, you just cannot record."
+            )
+        if self.state == "unrecorded":
+            return (
+                "No keeper deadline is recorded for this season, so nothing is locked. "
+                "ESPN keeps one in draftSettings.keeperDeadlineDate — record it in season "
+                "settings and the console will hold claims until it passes."
+            )
+        return (
+            f"The keeper deadline ({self.deadline:%Y-%m-%d %H:%M}) has passed. The console is "
+            f"open and stays open — nothing re-locks."
+        )
+
+
+def keeper_gate(season: int, store: ManualStore, *, now: datetime) -> KeeperGate:
+    """Read the gate off the recorded deadline. The one place the three states are decided."""
+    settings = store.season(season)
+    deadline = settings.keeper_deadline if settings else None
+    if deadline is None:
+        return KeeperGate(deadline=None, state="unrecorded")
+    return KeeperGate(deadline=deadline, state="open" if deadline < now else "locked")
 
 
 @dataclass(frozen=True)
@@ -121,6 +233,9 @@ class TeamScreen:
     waiver_recorded: bool
     submitted_at: datetime | None
     saved: bool = False
+    gate: KeeperGate | None = None
+    """``None`` renders as editable. Safe as a default because the ``save`` route computes its
+    own gate and never reads this one — a screen cannot talk a route into a write."""
 
     @property
     def errors(self) -> tuple[ValidationIssue, ...]:
@@ -134,20 +249,120 @@ class TeamScreen:
     def unverified(self) -> tuple[Note, ...]:
         return tuple(note for note in self.notes if note.kind in ("review", "error"))
 
+    @property
+    def fee_gap(self) -> int:
+        """How far the allocated fees are from the tier, unsigned. ``fee_state`` says which way.
 
-@dataclass(frozen=True)
-class TeamSummary:
-    manager_id: str
-    name: str
-    keeper_count: int
-    prospect_count: int
-    total_salary: int
-    total_fees: int
-    blocked: bool
-    error_count: int
-    review_count: int
-    declared: bool
-    fees_waived: bool
+        The card used to print the tier as a second total next to the allocated one and leave
+        the reader to subtract. This is the number that subtraction was for.
+        """
+        return abs(self.fee_shortfall or 0)
+
+    @property
+    def fee_state(self) -> str:
+        """``"met"``, ``"short"``, ``"over"``, ``"none"`` or ``"unknown"``.
+
+        Named in Python rather than inferred in a template. ``fee_shortfall`` is signed —
+        positive owes more, negative has over-allocated — and a template testing it for
+        truthiness calls both "short", which tells a manager who paid $5 too much to pay more.
+        """
+        if self.fee_expected is None:
+            return "unknown"
+        if not self.declared:
+            return "none"
+        if self.fee_shortfall == 0:
+            return "met"
+        return "short" if (self.fee_shortfall or 0) > 0 else "over"
+
+    @property
+    def keepers_only(self) -> bool:
+        """True once ESPN has pruned this roster to the players who were kept.
+
+        Read off the roster's depth, not off a setting. Between the keeper deadline and the
+        auction ESPN holds only the kept players, and at that point *who* is kept is not a
+        question anybody needs a picker to answer.
+        """
+        return 0 < len(self.rows) <= ROSTER_IS_KEEPERS_ONLY
+
+    @property
+    def slots(self) -> tuple[tuple[str, str, PlayerRow | None], ...]:
+        """The team's four keeper slots in order: ``(slot, short label, claim or None)``.
+
+        Always four rows, even when nothing is declared — an empty slot is a fact worth
+        rendering rather than a row that isn't there, and a card whose height depends on how
+        many keepers a team has makes a grid of twelve impossible to scan.
+
+        **Once the roster is pruned, unclaimed slots are pre-filled from it.** ESPN has already
+        said these are the keepers; making somebody re-pick them from a list of exactly
+        themselves is asking a question that has one answer. The fill is a *default on screen*,
+        not a record — nothing reaches ``claims.json`` until the card is submitted.
+
+        K1/K2/K3 are interchangeable, so the fill runs dearest first. Only the keeper/prospect
+        split is load-bearing anywhere (``is_keeper_slot``, ``prior_prospect_ids``), and **ESPN
+        cannot say which keep is the prospect** — so the prospect slot is never filled by
+        guessing. It stays empty and ``prospect_unknown`` says so.
+
+        A slot claimed twice keeps the first. That is a rule violation the engine reports as an
+        issue and the card shows as an error tag; the card is not the place to adjudicate it.
+        """
+        claimed: dict[str, PlayerRow] = {}
+        for row in self.rows:
+            if row.claimed and row.slot not in claimed:
+                claimed[row.slot] = row
+
+        fill: list[PlayerRow] = []
+        if self.keepers_only and not claimed:
+            fill = [row for row in self.pickable][:MAX_KEEPERS]
+
+        filled = iter(fill)
+        out: list[tuple[str, str, PlayerRow | None]] = []
+        for slot in SLOT_CHOICES:
+            name = str(slot)
+            row = claimed.get(name)
+            if row is None and is_keeper_slot(slot):
+                row = next(filled, None)
+            out.append((name, SLOT_LABELS[name], row))
+        return tuple(out)
+
+    @property
+    def prospect_unknown(self) -> bool:
+        """A pruned roster deeper than the keeper limit must hold a prospect, and ESPN won't say.
+
+        Three keepers is the maximum, so a team ESPN pruned to four has exactly one prospect
+        among them — a fact forced by the rules. *Which* one is not derivable from anything
+        ESPN publishes, so it is left for the commissioner rather than guessed.
+        """
+        return self.keepers_only and len(self.rows) > MAX_KEEPERS and not self.prospect_count
+
+    @property
+    def pickable(self) -> tuple[PlayerRow, ...]:
+        """Everyone on the roster, dearest first — the options behind each slot picker.
+
+        Ordered by what he would cost rather than alphabetically: a manager keeps his expensive
+        players, so the ones being picked cluster at the top of the list.
+        """
+        return tuple(sorted(self.rows, key=lambda row: (-row.candidate_price, row.name)))
+
+    @property
+    def declared(self) -> bool:
+        return bool(self.keeper_count or self.prospect_count)
+
+    @property
+    def error_count(self) -> int:
+        return len(self.errors)
+
+    @property
+    def review_count(self) -> int:
+        """Everything on this team needing the commissioner's eyes.
+
+        League-wide notes are excluded — an unrecorded consolation winner is one fact about the
+        season, and counting it against all twelve teams is how a real flag stops being read.
+        The season report shows those once, at the bottom.
+
+        A property rather than a number copied into a summary object: the report used to carry
+        its own count, and a count computed twice is a count that can disagree with itself.
+        """
+        return len(self.reviews) + len([n for n in self.unverified if n.team_specific])
 
 
 @dataclass(frozen=True)
@@ -156,17 +371,25 @@ class SeasonScreen:
 
     season: int
     prior_season: int
-    teams: tuple[TeamSummary, ...]
+    teams: tuple[TeamScreen, ...]
+    """Full screens, not summaries. This page *is* the entry form for all twelve franchises, so
+    it needs every priced row — and a summary object alongside them would be a second place for
+    the same numbers to live."""
     notes: tuple[Note, ...]
     league_salary: int
     league_fees: int
     declared_count: int
     blocked_count: int
-    keeper_deadline: datetime | None
-    deadline_passed: bool
+    gate: KeeperGate
     waiver_manager_id: str | None
     waiver_name: str | None
     waiver_recorded: bool
+    overrides: tuple[OverrideRow, ...]
+    """This season's draft-cash trades, recorded in the same sitting as the fees."""
+    override_net: int | None
+    """Live overrides summed. Should be zero — a cash trade moves money between two teams, and
+    ``check_override_balance`` reports it when it does not. ``None`` when any live row has no
+    ESPN base to compare against, because a total resting on a guess is worse than no total."""
 
 
 def _prospect_notes(
@@ -254,6 +477,7 @@ def build_team_screen(
     claims: list[KeeperClaim] | None = None,
     saved: bool = False,
     first_nfl_season: Mapping[int, int] | None = None,
+    gate: KeeperGate | None = None,
 ) -> TeamScreen:
     """Price and validate one team.
 
@@ -357,6 +581,17 @@ def build_team_screen(
                 f"still owed in full — only the fee on top is waived.",
             )
         )
+    if len(rows) > MAX_KEEPERS and 0 < len(rows) <= ROSTER_IS_KEEPERS_ONLY and not prospects:
+        notes.append(
+            Note(
+                "review",
+                f"ESPN has pruned this roster to {len(rows)} kept players, and {MAX_KEEPERS} is "
+                f"the keeper maximum — so exactly one of them is the prospect. ESPN does not "
+                f"record which, so the slots above are filled from the roster and the prospect "
+                f"is left empty. Set it before recording: a keeper charged as a prospect skips "
+                f"the ${KEEPER_TAX} tax, and a prospect charged as a keeper pays it.",
+            )
+        )
     notes += _prospect_notes(
         season, active, deadline, season - 1, origins, {p.espn_player_id: p.name for p in players.values()}
     )
@@ -422,6 +657,7 @@ def build_team_screen(
         waiver_recorded=waiver_recorded,
         submitted_at=max(submitted) if submitted else None,
         saved=saved,
+        gate=gate,
     )
 
 
@@ -432,60 +668,61 @@ def build_season_screen(
     store: ManualStore,
     *,
     now: datetime,
+    first_nfl_season: Mapping[int, int] | None = None,
 ) -> SeasonScreen:
-    """Every team's standing at a glance. Totals are added here, never in a template."""
-    summaries: list[TeamSummary] = []
+    """Every team's standing at a glance. Totals are added here, never in a template.
+
+    ``first_nfl_season`` is passed straight through to each team, and leaving it out is not a
+    harmless omission. ``keeper_rules`` reads ``None`` as "prospect rule 1 is not being applied"
+    and an empty mapping as "it *is* being applied and this player is unknown" — so a season
+    screen built without it reports every prospect in the league as unverified while the team
+    screen, handed the same claim and the real draft classes, reports him checked. Two screens
+    disagreeing about whether a rule ran is worse than either answer.
+    """
     waived_manager, waiver_recorded = store.fees_waived_for(season)
+    gate = keeper_gate(season, store, now=now)
 
-    for manager_id in current.manager_ids:
-        screen = build_team_screen(season, manager_id, current, prior, store)
-        summaries.append(
-            TeamSummary(
-                manager_id=manager_id,
-                name=screen.name,
-                keeper_count=screen.keeper_count,
-                prospect_count=screen.prospect_count,
-                total_salary=screen.total_salary,
-                total_fees=screen.total_fees,
-                blocked=screen.blocked,
-                error_count=len(screen.errors),
-                review_count=len(screen.reviews)
-                + len([n for n in screen.unverified if n.team_specific]),
-                declared=bool(screen.keeper_count or screen.prospect_count),
-                fees_waived=screen.fees_waived,
-            )
+    summaries = [
+        build_team_screen(
+            season,
+            manager_id,
+            current,
+            prior,
+            store,
+            first_nfl_season=first_nfl_season,
+            gate=gate,
         )
+        for manager_id in current.manager_ids
+    ]
 
-    settings = store.season(season)
-    deadline = settings.keeper_deadline if settings else None
-
+    # No "N teams have declared nothing yet" note. Every card already says "Not recorded yet"
+    # where that team is, and a list naming eleven franchises directly above eleven cards each
+    # saying the same thing is one fact told twice.
     notes: list[Note] = []
-    undeclared = [s for s in summaries if not s.declared]
-    if undeclared:
-        notes.append(
-            Note(
-                "info",
-                f"{len(undeclared)} of {len(summaries)} teams have declared nothing yet: "
-                f"{', '.join(s.name for s in undeclared)}.",
-            )
-        )
-    if deadline is None:
+    override_view = tuple(
+        override_row(o, current)
+        for o in sorted(store.overrides(season), key=lambda o: o.espn_player_id)
+    )
+    live_deltas = [row.delta for row in override_view if row.live]
+    override_net = None if any(d is None for d in live_deltas) else sum(live_deltas)
+    if override_net:
         notes.append(
             Note(
                 "review",
-                f"No keeper deadline is recorded for {season}. ESPN keeps one in "
-                f"draftSettings.keeperDeadlineDate — record it in season settings.",
+                f"This season's live draft-cash overrides net to ${override_net}, not $0. A "
+                f"cash trade moves money between two teams, so the legs should cancel — either "
+                f"a counterparty is unrecorded or one of the figures is wrong.",
             )
         )
-    elif deadline < now:
-        notes.append(
-            Note(
-                "review",
-                f"The keeper deadline ({deadline:%Y-%m-%d %H:%M}) has passed. Claims are still "
-                f"editable — the deadline is recorded and shown, never enforced — so anything "
-                f"changed after it is a deliberate correction.",
-            )
-        )
+
+    if gate.state == "unrecorded":
+        # Still REVIEW: an unrecorded deadline is a real gap in the season's record, and it has
+        # to be counted as unverified. It is just not a reason to lock the tool that records it.
+        notes.append(Note("review", gate.message))
+    # Locked and open get no note. Locked is the page's operating state and the template says so
+    # once, at the top, where it is acted on; open is what the deadline line already reads. The
+    # old note here warned that the deadline had passed, which is now simply what a season does —
+    # and a note repeating a banner is the same fact twice on one page.
     if not waiver_recorded:
         notes.append(
             Note(
@@ -504,12 +741,40 @@ def build_season_screen(
         league_fees=sum(s.total_fees for s in summaries),
         declared_count=sum(1 for s in summaries if s.declared),
         blocked_count=sum(1 for s in summaries if s.blocked),
-        keeper_deadline=deadline,
-        deadline_passed=bool(deadline and deadline < now),
+        gate=gate,
         waiver_manager_id=waived_manager,
         waiver_name=current.name_of(waived_manager) if waived_manager else None,
         waiver_recorded=waiver_recorded,
+        overrides=override_view,
+        override_net=override_net,
     )
+
+
+FIELD_SEP = "__"
+"""Separates the manager id from the field name: ``t1__player_K1``.
+
+The board is one form carrying all twelve franchises, so every field has to say which team it
+belongs to — twelve copies of ``player_K1`` in one POST are indistinguishable.
+"""
+
+
+def split_league_form(form: Mapping[str, str]) -> dict[str, dict[str, str]]:
+    """Split a board-wide form into one plain per-team form each.
+
+    Exists so there is still exactly **one** parser. ``claims_from_form`` never learns that a
+    league-wide POST is possible; it keeps taking a single team's fields, and this hands it
+    those fields whether they arrived alone from one card or alongside eleven others.
+
+    Fields with no manager prefix are dropped rather than guessed at. A field that cannot say
+    which team it belongs to cannot be recorded against one.
+    """
+    split: dict[str, dict[str, str]] = {}
+    for key, value in form.items():
+        manager_id, sep, field = key.partition(FIELD_SEP)
+        if not sep or not manager_id or not field:
+            continue
+        split.setdefault(manager_id, {})[field] = value
+    return split
 
 
 def claims_from_form(
@@ -522,37 +787,55 @@ def claims_from_form(
 ) -> tuple[list[KeeperClaim], list[str]]:
     """Build claims out of a posted form, and report what could not be parsed.
 
+    **Keyed by slot, not by player.** The form is a team's four keeper slots — ``player_K1``,
+    ``fee_K1``, and so on — because that is the shape of what a manager sends in: "K1 Nacua $5,
+    K2 Cook $10, prospect Skattebo". The screen it posts from is four rows, not sixteen, and the
+    commissioner is transcribing rather than shopping.
+
+    It used to be the other way round: a slot dropdown on every rostered player,
+    ``slot_{player_id}``. That reads the roster instead of the message, and it puts fifteen rows
+    on screen to record four.
+
     A fee of ``-5`` parses fine and comes back as a ``NEGATIVE_FEE`` issue from the engine.
     That is deliberate: the input carries no ``min`` attribute, because a browser refusing the
     value would hide a rule violation behind a form error and teach nobody anything. A fee of
     ``abc`` is a different thing — it is not a number at all — and is reported here.
+
+    So is **the same player picked into two slots**. That is not a league rule the engine can
+    speak to — it is an impossible input, the way ``abc`` is — and it arrived with the slot-keyed
+    form, which is the only shape that can express it. Left unreported the engine would price him
+    twice and the team would silently owe double.
 
     ``price_with`` freezes ``computed_salary`` at submission time. It is optional so the live
     preview can build claims without pretending to record anything.
     """
     claims: list[KeeperClaim] = []
     problems: list[str] = []
+    seen: dict[int, str] = {}
 
-    for key, raw in sorted(form.items()):
-        if not key.startswith("slot_"):
-            continue
-        slot_value = (raw or "").strip()
-        if not slot_value:
+    for slot in SLOT_CHOICES:
+        name = str(slot)
+        raw_player = (form.get(f"player_{name}") or "").strip()
+        if not raw_player:
             continue
         try:
-            player_id = int(key.removeprefix("slot_"))
+            player_id = int(raw_player)
         except ValueError:
-            problems.append(f"{key} is not a player id")
-            continue
-        if slot_value not in {str(slot) for slot in SLOT_CHOICES}:
-            problems.append(f"{slot_value} is not a keeper slot")
+            problems.append(f"{name} holds {raw_player!r}, which is not a player id")
             continue
 
-        raw_fee = (form.get(f"fee_{player_id}") or "").strip()
+        if player_id in seen:
+            problems.append(
+                f"the same player is in both {seen[player_id]} and {name} — pick him once"
+            )
+            continue
+        seen[player_id] = name
+
+        raw_fee = (form.get(f"fee_{name}") or "").strip()
         try:
             fee = int(raw_fee) if raw_fee else 0
         except ValueError:
-            problems.append(f"fee for player {player_id} is {raw_fee!r}, which is not a whole number")
+            problems.append(f"fee for {name} is {raw_fee!r}, which is not a whole number")
             continue
 
         claims.append(
@@ -560,7 +843,7 @@ def claims_from_form(
                 season=season,
                 manager_id=manager_id,
                 espn_player_id=player_id,
-                slot=KeeperSlot(slot_value),
+                slot=slot,
                 fee_allocated=fee,
                 submitted_at=now,
             )

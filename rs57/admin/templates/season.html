@@ -2,110 +2,89 @@
 {% set page = 'season' %}
 {% block title %}Keepers {{ screen.season }}{% endblock %}
 
+{# The keeper board. Twelve cards, four slots each, edited in place — viewing and entry are the
+   same screen because they are the same job.
+
+   No page title: the nav tab already says "Keepers 2026". No league totals line: every figure in
+   it is on a card, and a franchise's own numbers are read where that franchise is.
+
+   What is left is the deadline (which decides whether anything can be recorded), the board, and
+   whatever nobody has verified. #}
+
 {% block content %}
 {% import "_notes.html" as show %}
-<h1>Keepers {{ screen.season }}</h1>
-<p class="lede">
-  Every team's declared keepers, priced by the engine. This is the report to read before
-  releasing anything to the league.
-</p>
-
-<div class="panel">
-  <div class="stats">
-    <div class="stat">
-      <div class="figure">{{ screen.declared_count }}</div>
-      <div class="label">Teams declared</div>
-    </div>
-    <div class="stat">
-      <div class="figure">${{ screen.league_salary }}</div>
-      <div class="label">Salary committed</div>
-    </div>
-    <div class="stat">
-      <div class="figure">${{ screen.league_fees }}</div>
-      <div class="label">Fees allocated</div>
-    </div>
-    <div class="stat">
-      <div class="figure">{{ screen.blocked_count }}</div>
-      <div class="label">Teams blocked</div>
-    </div>
-  </div>
-  <p class="small muted" style="margin-bottom:0">
+<div class="page-meta">
+  <div>
     Keeper deadline:
-    {% if screen.keeper_deadline %}
-      {{ screen.keeper_deadline.strftime('%Y-%m-%d %H:%M') }}
-      {% if screen.deadline_passed %}<span class="tag-inline">passed</span>{% endif %}
+    {% if screen.gate.deadline %}
+      {{ screen.gate.deadline.strftime('%Y-%m-%d %H:%M') }}
+      {% if screen.gate.state == 'locked' %}
+        <span class="tag-inline">locked until then</span>
+      {% else %}
+        <span class="tag-inline ok">passed — open</span>
+      {% endif %}
     {% else %}
       not recorded — <a href="{{ url_for('settings', year=screen.season) }}">record it</a>
     {% endif %}
-    &middot; Fees waived:
-    {% if not screen.waiver_recorded %}
-      unknown, {{ screen.prior_season }} not recorded
-    {% elif screen.waiver_manager_id %}
-      {{ screen.waiver_name }}
-    {% else %}
-      nobody
-    {% endif %}
-  </p>
+  </div>
+  <div>
+    {# Read-only, and the only thing here that touches the network — so a button, never
+       something the page does on its way in. An unreachable ESPN must not take down the page
+       the whole offseason is entered on. #}
+    <button type="button" class="quiet"
+            hx-post="{{ url_for('verify_espn', year=screen.season) }}"
+            hx-target="#verify-result"
+            hx-swap="outerHTML">
+      Verify with ESPN
+    </button>
+    <span class="spin">reading ESPN…</span>
+  </div>
 </div>
 
-<div class="scroll">
-  <table>
-    <thead>
-      <tr>
-        <th>Franchise</th>
-        <th class="num">Keepers</th>
-        <th class="num">Prospect</th>
-        <th class="num">Fees</th>
-        <th class="num">Salary</th>
-        <th>State</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for team in screen.teams %}
-        <tr>
-          <td>
-            <a href="{{ url_for('team', year=screen.season, manager_id=team.manager_id) }}">{{ team.name }}</a>
-            {% if team.fees_waived %}<span class="tag-inline ok">fees waived</span>{% endif %}
-          </td>
-          <td class="num">{{ team.keeper_count }}</td>
-          <td class="num">{{ team.prospect_count }}</td>
-          <td class="num">${{ team.total_fees }}</td>
-          <td class="num money">${{ team.total_salary }}</td>
-          <td class="small">
-            {% if not team.declared %}
-              <span class="tag-inline flat">nothing declared</span>
-            {% elif team.blocked %}
-              <span class="tag-inline bad">{{ team.error_count }} error(s)</span>
-            {% else %}
-              <span class="tag-inline ok">recorded</span>
-            {% endif %}
-            {% if team.review_count %}
-              <span class="tag-inline">{{ team.review_count }} unverified</span>
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-      <tr>
-        <td>League</td>
-        <td class="num"></td>
-        <td class="num"></td>
-        <td class="num">${{ screen.league_fees }}</td>
-        <td class="num">${{ screen.league_salary }}</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
-</div>
+<div id="verify-result"></div>
+
+{# No lock banner. The deadline line above already carries a "locked until then" tag, every
+   control on every card is disabled and every button says so — a paragraph repeating it is the
+   fourth telling of one fact. #}
+{% with recorded = [], skipped = [], attempted = true %}
+  {% include "_board.html" %}
+{% endwith %}
 
 {{ show.notes(screen.notes) }}
 
-<h2>Where the numbers come from</h2>
-<p class="small">
-  Base is ESPN's <code>{{ source.base_salary_field }}</code> for {{ screen.season }} — what the
-  player cost his manager this season, with every prior fee and tax already inside it. The engine
-  adds the allocated fee and the ${{ keeper_tax }} tax for a player kept last season. There is no
-  salary cap.
-</p>
+<details class="fold">
+  <summary>
+    Draft-cash overrides
+    {% if screen.overrides %}
+      <span class="tag-inline">{{ screen.overrides | length }} recorded</span>
+      {% if screen.override_net is none %}
+        <span class="tag-inline">net unknown</span>
+      {% elif screen.override_net %}
+        <span class="tag-inline bad">nets ${{ screen.override_net }}, not $0</span>
+      {% endif %}
+    {% endif %}
+  </summary>
+  <div class="fold-body">
+    <p class="small">
+      Managers trade draft cash and ESPN has no native support, so a few salaries get hand-edited
+      on the two teams involved and changed back before the next draft. The override records the
+      <strong>true</strong> value while ESPN holds the distorted one. The
+      <a href="{{ url_for('overrides') }}">overrides tab</a> is the ledger across every season —
+      only it can show both legs of a trade cancelling.
+    </p>
+
+    {% if screen.overrides %}
+      {% with rows = screen.overrides, show_season = false, return_year = screen.season %}
+        {% include "_override_table.html" %}
+      {% endwith %}
+    {% else %}
+      <p class="muted small">Nothing recorded for {{ screen.season }}.</p>
+    {% endif %}
+
+    {% with scope = 'season', year = screen.season, return_year = screen.season %}
+      {% include "_override_form.html" %}
+    {% endwith %}
+  </div>
+</details>
+
 {% endblock %}

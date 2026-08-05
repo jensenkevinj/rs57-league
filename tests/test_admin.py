@@ -26,10 +26,24 @@ import pytest
 from rs57.admin import create_app
 from rs57.admin.derived import Derived
 from rs57.admin.gitops import Git, GitError
-from rs57.admin.reconcile import EspnKeeperPick, keeper_picks, reconcile
-from rs57.admin.screens import build_season_screen, build_team_screen, claims_from_form
+from rs57 import admin
+from rs57.admin.reconcile import (
+    EspnKeeperPick,
+    keeper_picks,
+    reconcile,
+    roster_salaries,
+    verify,
+)
+from rs57.admin.screens import (
+    SLOT_CHOICES,
+    KeeperGate,
+    build_season_screen,
+    build_team_screen,
+    claims_from_form,
+    keeper_gate,
+)
 from rs57.admin.store import CLAIMS, ManualStore, OwnershipError
-from rs57.keeper_rules import KEEPER_TAX, IssueCode, Severity, compute_team_keepers
+from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, IssueCode, Severity, compute_team_keepers
 from rs57.models import KeeperClaim, KeeperSlot, SalaryOverride, Season
 
 SEASON = 2026
@@ -170,12 +184,16 @@ def client(app):
     return app.test_client()
 
 
-def form(*claims: tuple[int, str, int]) -> dict[str, str]:
-    """A posted claim form: ``(player_id, slot, fee)`` per row."""
+def form(*claims: tuple[int, str, int], manager: str = "t1") -> dict[str, str]:
+    """A posted claim form: ``(player_id, slot, fee)`` per row.
+
+    Manager-scoped, the way the board posts it — one form carries all twelve franchises, so
+    every field says which team it belongs to.
+    """
     posted: dict[str, str] = {}
     for player_id, slot, fee in claims:
-        posted[f"slot_{player_id}"] = slot
-        posted[f"fee_{player_id}"] = str(fee)
+        posted[f"{manager}__player_{slot}"] = str(player_id)
+        posted[f"{manager}__fee_{slot}"] = str(fee)
     return posted
 
 
@@ -290,9 +308,12 @@ def test_an_override_reason_is_escaped_not_executed(client, store: ManualStore):
     # Stored exactly as typed — a sanitised reason would be a silently altered record.
     assert store.overrides(SEASON)[0].reason == nasty
 
-    page = client.get("/overrides").get_data(as_text=True)
-    assert nasty not in page
-    assert "&lt;script&gt;" in page
+    # Rendered on BOTH pages now. A second render site is a second chance to get it wrong, and
+    # this string ends up on a public site either way.
+    for url in ("/overrides", f"/season/{SEASON}"):
+        page = client.get(url).get_data(as_text=True)
+        assert nasty not in page, f"{url} rendered the reason unescaped"
+        assert "&lt;script&gt;" in page, f"{url} did not render the reason at all"
 
 
 def test_a_franchise_name_is_escaped(client, data_dir: Path):
@@ -379,7 +400,7 @@ def test_a_fee_mismatch_blocks_the_save_and_writes_nothing(client, store: Manual
     assert "fees total $0, expected $5" in page
     assert store.claims(SEASON) == [], "a blocked claim must not be recorded"
     assert not (store.manual / CLAIMS).exists()
-    assert "Fix the errors to record" in page
+    assert "not recorded" in text(page), "the card has to say it did not record and why"
 
 
 def test_a_negative_fee_is_a_rule_violation_not_a_form_error(client, store: ManualStore):
@@ -917,24 +938,39 @@ def test_payments_record_no_amount_and_no_method(store: ManualStore):
 def test_an_unparseable_fee_is_a_form_problem(client, store: ManualStore):
     page = client.post(
         f"/season/{SEASON}/team/t1",
-        data={"slot_1": "K1", "fee_1": "abc"},
+        data={"t1__player_K1": str(TAXED), "t1__fee_K1": "abc"},
     ).get_data(as_text=True)
     assert "not a whole number" in page
     assert store.claims(SEASON) == []
 
 
-def test_a_blank_slot_is_not_a_claim():
+def test_an_empty_slot_is_not_a_claim():
     claims, problems = claims_from_form(
-        SEASON, "t1", {"slot_1": "", "fee_1": "5", "slot_2": "K1", "fee_2": "0"}
+        SEASON, "t1",
+        {"player_K1": "", "fee_K1": "5", "player_K2": str(PLAIN), "fee_K2": "0"},
     )
     assert [claim.espn_player_id for claim in claims] == [PLAIN]
     assert problems == []
 
 
-def test_a_bogus_slot_is_refused():
-    claims, problems = claims_from_form(SEASON, "t1", {"slot_1": "K9", "fee_1": "0"})
+def test_a_slot_holding_something_that_is_not_a_player_id_is_refused():
+    claims, problems = claims_from_form(SEASON, "t1", {"player_K1": "nobody", "fee_K1": "0"})
     assert claims == []
-    assert problems and "not a keeper slot" in problems[0]
+    assert problems and "not a player id" in problems[0]
+
+
+def test_the_same_player_cannot_fill_two_slots():
+    """A failure mode the slot-keyed form invented, so it is the form that has to catch it.
+
+    Unreported, the engine prices him once per claim and the team silently owes double. It is
+    not a league rule the engine can speak to — it is an impossible input, like a fee of "abc".
+    """
+    claims, problems = claims_from_form(
+        SEASON, "t1",
+        {"player_K1": str(TAXED), "fee_K1": "0", "player_K2": str(TAXED), "fee_K2": "5"},
+    )
+    assert [claim.espn_player_id for claim in claims] == [TAXED], "the first pick stands"
+    assert problems and "pick him once" in problems[0]
 
 
 # ---------------------------------------------------------------------------
@@ -978,6 +1014,67 @@ def test_reverting_keeps_the_row_and_hands_espn_back(client, store: ManualStore)
     rows = store.overrides(SEASON)
     assert len(rows) == 1, "reverting is not deletion — the row is the explanation"
     assert rows[0].reverted
+
+
+def test_an_override_can_be_recorded_from_the_keeper_page(client, store: ManualStore):
+    """Step 7 of the offseason happens in the same sitting as steps 4-6, so it lives there."""
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert 'action="/overrides"' in page, "the keeper page needs the override form"
+    assert f'name="return_year" value="{SEASON}"' in page
+
+    response = client.post(
+        "/overrides",
+        data={
+            "season": SEASON, "espn_player_id": PLAIN, "actual_salary": 45,
+            "reason": "Draft cash: $3 to t2", "return_year": SEASON,
+        },
+    )
+    assert response.headers["Location"].endswith(f"/season/{SEASON}"), (
+        "recording from the keeper page must come back to it, not bounce to the ledger"
+    )
+    assert store.overrides(SEASON)[0].actual_salary == 45
+
+
+def test_the_keeper_page_shows_only_its_own_season(client, store: ManualStore):
+    """And the tab keeps showing every season — that is what makes it the ledger."""
+    store.add_override(SalaryOverride(
+        espn_player_id=PLAIN, season=SEASON, actual_salary=45,
+        reason="cash moved this season", created_at=NOW, reverted=False,
+    ))
+    store.add_override(SalaryOverride(
+        espn_player_id=PLAIN, season=PRIOR, actual_salary=30,
+        reason="cash moved last season", created_at=NOW, reverted=False,
+    ))
+
+    keeper_page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "cash moved this season" in text(keeper_page)
+    assert "cash moved last season" not in text(keeper_page)
+
+    ledger = text(client.get("/overrides").get_data(as_text=True))
+    assert "cash moved this season" in ledger and "cash moved last season" in ledger, (
+        "check_override_balance is league-wide; only the tab can show both legs of a trade"
+    )
+
+
+def test_overrides_that_do_not_cancel_are_reported(client, store: ManualStore):
+    """A cash trade moves money between two teams, so the live legs should sum to zero."""
+    store.add_override(SalaryOverride(
+        espn_player_id=PLAIN, season=SEASON, actual_salary=45,  # ESPN holds 42 for t1
+        reason="one leg, no counterparty", created_at=NOW, reverted=False,
+    ))
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert "net to $3, not $0" in page
+
+
+def test_an_unknowable_override_total_is_not_guessed_at_zero(client, store: ManualStore):
+    """Where a number cannot be known, record no number — a guessed zero looks balanced."""
+    store.add_override(SalaryOverride(
+        espn_player_id=999, season=SEASON, actual_salary=45,  # nobody ESPN has a base for
+        reason="player not on any roster", created_at=NOW, reverted=False,
+    ))
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert "unknown" in page.lower()
+    assert "the legs cancel" not in page
 
 
 def test_the_overrides_page_does_not_offer_to_fix_espn(client):
@@ -1153,11 +1250,207 @@ def test_reconcile_matches_on_player_id_not_name(data_dir: Path):
     assert result.agrees
 
 
+def test_an_unpriced_claim_is_not_an_unrecorded_keeper(data_dir: Path):
+    """He was recorded. There is just no price for him, which is a different finding.
+
+    ``computed_salary`` is legitimately ``None`` when ``compute_team_keepers`` skipped the
+    claim — a player no longer on the roster, which is the state somebody reconciles in. The
+    old ordering read that as "ESPN has a keeper you never recorded".
+    """
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=None),
+    ]
+    picks = [EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=10)]
+    result = reconcile(SEASON, claims, picks, current)
+
+    assert [row.name for row in result.unpriced] == ["Puka Nacua"]
+    assert result.espn_only == (), "a recorded claim is not an ESPN-only pick"
+    assert not result.agrees, "a row nobody could compare has not been checked"
+
+
+def test_an_espn_pick_nobody_claimed_is_still_espn_only(data_dir: Path):
+    """The other side of the same branch — an absent claim must keep reporting as absent."""
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    result = reconcile(
+        SEASON, [], [EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=10)], current
+    )
+    assert [row.name for row in result.espn_only] == ["Puka Nacua"]
+    assert result.unpriced == ()
+
+
 def test_no_espn_picks_is_a_normal_state(data_dir: Path):
     current = Derived(derived_dir=data_dir / "derived").load(SEASON)
     result = reconcile(SEASON, [], [], current)
     assert result.espn_pick_count == 0
     assert result.error is None
+
+
+def _sizes(depth: int) -> dict[int, int]:
+    """Twelve teams all at the same depth, the way a real league comes back."""
+    return {team: depth for team in range(1, 13)}
+
+
+def test_a_full_roster_cannot_check_for_unrecorded_keepers(data_dir: Path):
+    """Every player carries a keeper value whether he is a keeper or not.
+
+    So a rostered player with no claim proves nothing, and reporting the league clean on that
+    basis is a check that never ran wearing the face of one that passed.
+    """
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=10),
+    ]
+    salaries = [
+        EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=10),
+        EspnKeeperPick(espn_team_id=1, espn_player_id=PLAIN, bid=42),  # rostered, not a keeper
+    ]
+    result = verify(SEASON, claims, salaries, _sizes(16), current)
+
+    assert result.regime == "full"
+    assert not result.unrecorded_checked
+    assert result.espn_only == (), "an unclaimed player on a full roster is not a finding"
+    assert result.clean
+
+
+def test_a_pruned_roster_does_catch_an_unrecorded_keeper(data_dir: Path):
+    """Once ESPN holds only the kept players, a rostered player nobody claimed is a keeper."""
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=10),
+    ]
+    salaries = [
+        EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=10),
+        EspnKeeperPick(espn_team_id=1, espn_player_id=PLAIN, bid=42),
+    ]
+    result = verify(SEASON, claims, salaries, _sizes(3), current)
+
+    assert result.regime == "keepers"
+    assert result.unrecorded_checked
+    assert [row.name for row in result.espn_only] == ["James Cook III"]
+    assert not result.clean
+
+
+def test_verify_catches_a_mistyped_espn_salary(data_dir: Path):
+    """The whole reason the screen exists — a typo becomes the base and the ratchet carries it."""
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=10),
+    ]
+    result = verify(
+        SEASON, claims, [EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=100)],
+        _sizes(16), current,
+    )
+    assert [(row.name, row.delta) for row in result.mismatches] == [("Puka Nacua", 90)]
+    assert not result.clean
+
+
+def test_a_salary_not_yet_typed_into_espn_is_not_a_mismatch(data_dir: Path):
+    """Before step 6 ESPN still holds the carried-in price, so every keeper differs by exactly
+    its own fee and tax. Reporting the whole league red before anybody has typed anything is
+    how the mismatch this screen exists to catch gets scrolled past.
+
+    Observed live on 2026: Josh Allen recorded at $33 against ESPN's $28, McBride $32 against
+    $22, Chase Brown $18 against $8 — fee, then fee plus tax, then fee plus tax.
+    """
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [  # TAXED carries in at 5, so 5 + tax + no fee = 10 recorded
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=5 + KEEPER_TAX),
+    ]
+    result = verify(
+        SEASON, claims, [EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=5)],
+        _sizes(16), current,
+    )
+
+    assert [row.name for row in result.not_yet_entered] == ["Puka Nacua"]
+    assert result.mismatches == (), "the carried-in price is not a disagreement"
+    assert not result.clean, "ESPN does not hold the number yet, so nothing is confirmed"
+
+
+def test_a_real_mismatch_still_reports_as_one(data_dir: Path):
+    """The benign state must not swallow the finding — a typed-wrong salary is neither the
+    carried-in price nor the recorded one."""
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot=KeeperSlot.K1,
+                    fee_allocated=0, computed_salary=5 + KEEPER_TAX),
+    ]
+    result = verify(
+        SEASON, claims, [EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=100)],
+        _sizes(16), current,
+    )
+    assert [row.name for row in result.mismatches] == ["Puka Nacua"]
+    assert result.not_yet_entered == ()
+
+
+def test_an_unreachable_espn_is_never_reported_as_clean(data_dir: Path):
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    result = verify(SEASON, [], [], {}, current, error="connection refused")
+    assert not result.clean
+    assert result.regime is None
+    assert not result.unrecorded_checked
+
+
+def test_a_degraded_roster_response_is_not_verified_against(data_dir: Path):
+    """One short team among eleven full ones is a truncated response, not a league state."""
+    current = Derived(derived_dir=data_dir / "derived").load(SEASON)
+    sizes = _sizes(16) | {3: 1}
+    result = verify(SEASON, [], [], sizes, current)
+    assert not result.clean
+    assert "degraded" in (result.error or "")
+
+
+def test_verify_reads_the_field_the_derived_file_was_built_from(data_dir: Path):
+    """keeperValue before the auction, keeperValueFuture after. Chosen in one place only.
+
+    Getting it wrong does not fail loudly — it reports the whole league mismatched, or reports
+    it clean having compared each number against itself.
+    """
+    payload = {
+        "teams": [{"roster": {"entries": [
+            {"playerPoolEntry": {"player": {"id": TAXED}, "keeperValue": 5,
+                                 "keeperValueFuture": 99}},
+        ]}}]
+    }
+    rows, depth = roster_salaries(payload, 1, "keeperValue")
+    assert (rows[0].bid, depth) == (5, 1)
+    rows, _ = roster_salaries(payload, 1, "keeperValueFuture")
+    assert rows[0].bid == 99
+
+
+def test_verify_writes_nothing(client, data_dir: Path, monkeypatch):
+    """It is the only screen that touches the network, on a page that also writes."""
+    monkeypatch.setattr(
+        admin, "fetch_roster_salaries",
+        lambda season, field, ids: ([EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=10)],
+                                    _sizes(16), None),
+    )
+    monkeypatch.setattr(admin, "fetch_keeper_picks", lambda season: ([], None))
+
+    before = {p: p.read_bytes() for p in sorted(data_dir.rglob("*.json"))}
+    response = client.post(f"/season/{SEASON}/verify")
+    after = {p: p.read_bytes() for p in sorted(data_dir.rglob("*.json"))}
+
+    assert response.status_code == 200
+    assert before == after, "verify touched a file"
+
+
+def test_verify_is_never_a_get(client):
+    """An unreachable ESPN must not take down the page the offseason is entered on."""
+    assert client.get(f"/season/{SEASON}/verify").status_code == 405
+
+
+def test_the_reconcile_tab_is_gone(client):
+    """Folded into the season page. The comparison logic stayed; the separate screen did not."""
+    assert client.get(f"/season/{SEASON}/reconcile").status_code == 404
+    assert not (TEMPLATES / "reconcile.html").exists()
+    for url in (f"/season/{SEASON}", f"/season/{SEASON}/team/t1"):
+        assert "reconcile" not in client.get(url).get_data(as_text=True).lower()
 
 
 def test_reconcile_never_writes_a_claim(data_dir: Path, store: ManualStore):
@@ -1179,10 +1472,378 @@ def test_the_report_counts_a_league_wide_flag_once(data_dir: Path, store: Manual
     screen = build_season_screen(
         SEASON, derived.load(SEASON), derived.load(PRIOR), store, now=NOW
     )
-    assert all(team.review_count == 0 for team in screen.teams), (
-        "an unrecorded consolation winner is a league fact, not twelve team facts"
+    # Named rather than counted: a team's review_count legitimately holds its own unverified
+    # items, so asserting it is zero would break the day any of them fires and would say
+    # nothing about the fact under test.
+    for team in screen.teams:
+        assert not any("priced IN FULL" in note.message for note in team.notes if note.team_specific), (
+            f"{team.manager_id} counts an unrecorded consolation winner as its own fact"
+        )
+    assert len([n for n in screen.notes if "consolation bracket" in n.message]) == 1, (
+        "the league fact belongs on the report once"
     )
-    assert any("consolation bracket" in note.message for note in screen.notes)
+
+
+def test_an_open_board_has_exactly_one_record_button(client, data_dir: Path):
+    """One action, taken once. Twelve buttons is twelve chances to forget a franchise.
+
+    Also the other half of the lock test — removing the button unconditionally would pass that
+    one on its own.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # no deadline = open
+    assert page.count("Record all") == 1
+    assert re.search(r'<form[^>]*hx-post="/season/\d+/record"', page)
+
+
+def test_no_card_renders_an_empty_row(client, store: ManualStore):
+    """An element that renders nothing should not exist.
+
+    A locked card has no status — nothing to record and nothing recorded — but the row was
+    emitted anyway, leaving a zero-height div that still contributed its own margin. Twelve
+    cards each carried a band of space holding nothing.
+    """
+    def rows(page: str) -> list[str]:
+        return [
+            re.sub(r"<[^>]*>", "", row).strip()
+            for row in re.findall(r'<div class="tc-actions">(.*?)</div>\s*</div>', page, re.S)
+        ]
+
+    # A locked card may still carry a row — an unverified tag is something to say. What it must
+    # never be is present and empty.
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    locked = rows(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert all(locked), f"a locked card rendered an empty row: {locked}"
+
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
+    open_rows = rows(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert open_rows, "an open board still says what each franchise's state is"
+    assert all(open_rows), f"an open card rendered an empty row: {open_rows}"
+
+
+def test_the_keeper_board_is_a_card_per_franchise(client, data_dir: Path):
+    """One page, one card per team, edited in place. No Edit button, no navigation."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    managers = derived.load(SEASON).manager_ids
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    for manager_id in managers:
+        assert f'id="claim-form-{manager_id}"' in page, f"{manager_id} has no card on the page"
+        assert f"/season/{SEASON}/team/{manager_id}/preview" in page
+
+
+def full_roster_doc(season: int = SEASON):
+    """A derived season whose rosters are full depth, the way ESPN holds them most of the year.
+
+    The small fixture above is four players deep, which is what a *pruned* league looks like —
+    so a test that wants the picker has to say so rather than inherit it by accident.
+    """
+    doc = keeper_doc(season)
+    for extra in range(10, 10 + 12):
+        doc["players"].append(
+            {"espn_player_id": extra, "name": f"Filler {extra}", "position": "WR",
+             "nfl_team": "FA"}
+        )
+        doc["roster"].append(
+            {"season": season, "manager_id": "t1", "espn_player_id": extra,
+             "acquired_at": "2025-09-02T12:00:00", "base_salary": 1,
+             "kept_prior_year": False, "source": "draft"}
+        )
+    return doc
+
+
+def write_full_roster(data_dir: Path, season: int = SEASON) -> None:
+    (data_dir / "derived" / f"{season}.json").write_text(
+        json.dumps(full_roster_doc(season)), encoding="utf-8"
+    )
+
+
+def test_a_full_roster_still_needs_a_picker(client, data_dir: Path):
+    """Before the deadline ESPN holds everyone, so who is kept is a real question."""
+    write_full_roster(data_dir)
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert '<select name="t1__player_K1"' in page
+    assert "Puka Nacua" in page and "James Cook III" in page
+    assert f"${5 + KEEPER_TAX}" in page, "each option shows what that player would cost"
+
+
+def test_a_pruned_roster_drops_the_picker(client, data_dir: Path, store: ManualStore):
+    """Once ESPN prunes to the kept players there is nothing left to choose.
+
+    Read off the roster's depth, not a setting somebody flips — so the picker disappears on its
+    own the day rosters prune, and comes back if they do not.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
+    assert "<select" not in page, "nothing to pick from a pruned roster"
+    assert '<input type="hidden" name="t1__player_K1"' in page
+    assert "Puka Nacua" in page, "the kept players are still named"
+
+
+def test_a_pruned_roster_fills_the_keeper_slots_but_never_the_prospect(data_dir: Path, store: ManualStore):
+    """ESPN says who was kept. It cannot say which keep is the prospect, so that stays empty.
+
+    Three keepers is the maximum, so a team pruned to four holds exactly one prospect — forced
+    by the rules. *Which* one is not derivable from anything ESPN publishes.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store
+    )
+    assert screen.keepers_only
+    filled = {slot: (row.name if row else None) for slot, _, row in screen.slots}
+    assert filled["PROSPECT"] is None, "a guessed prospect is a guessed $5 tax"
+    assert len([v for v in filled.values() if v]) == MAX_KEEPERS
+    assert screen.prospect_unknown
+    assert any(
+        "exactly one of them is the prospect" in note.message for note in screen.unverified
+    ), "an empty prospect slot on a pruned roster must say why, labelled unverified"
+
+
+def test_a_card_with_a_record_is_never_prefilled_around(data_dir: Path, store: ManualStore):
+    """Once anything is recorded, the record is what the card shows.
+
+    Filling the empty slots around it would put players the commissioner did not declare onto a
+    card that already has an answer — suggesting keepers next to real ones, indistinguishable
+    from them.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    store.save_team_claims(
+        SEASON, "t1",
+        [KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=EX_PROSPECT,
+                     slot=KeeperSlot.K1, fee_allocated=0, computed_salary=3)],
+    )
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+
+    shown = [row.name for _, _, row in screen.slots if row]
+    assert shown == ["Tyjae Spears"], f"the card invented {shown[1:]}"
+
+
+def test_the_prefill_is_a_default_on_screen_not_a_record(data_dir: Path, store: ManualStore):
+    """Nothing reaches claims.json until the card is submitted."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+    assert any(row for _, _, row in screen.slots)
+    assert screen.keeper_count == 0 and screen.total_salary == 0
+    assert store.claims(SEASON) == []
+
+
+def test_every_card_has_exactly_four_slots(client, data_dir: Path):
+    """Four rows whether or not anything is declared.
+
+    An empty slot is a fact worth rendering, and a card whose height depends on how many
+    keepers a team has makes a grid of twelve impossible to scan.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    managers = derived.load(SEASON).manager_ids
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    for slot in SLOT_CHOICES:
+        for manager_id in managers:
+            assert f'name="{manager_id}__player_{slot}"' in page
+            assert f'name="{manager_id}__fee_{slot}"' in page
+
+
+def test_over_allocated_fees_do_not_read_as_short(client, data_dir: Path, store: ManualStore):
+    """One keeper owes $0. Allocating $5 is over, not short.
+
+    ``fee_shortfall`` is signed, so a template testing it for truthiness calls both cases
+    "short" — and tells a manager who has already paid $5 too much to pay more.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    over = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        claims=[KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                            slot=KeeperSlot.K1, fee_allocated=5)],
+    )
+    assert over.fee_state == "over"
+
+    short = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        claims=[
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                        slot=KeeperSlot.K1, fee_allocated=0),
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=PLAIN,
+                        slot=KeeperSlot.K2, fee_allocated=0),
+        ],
+    )
+    assert short.fee_state == "short"
+
+    page = client.post(
+        f"/season/{SEASON}/team/t1/preview", data=form((TAXED, "K1", 5))
+    ).get_data(as_text=True)
+    assert "over</span>" in page and "short</span>" not in page
+
+
+def test_the_board_carries_no_salary_cap(client):
+    """The league has none. A disabled one lying around is how a rule nobody has gets enforced."""
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True)).lower()
+    assert "salary cap" not in page or "no salary cap" in page
+    assert "available salary" not in page
+
+
+def test_each_card_targets_only_itself(client, data_dir: Path):
+    """A shared id would make every franchise's edit swap the first franchise's card.
+
+    The fragment used to hardcode ``#claim-form``, which was correct while exactly one lived on
+    a page. Twelve of them is a silent failure: htmx swaps *something*, so it looks like it
+    worked and the numbers land on the wrong team.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    managers = derived.load(SEASON).manager_ids
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    assert 'hx-target="#claim-form"' not in page, "a bare shared target is the bug"
+    for manager_id in managers:
+        assert page.count(f'hx-target="#claim-form-{manager_id}"') == 1, (
+            f"{manager_id} must swap itself and nobody else"
+        )
+
+
+def test_the_lock_is_shown_without_a_banner_or_a_dead_button(client, store: ManualStore):
+    """A league fact belongs on the page once, and here it needs no prose and no control.
+
+    The deadline line carries the tag and the fee boxes are disabled where you would type. A
+    paragraph on top of that, or twelve greyed-out buttons offering an action that does not
+    exist, is the same fact told over and over — which is how a real flag stops being read.
+    """
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    managers = Derived(
+        derived_dir=Path(client.application.config["DERIVED_DIR"])
+    ).load(SEASON).manager_ids
+
+    # No banner anywhere. The lock is evident from the deadline line, the disabled controls and
+    # every button — a paragraph repeating it would be the fourth telling of one fact.
+    assert "Claims are locked until the keeper deadline" not in page
+    assert page.count("locked until then") == 1
+    assert "Record all" not in page, "a locked board offers nothing to press"
+    assert page.count("locked until then") == 1
+    assert len(re.findall(r'name="t\d+__fee_[A-Z0-9]+"[^>]*\sdisabled', page, re.S)) == len(
+        managers
+    ) * len(SLOT_CHOICES), "every fee box on every card is disabled too"
+
+
+def test_one_franchises_error_does_not_discard_anothers_work(client, store: ManualStore):
+    """One button, but the write is still team by team.
+
+    Twelve franchises go in during one sitting, so recording them is one action — and a single
+    illegal fee spread must neither record itself nor take the other eleven down with it.
+    """
+    posted = form((TAXED, "K1", 99))                       # fee over the tier: blocked
+    posted |= form((PLAIN, "K1", 0), manager="t2")         # legal
+    page = client.post(f"/season/{SEASON}/record", data=posted).get_data(as_text=True)
+
+    assert [claim.manager_id for claim in store.claims(SEASON)] == ["t2"]
+    body = text(page)
+    assert "Belichick" in body, "the recorded franchise is named"
+    assert "Fake News" in body, "so is the skipped one — a count leaves you hunting"
+
+
+def test_a_franchise_missing_from_the_request_is_not_wiped(client, store: ManualStore):
+    """Absent is not the same as empty, and confusing them deletes a record nobody touched.
+
+    The board posts all twelve every time, so a franchise with no fields in the request means
+    this submission was not about that team. Writing an empty claim list for it would clear
+    claims the commissioner never opened — the same trap ``save_settings`` already avoids.
+    """
+    store.save_team_claims(
+        SEASON, "t2",
+        [KeeperClaim(season=SEASON, manager_id="t2", espn_player_id=PLAIN,
+                     slot=KeeperSlot.K1, fee_allocated=0, computed_salary=20)],
+    )
+    response = client.post(f"/season/{SEASON}/record", data=form((TAXED, "K1", 0)))  # t1 only
+
+    # Asserted, because a 500 leaves the data untouched too — and a crash passing for safety is
+    # how a guard gets removed without anything noticing.
+    assert response.status_code == 200
+    assert [c.manager_id for c in store.claims(SEASON)] == ["t1", "t2"], (
+        "t2 was not in the request and must be untouched"
+    )
+
+
+def test_a_franchise_submitted_empty_is_cleared(client, store: ManualStore):
+    """The other half: fields present and blank is a deliberate "keep nobody"."""
+    store.save_team_claims(
+        SEASON, "t1",
+        [KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                     slot=KeeperSlot.K1, fee_allocated=0, computed_salary=10)],
+    )
+    client.post(
+        f"/season/{SEASON}/record",
+        data={f"t1__player_{slot}": "" for slot in SLOT_CHOICES}
+        | {f"t1__fee_{slot}": "0" for slot in SLOT_CHOICES},
+    )
+    assert store.claims(SEASON) == []
+
+
+def test_the_league_record_names_what_it_skipped_and_why(client, store: ManualStore):
+    """A count is a puzzle. The reason is what tells you which rule to go and fix."""
+    page = client.post(
+        f"/season/{SEASON}/record", data=form((TAXED, "K1", 99))
+    ).get_data(as_text=True)
+    body = text(page)
+    assert "Skipped 1" in body
+    assert "fees total $99, expected $0" in body
+
+
+def test_the_league_record_is_refused_before_the_deadline(client, store: ManualStore):
+    """The same guard as the per-team save, for the same reason: a stale tab still posts."""
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    page = client.post(
+        f"/season/{SEASON}/record", data=form((TAXED, "K1", 0))
+    ).get_data(as_text=True)
+
+    assert store.claims(SEASON) == [], "a locked board must record nothing"
+    assert "locked" in text(page).lower()
+
+
+def test_a_field_that_names_no_franchise_is_dropped(client, store: ManualStore):
+    """A field that cannot say which team it belongs to cannot be recorded against one."""
+    page = client.post(
+        f"/season/{SEASON}/record",
+        data={"player_K1": str(TAXED), "fee_K1": "0"},  # no manager prefix
+    ).get_data(as_text=True)
+    assert store.claims(SEASON) == []
+    assert "Recorded" not in text(page), "an unattributable field must record against nobody"
+
+
+def test_both_screens_agree_whether_the_rookie_rule_ran(data_dir: Path, store: ManualStore):
+    """A prospect the team screen verified must not read as unverified in the league report.
+
+    ``keeper_rules`` distinguishes ``None`` (rule 1 is not being applied) from an empty mapping
+    (it is, and this player is unknown). A season screen built without the draft classes lands
+    on the second and reports every prospect in the league as unverified — so the report
+    contradicted the very screen the commissioner would open to check it.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    store.save_team_claims(
+        SEASON,
+        "t1",
+        [
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=LATE,
+                        slot=KeeperSlot.PROSPECT, fee_allocated=0)
+        ],
+    )
+    origins = {LATE: SEASON - 1}
+
+    team = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        first_nfl_season=origins,
+    )
+    season = build_season_screen(
+        SEASON, derived.load(SEASON), derived.load(PRIOR), store,
+        now=NOW, first_nfl_season=origins,
+    )
+    t1 = next(t for t in season.teams if t.manager_id == "t1")
+
+    assert IssueCode.PROSPECT_ROOKIE_UNVERIFIED not in {i.code for i in team.issues}
+    assert t1.review_count == len(team.reviews) + len(
+        [n for n in team.unverified if n.team_specific]
+    ), "the report's count must be the team screen's own count, not a different one"
+    assert t1.review_count == 0, (
+        "the team screen verified this prospect against the draft class; the report says "
+        "otherwise only when it was built without them"
+    )
 
 
 def test_the_report_totals_come_from_the_engine(client, store: ManualStore, data_dir: Path):
@@ -1193,8 +1854,15 @@ def test_the_report_totals_come_from_the_engine(client, store: ManualStore, data
     assert screen.league_salary == 5 + KEEPER_TAX
 
 
-def test_the_deadline_is_shown_and_never_enforced(client, store: ManualStore):
-    """A claim after the deadline is recorded and flagged, not refused."""
+def test_the_deadline_is_enforced_before_it_and_never_after(client, store: ManualStore):
+    """The rule this tool was built on, reversed by the commissioner 2026-08-04.
+
+    It used to be "shown and stamped, never enforced". It is now enforced *until* the deadline
+    and never after: no salary is entered before it, so a lock costs nothing and stops a number
+    being recorded while managers can still change their minds. The second half is unchanged and
+    matters as much — nothing ever re-locks, so there is still no state that forces a hand edit
+    of ``data/manual/seasons.json``.
+    """
     store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
     assert "passed" in text(page)
@@ -1204,6 +1872,66 @@ def test_the_deadline_is_shown_and_never_enforced(client, store: ManualStore):
     ).get_data(as_text=True)
     assert "Saved to" in saved
     assert len(store.claims(SEASON)) == 1
+
+
+def test_a_claim_before_the_deadline_is_refused_by_the_route(client, store: ManualStore):
+    """The guard is the route, not the ``disabled`` attribute.
+
+    A tab opened before the deadline, or an htmx request already in flight, posts a form that
+    carries no ``disabled`` anything. If the only lock were in the template this write would
+    land.
+    """
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    body = client.post(
+        f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
+    ).get_data(as_text=True)
+
+    assert store.claims(SEASON) == [], "a locked season must record nothing"
+    assert "locked" in text(body).lower()
+
+
+def test_a_locked_season_still_prices_the_roster(client, store: ManualStore):
+    """Looking is the harmless half. The lock is about recording a number, not seeing one."""
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    body = client.post(
+        f"/season/{SEASON}/team/t1/preview", data=form((TAXED, "K1", 0))
+    ).get_data(as_text=True)
+    assert f"${5 + KEEPER_TAX}" in body
+    assert store.claims(SEASON) == []
+
+
+def test_an_unrecorded_deadline_does_not_lock_the_console(client, store: ManualStore):
+    """The lockout this would otherwise be.
+
+    ``store.season(year)`` returns ``None`` for a year with no settings row, so an unrecorded
+    deadline and a future one both used to read as "not passed". Gating on that single flag
+    freezes a freshly synced season with no way out on screen — and the deadline is recorded in
+    this very tool.
+    """
+    assert store.season(SEASON) is None
+
+    saved = client.post(
+        f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
+    ).get_data(as_text=True)
+    assert "Saved to" in saved
+    assert len(store.claims(SEASON)) == 1
+
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert "nothing is locked" in page, "say why it is open, and where to record one"
+
+
+def test_the_three_deadline_states_are_distinct(store: ManualStore):
+    """Unrecorded is not the same fact as future, and only one of them locks."""
+    assert keeper_gate(SEASON, store, now=NOW).state == "unrecorded"
+
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    assert keeper_gate(SEASON, store, now=NOW).state == "locked"
+
+    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
+    assert keeper_gate(SEASON, store, now=NOW).state == "open"
+
+    assert keeper_gate(SEASON, store, now=NOW).editable
+    assert not KeeperGate(deadline=NOW, state="locked").editable
 
 
 def test_a_season_with_no_derived_file_is_a_404(client):

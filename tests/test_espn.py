@@ -30,6 +30,7 @@ from rs57.espn import (
     CORE_HOST,
     AthleteNotFound,
     HOST,
+    KEEPERS_ONLY_ROSTER_SIZE,
     LEAGUE_SIZE,
     AcquisitionSource,
     EspnCoreClient,
@@ -43,6 +44,7 @@ from rs57.espn import (
     keeper_pick_ids,
     winning_bids,
 )
+from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS
 from rs57.models import dump_json, json_dumps
 from rs57.sync import season_document
 
@@ -485,9 +487,74 @@ def test_bids_come_from_the_season_that_set_the_bases():
 
 
 def test_short_roster_raises(doc_2026):
+    """One short team among eleven full ones is the truncation this guard was built for."""
     doc_2026["rosters"]["3"]["teams"][0]["roster"]["entries"] = []
     with pytest.raises(EspnError, match="degraded"):
         build_season(ReplayClient(2026, doc_2026))
+
+
+def _prune_every_roster(doc: dict, keep: int) -> None:
+    """Cut all twelve rosters to ``keep`` players, as ESPN does at the keeper deadline."""
+    for roster in doc["rosters"].values():
+        entries = roster["teams"][0]["roster"]["entries"]
+        roster["teams"][0]["roster"]["entries"] = entries[:keep]
+
+
+def test_a_pruned_keeper_window_is_not_degraded(doc_2026):
+    """The whole point of the swap: four deep on all twelve teams is a real league state.
+
+    Between the keeper deadline and the auction ESPN holds only the kept players. The old
+    per-team floor failed the nightly every night in that window.
+    """
+    _prune_every_roster(doc_2026, KEEPERS_ONLY_ROSTER_SIZE)
+    season = build_season(ReplayClient(2026, doc_2026))
+    assert len(season.roster) == LEAGUE_SIZE * KEEPERS_ONLY_ROSTER_SIZE
+    assert any("pruned the league to its keepers" in w for w in season.warnings), (
+        "a season holding only keepers must say so — read as a full roster it is a "
+        "league that dropped three quarters of its players"
+    )
+
+
+def test_a_league_wide_wipe_is_degraded_not_a_keeper_window(doc_2026):
+    """All twelve empty is what a dead API looks like, and nobody has ever kept nothing."""
+    _prune_every_roster(doc_2026, 0)
+    with pytest.raises(EspnError, match="degraded"):
+        build_season(ReplayClient(2026, doc_2026))
+
+
+def test_a_league_between_the_two_regimes_is_degraded(doc_2026):
+    """Seven deep is too shallow to be a roster and too deep to be a keeper set.
+
+    Nobody can account for the shape, so it is not a thing to write a season from.
+    """
+    _prune_every_roster(doc_2026, 7)
+    with pytest.raises(EspnError, match="degraded"):
+        build_season(ReplayClient(2026, doc_2026))
+
+
+def test_one_team_pruned_alone_is_degraded(doc_2026):
+    """The mirror of test_short_roster_raises, and the reason the rule is agreement.
+
+    A single team at the keeper-window depth while eleven are full is not a pruned league —
+    it is one response arriving short, which is precisely what must never be written.
+    """
+    entries = doc_2026["rosters"]["3"]["teams"][0]["roster"]["entries"]
+    doc_2026["rosters"]["3"]["teams"][0]["roster"]["entries"] = entries[:KEEPERS_ONLY_ROSTER_SIZE]
+    with pytest.raises(EspnError, match="degraded"):
+        build_season(ReplayClient(2026, doc_2026))
+
+
+def test_an_empty_team_inside_a_pruned_league_is_allowed(doc_2026):
+    """Keeping nobody is a legal choice, so one empty roster cannot condemn the league."""
+    _prune_every_roster(doc_2026, KEEPERS_ONLY_ROSTER_SIZE)
+    doc_2026["rosters"]["3"]["teams"][0]["roster"]["entries"] = []
+    season = build_season(ReplayClient(2026, doc_2026))
+    assert not any(entry.manager_id == "t3" for entry in season.roster)
+
+
+def test_the_keeper_window_depth_comes_from_the_rules(doc_2026):
+    """Typed as a 4 it would survive a change to the keeper limit and start refusing seasons."""
+    assert KEEPERS_ONLY_ROSTER_SIZE == MAX_KEEPERS + MAX_PROSPECTS
 
 
 def test_missing_team_raises(doc_2026):

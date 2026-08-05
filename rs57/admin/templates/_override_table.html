@@ -1,0 +1,64 @@
+{# Recorded overrides. Shared by the overrides tab (every season) and the season page (one).
+
+   `show_season` is off on the season page, where the column would repeat one value down the
+   whole table. Nothing here computes money: `row.delta` is summed and subtracted in screens.py,
+   which is the rule the whole tool is built on. #}
+<div class="scroll">
+  <table>
+    <thead>
+      <tr>
+        {% if show_season %}<th>Season</th>{% endif %}
+        <th>Player</th>
+        <th>Team</th>
+        <th class="num">ESPN says</th>
+        <th class="num">True</th>
+        <th class="num">Moved</th>
+        <th>Reason</th>
+        <th>State</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          {% if show_season %}<td>{{ row.override.season }}</td>{% endif %}
+          <td>{{ row.name }} <span class="small muted">{{ row.override.espn_player_id }}</span></td>
+          <td class="small">{{ row.manager or '—' }}</td>
+          <td class="num">{% if row.espn_base is none %}—{% else %}${{ row.espn_base }}{% endif %}</td>
+          <td class="num money">${{ row.override.actual_salary }}</td>
+          <td class="num">
+            {% if row.delta is none %}
+              <span class="muted" title="ESPN has no base for this player, so nothing to compare">—</span>
+            {% else %}
+              ${{ row.delta }}
+            {% endif %}
+          </td>
+          <td class="small">{{ row.override.reason }}</td>
+          <td class="small">
+            {% if row.override.reverted %}
+              <span class="tag-inline flat">reverted — ESPN wins</span>
+            {% else %}
+              <span class="tag-inline">live — overrides ESPN</span>
+            {% endif %}
+            {% if row.override.unpaired_ok %}
+              <span class="tag-inline flat">unpaired ok</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not row.override.reverted %}
+              <form method="post" action="{{ url_for('revert_override') }}">
+                {% if return_year %}
+                  <input type="hidden" name="return_year" value="{{ return_year }}">
+                {% endif %}
+                <input type="hidden" name="season" value="{{ row.override.season }}">
+                <input type="hidden" name="espn_player_id" value="{{ row.override.espn_player_id }}">
+                <input type="hidden" name="created_at" value="{{ row.override.created_at.isoformat() }}">
+                <button type="submit" class="quiet">Mark reverted</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

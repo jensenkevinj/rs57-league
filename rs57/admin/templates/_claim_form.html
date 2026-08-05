@@ -1,159 +1,166 @@
-{# The claim screen. This fragment is the whole interaction.
+{# One franchise's keeper card. Four slots, editable in place. This fragment is the whole
+   interaction — twelve of them make the keeper tab.
 
-   Every number here arrived already computed from keeper_rules.compute_team_keepers — the
-   engine prices the team and validates it in one pass, so the live math is: post the form,
-   call the function, swap this fragment. Nothing below multiplies, adds or taxes anything.
+   Every number arrived already computed from keeper_rules.compute_team_keepers. The live math
+   is: change a field, post the card, call the function, swap the card back. Nothing below
+   multiplies, adds or taxes anything, and a test greps these templates for arithmetic on money.
 
    The fee inputs carry NO min attribute, deliberately. A negative fee is a rule violation the
    engine reports as NEGATIVE_FEE, not something for a browser to refuse — hiding it behind a
-   form error would teach nobody which rule they broke. #}
+   form error would teach nobody which rule they broke.
+
+   There is no salary cap row. The league has none, and a disabled one lying around is how a
+   rule that does not exist gets enforced by accident. #}
 {% import "_notes.html" as show %}
+{# Issue messages name a player by id; this is the id-to-name map they render through. #}
 {% set players = {} %}
 {% for row in screen.rows %}{% set _ = players.update({row.espn_player_id: row.name}) %}{% endfor %}
+{% set form_id = 'claim-form-' ~ screen.manager_id %}
+{% set locked = screen.gate and not screen.gate.editable %}
+{% set lock_banner = lock_banner if lock_banner is defined else True %}
+{# The grid renders twelve cards and passes detailed=false, so it stays scannable. Everything
+   else — the team page, and the fragment htmx swaps back after an edit — defaults to True.
 
-<form id="claim-form"
-      hx-post="{{ url_for('preview', year=screen.season, manager_id=screen.manager_id) }}"
-      hx-trigger="change"
-      hx-target="#claim-form"
-      hx-swap="outerHTML">
+   That default is the important half. A card that dropped its notes would drop REVIEW items
+   with them, and an unverified thing rendering as nothing is the one failure this project
+   keeps guarding against. So the card you are actually working on always shows them; only the
+   eleven you are not looking at stay quiet. #}
+{% set detailed = detailed if detailed is defined else True %}
+
+{# A div, not a form: the board wraps all twelve in one form so a single button can record the
+   league. Live pricing still posts this card alone — hx-include="closest .team-card" — so a
+   keystroke re-renders one franchise, not twelve. #}
+{% set p = screen.manager_id ~ '__' %}
+<div id="{{ form_id }}" class="team-card{% if screen.blocked %} blocked{% endif %}"
+     hx-post="{{ url_for('preview', year=screen.season, manager_id=screen.manager_id) }}"
+     hx-trigger="change"
+     hx-include="closest .team-card"
+     hx-target="#{{ form_id }}"
+     hx-swap="outerHTML">
+
+  <div class="tc-head">
+    <span class="tc-name">
+      <a href="{{ url_for('team', year=screen.season, manager_id=screen.manager_id) }}">{{ screen.name }}</a>
+    </span>
+    {% if screen.fees_waived %}<span class="tag-inline ok">fees waived</span>{% endif %}
+    <span class="spin">…</span>
+  </div>
 
   {% if screen.saved %}
     <div class="flag ok">
       <span class="tag">Recorded</span>
       <div>
-        Saved to <code>data/manual/claims.json</code>. Nothing is published until you commit —
-        <a href="{{ url_for('commit') }}">read the diff and commit</a>.
+        Saved to <code>data/manual/claims.json</code>. Nothing is published until you
+        <a href="{{ url_for('commit') }}">commit</a>.
       </div>
     </div>
   {% endif %}
 
+  {% if locked and lock_banner %}
+    <div class="flag plain"><span class="tag">Locked</span><div>{{ screen.gate.message }}</div></div>
+  {% endif %}
+
   {% for problem in problems %}
-    <div class="flag bad">
-      <span class="tag">Cannot read the form</span>
-      <div>{{ problem }}</div>
-    </div>
+    <div class="flag bad"><span class="tag">Cannot read the form</span><div>{{ problem }}</div></div>
   {% endfor %}
 
-  <div class="panel">
-    <div class="stats">
-      <div class="stat">
-        <div class="figure">${{ screen.total_salary }}</div>
-        <div class="label">Total salary</div>
-      </div>
-      <div class="stat">
-        <div class="figure">${{ screen.total_fees }}</div>
-        <div class="label">Fees allocated</div>
-      </div>
-      <div class="stat">
-        <div class="figure">
-          {% if screen.fee_expected is none %}—{% else %}${{ screen.fee_expected }}{% endif %}
-        </div>
-        <div class="label">Fee owed{% if screen.fees_waived %} (waived){% endif %}</div>
-      </div>
-      <div class="stat">
-        <div class="figure">{{ screen.keeper_count }}</div>
-        <div class="label">Keepers of {{ max_keepers }}</div>
-      </div>
-      <div class="stat">
-        <div class="figure">{{ screen.prospect_count }}</div>
-        <div class="label">Prospects of {{ max_prospects }}</div>
-      </div>
-      <div class="spin">recomputing…</div>
-    </div>
-    {% if screen.fee_shortfall %}
-      <p class="small muted">
-        Fees allocated do not match the tier yet — see the issues below.
-      </p>
-    {% endif %}
-  </div>
-
-  <div class="scroll">
-    <table>
-      <caption>
-        Salaries come from the engine. “Would cost” is base plus the ${{ keeper_tax }} tax with
-        no fee — what he costs before the manager splits the tier across his keepers.
-      </caption>
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Pos</th>
-          <th class="num">Base</th>
-          <th class="num">Tax</th>
-          <th class="num">Would cost</th>
-          <th>Slot</th>
-          <th class="num">Fee</th>
-          <th class="num">Salary</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in screen.rows %}
-          <tr class="{% if row.claimed %}claimed{% endif %}">
-            <td>
-              {{ row.name }}
-              {% if row.overridden %}
-                <span class="tag-inline" title="An override is live: ESPN holds ${{ row.espn_base }}">override</span>
-              {% endif %}
-            </td>
-            <td class="small muted">{{ row.position }} · {{ row.nfl_team }}</td>
-            <td class="num">${{ row.base }}</td>
-            <td class="num">
-              {% if row.kept_prior_year %}${{ row.tax }}{% else %}<span class="muted">—</span>{% endif %}
-            </td>
-            <td class="num">${{ row.candidate_price }}</td>
-            <td>
-              <select name="slot_{{ row.espn_player_id }}" aria-label="Slot for {{ row.name }}">
-                <option value="">not kept</option>
-                {% for slot in slot_choices %}
-                  <option value="{{ slot.value }}" {% if row.slot == slot.value %}selected{% endif %}>
-                    {{ slot.value }}
+  <table class="tc-table">
+    <thead>
+      <tr>
+        <th class="tc-slot-col"></th>
+        <th>Player, team pos</th>
+        <th class="num">Fee</th>
+        <th class="num">$</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for slot, label, row in screen.slots %}
+        <tr class="{% if row %}claimed{% endif %}">
+          <td class="tc-slot-col"><span class="tc-slot">{{ label }}</span></td>
+          <td>
+            {% if screen.keepers_only and row %}
+              {# ESPN has pruned to the kept players, so there is nothing to pick. The id still
+                 posts, so the form shape is unchanged and one parser reads both cases. #}
+              <input type="hidden" name="{{ p }}player_{{ slot }}" value="{{ row.espn_player_id }}">
+              <span class="tc-player">{{ row.name }}</span>
+              <span class="tc-pos">{{ row.position }} {{ row.nfl_team }}</span>
+            {% elif screen.keepers_only %}
+              <input type="hidden" name="{{ p }}player_{{ slot }}" value="">
+              <span class="muted">—</span>
+            {% else %}
+              <select name="{{ p }}player_{{ slot }}" aria-label="{{ slot }} for {{ screen.name }}"
+                      {% if locked %}disabled{% endif %}>
+                <option value="">Not selected</option>
+                {% for option in screen.pickable %}
+                  <option value="{{ option.espn_player_id }}"
+                          {% if row and row.espn_player_id == option.espn_player_id %}selected{% endif %}>
+                    {{ option.name }} · {{ option.position }} {{ option.nfl_team }} · ${{ option.candidate_price }}
                   </option>
                 {% endfor %}
               </select>
-            </td>
-            <td class="num">
-              <input type="number" step="1" name="fee_{{ row.espn_player_id }}"
-                     value="{{ row.fee }}" aria-label="Fee for {{ row.name }}">
-            </td>
-            <td class="num money">
-              {% if row.salary is none %}
-                <span class="muted">—</span>
-              {% else %}
-                ${{ row.salary }}
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="6">Declared</td>
-          <td class="num">${{ screen.total_fees }}</td>
-          <td class="num">${{ screen.total_salary }}</td>
+            {% endif %}
+          </td>
+          <td class="num">
+            <input type="number" step="1" name="{{ p }}fee_{{ slot }}"
+                   value="{{ row.fee if row else 0 }}"
+                   aria-label="Fee for {{ slot }} on {{ screen.name }}"
+                   {% if locked %}disabled{% endif %}>
+          </td>
+          <td class="num money">
+            {% if row and row.salary is not none %}${{ row.salary }}{% else %}<span class="muted">—</span>{% endif %}
+          </td>
         </tr>
-      </tfoot>
-    </table>
-  </div>
+      {% endfor %}
+    </tbody>
+    {# One total, not two. The tier used to print as a second figure beside the allocated one,
+       leaving the reader to subtract; the tag carries that difference instead, which is the
+       number the subtraction was for. #}
+    <tfoot>
+      <tr>
+        <td class="tc-slot-col"></td>
+        {# "fees waived" is already on the card head, where you scan. Not twice. #}
+        <td>Total</td>
+        <td class="num">
+          ${{ screen.total_fees }}
+          {% if screen.fee_state == 'short' %}
+            <span class="tag-inline bad">${{ screen.fee_gap }} short</span>
+          {% elif screen.fee_state == 'over' %}
+            <span class="tag-inline bad">${{ screen.fee_gap }} over</span>
+          {% elif screen.fee_state == 'unknown' %}
+            <span class="tag-inline">over the limit</span>
+          {% endif %}
+        </td>
+        <td class="num money">${{ screen.total_salary }}</td>
+      </tr>
+    </tfoot>
+  </table>
 
   {{ show.issues(screen.issues, players) }}
-  {{ show.notes(screen.notes) }}
+  {% if detailed %}{{ show.notes(screen.notes) }}{% endif %}
 
-  <div class="actions">
-    <button type="submit"
-            hx-post="{{ url_for('save', year=screen.season, manager_id=screen.manager_id) }}"
-            hx-target="#claim-form"
-            hx-swap="outerHTML"
-            {% if screen.blocked %}disabled{% endif %}>
-      {% if screen.blocked %}Fix the errors to record{% else %}Record these claims{% endif %}
-    </button>
-    <span class="small muted">
-      {% if screen.blocked %}
-        An error blocks the record. The salaries above are still priced so you can see what the
-        fix costs.
-      {% elif screen.submitted_at %}
-        Last recorded {{ screen.submitted_at.strftime('%Y-%m-%d %H:%M') }}.
-      {% else %}
-        Nothing recorded for this team yet.
-      {% endif %}
-    </span>
-  </div>
-</form>
+  {# No per-card button. Recording twelve franchises is one action taken once, and a button per
+     card is twelve chances to forget one. The board's single Record writes team by team, so a
+     franchise with an error is skipped and named rather than taking the other eleven with it.
+
+     The row is emitted only when it has something to say. A locked card has no status — there
+     is nothing to record and nothing has been — so rendering an empty div here left a
+     zero-height element still contributing its own margin, and the card carried a band of
+     space holding nothing. An element that renders nothing should not exist. #}
+  {% if not locked or screen.review_count %}
+    <div class="tc-actions">
+      <span class="small muted">
+        {% if locked %}
+        {% elif screen.blocked %}
+          <span class="tag-inline bad">{{ screen.error_count }} error(s) — not recorded</span>
+        {% elif screen.submitted_at %}
+          Recorded {{ screen.submitted_at.strftime('%Y-%m-%d %H:%M') }}
+        {% else %}
+          Not recorded yet
+        {% endif %}
+        {% if screen.review_count %}
+          <span class="tag-inline">{{ screen.review_count }} unverified</span>
+        {% endif %}
+      </span>
+    </div>
+  {% endif %}
+</div>

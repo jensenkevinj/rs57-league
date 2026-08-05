@@ -4,15 +4,17 @@
 
 {% block content %}
 <h1>{{ screen.name }}</h1>
-<p class="lede">
+<p class="page-intro">
   Keeper claims for {{ screen.season }}. {{ limits_help }}
 </p>
-<p class="small muted">
-  <a href="{{ url_for('season', year=screen.season) }}">← all teams</a>
-  &middot; team id <code>{{ screen.manager_id }}</code>
-  &middot; base read from ESPN's <code>{{ source.base_salary_field }}</code>
-  {% if not source.drafted %}(this season has not drafted){% endif %}
-</p>
+<div class="page-meta">
+  <div><a href="{{ url_for('season', year=screen.season) }}">← all teams</a></div>
+  <div>Team id <code>{{ screen.manager_id }}</code></div>
+  <div>
+    Base read from ESPN's <code>{{ source.base_salary_field }}</code>
+    {% if not source.drafted %}(this season has not drafted){% endif %}
+  </div>
+</div>
 
 <div class="panel small">
   <p style="margin-top:0">{{ fee_help }}</p>
@@ -22,7 +24,11 @@
   </p>
 </div>
 
-{% include "_claim_form.html" %}
+{# The same card the board renders, on its own with full notes. The board passes
+   detailed=false; here it defaults to true, so nothing unverified is folded away. #}
+{% with problems = problems | default([]) %}
+  {% include "_claim_form.html" %}
+{% endwith %}
 
 <h2>What happens after you record this</h2>
 <p class="small">
@@ -30,6 +36,6 @@
   <a href="{{ url_for('commit') }}">commit button</a> is what publishes it: the nightly Action
   rebuilds the site from what is committed. Then enter each keeper into ESPN's auction at the
   salary above — ESPN reports that number back as next season's base, so
-  <a href="{{ url_for('reconcile_espn', year=screen.season) }}">reconcile</a> once you have.
+  <a href="{{ url_for('season', year=screen.season) }}">verify against ESPN</a> once you have.
 </p>
 {% endblock %}

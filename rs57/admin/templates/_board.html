@@ -1,0 +1,64 @@
+{# The board after a league-wide record: the twelve cards again, plus what happened.
+
+   Recorded and skipped are named, never counted alone. "10 recorded" leaves you hunting for the
+   two; naming them is the difference between a result and a puzzle. #}
+<form id="board"
+      hx-post="{{ url_for('record_league', year=screen.season) }}"
+      hx-target="#board"
+      hx-swap="outerHTML">
+
+  {% if recorded %}
+    <div class="flag ok">
+      <span class="tag">Recorded {{ recorded | length }}</span>
+      <div>
+        {{ recorded | join(', ') }} — written to <code>data/manual/claims.json</code> on this
+        machine. Nothing is published until you
+        <a href="{{ url_for('commit') }}">commit</a>.
+      </div>
+    </div>
+  {% endif %}
+
+  {% if skipped %}
+    <div class="flag bad">
+      <span class="tag">Skipped {{ skipped | length }}</span>
+      <div>
+        Recorded nothing for these, and left what was already on file alone:
+        <ul>
+          {% for name, reason in skipped %}
+            <li><strong>{{ name }}</strong> — {{ reason }}</li>
+          {% endfor %}
+        </ul>
+        Every other franchise still recorded.
+      </div>
+    </div>
+  {% endif %}
+
+  {# Nothing recorded and nothing skipped means nothing was declared. The cards already say
+     "Not recorded yet" each; an alert repeating it adds no fact. #}
+  {% if not attempted %}
+    <div class="flag bad">
+      <span class="tag">Locked</span>
+      <div>{{ screen.gate.message }}</div>
+    </div>
+  {% endif %}
+
+  <div class="team-grid">
+    {% for team in screen.teams %}
+      {% with screen = team, problems = [], lock_banner = false, detailed = false %}
+        {% include "_claim_form.html" %}
+      {% endwith %}
+    {% endfor %}
+  </div>
+
+  {% if screen.gate.editable %}
+    <div class="board-actions">
+      <button type="submit">Record all {{ screen.teams | length }} franchises</button>
+      <span class="spin">recording…</span>
+      <span class="small muted">
+        Writes <code>data/manual/claims.json</code> on this machine. Nothing is published until
+        you <a href="{{ url_for('commit') }}">commit</a>. A franchise with an error is skipped
+        and named — the rest still record.
+      </span>
+    </div>
+  {% endif %}
+</form>

@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Salary overrides</h1>
-<p class="lede">
+<p class="page-intro">
   Managers trade draft cash. ESPN has no native support for that, so a few player salaries get
   hand-edited on the two teams involved and changed back before the next draft. An override
   records the <strong>true</strong> value while ESPN holds the distorted one.
@@ -21,94 +21,25 @@
   </div>
 </div>
 
+<p class="small muted">
+  This tab is the <strong>ledger</strong>: every season at once, which is the only view that can
+  show a cash trade's two legs cancelling. Recording one for the season you are working on is
+  quicker from
+  {% if year %}<a href="{{ url_for('season', year=year) }}">the keeper page</a>{% else %}the keeper page{% endif %}.
+</p>
+
 <h2>Record an override</h2>
-<form method="post" action="{{ url_for('add_override') }}">
-  <div class="row">
-    <div class="field">
-      <label for="season">Season</label>
-      <input type="number" step="1" id="season" name="season" value="{{ year or '' }}">
-    </div>
-    <div class="field">
-      <label for="espn_player_id">ESPN player id</label>
-      <input type="number" step="1" id="espn_player_id" name="espn_player_id">
-    </div>
-    <div class="field">
-      <label for="actual_salary">True salary</label>
-      <input type="number" step="1" id="actual_salary" name="actual_salary">
-    </div>
-    <div class="field">
-      <label>
-        <input type="checkbox" name="unpaired_ok" value="1">
-        counterparty unrecoverable
-      </label>
-    </div>
-  </div>
-  <div class="field" style="margin-top:0.8rem">
-    <label for="reason">Reason</label>
-    <textarea id="reason" name="reason" rows="2"
-              placeholder="Draft cash: $3 to t7 for the 2026 auction"></textarea>
-  </div>
-  <div class="actions">
-    <button type="submit">Record override</button>
-    <span class="small muted">
-      Players are matched on ESPN player id, never on name. The reason is published on the public
-      site as typed.
-    </span>
-  </div>
-</form>
+{% with scope = 'tab' %}
+  {% include "_override_form.html" %}
+{% endwith %}
 
 <h2>Recorded</h2>
 {% if not rows %}
   <p class="muted">None recorded. <code>data/manual/overrides.json</code> does not exist yet.</p>
 {% else %}
-  <div class="scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>Season</th>
-          <th>Player</th>
-          <th>Team</th>
-          <th class="num">ESPN says</th>
-          <th class="num">True</th>
-          <th>Reason</th>
-          <th>State</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-          <tr>
-            <td>{{ row.override.season }}</td>
-            <td>{{ row.name }} <span class="small muted">{{ row.override.espn_player_id }}</span></td>
-            <td class="small">{{ row.manager or '—' }}</td>
-            <td class="num">{% if row.espn_base is none %}—{% else %}${{ row.espn_base }}{% endif %}</td>
-            <td class="num money">${{ row.override.actual_salary }}</td>
-            <td class="small">{{ row.override.reason }}</td>
-            <td class="small">
-              {% if row.override.reverted %}
-                <span class="tag-inline flat">reverted — ESPN wins</span>
-              {% else %}
-                <span class="tag-inline">live — overrides ESPN</span>
-              {% endif %}
-              {% if row.override.unpaired_ok %}
-                <span class="tag-inline flat">unpaired ok</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if not row.override.reverted %}
-                <form method="post" action="{{ url_for('revert_override') }}">
-                  <input type="hidden" name="season" value="{{ row.override.season }}">
-                  <input type="hidden" name="espn_player_id" value="{{ row.override.espn_player_id }}">
-                  <input type="hidden" name="created_at" value="{{ row.override.created_at.isoformat() }}">
-                  <button type="submit" class="quiet">Mark reverted</button>
-                </form>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  {% with show_season = true %}
+    {% include "_override_table.html" %}
+  {% endwith %}
   <p class="small muted">
     Marking a row reverted means ESPN has been put back and ESPN's value wins again. The row stays
     on file — it is the explanation for why a base moved, and

@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS
 from rs57.models import (
     AcquisitionSource,
     FranchiseName,
@@ -75,8 +76,15 @@ POSITION_BY_ID: Mapping[int, Position] = {
 drift and raises rather than guessing a position."""
 
 MIN_ROSTER_SIZE = 10
-"""Below this a team's roster is treated as a degraded response, not a small roster. Real
-rosters here run 15-16. A sync that "succeeds" with a short roster would blank a season."""
+"""A full roster is at least this deep. Real ones here run 14-17.
+
+Not a per-team floor on its own — see ``check_roster_sizes``. Between the keeper deadline and
+the auction, ESPN prunes every roster down to the kept players, and a season read in that window
+is legitimately four deep."""
+
+KEEPERS_ONLY_ROSTER_SIZE = MAX_KEEPERS + MAX_PROSPECTS
+"""The deepest a pruned keeper-window roster can legally be. Read off the rules rather than
+typed as a 4, so that raising the keeper limit cannot leave this behind."""
 
 BENCH_SLOT_IDS = frozenset({20, 21})
 """``lineupSlotId`` 20 is the bench and 21 is IR. Everything else is a started slot, including
@@ -345,6 +353,50 @@ def first_nfl_season(athlete: Mapping[str, Any]) -> tuple[int, str] | None:
     return None
 
 
+def check_roster_sizes(sizes: Mapping[int, int]) -> str:
+    """Refuse a degraded response without refusing a legitimately pruned league.
+
+    The old guard was a per-team floor: fewer than ``MIN_ROSTER_SIZE`` entries and the sync
+    raised. That encodes an assumption which is only true for most of the year. Between the
+    keeper deadline and the auction, ESPN prunes every roster to the kept players, so a season
+    read in that window comes back four deep on all twelve teams and the floor would fail the
+    nightly every night until draft day.
+
+    **The tell for a degraded response is disagreement, not size.** A truncated response hits
+    one team; a pruned league hits all twelve at once. So the league has to land wholly in one
+    of two regimes, and a mix is what raises:
+
+    * ``"full"`` — every team at ``MIN_ROSTER_SIZE`` or deeper. The ordinary season.
+    * ``"keepers"`` — every team at ``KEEPERS_ONLY_ROSTER_SIZE`` or shallower, and somebody
+      kept somebody. The window between the keeper deadline and the auction.
+
+    Anything else raises: one short team among eleven full ones is the truncation the old guard
+    was built for, and a league sitting uniformly between the two regimes is a shape nobody can
+    account for, which is not a thing to write a season from.
+
+    An individual team may legitimately be empty in the keeper window — keeping nobody is a
+    legal choice — but **all twelve empty is refused**. Nobody in league history has kept
+    nothing, and an empty league is exactly what a dead API looks like. Returning "keepers"
+    there would blank a season of salaries, which is the failure this whole guard exists for.
+
+    Returns the regime name so the caller can say which one it read.
+    """
+    counts = sizes.values()
+    if all(n >= MIN_ROSTER_SIZE for n in counts):
+        return "full"
+    if all(n <= KEEPERS_ONLY_ROSTER_SIZE for n in counts) and any(counts):
+        return "keepers"
+
+    shape = ", ".join(f"team {tid}: {n}" for tid, n in sorted(sizes.items()))
+    raise EspnError(
+        f"roster sizes do not describe one league — refusing to write a degraded season. "
+        f"A full roster is {MIN_ROSTER_SIZE}+ and a pruned keeper-window roster is "
+        f"{KEEPERS_ONLY_ROSTER_SIZE} or fewer; every team has to be in the same regime, "
+        f"because a short response hits one team and a pruned league hits all twelve. "
+        f"Got {shape}"
+    )
+
+
 def base_salary_field(drafted: bool) -> str:
     """Which ESPN field holds ``base_salary`` for a season, given whether it has drafted.
 
@@ -522,6 +574,7 @@ def build_season(
     warnings: list[str] = []
     verified_waivers = 0
     mismatched_waivers: list[int] = []
+    roster_sizes: dict[int, int] = {}
 
     for team in sorted(teams, key=lambda t: t["id"]):
         espn_team_id = team["id"]
@@ -538,11 +591,9 @@ def build_season(
 
         payload = client.fetch_roster(espn_team_id)
         entries = ((payload.get("teams") or [{}])[0].get("roster") or {}).get("entries") or []
-        if len(entries) < MIN_ROSTER_SIZE:
-            raise EspnError(
-                f"team {espn_team_id} returned {len(entries)} roster entries "
-                f"(minimum {MIN_ROSTER_SIZE}) — refusing to write a degraded season"
-            )
+        # Judged league-wide once every team is in, not here — a pruned keeper window is four
+        # deep on all twelve and is not degraded. See check_roster_sizes.
+        roster_sizes[espn_team_id] = len(entries)
 
         for entry in entries:
             pool = entry.get("playerPoolEntry") or {}
@@ -597,6 +648,16 @@ def build_season(
                     source=source,
                 )
             )
+
+    # Raises on a degraded response. Nothing has been written — the caller does that — so
+    # raising here still refuses the season rather than half-writing one.
+    regime = check_roster_sizes(roster_sizes)
+    if regime == "keepers":
+        warnings.append(
+            f"every roster is {KEEPERS_ONLY_ROSTER_SIZE} players or fewer, so ESPN has pruned "
+            f"the league to its keepers: this is the window between the keeper deadline and "
+            f"the auction, and the season holds only kept players. Re-sync after the auction."
+        )
 
     if not prior_keepers:
         warnings.append(

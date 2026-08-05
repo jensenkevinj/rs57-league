@@ -1,0 +1,165 @@
+{# The result of reading ESPN's live rosters back. Swapped into the season page by htmx.
+
+   Nothing here was written anywhere. This fragment is a comparison of what is on file against
+   what ESPN currently holds, and both sides arrived already computed.
+
+   The rule this template exists to honour: a check that could not run is reported as such, with
+   the reason. A green tick that means "we could not look" is worse than no tick. #}
+<div id="verify-result">
+  {% if result.error %}
+    <div class="flag bad">
+      <span class="tag">Could not read ESPN</span>
+      <div>
+        {{ result.error }}
+        <p class="small" style="margin-bottom:0">
+          Nothing was checked and nothing was written. This is a normal thing for a localhost
+          tool to meet — try again.
+        </p>
+      </div>
+    </div>
+  {% else %}
+    {% if result.clean %}
+      <div class="flag ok">
+        <span class="tag">ESPN agrees</span>
+        <div>
+          All {{ result.checked | length }} recorded claim(s) carry the salary this tool
+          computed.
+        </div>
+      </div>
+    {% endif %}
+
+    {% if result.not_yet_entered %}
+      <div class="flag plain">
+        <span class="tag">{{ result.not_yet_entered | length }} not entered into ESPN yet</span>
+        <div>
+          ESPN still holds the price these players carried in, unchanged since the last sync —
+          so each difference below is exactly that player's fee plus tax. That is what a keeper
+          looks like before his salary is typed into ESPN, not a disagreement about it. Enter
+          them, then verify again.
+        </div>
+      </div>
+    {% endif %}
+
+    {% if result.mismatches %}
+      <div class="flag bad">
+        <span class="tag">{{ result.mismatches | length }} salary mismatch(es)</span>
+        <div>
+          ESPN holds a different number from the one recorded. A mistyped keeper price does not
+          stay a typo — it becomes the player's base and the ratchet carries it forward every
+          season after.
+        </div>
+      </div>
+    {% endif %}
+
+    {% if result.unpriced %}
+      <div class="flag">
+        <span class="tag">{{ result.unpriced | length }} claim(s) carry no price</span>
+        <div>
+          Recorded, but with no <code>computed_salary</code> to compare — the player is no
+          longer on the roster the engine priced against. Nothing was checked for these.
+        </div>
+      </div>
+    {% endif %}
+
+    {% if result.missing_from_espn %}
+      <div class="flag">
+        <span class="tag">{{ result.missing_from_espn | length }} not found on ESPN</span>
+        <div>Recorded here, but ESPN holds no value for them on that roster.</div>
+      </div>
+    {% endif %}
+
+    {% if result.espn_only %}
+      <div class="flag bad">
+        <span class="tag">{{ result.espn_only | length }} kept but never recorded</span>
+        <div>ESPN holds these as keepers and nothing in this tool claims them.</div>
+      </div>
+    {% endif %}
+
+    {% if not result.unrecorded_checked %}
+      <div class="flag">
+        <span class="tag">Not checked: keepers nobody recorded</span>
+        <div>
+          ESPN has not pruned the rosters to the kept players, so every player carries a keeper
+          value whether he is a keeper or not — there is nothing in the payload that tells them
+          apart. This run could only check the salaries of claims already on file.
+          {% if result.draft_picks_seen %}
+            ESPN's draft record holds {{ result.draft_picks_seen }} keeper pick(s), which does
+            settle it once the auction has run.
+          {% else %}
+            ESPN's draft record is still empty, which is normal before the auction.
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if result.rows %}
+      <div class="scroll">
+        <table>
+          <caption>
+            Compared against each claim's recorded <code>computed_salary</code> — what the
+            manager was told they owed — never against a fresh recomputation.
+          </caption>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Player</th>
+              <th>Slot</th>
+              <th class="num">Recorded</th>
+              <th class="num">ESPN holds</th>
+              <th class="num">Difference</th>
+              <th>State</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in result.rows %}
+              <tr>
+                <td class="small">{{ row.manager_id }}</td>
+                <td>{{ row.name }}</td>
+                <td class="small muted">{{ row.slot or '—' }}</td>
+                <td class="num">
+                  {% if row.recorded_salary is none %}—{% else %}${{ row.recorded_salary }}{% endif %}
+                </td>
+                <td class="num">
+                  {% if row.espn_value is none %}—{% else %}${{ row.espn_value }}{% endif %}
+                </td>
+                <td class="num money">
+                  {% if row.delta is none %}—{% else %}${{ row.delta }}{% endif %}
+                </td>
+                <td class="small">
+                  {% if row.state == 'agrees' %}
+                    <span class="tag-inline ok">agrees</span>
+                  {% elif row.state == 'mismatch' %}
+                    <span class="tag-inline bad">mismatch</span>
+                  {% elif row.state == 'not_yet_entered' %}
+                    <span class="tag-inline flat">not entered into ESPN yet</span>
+                  {% elif row.state == 'unpriced' %}
+                    <span class="tag-inline">no price recorded</span>
+                  {% elif row.state == 'espn_only' %}
+                    <span class="tag-inline bad">never recorded here</span>
+                  {% else %}
+                    <span class="tag-inline">not on ESPN</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted small">Nothing recorded for {{ year }} yet, so there was nothing to check.</p>
+    {% endif %}
+
+    <p class="small muted">
+      Read from ESPN's <code>{{ source.base_salary_field }}</code>, the same field
+      <code>data/derived/{{ year }}.json</code> was built from. Rosters came back
+      {% if result.regime == 'keepers' %}
+        pruned to the kept players.
+      {% elif result.regime == 'full' %}
+        at full depth.
+      {% else %}
+        in an unreadable shape.
+      {% endif %}
+      Nothing was written.
+    </p>
+  {% endif %}
+</div>

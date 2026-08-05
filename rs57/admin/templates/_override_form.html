@@ -1,0 +1,44 @@
+{# Recording one leg of a draft-cash trade. Shared by the overrides tab and the season page,
+   because step 7 of the offseason happens in the same sitting as the fees.
+
+   `reason` is free text a human types here, stored in data/manual/, committed to a public repo
+   and rendered on a public site. It is the injection path — stored exactly as typed and escaped
+   at render time, never sanitised on the way in, because a stripped-down reason is a silently
+   altered record. No template in this directory uses the `safe` filter. #}
+<form method="post" action="{{ url_for('add_override') }}">
+  {% if return_year %}
+    <input type="hidden" name="return_year" value="{{ return_year }}">
+  {% endif %}
+  <div class="row">
+    <div class="field">
+      <label for="season-{{ scope }}">Season</label>
+      <input type="number" step="1" id="season-{{ scope }}" name="season" value="{{ year or '' }}">
+    </div>
+    <div class="field">
+      <label for="player-{{ scope }}">ESPN player id</label>
+      <input type="number" step="1" id="player-{{ scope }}" name="espn_player_id">
+    </div>
+    <div class="field">
+      <label for="salary-{{ scope }}">True salary</label>
+      <input type="number" step="1" id="salary-{{ scope }}" name="actual_salary">
+    </div>
+    <div class="field">
+      <label>
+        <input type="checkbox" name="unpaired_ok" value="1">
+        counterparty unrecoverable
+      </label>
+    </div>
+  </div>
+  <div class="field" style="margin-top:0.8rem">
+    <label for="reason-{{ scope }}">Reason</label>
+    <textarea id="reason-{{ scope }}" name="reason" rows="2"
+              placeholder="Draft cash: $3 to t7 for the {{ year or 'next' }} auction"></textarea>
+  </div>
+  <div class="actions">
+    <button type="submit">Record override</button>
+    <span class="small muted">
+      Players are matched on ESPN player id, never on name. The reason is published on the public
+      site as typed.
+    </span>
+  </div>
+</form>

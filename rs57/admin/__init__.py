@@ -44,7 +44,12 @@ from flask import Flask, abort, flash, redirect, render_template, request, url_f
 
 from rs57.admin.derived import DERIVED, Derived
 from rs57.admin.gitops import Git, GitError, commit_message
-from rs57.admin.reconcile import fetch_deadlines, fetch_keeper_picks, reconcile
+from rs57.admin.reconcile import (
+    fetch_deadlines,
+    fetch_keeper_picks,
+    fetch_roster_salaries,
+    verify,
+)
 from rs57.admin.screens import (
     FEE_HELP,
     LIMITS_HELP,
@@ -52,7 +57,10 @@ from rs57.admin.screens import (
     build_season_screen,
     build_team_screen,
     claims_from_form,
+    keeper_gate,
+    split_league_form,
     override_form,
+    override_row,
 )
 from rs57.admin.store import DATA, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, MAX_PROSPECTS
@@ -136,7 +144,14 @@ def create_app(
     @app.get("/season/<int:year>")
     def season(year: int):
         current = season_or_404(year)
-        screen = build_season_screen(year, current, derived.load(year - 1), store, now=now())
+        screen = build_season_screen(
+            year,
+            current,
+            derived.load(year - 1),
+            store,
+            now=now(),
+            first_nfl_season=derived.first_nfl_seasons(),
+        )
         return render_template("season.html", screen=screen, source=current)
 
     @app.get("/season/<int:year>/team/<manager_id>")
@@ -151,14 +166,22 @@ def create_app(
             derived.load(year - 1),
             store,
             first_nfl_season=derived.first_nfl_seasons(),
+            gate=keeper_gate(year, store, now=now()),
         )
         return render_template("team.html", screen=screen, source=current)
 
     @app.post("/season/<int:year>/team/<manager_id>/preview")
     def preview(year: int, manager_id: str):
-        """Live salary math. Prices and validates, writes nothing."""
+        """Live salary math. Prices and validates, writes nothing.
+
+        Deliberately **not** gated on the deadline. It writes nothing, and seeing what a keeper
+        would cost before the deadline is the harmless half — the lock is about recording a
+        number, not about looking at one. The gate is still passed through so the fragment it
+        returns renders in the same state as the page it replaces.
+        """
         current = season_or_404(year)
-        claims, problems = claims_from_form(year, manager_id, request.form.to_dict())
+        posted = split_league_form(request.form.to_dict()).get(manager_id, {})
+        claims, problems = claims_from_form(year, manager_id, posted)
         screen = build_team_screen(
             year,
             manager_id,
@@ -167,6 +190,7 @@ def create_app(
             store,
             claims=claims,
             first_nfl_season=derived.first_nfl_seasons(),
+            gate=keeper_gate(year, store, now=now()),
         )
         return render_template(
             "_claim_form.html", screen=screen, source=current, problems=problems
@@ -174,12 +198,33 @@ def create_app(
 
     @app.post("/season/<int:year>/team/<manager_id>")
     def save(year: int, manager_id: str):
-        """Record the claims. An ERROR blocks the save; a REVIEW never does."""
+        """Record the claims. An ERROR blocks the save; a REVIEW never does.
+
+        **The deadline lock is enforced here, not in the template.** ``disabled`` on an input
+        is a courtesy to the browser: a tab opened before the deadline, or an htmx request
+        already in flight, still posts. The gate is recomputed from the store and the clock on
+        every save rather than read off the screen that was rendered.
+        """
         current = season_or_404(year)
+        gate = keeper_gate(year, store, now=now())
+        if not gate.editable:
+            screen = build_team_screen(
+                year,
+                manager_id,
+                current,
+                derived.load(year - 1),
+                store,
+                first_nfl_season=derived.first_nfl_seasons(),
+                gate=gate,
+            )
+            return render_template(
+                "_claim_form.html", screen=screen, source=current, problems=[gate.message]
+            )
+
         claims, problems = claims_from_form(
             year,
             manager_id,
-            request.form.to_dict(),
+            split_league_form(request.form.to_dict()).get(manager_id, {}),
             now=now(),
             price_with=(current, store),
         )
@@ -212,6 +257,77 @@ def create_app(
             first_nfl_season=derived.first_nfl_seasons(),
         )
         return render_template("_claim_form.html", screen=saved, source=current, problems=[])
+
+    @app.post("/season/<int:year>/record")
+    def record_league(year: int):
+        """Record every franchise on the board in one action.
+
+        **Team by team, not all-or-nothing.** Twelve franchises are entered in one sitting, so
+        recording them is one button — but a single illegal fee spread must not discard the
+        other eleven teams' work, and neither must it record itself. Each team is priced,
+        validated and written on its own; the ones that cannot be are skipped and named.
+
+        The deadline lock is enforced here for the same reason it is on the per-team save: a
+        tab opened before the deadline still posts.
+        """
+        current = season_or_404(year)
+        gate = keeper_gate(year, store, now=now())
+        posted = split_league_form(request.form.to_dict())
+        recorded: list[str] = []
+        skipped: list[tuple[str, str]] = []
+
+        if gate.editable:
+            for manager_id in current.manager_ids:
+                # **A franchise absent from the request is left as it was.** Only one whose
+                # fields arrived, and arrived empty, is cleared. The board posts all twelve
+                # every time, so "missing" means this submission was not about that team — and
+                # writing an empty claim list for it would delete a record nobody touched. The
+                # same rule ``save_settings`` follows, for the same reason.
+                if manager_id not in posted:
+                    continue
+                claims, problems = claims_from_form(
+                    year,
+                    manager_id,
+                    posted[manager_id],
+                    now=now(),
+                    price_with=(current, store),
+                )
+                screen = build_team_screen(
+                    year,
+                    manager_id,
+                    current,
+                    derived.load(year - 1),
+                    store,
+                    claims=claims,
+                    first_nfl_season=derived.first_nfl_seasons(),
+                    gate=gate,
+                )
+                if problems:
+                    skipped.append((current.name_of(manager_id), problems[0]))
+                elif screen.blocked:
+                    skipped.append(
+                        (current.name_of(manager_id), screen.errors[0].message)
+                    )
+                else:
+                    store.save_team_claims(year, manager_id, claims)
+                    recorded.append(current.name_of(manager_id))
+
+        screen = build_season_screen(
+            year,
+            current,
+            derived.load(year - 1),
+            store,
+            now=now(),
+            first_nfl_season=derived.first_nfl_seasons(),
+        )
+        return render_template(
+            "_board.html",
+            screen=screen,
+            source=current,
+            recorded=recorded,
+            skipped=skipped,
+            attempted=gate.editable,
+        )
 
     # -- season settings --------------------------------------------------------
 
@@ -324,32 +440,31 @@ def create_app(
 
     # -- overrides --------------------------------------------------------------
 
+    def _back_to(default: str):
+        """Return to the page the form was posted from.
+
+        The override form lives on two pages now. ``return_year`` is parsed as an int and fed to
+        ``url_for`` rather than used as a URL, so a hand-edited field can only ever name a season
+        route — there is nowhere for it to redirect to that this app does not already serve.
+        """
+        raw = (request.form.get("return_year") or "").strip()
+        if not raw:
+            return redirect(url_for(default))
+        try:
+            return redirect(url_for("season", year=int(raw)))
+        except ValueError:
+            return redirect(url_for(default))
+
     @app.get("/overrides")
     def overrides():
         current_year = derived.current_season()
         current = derived.load(current_year) if current_year else None
-        rows = []
-        for override in sorted(
-            store.overrides(), key=lambda o: (o.season, o.espn_player_id), reverse=True
-        ):
-            loaded = derived.load(override.season)
-            player = (loaded.player_by_id.get(override.espn_player_id)) if loaded else None
-            entry = next(
-                (
-                    e
-                    for e in (loaded.roster if loaded else ())
-                    if e.espn_player_id == override.espn_player_id
-                ),
-                None,
+        rows = [
+            override_row(override, derived.load(override.season))
+            for override in sorted(
+                store.overrides(), key=lambda o: (o.season, o.espn_player_id), reverse=True
             )
-            rows.append(
-                {
-                    "override": override,
-                    "name": player.name if player else f"player {override.espn_player_id}",
-                    "espn_base": entry.base_salary if entry else None,
-                    "manager": loaded.name_of(entry.manager_id) if loaded and entry else None,
-                }
-            )
+        ]
         return render_template(
             "overrides.html", rows=rows, year=current_year, source=current
         )
@@ -360,7 +475,7 @@ def create_app(
         if override is None:
             for problem in problems:
                 flash(problem, "error")
-            return redirect(url_for("overrides"))
+            return _back_to("overrides")
         store.add_override(override)
         flash(
             f"Recorded an override for player {override.espn_player_id} in {override.season}. "
@@ -368,7 +483,7 @@ def create_app(
             f"reverted.",
             "ok",
         )
-        return redirect(url_for("overrides"))
+        return _back_to("overrides")
 
     @app.post("/overrides/revert")
     def revert_override():
@@ -383,7 +498,7 @@ def create_app(
             created = datetime.fromisoformat(request.form.get("created_at", ""))
         except ValueError:
             flash("could not identify which override to revert", "error")
-            return redirect(url_for("overrides"))
+            return _back_to("overrides")
 
         rows = store.overrides(season)
         updated = [
@@ -397,7 +512,7 @@ def create_app(
         else:
             store.save_overrides(season, updated)
             flash("Marked reverted — ESPN's value wins again for that player.", "ok")
-        return redirect(url_for("overrides"))
+        return _back_to("overrides")
 
     # -- payouts ----------------------------------------------------------------
 
@@ -423,14 +538,39 @@ def create_app(
         rows, totals = _payout_rows(derived, store, year)
         return render_template("_payout_table.html", year=year, rows=rows, totals=totals)
 
-    # -- reconciliation with ESPN ----------------------------------------------
+    # -- verification against ESPN ----------------------------------------------
 
-    @app.get("/season/<int:year>/reconcile")
-    def reconcile_espn(year: int):
+    @app.post("/season/<int:year>/verify")
+    def verify_espn(year: int):
+        """Read ESPN's live rosters and compare. **Writes nothing, ever.**
+
+        POST rather than GET, and never on the way into the season page: this is the only screen
+        that touches the network, and an unreachable ESPN must not take down the page the whole
+        offseason is entered on.
+
+        The field compared against is the derived season's own ``base_salary_field`` —
+        ``keeperValue`` before a season's auction and ``keeperValueFuture`` after. It is read
+        from the file rather than decided here so the verify cannot disagree with the pipeline
+        that produced the numbers it is checking.
+        """
         current = season_or_404(year)
-        picks, error = fetch_keeper_picks(year)
-        result = reconcile(year, store.claims(year), picks, current, error=error)
-        return render_template("reconcile.html", result=result, source=current, year=year)
+        team_ids = sorted(int(mid.removeprefix("t")) for mid in current.manager_ids)
+        salaries, sizes, error = fetch_roster_salaries(
+            year, current.base_salary_field, team_ids
+        )
+        # Secondary, and only meaningful once the draft has run. Kept because it catches the
+        # direction a roster read cannot, and it costs one request.
+        picks, pick_error = fetch_keeper_picks(year)
+        result = verify(
+            year,
+            store.claims(year),
+            salaries,
+            sizes,
+            current,
+            draft_picks=len(picks),
+            error=error or pick_error if error else None,
+        )
+        return render_template("_verify.html", result=result, year=year, source=current)
 
     # -- the commit button ------------------------------------------------------
 
