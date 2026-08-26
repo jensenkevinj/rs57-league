@@ -1,0 +1,40 @@
+{
+  "_about": [
+    "Per-season settings, keyed by year. Written by the admin tool and by nothing else.",
+    "",
+    "consolation_winner_id is the manager who won THIS season's consolation bracket, and",
+    "their keeper fees are waived in year + 1. Read it off by one year and every waiver",
+    "lands on the wrong team. Recording it here is what turns a derived guess into a",
+    "decision -- until a year is recorded, the tool prices that year's keepers with fees ON",
+    "and says the waiver is unconfirmed.",
+    "",
+    "keeper_deadline and draft_date do NOT live here (commissioner, 2026-08-26). Both are ESPN",
+    "facts -- draftSettings.keeperDeadlineDate and .date -- and a hand-typed copy of one had",
+    "already drifted from what ESPN actually held. They are read straight off the nightly sync",
+    "in data/derived/{year}.json (DerivedSeason.keeper_deadline / .draft_date) and nothing in",
+    "this tool can override them.",
+    "",
+    "The keeper deadline is enforced UNTIL it passes and never after (commissioner,",
+    "2026-08-04). No salary is entered before the deadline, so holding claims until then",
+    "costs nothing and stops a number being recorded while managers can still change their",
+    "minds. Nothing ever re-locks: after the deadline the console stays open for good.",
+    "",
+    "A season not yet synced, or one ESPN has not given a keeperDeadlineDate, is NOT locked.",
+    "An unrecorded deadline and a future one are different facts -- collapsing them would",
+    "freeze a freshly synced season with no way out on screen."
+  ],
+  "seasons": {
+    "2025": {
+      "consolation_winner_id": "t3",
+      "season_start": null,
+      "trade_deadline": null,
+      "year": 2025
+    },
+    "2026": {
+      "consolation_winner_id": null,
+      "season_start": null,
+      "trade_deadline": "2026-12-02T17:00:00",
+      "year": 2026
+    }
+  }
+}

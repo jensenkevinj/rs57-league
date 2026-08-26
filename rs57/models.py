@@ -93,16 +93,20 @@ class Season(Base):
     lands on the wrong team: the ``*`` beside ``Bijan's Mustard`` in the 2025 fee allocations
     comes from ``Season(year=2024).consolation_winner_id``.
 
-    ``draft_date`` and ``draft_doodle_url`` are shown on the public home page while the season
-    has not drafted yet (see ``site.build_site``) and, like ``keeper_deadline``, are recorded
-    and displayed only — nothing in the engine reads them.
+    ``draft_doodle_url`` is shown on the public home page while the season has not drafted yet
+    (see ``site.build_site``) and is recorded and displayed only — nothing in the engine reads
+    it. It has no ESPN equivalent, so it is the one date-adjacent field still typed by hand.
+
+    ``draft_date`` and ``keeper_deadline`` used to live here too and do not any more
+    (commissioner, 2026-08-26): both are ESPN facts (``draftSettings.date`` and
+    ``.keeperDeadlineDate``), and a hand-typed copy had already drifted from what ESPN actually
+    held. They are read straight off the nightly sync now — see
+    ``rs57.admin.derived.DerivedSeason`` — and nothing in this tool can override them.
     """
 
     year: int
     season_start: datetime | None = None
     trade_deadline: datetime | None = None
-    keeper_deadline: datetime | None = None
-    draft_date: datetime | None = None
     draft_doodle_url: str | None = None
     consolation_winner_id: str | None = None
 
@@ -196,6 +200,51 @@ class RosterEntry(Base):
     source: AcquisitionSource
 
 
+class CashTrade(Base):
+    """A trade in which draft cash changed hands, and the record of which way it went.
+
+    ESPN has no native support for trading auction budget, so a cash trade is *expressed* as a
+    handful of hand-edited player salaries — the ``SalaryOverride`` rows that point back here
+    through ``trade_id``. Those rows are the legs; this is the trade itself.
+
+    Recording the trade separately is what makes the audit precise. Without it the only
+    available check is ``check_override_balance``, which nets every live override in the league
+    and therefore cannot tell one balanced trade from two unrelated mistakes that happen to
+    cancel. With it, each trade is balanced against **its own** declared amount and the two
+    teams that agreed it, so a missing leg names the trade that is missing it.
+
+    Direction is explicit and is the thing most worth getting right. ``amount`` dollars of draft
+    budget move **from** ``from_manager_id`` **to** ``to_manager_id``. On the receiving team
+    ESPN under-charges — its player salary is edited *below* the true figure, freeing budget —
+    so that leg's ``actual_salary - espn_base`` is **positive**. The paying team's leg is
+    negative by the same amount. The two sum to zero, which is what
+    ``keeper_rules.check_cash_trades`` audits.
+
+    Confirmed against the record: the 2025 workbook's Jonathan Taylor (``-1``, Bijan's Mustard)
+    and Jaxon Smith-Njigba (``+1``, Jaxian McJigberson) legs are one $1 cash trade and cancel
+    exactly. Saquon Barkley's ``+3`` is the orphan whose counterparty nobody can identify.
+
+    ``draft_year`` is **the auction the cash moves at, not the season the deal was struck in**,
+    and this is the one model where those differ. A trade agreed on 25 Nov 2025 spends its money
+    at the 2026 auction, so it is ``draft_year=2026`` with ``agreed_at`` in 2025. Every other
+    model here calls this field ``season`` because for a roster or a claim the two are the same
+    integer — season Y's prices are the prices set at Y's auction — but a trade has a date of
+    its own, and calling this ``season`` invites exactly the wrong reading of it.
+
+    ``note`` is free text a human types and the site renders — the same injection path as
+    ``SalaryOverride.reason``, and it gets the same treatment: stored exactly as typed, escaped
+    at render time, never passed through ``|safe``.
+    """
+
+    id: str
+    draft_year: int
+    from_manager_id: str
+    to_manager_id: str
+    amount: NonNegMoney
+    agreed_at: datetime
+    note: str = ""
+
+
 class SalaryOverride(Base):
     """The true salary for a player whose ESPN value has been deliberately distorted.
 
@@ -211,6 +260,31 @@ class SalaryOverride(Base):
     This matters more than a one-year mispricing: under the ratchet, a distortion that never
     gets reverted bakes itself into the player's base and carries forward every year after.
 
+    ``season`` here **is** the draft year, and the screens say so. ESPN's season-Y payload holds
+    the prices set at Y's auction, so a distortion recorded against season Y is a distortion of
+    the Y draft. It keeps the name ``season`` because that is what it joins to — a
+    ``RosterEntry`` for that season — and renaming it would rename the join on both sides of the
+    ratchet audit for no change in meaning. See ``CashTrade.draft_year``, which is the one field
+    where the two genuinely come apart.
+
+    ``trade_ids`` names every ``CashTrade`` this row is a leg of — **several, not one**.
+
+    A single salary edit routinely expresses more than one trade. If a franchise owes another
+    $1 from one deal and $2 from a second, the commissioner edits one player by $3 rather than
+    four players by scattered amounts; and if A pays B $5 while B pays C $5, B is skipped
+    entirely and only A and C are touched. Modelling this as a single ``trade_id`` could not
+    say either of those, and forced a choice of which trade to file the edit under.
+
+    **What that costs, stated plainly:** once edits are netted, per-trade balancing is not
+    possible even in principle — nothing in the data says which dollar belonged to which deal,
+    and splitting one would be recording a number nobody decided. What stays exactly checkable
+    is the net per franchise across the trades that share legs. See
+    ``keeper_rules.check_cash_trades``.
+
+    Empty on purpose for rows predating the trades file, and for a leg whose counterparty is
+    unrecoverable. An unlinked live leg is a REVIEW, not an error: it still nets into the
+    league-wide ``check_override_balance``, the weaker check that these links upgrade.
+
     ``unpaired_ok`` suppresses the league-wide balance check for a row whose counterparty is
     unrecoverable. Cash trades move money between two teams, so un-reverted overrides should
     net to zero; exactly one historical row (Saquon Barkley, +$3) has a missing fourth player
@@ -224,6 +298,7 @@ class SalaryOverride(Base):
     created_at: datetime
     reverted: bool = False
     unpaired_ok: bool = False
+    trade_ids: tuple[str, ...] = ()
 
 
 class KeeperClaim(Base):

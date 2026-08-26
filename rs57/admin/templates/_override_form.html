@@ -1,4 +1,4 @@
-{# Recording one leg of a draft-cash trade. Shared by the overrides tab and the season page,
+{# Recording one leg of a draft-cash trade. Shared by the draft-cash tab and the season page,
    because step 7 of the offseason happens in the same sitting as the fees.
 
    `reason` is free text a human types here, stored in data/manual/, committed to a public repo
@@ -23,6 +23,15 @@
       <input type="number" step="1" id="salary-{{ scope }}" name="actual_salary">
     </div>
     <div class="field">
+      <label for="trade-{{ scope }}">Leg of</label>
+      <select id="trade-{{ scope }}" name="trade_id">
+        <option value="">— no trade recorded —</option>
+        {% for trade in trade_choices %}
+          <option value="{{ trade.id }}">{{ trade.id }} (${{ trade.amount }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
       <label>
         <input type="checkbox" name="unpaired_ok" value="1">
         counterparty unrecoverable
@@ -38,7 +47,8 @@
     <button type="submit">Record override</button>
     <span class="small muted">
       Players are matched on ESPN player id, never on name. The reason is published on the public
-      site as typed.
+      site as typed. Attaching the leg to a trade is what lets it be balanced against that
+      trade's own amount instead of against the whole league.
     </span>
   </div>
 </form>

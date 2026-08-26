@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from conftest import SEASON, TRADE_DEADLINE, claim, entry, override
+from conftest import SEASON, TRADE_DEADLINE, claim, entry, override, trade
 from rs57.keeper_rules import (
     KEEPER_TAX,
     IssueCode,
@@ -15,6 +15,7 @@ from rs57.keeper_rules import (
     TeamKeeperResult,
     ValidationIssue,
     check_base_continuity,
+    check_cash_trades,
     check_override_balance,
     compute_team_keepers,
     derive_kept_prior_year,
@@ -461,3 +462,241 @@ def test_there_is_no_salary_cap():
     result = compute_team_keepers(claims, roster)
     assert result.keepers[0].salary == 200
     assert result.issues == ()
+
+
+# --------------------------------------------------------------------------- cash trades
+#
+# A draft-cash trade is a declared amount moving between two named teams, and the salary
+# overrides that express it in ESPN are its legs. The sign convention is the whole thing:
+# ESPN UNDER-charges the receiving team, freeing that much auction budget, so the receiving
+# leg's (actual - espn base) is POSITIVE and the paying leg's is negative.
+#
+# Confirmed against the record before it was written down. fixtures/keeper_cases.json carries
+# the two real legs of a $1 trade: Jaxon Smith-Njigba (ESPN 18, true 19, so +1) and Jonathan
+# Taylor (ESPN 33, true 32, so -1). They cancel, which is what these cases are built on.
+
+
+def balanced_pair():
+    """The canonical $5 trade: m1 pays, m2 receives. Legs on the two teams, deltas +5 / -5."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m2")]
+    overrides = [
+        override(1, 20, trade_id="T1"),  # m1 pays: ESPN over-charges by 5
+        override(2, 35, trade_id="T1"),  # m2 receives: ESPN under-charges by 5
+    ]
+    return roster, overrides, [trade("T1", amount=5, payer="m1", payee="m2")]
+
+
+def test_a_balanced_cash_trade_reports_nothing():
+    roster, overrides, trades = balanced_pair()
+    assert check_cash_trades(roster, overrides, trades) == []
+
+
+def test_a_trade_recorded_backwards_is_reported():
+    """The direction is not cosmetic: it decides which leg is expected to be positive.
+
+    Same two legs, same dollars, parties swapped. Netting would call this balanced — which is
+    exactly the mistake per-side summing exists to catch.
+    """
+    roster, overrides, _ = balanced_pair()
+    backwards = [trade("T1", amount=5, payer="m2", payee="m1")]
+    assert codes(check_cash_trades(roster, overrides, backwards)) == {
+        IssueCode.CASH_TRADE_UNBALANCED
+    }
+
+
+def test_two_legs_on_one_team_are_not_a_trade():
+    """They net to zero and move no budget between anybody. Netting alone would pass this."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m1")]
+    overrides = [override(1, 20, trade_id="T1"), override(2, 35, trade_id="T1")]
+    trades = [trade("T1", amount=5, payer="m1", payee="m2")]
+    assert IssueCode.CASH_TRADE_UNBALANCED in codes(
+        check_cash_trades(roster, overrides, trades)
+    )
+
+
+def test_a_missing_leg_names_the_trade_that_is_missing_it():
+    roster, overrides, trades = balanced_pair()
+    issues = check_cash_trades(roster, overrides[:1], trades)
+    assert codes(issues) == {IssueCode.CASH_TRADE_UNBALANCED}
+    assert issues[0].trade_id == "T1", "grouped by field, never by reading the message"
+
+
+def test_a_trade_nothing_points_at_is_reported():
+    trades = [trade("T1", amount=5, payer="m1", payee="m2")]
+    issues = check_cash_trades([entry(1, 25, manager="m1")], [], trades)
+    assert codes(issues) == {IssueCode.CASH_TRADE_NO_LEGS}
+
+
+def test_a_fully_reverted_trade_is_finished_not_broken():
+    """Both sides put back in ESPN is the intended end state. It must not nag forever."""
+    roster, overrides, trades = balanced_pair()
+    reverted = [o.model_copy(update={"reverted": True}) for o in overrides]
+    assert check_cash_trades(roster, reverted, trades) == []
+
+
+def test_half_reverting_a_trade_is_reported_and_says_why():
+    """One leg put back and one left live bakes the distortion into next season's base."""
+    roster, overrides, trades = balanced_pair()
+    half = [overrides[0].model_copy(update={"reverted": True}), overrides[1]]
+    issues = check_cash_trades(roster, half, trades)
+    assert codes(issues) == {IssueCode.CASH_TRADE_UNBALANCED}
+    assert "reverted" in issues[0].message
+
+
+def test_an_unknowable_leg_is_reported_not_dropped():
+    """Where a number cannot be known, record no number.
+
+    Dropping the leg would leave the other one summing to something that looks like an answer,
+    and the trade would then be reported as unbalanced for the wrong reason — or, if the
+    remaining legs happened to cancel, not reported at all.
+    """
+    roster = [entry(1, 25, manager="m1")]  # nobody ESPN has a base for player 2
+    overrides = [override(1, 20, trade_id="T1"), override(2, 35, trade_id="T1")]
+    trades = [trade("T1", amount=5, payer="m1", payee="m2")]
+    issues = check_cash_trades(roster, overrides, trades)
+    assert codes(issues) == {IssueCode.CASH_TRADE_UNCHECKABLE}
+    assert not any(i.code is IssueCode.CASH_TRADE_UNBALANCED for i in issues)
+
+
+def test_a_leg_on_a_third_team_is_reported():
+    """A cash trade is only ever expressed on the two teams that agreed it."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m3")]
+    overrides = [override(1, 20, trade_id="T1"), override(2, 35, trade_id="T1")]
+    trades = [trade("T1", amount=5, payer="m1", payee="m2")]
+    assert IssueCode.CASH_TRADE_STRANGER_LEG in codes(
+        check_cash_trades(roster, overrides, trades)
+    )
+
+
+def test_a_live_override_on_no_trade_is_reported():
+    roster = [entry(1, 25, manager="m1")]
+    issues = check_cash_trades(roster, [override(1, 20)], [])
+    assert codes(issues) == {IssueCode.OVERRIDE_NOT_ON_A_TRADE}
+
+
+def test_a_dangling_trade_id_is_reported():
+    """Otherwise the leg falls out of BOTH audits: the per-trade check has no trade to
+    balance it against, and the league-wide one skips anything carrying a trade_id."""
+    roster = [entry(1, 25, manager="m1")]
+    issues = check_cash_trades(roster, [override(1, 20, trade_id="nope")], [])
+    assert codes(issues) == {IssueCode.OVERRIDE_NOT_ON_A_TRADE}
+    assert "not on file" in issues[0].message
+
+
+@pytest.mark.parametrize("kwargs", [{"reverted": True}, {"unpaired_ok": True}])
+def test_a_settled_or_orphaned_override_is_not_chased_for_a_trade(kwargs):
+    """Reverted means ESPN wins again; unpaired_ok means the counterparty is unrecoverable.
+    Neither can ever be attached to a trade, so neither should be asked for one."""
+    roster = [entry(1, 25, manager="m1")]
+    assert check_cash_trades(roster, [override(1, 20, **kwargs)], []) == []
+
+
+def test_the_league_wide_check_leaves_trade_linked_legs_alone():
+    """The per-trade audit is strictly more precise, and reporting a leg twice would make the
+    league-wide message a duplicate that moves whenever an unrelated trade changes.
+
+    Deliberately an **unbalanced** leg. A balanced pair nets to zero whether it is excluded or
+    not, so it would pass with the exclusion gone and prove nothing about it.
+    """
+    roster = [entry(1, 25, manager="m1")]
+    linked = [override(1, 20, trade_id="T1")]  # -$5 on its own: never nets to zero
+    assert check_override_balance(roster, linked) == []
+    # ...and the identical leg still reports when it is attached to nothing.
+    assert codes(check_override_balance(roster, [override(1, 20)])) == {
+        IssueCode.OVERRIDES_UNBALANCED
+    }
+
+
+def test_every_cash_trade_issue_is_review_and_never_blocks():
+    """The six historical rows that predate trades.json are legitimately unlinked. A fresh
+    ERROR would turn the existing record red for a rule it was recorded before."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m3")]
+    overrides = [override(1, 20, trade_id="T1"), override(2, 35, trade_id="T1"),
+                 override(3, 99)]
+    trades = [trade("T1", amount=5, payer="m1", payee="m2"), trade("T2", payer="m1")]
+    issues = check_cash_trades(roster, overrides, trades)
+    assert issues, "this case is meant to produce findings"
+    assert {i.severity for i in issues} == {Severity.REVIEW}
+
+
+def test_a_leg_filed_under_a_different_draft_is_reported():
+    """A trade is expressed at the auction it spends its money at.
+
+    So a 2026 trade cannot be expressed by distorting a 2025 keeper price, and the mismatch is
+    a real finding rather than something to quietly balance anyway. This is what a trade whose
+    draft year was edited after its legs were attached looks like.
+    """
+    roster = [entry(1, 25, manager="m1", season=SEASON), entry(2, 30, manager="m2", season=SEASON)]
+    overrides = [override(1, 20, trade_id="T1", season=SEASON),
+                 override(2, 35, trade_id="T1", season=SEASON)]
+    wrong = [trade("T1", amount=5, payer="m1", payee="m2", draft_year=SEASON - 1)]
+    issues = check_cash_trades(roster, overrides, wrong)
+    assert IssueCode.CASH_TRADE_LEG_WRONG_DRAFT in codes(issues)
+    assert not any(i.code is IssueCode.CASH_TRADE_UNBALANCED for i in issues), (
+        "a mismatched draft is not a balance problem — reporting it as one would send "
+        "somebody hunting for a missing leg that is not missing"
+    )
+
+
+# ------------------------------------------------------- netted trades (shared salary edits)
+#
+# One salary edit routinely expresses more than one trade. The unit of audit is therefore a
+# franchise's NET across the trades that share edits — see check_cash_trades. A trade netted
+# with nothing is a group of one, which is every case above.
+
+
+def test_two_trades_between_the_same_pair_settle_with_one_pair_of_edits():
+    """m1 owes m2 $1 and $2. That is one $3 edit each way, not four scattered ones."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m2")]
+    both = ("A", "B")
+    overrides = [override(1, 22, trade_ids=both), override(2, 33, trade_ids=both)]
+    trades = [trade("A", amount=1, payer="m1", payee="m2"),
+              trade("B", amount=2, payer="m1", payee="m2")]
+    assert check_cash_trades(roster, overrides, trades) == []
+
+
+def test_a_middle_team_that_nets_to_zero_needs_no_edit_at_all():
+    """m1 pays m2 $5 and m2 pays m3 $5, so m2 is skipped entirely.
+
+    Per-trade balancing calls this two broken trades. Per-franchise nets call it what it is.
+    """
+    roster = [entry(1, 25, manager="m1"), entry(3, 30, manager="m3")]
+    both = ("A", "B")
+    overrides = [override(1, 20, trade_ids=both), override(3, 35, trade_ids=both)]
+    trades = [trade("A", amount=5, payer="m1", payee="m2"),
+              trade("B", amount=5, payer="m2", payee="m3")]
+    assert check_cash_trades(roster, overrides, trades) == []
+
+
+def test_a_netted_group_that_is_short_names_the_franchise_and_the_gap():
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m2")]
+    both = ("A", "B")
+    overrides = [override(1, 23, trade_ids=both), override(2, 32, trade_ids=both)]  # $2, not $3
+    trades = [trade("A", amount=1, payer="m1", payee="m2"),
+              trade("B", amount=2, payer="m1", payee="m2")]
+    issues = check_cash_trades(roster, overrides, trades)
+    assert codes(issues) == {IssueCode.CASH_TRADE_UNBALANCED}
+    assert "m1" in issues[0].message and "m2" in issues[0].message
+    assert "A + B" in issues[0].message, "the finding names the group, not one arbitrary trade"
+
+
+def test_netting_does_not_excuse_a_group_from_balancing():
+    """The looser unit of audit must not become no audit. Same two trades, one leg missing."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m2")]
+    overrides = [override(1, 22, trade_ids=("A", "B"))]
+    trades = [trade("A", amount=1, payer="m1", payee="m2"),
+              trade("B", amount=2, payer="m1", payee="m2")]
+    assert IssueCode.CASH_TRADE_UNBALANCED in codes(check_cash_trades(roster, overrides, trades))
+
+
+def test_an_unrelated_trade_is_not_dragged_into_someone_else_s_group():
+    """Groups form through SHARED EDITS, not through shared franchises. A separate trade with
+    its own legs is audited on its own, or one bad trade would redden every other."""
+    roster = [entry(1, 25, manager="m1"), entry(2, 30, manager="m2"),
+              entry(3, 10, manager="m1"), entry(4, 10, manager="m2")]
+    overrides = [override(1, 20, trade_ids=("A",)), override(2, 35, trade_ids=("A",)),
+                 override(3, 99, trade_ids=("B",))]
+    trades = [trade("A", amount=5, payer="m1", payee="m2"),
+              trade("B", amount=5, payer="m1", payee="m2")]
+    issues = check_cash_trades(roster, overrides, trades)
+    assert {i.trade_id for i in issues} == {"B"}, "A balances on its own and stays quiet"

@@ -503,6 +503,12 @@ class SyncedSeason:
     players: tuple[Player, ...]
     roster: tuple[RosterEntry, ...]
     trade_deadline: datetime | None
+    draft_date: datetime | None
+    """When the auction is scheduled. ESPN's ``draftSettings.date`` — display-only, read fresh
+    off the league every sync so the home page can never show a stale hand-typed guess."""
+    keeper_deadline: datetime | None
+    """ESPN's ``draftSettings.keeperDeadlineDate``. Gates the admin console the same way
+    ``trade_deadline`` gates the prospect check — never hand-entered, never overridden."""
     warnings: tuple[str, ...] = ()
     waiver_bases_verified: int = 0
     """Waiver adds whose base was confirmed against the FAAB actually bid."""
@@ -567,6 +573,9 @@ def build_season(
     prospects = frozenset(prior_prospect_ids or ())
     prior_keepers = frozenset(prior_keeper_ids) - prospects
     deadline = _epoch_ms((settings.get("tradeSettings") or {}).get("deadlineDate"))
+    draft_settings = settings.get("draftSettings") or {}
+    draft_date = _epoch_ms(draft_settings.get("date"))
+    keeper_deadline = _epoch_ms(draft_settings.get("keeperDeadlineDate"))
 
     franchises: list[FranchiseName] = []
     players: dict[int, Player] = {}
@@ -696,6 +705,8 @@ def build_season(
         players=tuple(sorted(players.values(), key=lambda p: p.espn_player_id)),
         roster=tuple(sorted(roster, key=lambda r: (r.manager_id, r.espn_player_id))),
         trade_deadline=deadline,
+        draft_date=draft_date,
+        keeper_deadline=keeper_deadline,
         warnings=tuple(warnings),
         waiver_bases_verified=verified_waivers,
         waiver_base_mismatches=tuple(sorted(mismatched_waivers)),

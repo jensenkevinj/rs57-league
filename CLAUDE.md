@@ -86,6 +86,20 @@ and **from 2026 on the admin tool is the record** and its rows are copied across
   NOT "won the last ladder game" (2025 would name three) and NOT "went undefeated" (2024's
   ladder had four teams at 2-1). Confirmed against 2023/2024/2025; 2024 returns
   `Bijan's Mustard`, which is the `*` in the 2025 fee allocations.
+  - This is the algorithm, not the trigger. The waiver only fires once the **prior** season's
+    `Season.consolation_winner_id` is recorded in `data/manual/seasons.json` — a derived guess
+    must never quietly waive a real team's fees. Unrecorded, `fees_waived_for()` prices that
+    year's keepers with fees ON and reports the waiver unconfirmed rather than applying it.
+- Keeper deadline: the admin console refuses to save keeper claims before the deadline passes,
+  and nothing ever re-locks afterward (commissioner, 2026-08-04). **The deadline and the draft
+  date are ESPN facts, not admin fields** (commissioner, 2026-08-26) — `DerivedSeason.keeper_deadline`
+  and `.draft_date` come straight from `draftSettings.keeperDeadlineDate` / `.date`, synced into
+  `data/derived/{year}.json` by the nightly Action the same way `trade_deadline` already was.
+  `Season.keeper_deadline` and `Season.draft_date` no longer exist and there is no admin UI to
+  set either one: a hand-typed copy is a second record of a number ESPN already holds, and the
+  two had already drifted apart once. An unrecorded deadline (ESPN hasn't set one, or the season
+  hasn't synced) leaves the console open rather than locked — a missing fact is not the same as a
+  future one, and collapsing them would freeze a freshly synced season with no way out on screen.
 - Prospects: **must be a rookie**, rostered before the trade deadline, kept at
   acquisition value, no fee allocation. **Prospects may be started** — the old
   "never started by any league team" rule is retired, as is the allowance for
@@ -152,10 +166,60 @@ Un-reverted overrides should net to zero league-wide (`check_override_balance`),
 trade moves money between two teams. One historical row has an unrecoverable counterparty and
 is flagged `unpaired_ok`.
 
-**Three real ones are still unrecorded** — the workbook's `Manually Changed Salaries` rows
-(Saquon Barkley, Jaxon Smith-Njigba, Jonathan Taylor, all season 2025, all still un-reverted).
-They exist nowhere in `data/`, so the ratchet audit reports them every run. Entering them
-through the admin tool clears them. Open items live in `docs/open-reconciliations.md`.
+#### The trade is recorded, not just its legs
+
+An override is one **leg**. `CashTrade` in `data/manual/trades.json` is the trade itself — two
+franchises, an amount, a direction, keyed by **draft year** — and a leg names it through
+`SalaryOverride.trade_ids`. A leg carrying any `trade_ids` is excluded from
+`check_override_balance` so it is not reported twice.
+
+**A leg can belong to several trades, and that is the normal case.** One salary edit routinely
+expresses more than one deal: a franchise owing $1 from one and $2 from another gets a single
+$3 edit, and a franchise that both pays and receives $5 gets no edit at all. `trade_ids` is
+plural for that reason.
+
+**What netting costs, stated plainly:** per-trade balancing is then impossible *in principle* —
+nothing records which dollar belonged to which deal, and splitting one would be recording a
+number nobody decided. So the unit of audit is **a franchise's net across the trades that share
+edits**:
+
+    expected[manager] = Σ over the group's trades (−amount to payer, +amount to payee)
+    actual[manager]   = Σ of that manager's live legs' (actual_salary − espn_base)
+
+Trades group by *shared edits*, not by shared franchises — otherwise one bad trade would redden
+every other between the same pair. A trade netted with nothing is a group of one, and then
+`expected` is `{payer: −amount, payee: +amount}`: exactly the two-sided check this replaced.
+Nothing got weaker for the simple case.
+
+**The sign convention is the thing to get right.** `amount` moves FROM `from_manager_id` TO
+`to_manager_id`. The receiving team is the one ESPN **under**-charges — its player's salary is
+edited *below* the true figure, which frees that much auction budget — so the receiving leg's
+`actual_salary - espn_base` is **positive** and the paying leg's is negative.
+
+Settled against the record: the 2025 workbook's Jonathan Taylor (ESPN $33, true $32, so `-1`,
+Bijan's Mustard) and Jaxon Smith-Njigba (ESPN $18, true $19, so `+1`, Jaxian McJigberson) are
+one $1 trade and cancel exactly. Saquon Barkley's `+3` is the orphan.
+
+Summed **per franchise, never league-wide**. A league-wide net of zero is also what two legs on
+one team give, and that moves no budget at all.
+
+`trade_ids` may be empty and every finding is REVIEW, deliberately: the rows predating this file
+are legitimately unlinked, and an ERROR would turn the existing record red for a rule it was
+recorded before. A trade whose legs are all reverted is **finished, not broken** — that is the
+intended end state and it reports nothing.
+
+The workbook's three `Manually Changed Salaries` rows (Saquon Barkley, Jaxon Smith-Njigba,
+Jonathan Taylor, all 2025) **have since been entered** and are the whole of `overrides.json`.
+A duplicate set was briefly recorded against 2026 as well, on the theory that ESPN carried the
+distortion forward; every one of those had `actual_salary` equal to ESPN's own 2026 base, so
+they asserted nothing and were deleted (commissioner, 2026-08-10).
+
+**One thing about them is unresolved.** All six rows are stored `reverted: true`, but the
+workbook says `changed back? FALSE`. If ESPN was never actually put back, `reverted: true` is
+wrong in the costly direction: it drops them from `check_override_balance`, from
+`check_cash_trades`, and from `effective_base_salary`, so a live distortion would ratchet
+forward every season while reading as settled. Confirm against ESPN before trusting the flag.
+Open items live in `docs/open-reconciliations.md`.
 
 ## Prize rules
 
@@ -192,6 +256,16 @@ absent — its $9.29 weekly prize is not an integer dollar and widening `Payout.
 float would put floats into every salary in the league. 2019-2022 predate the `RS57` sheet
 entirely and have no source. Those seasons derive stats and award nothing, which `validate`
 reports as REVIEW rather than passing over.
+
+**Whether a prize was actually paid is a separate fact from what it pays.** `Payout.paid` is
+derived — `stats.award_prizes` computes it and the nightly Action rewrites it every run, so a
+flag set there vanishes on the next sync. `data/manual/payments.json` (the `Payment` model) is
+the human record of a handoff that really happened, joined to the derived payout on
+`(season, label, winner_manager_id)` — all three, because a tie splits one label across two
+winners and `(season, label)` alone would mark both halves paid when only one had been. No
+amount field there (that stays in `payouts.json`, `stats`'s to compute — two copies of a number
+are two numbers) and no payment method, handle, or note: this file is committed to a public
+repo.
 
 ## Conventions
 - Key franchises on espn_team_id. Display names change yearly and are unreliable

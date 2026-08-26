@@ -19,3 +19,7 @@ __pycache__/
 
 # macOS
 .DS_Store
+
+# Claude Code's own local, per-machine config (permission allowlist, absolute paths).
+# .claude/launch.json is shared dev-server config and stays committed.
+.claude/settings.local.json

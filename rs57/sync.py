@@ -89,6 +89,10 @@ def season_document(season: SyncedSeason) -> dict[str, Any]:
             "trade_deadline": (
                 season.trade_deadline.isoformat() if season.trade_deadline else None
             ),
+            "draft_date": season.draft_date.isoformat() if season.draft_date else None,
+            "keeper_deadline": (
+                season.keeper_deadline.isoformat() if season.keeper_deadline else None
+            ),
         },
         "franchises": list(season.franchises),
         "players": list(season.players),

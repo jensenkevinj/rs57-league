@@ -25,10 +25,21 @@ is charged again every season after.
 ## What to check
 
 - **The three "already known" rows** are the workbook's `Manually Changed Salaries` entries
-  (Saquon Barkley, Jaxon Smith-Njigba, Jonathan Taylor — all 2025, all still `changed back? FALSE`).
-  They have never been recorded as `SalaryOverride` rows anywhere in `data/`, which is why they
-  appear here. Entering them in the admin tool's overrides screen clears all three and leaves only
-  the genuinely unexplained ones.
+  (Saquon Barkley, Jaxon Smith-Njigba, Jonathan Taylor — all 2025, all `changed back? FALSE`).
+  They **have since been entered**, for 2025 and again for 2026. This section used to say they
+  had never been recorded; that is out of date.
+
+  **What still needs checking is the `reverted` flag on them.** All six rows are stored
+  `reverted: true` while the workbook says they were never changed back. A reverted row is
+  excluded from `check_override_balance`, from `check_cash_trades` and from
+  `effective_base_salary` — so if ESPN was never actually put back, a live distortion is
+  ratcheting forward each season while every audit reads it as settled. Check ESPN, then either
+  clear the flag or note why the workbook is stale.
+
+- **Taylor and Smith-Njigba are one $1 draft-cash trade** and can now be recorded as such on the
+  admin tool's Draft cash tab: $1 from Bijan's Mustard (`t10`) to Jaxian McJigberson (`t3`).
+  Their legs cancel exactly (`-1` and `+1`), which is what identifies them as a pair. Barkley's
+  `+3` is the orphan and keeps `unpaired_ok`.
 - **The rest have no recorded explanation.** Likely unrecorded draft-cash trades — the league group
   chat is the place those were agreed.
 - **Michael Pittman Jr. appears twice**, in consecutive seasons. A mispricing that never got

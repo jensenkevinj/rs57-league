@@ -31,6 +31,12 @@ class DerivedSeason:
     drafted: bool
     base_salary_field: str
     trade_deadline: datetime | None
+    draft_date: datetime | None
+    """ESPN's own scheduled auction time (``draftSettings.date``). Display-only, and there is no
+    admin field to override it — the nightly sync is the only writer."""
+    keeper_deadline: datetime | None
+    """ESPN's own ``draftSettings.keeperDeadlineDate``. Not hand-entered anywhere in this tool —
+    ``keeper_gate`` reads it straight off this object."""
     franchises: tuple[FranchiseName, ...]
     players: tuple[Player, ...]
     roster: tuple[RosterEntry, ...]
@@ -108,11 +114,17 @@ class Derived:
         source = doc.get("source") or {}
         review = doc.get("review") or {}
         raw_deadline = source.get("trade_deadline")
+        raw_draft_date = source.get("draft_date")
+        raw_keeper_deadline = source.get("keeper_deadline")
         loaded = DerivedSeason(
             season=season,
             drafted=bool(source.get("drafted")),
             base_salary_field=str(source.get("base_salary_field") or "unknown"),
             trade_deadline=datetime.fromisoformat(raw_deadline) if raw_deadline else None,
+            draft_date=datetime.fromisoformat(raw_draft_date) if raw_draft_date else None,
+            keeper_deadline=(
+                datetime.fromisoformat(raw_keeper_deadline) if raw_keeper_deadline else None
+            ),
             franchises=tuple(FranchiseName(**row) for row in doc.get("franchises") or []),
             players=tuple(Player(**row) for row in doc.get("players") or []),
             roster=tuple(RosterEntry(**row) for row in doc.get("roster") or []),

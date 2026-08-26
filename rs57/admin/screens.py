@@ -26,7 +26,7 @@ renders as unverified.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -37,17 +37,23 @@ from rs57.keeper_rules import (
     MAX_KEEPERS,
     MAX_PROSPECTS,
     PROSPECT_RULES_TIGHTENED,
+    IssueCode,
     Severity,
     ValidationIssue,
+    check_cash_trades,
+    trade_groups,
     compute_team_keepers,
     effective_base_salary,
     fee_total_for,
     is_keeper_slot,
     keeper_salary,
 )
-from rs57.models import KeeperClaim, KeeperSlot, SalaryOverride
+from rs57.models import CashTrade, KeeperClaim, KeeperSlot, RosterEntry, SalaryOverride
 
 SLOT_CHOICES = (KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3, KeeperSlot.PROSPECT)
+
+DEFAULT_OVERRIDE_REASON = "Draft-cash trade"
+"""What an override is, every time. See ``override_form``."""
 
 SLOT_LABELS = {"K1": "K1", "K2": "K2", "K3": "K3", "PROSPECT": "P"}
 """Short labels for the card, which is narrow. Display only — the stored slot is unchanged."""
@@ -87,6 +93,10 @@ class OverrideRow:
     name: str
     espn_base: int | None
     manager: str | None
+    manager_id: str | None = None
+    """Who holds the player, as an id. ``manager`` is the display name and changes yearly —
+    one of them carries a double space — so anything deciding *which side of a trade this leg
+    is on* keys on this and never on the name."""
 
     @property
     def live(self) -> bool:
@@ -121,6 +131,162 @@ def override_row(override: SalaryOverride, season: DerivedSeason | None) -> Over
         name=player.name if player else f"player {override.espn_player_id}",
         espn_base=entry.base_salary if entry else None,
         manager=season.name_of(entry.manager_id) if season and entry else None,
+        manager_id=entry.manager_id if entry else None,
+    )
+
+
+@dataclass(frozen=True)
+class TradeLeg:
+    """One override, joined to the trade it is a leg of and the side of it that it sits on.
+
+    ``side`` is ``"to"``, ``"from"``, ``"stranger"`` (a player on neither party's roster) or
+    ``"unknown"`` (ESPN has no base, so which way the money moved cannot be worked out). The
+    last two exist so the screen can *show* the problem rather than dropping the row and
+    presenting a total that silently rests on fewer legs than the trade has.
+    """
+
+    row: OverrideRow
+    side: str
+
+    @property
+    def live(self) -> bool:
+        return self.row.live
+
+
+@dataclass(frozen=True)
+class TradeRow:
+    """One cash trade, its legs, and what those legs actually move.
+
+    ``received`` and ``paid`` are display figures — the sums the templates print. Whether the
+    trade is **acceptable** is not decided here: ``issues`` comes straight from
+    ``keeper_rules.check_cash_trades``, so there is exactly one implementation of the rule and
+    the screen cannot disagree with the validator. Both are ``None`` when any live leg's dollar
+    movement is unknown, because a total formed from a subset of the legs is not a total.
+    """
+
+    trade: CashTrade
+    legs: tuple[TradeLeg, ...]
+    from_name: str
+    to_name: str
+    received: int | None
+    paid: int | None
+    issues: tuple[ValidationIssue, ...] = ()
+    netted_with: tuple[str, ...] = ()
+    """Other trades sharing a salary edit with this one.
+
+    When this is non-empty the per-trade ``paid``/``received`` below are **not** meaningful and
+    are ``None``: the edits were netted, so no dollar in them belongs to one trade rather than
+    another. The verdict in ``issues`` is the group's, computed per franchise."""
+
+    @property
+    def netted(self) -> bool:
+        return bool(self.netted_with)
+
+    @property
+    def live_legs(self) -> tuple[TradeLeg, ...]:
+        return tuple(leg for leg in self.legs if leg.live)
+
+    @property
+    def settled(self) -> bool:
+        """Both sides put back in ESPN. The intended end state, not a problem."""
+        return bool(self.legs) and not self.live_legs
+
+    @property
+    def balanced(self) -> bool:
+        """Nothing to report — which for a settled trade is true without any sums at all."""
+        return not self.issues
+
+
+def trade_rows(
+    trades: list[CashTrade],
+    overrides: list[SalaryOverride],
+    seasons: Mapping[int, DerivedSeason | None],
+    roster: Sequence[RosterEntry],
+) -> list[TradeRow]:
+    """Join trades to their legs for the ledger.
+
+    ``roster`` is every shown season's roster at once, which lets the engine be called a single
+    time for the whole page. A leg is matched on ``(player, season)``, so one combined roster
+    cannot confuse two seasons of the same player.
+
+    The **verdict** is the engine's — ``issues`` is grouped straight off
+    ``ValidationIssue.trade_id``. What is computed here is only what the table prints, and it
+    is computed the same way the engine computes it: per side, keyed on ``manager_id``.
+    """
+    issues = check_cash_trades(roster, overrides, trades)
+    group_of = {
+        trade.id: tuple(t.id for t in group)
+        for group in trade_groups(trades, overrides=overrides)
+        for trade in group
+    }
+    by_trade: dict[str, list[SalaryOverride]] = {}
+    for override in overrides:
+        for trade_id in override.trade_ids:
+            by_trade.setdefault(trade_id, []).append(override)
+
+    rows: list[TradeRow] = []
+    for trade in sorted(trades, key=lambda t: (t.draft_year, t.id), reverse=True):
+        season = seasons.get(trade.draft_year)
+        sides = {trade.from_manager_id: 0, trade.to_manager_id: 0}
+        legs: list[TradeLeg] = []
+        unknown = False
+        for override in sorted(by_trade.get(trade.id, []), key=lambda o: o.espn_player_id):
+            row = override_row(override, season)
+            if row.delta is None or row.manager_id is None:
+                side = "unknown"
+            elif row.manager_id == trade.to_manager_id:
+                side = "to"
+            elif row.manager_id == trade.from_manager_id:
+                side = "from"
+            else:
+                side = "stranger"
+            legs.append(TradeLeg(row=row, side=side))
+            if not row.live:
+                continue
+            # Only live legs move money — a reverted one has already been put back in ESPN.
+            if side in ("unknown", "stranger"):
+                unknown = True
+            else:
+                sides[row.manager_id] += row.delta
+
+        siblings = tuple(t for t in group_of.get(trade.id, ()) if t != trade.id)
+        rows.append(
+            TradeRow(
+                netted_with=siblings,
+                trade=trade,
+                legs=tuple(legs),
+                from_name=season.name_of(trade.from_manager_id)
+                if season
+                else trade.from_manager_id,
+                to_name=season.name_of(trade.to_manager_id)
+                if season
+                else trade.to_manager_id,
+                # Netted edits carry no per-trade split, so no per-trade figure is shown.
+                received=None if unknown or siblings else sides[trade.to_manager_id],
+                paid=None if unknown or siblings else sides[trade.from_manager_id],
+                issues=tuple(
+                    issue
+                    for issue in issues
+                    if issue.trade_id in {trade.id, *group_of.get(trade.id, ())}
+                ),
+            )
+        )
+    return rows
+
+
+def unlinked_override_issues(
+    overrides: list[SalaryOverride], trades: list[CashTrade], roster: Sequence[RosterEntry]
+) -> tuple[ValidationIssue, ...]:
+    """Live legs attached to no trade at all — the ones no ``TradeRow`` can show.
+
+    Split out because they belong under the table rather than in it: they are exactly the rows
+    the per-trade audit **cannot** reach, and leaving them off the screen would make a ledger
+    of balanced trades look like a complete account of the season's cash.
+    """
+    return tuple(
+        issue
+        for issue in check_cash_trades(roster, overrides, trades)
+        if issue.code is IssueCode.OVERRIDE_NOT_ON_A_TRADE
     )
 
 
@@ -129,11 +295,12 @@ class KeeperGate:
     """Whether claims may be edited right now, and why.
 
     **Three states, not two.** ``deadline`` is ``None`` for two entirely different reasons —
-    nobody has recorded one yet, or... no, only one reason, and that is the point. A future
-    deadline and an unrecorded deadline both used to collapse into ``deadline_passed = False``,
-    so gating on that single flag would freeze a freshly synced season solid, with nothing on
-    screen saying why and the way out — the settings page — not obviously connected. The
-    deadline is recorded in this same tool; a missing one cannot be the thing that locks it.
+    ESPN has not set one yet, or that season has not synced. A future deadline and an unrecorded
+    deadline both used to collapse into ``deadline_passed = False``, so gating on that single
+    flag would freeze a freshly synced season solid, with nothing on screen saying why. The
+    deadline comes from ESPN's own ``draftSettings.keeperDeadlineDate``, read off the derived
+    season the nightly sync already wrote (commissioner, 2026-08-26) — nowhere in this tool can
+    set or override it, so a missing one cannot be the thing that locks the console.
 
     ``state`` is ``"locked"``, ``"open"`` or ``"unrecorded"``. Only ``"locked"`` refuses a write.
 
@@ -161,9 +328,9 @@ class KeeperGate:
             )
         if self.state == "unrecorded":
             return (
-                "No keeper deadline is recorded for this season, so nothing is locked. "
-                "ESPN keeps one in draftSettings.keeperDeadlineDate — record it in season "
-                "settings and the console will hold claims until it passes."
+                "ESPN has no keeper deadline set for this season yet "
+                "(draftSettings.keeperDeadlineDate), so nothing is locked. It will start "
+                "holding claims automatically once ESPN sets one and the season re-syncs."
             )
         return (
             f"The keeper deadline ({self.deadline:%Y-%m-%d %H:%M}) has passed. The console is "
@@ -171,10 +338,9 @@ class KeeperGate:
         )
 
 
-def keeper_gate(season: int, store: ManualStore, *, now: datetime) -> KeeperGate:
-    """Read the gate off the recorded deadline. The one place the three states are decided."""
-    settings = store.season(season)
-    deadline = settings.keeper_deadline if settings else None
+def keeper_gate(current: DerivedSeason, *, now: datetime) -> KeeperGate:
+    """Read the gate off ESPN's own deadline. The one place the three states are decided."""
+    deadline = current.keeper_deadline
     if deadline is None:
         return KeeperGate(deadline=None, state="unrecorded")
     return KeeperGate(deadline=deadline, state="open" if deadline < now else "locked")
@@ -680,7 +846,7 @@ def build_season_screen(
     disagreeing about whether a rule ran is worse than either answer.
     """
     waived_manager, waiver_recorded = store.fees_waived_for(season)
-    gate = keeper_gate(season, store, now=now)
+    gate = keeper_gate(current, now=now)
 
     summaries = [
         build_team_screen(
@@ -885,9 +1051,15 @@ def _freeze_salaries(
 
 
 def override_form(
-    form: dict[str, str], *, now: datetime
+    form: dict[str, str], *, now: datetime, known_trades: set[str] | None = None
 ) -> tuple[SalaryOverride | None, list[str]]:
     """Build a ``SalaryOverride`` from the posted form.
+
+    ``known_trades`` is the set of trade ids on file. When given, a ``trade_id`` naming a trade
+    that does not exist is refused rather than stored — a dangling reference would leave the
+    leg out of both audits at once, since the per-trade check has no trade to balance it
+    against and the league-wide one skips anything carrying a ``trade_id``. Defaults to ``None``
+    (no check) so the form stays usable without a store to hand.
 
     ``reason`` is required and free text. It is the injection path — typed here, stored in
     ``data/manual/``, committed to a public repo and rendered on a public site — so it is
@@ -912,9 +1084,15 @@ def override_form(
         actual = -1
     if actual < 0:
         problems.append("actual salary cannot be negative")
-    reason = (form.get("reason") or "").strip()
-    if not reason:
-        problems.append("a reason is required — an override with no reason is unauditable")
+    # Defaulted, not demanded. It is a draft-cash trade every single time, so requiring the
+    # commissioner to retype that on every row bought nothing; the rows already on file carry
+    # real provenance and keep it. The field stays stored and stays escaped at render.
+    reason = (form.get("reason") or "").strip() or DEFAULT_OVERRIDE_REASON
+    named = tuple(t for t in form.get("trade_ids", "").split(",") if t.strip())
+    if known_trades is not None:
+        for trade_id in named:
+            if trade_id not in known_trades:
+                problems.append(f"no trade {trade_id} on file — record the trade before its legs")
 
     if problems:
         return None, problems
@@ -927,6 +1105,105 @@ def override_form(
             created_at=now,
             reverted=False,
             unpaired_ok=bool(form.get("unpaired_ok")),
+            trade_ids=tuple(t for t in form.get("trade_ids", "").split(",") if t.strip()),
+        ),
+        [],
+    )
+
+
+def new_trade_id(draft_year: int, from_manager_id: str, to_manager_id: str, taken: set[str]) -> str:
+    """A readable, stable id for a new trade: ``2026-t3-to-t10``, suffixed if that is taken.
+
+    Readable because it is what a leg carries in ``overrides.json`` and what an audit message
+    names — a UUID there would make the file unreadable in a diff, and the diff is the only
+    review step between this tool and a public repo. Uniqueness is checked league-wide rather
+    than per season, because a leg names a trade by id alone.
+    """
+    stem = f"{draft_year}-{from_manager_id}-to-{to_manager_id}"
+    if stem not in taken:
+        return stem
+    n = 2
+    while f"{stem}-{n}" in taken:
+        n += 1
+    return f"{stem}-{n}"
+
+
+def trade_form(
+    form: dict[str, str],
+    *,
+    now: datetime,
+    taken: set[str],
+    known_managers: Sequence[str] = (),
+    existing_id: str | None = None,
+) -> tuple[CashTrade | None, list[str]]:
+    """Build a ``CashTrade`` from the posted form.
+
+    ``existing_id`` turns this into the edit form: the id is kept rather than minted, so a
+    trade keeps the identity its legs already name even when its draft year or its two parties
+    change. Every other rule below applies identically — an edit that made a trade illegal
+    would otherwise slip past the checks the original had to satisfy.
+
+    The direction is not a detail to be inferred later: ``from`` pays and ``to`` receives, and
+    the audit reads the sign of every leg off that. So both are required, they must differ, and
+    both must be franchises that actually exist in the draft being recorded — a typo in a
+    manager id would otherwise produce a trade whose legs all read as belonging to strangers.
+
+    ``amount`` must be positive. A $0 cash trade balances trivially and records nothing that
+    happened, which would put a row on file that no audit could ever fail.
+
+    ``agreed_at`` is **when the trade happened**, not when it was typed in. Those are routinely
+    months apart — the 2025 legs are being reconstructed from a workbook in 2026 — so it is a
+    field rather than a clock read, and it falls back to ``now`` only when left blank.
+
+    ``note`` is free text and, like ``SalaryOverride.reason``, is stored exactly as typed and
+    escaped at render time — never sanitised on the way in.
+    """
+    problems: list[str] = []
+    try:
+        draft_year = int((form.get("draft_year") or "").strip())
+    except ValueError:
+        problems.append("draft year must be a year")
+        draft_year = 0
+    try:
+        amount = int((form.get("amount") or "").strip())
+    except ValueError:
+        problems.append("amount must be a whole number of dollars")
+        amount = 0
+    if amount <= 0:
+        problems.append("amount must be more than $0 — a $0 cash trade records nothing")
+
+    agreed = now
+    raw_date = (form.get("agreed_at") or "").strip()
+    if raw_date:
+        try:
+            agreed = datetime.fromisoformat(raw_date)
+        except ValueError:
+            problems.append(f"{raw_date} is not a date — use YYYY-MM-DD")
+
+    payer = (form.get("from_manager_id") or "").strip()
+    payee = (form.get("to_manager_id") or "").strip()
+    if not payer or not payee:
+        problems.append("a cash trade needs both a paying and a receiving franchise")
+    elif payer == payee:
+        problems.append("a cash trade moves money between two teams, not from a team to itself")
+    if known_managers:
+        for role, manager_id in (("paying", payer), ("receiving", payee)):
+            if manager_id and manager_id not in known_managers:
+                problems.append(
+                    f"{manager_id} is not a franchise in {draft_year} ({role} side)"
+                )
+
+    if problems:
+        return None, problems
+    return (
+        CashTrade(
+            id=existing_id or new_trade_id(draft_year, payer, payee, taken),
+            draft_year=draft_year,
+            from_manager_id=payer,
+            to_manager_id=payee,
+            amount=amount,
+            agreed_at=agreed,
+            note=(form.get("note") or "").strip(),
         ),
         [],
     )

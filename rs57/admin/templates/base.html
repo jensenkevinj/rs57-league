@@ -109,7 +109,9 @@
   .tag-inline.bad { color: var(--bad); background: var(--bad-bg); border-color: var(--bad-line); }
   .tag-inline.ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
   .tag-inline.flat { color: var(--muted); background: var(--bg); border-color: var(--line); }
-  input[type="number"], input[type="text"], select, textarea {
+  /* `date` belongs here with the rest: left out, it renders at the browser's own default font
+     and padding and sits visibly shorter than every control beside it. */
+  input[type="number"], input[type="text"], input[type="date"], select, textarea {
     font: inherit; font-size: 0.92rem; padding: 0.25rem 0.4rem; border: 1px solid var(--line);
     border-radius: 5px; background: var(--bg); color: var(--ink); max-width: 100%;
   }
@@ -123,7 +125,6 @@
     color: #fff; cursor: pointer;
   }
   button.quiet { background: var(--bg); color: var(--accent); border-color: var(--line); }
-  button.danger { background: var(--bg); color: var(--bad); border-color: var(--bad-line); }
   button:disabled { opacity: 0.5; cursor: not-allowed; }
   .row { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: flex-end; }
   .field { display: flex; flex-direction: column; gap: 0.25rem; }
@@ -151,6 +152,32 @@
   .htmx-request .spin { visibility: visible; }
   .spin { visibility: hidden; color: var(--muted); font-size: 0.85rem; }
   .row .field input, .row .field select, .row .field textarea { min-width: 16rem; }
+
+  /* The cash-trade form, which wants all four fields on one line. The 16rem min-width above
+     is what wraps them, so it is cleared here rather than relaxed globally — every other form
+     in the tool shares that rule and none of them wants narrower inputs. The two selects hold
+     a franchise name and its id ("Aiyukiddinme? I'm Odunze here (t7)"), which is what sets
+     their width; the two money/year fields need far less. */
+  .row.cash-fields { flex-wrap: nowrap; align-items: flex-end; }
+  /* One height for all five. Left to themselves a number input, a select and a date input
+     come out 33, 29 and 35 pixels tall, and bottom-aligning them staggers the labels above. */
+  .row.cash-fields .field input,
+  .row.cash-fields .field select { min-width: 0; height: 2.2rem; }
+  /* `select` as well as `input`: the draft year is a dropdown, and left unsized it collapses
+     to its content and stops matching the money field beside it. */
+  .row.cash-fields .field.narrow input,
+  .row.cash-fields .field.narrow select { width: 6.5rem; }
+  .row.cash-fields .field.date input { width: 9.5rem; text-align: left; }
+  /* The selects take 15.5rem when there is room and give it back when there is not, rather
+     than holding a fixed width and pushing the row into a horizontal scrollbar. `nowrap`
+     above means an overflow would not wrap — it would just hang off the edge. */
+  .row.cash-fields .field.team { flex: 0 1 15.5rem; min-width: 7rem; }
+  .row.cash-fields .field.team select { width: 100%; }
+  @media (max-width: 62rem) {
+    /* Below this the five would not fit. Wrapping beats shrinking the selects to a width
+       that cannot show a franchise name. */
+    .row.cash-fields { flex-wrap: wrap; }
+  }
 
   /* The keeper board: a card per franchise, four slots each, edited in place. */
   .team-grid {
@@ -204,12 +231,98 @@
   .board-actions .small { flex: 1 1 20rem; }
 
   /* Everything that belongs on the tab but is not what the tab is for. */
+  /* The cash-trade table: every row is live, and the last row is the insert form.
+
+     Replaced a card-per-trade layout, which nested each trade's legs in their own table — and
+     every one of those legs is already a row in the overrides table below, carrying the same
+     Player, Team, ESPN says, True and State columns. What that table cannot show is the
+     per-trade arithmetic, so that is all the Legs column here keeps.
+
+     Controls fill their cell: the generic `input[type=number] { width: 5.5rem }` and the
+     16rem min-width on `.row` fields are both page-form sizing and neither belongs in a grid,
+     where the column decides the width. */
+  table.trades { table-layout: fixed; }
+  /* Tighter than the page default: nine columns of controls, and the generic 0.65rem side
+     padding was eating enough width to clip the draft year and the Save button. */
+  table.trades td, table.trades th { padding: 0.45rem 0.35rem; }
+  table.trades td { vertical-align: top; }
+  table.trades select,
+  table.trades input[type="text"],
+  table.trades input[type="date"],
+  table.trades input[type="number"] {
+    width: 100%; min-width: 0; padding: 0.25rem 0.4rem;
+  }
+  table.trades input[type="number"] { text-align: right; }
+  /* The id is what `validate` names a trade by, so it has to be readable somewhere — under
+     the date, where it is available for correlating with the overrides table's "Leg of"
+     column without taking a column of its own. */
+  table.trades th { white-space: nowrap; }
+  table.trades .row-state { margin-top: 0.3rem; }
+  table.trades .row-id { margin-top: 0.2rem; font-size: 0.78rem; }
+  table.trades .row-id code {
+    background: transparent; border: none; padding: 0; color: var(--muted);
+  }
+  table.trades tr.insert-row td { background: var(--panel); }
+  table.trades tr.insert-row:hover td { background: var(--panel); }
+
+  /* Row actions: compact, side by side, and quiet until you reach for them.
+
+     Per-row controls in a table are ghost buttons everywhere else for a reason — one filled
+     button per row is four filled buttons on four rows, and none of them is more important
+     than the data. Delete is not permanently red either; a destructive control that shouts
+     all the time is one nobody reads by the third row. It earns its colour on hover. */
+  .row-actions { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: flex-start; }
+  .row-actions button, .row-actions summary {
+    font: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.5rem;
+    border-radius: 5px; border: 1px solid transparent; background: transparent;
+    color: var(--accent); cursor: pointer; white-space: nowrap;
+  }
+  .row-actions button:hover { border-color: var(--line); background: var(--bg); }
+
+  /* Two steps to destroy something, without a modal: the summary IS the Delete button, and
+     opening it reveals the real one. No `confirm()` — a blocking dialog is not something a
+     localhost tool should reach for, and this keeps the whole page working without JS. */
+  details.confirm { display: inline-block; }
+  details.confirm > summary {
+    color: var(--muted); list-style: none; display: inline-flex; align-items: center;
+  }
+  details.confirm > summary::-webkit-details-marker { display: none; }
+  details.confirm > summary:hover { color: var(--bad); border-color: var(--bad-line); }
+  details.confirm[open] > summary { color: var(--muted); border-color: var(--line); }
+  details.confirm > summary .on-open { display: none; }
+  details.confirm[open] > summary .on-closed { display: none; }
+  details.confirm[open] > summary .on-open { display: inline; }
+  .confirm-body { margin-top: 0.3rem; }
+  .confirm-body button {
+    color: #fff; background: var(--bad); border-color: var(--bad);
+  }
+  .confirm-body button:hover { background: #7d1a0c; border-color: #7d1a0c; }
+
+  /* The overrides table's "Leg of" picker. Unbounded it sizes to the longest trade id, which
+     squeezes the free-text Reason column next to it into a narrow ribbon and triples the row
+     height. */
+  td .leg-of select { max-width: 9rem; }
+  /* Long free text in a table cell, kept to three lines with the whole of it on hover. */
+  .clamp {
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden; min-width: 10rem;
+  }
   details.fold { border-top: 1px solid var(--line); padding: 0.5rem 0; }
   details.fold > summary {
     cursor: pointer; font-weight: 600; font-size: 1rem; padding: 0.35rem 0;
     display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    list-style: none;
   }
+  /* `display: flex` on a summary drops the native disclosure triangle, which left these
+     reading as plain bold headings that happen to be clickable. The marker is put back by
+     hand — and it has to be, on both the standards and the WebKit pseudo-element. */
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before {
+    content: "▸"; color: var(--muted); font-size: 0.8em; line-height: 1;
+  }
+  details.fold[open] > summary::before { content: "▾"; }
   details.fold > summary:hover { color: var(--accent); }
+  details.fold > summary:hover::before { color: var(--accent); }
   .fold-body { padding: 0.2rem 0 1rem; }
   footer { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 0.9rem; }
 </style>
@@ -230,7 +343,7 @@
         <a href="{{ url_for('payouts', year=prior_season) }}"
            class="{% if page == 'payouts' %}on{% endif %}">Payouts</a>
       {% endif %}
-      <a href="{{ url_for('overrides') }}" class="{% if page == 'overrides' %}on{% endif %}">Overrides</a>
+      <a href="{{ url_for('trades') }}" class="{% if page == 'trades' %}on{% endif %}">Draft cash</a>
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">Commit</a>
     </nav>
   </div>

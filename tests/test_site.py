@@ -691,6 +691,10 @@ def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, 
     ``derived`` carries SEASON undrafted, which is today's actual state — this is the case
     ``render()``'s default exists to paper over for every other test; this is the one test that
     turns it back off to look at the page it produces.
+
+    The draft date and keeper deadline come from SEASON's own derived file now (ESPN's
+    ``draftSettings``, commissioner 2026-08-26) — only the Doodle link is still in
+    ``data/manual/seasons.json``, since it has no ESPN equivalent.
     """
     manual = tmp_path / "manual"
     manual.mkdir()
@@ -700,8 +704,6 @@ def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, 
                 "seasons": {
                     str(SEASON): {
                         "year": SEASON,
-                        "keeper_deadline": "2026-08-30T21:00:00",
-                        "draft_date": "2026-08-31T19:00:00",
                         "draft_doodle_url": "https://doodle.com/rs57-2026",
                     }
                 }
@@ -709,6 +711,12 @@ def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, 
         ),
         encoding="utf-8",
     )
+    keeper_path = derived / f"{SEASON}.json"
+    doc = json.loads(keeper_path.read_text(encoding="utf-8"))
+    doc["source"]["keeper_deadline"] = "2026-08-30T21:00:00"
+    doc["source"]["draft_date"] = "2026-08-31T19:00:00"
+    keeper_path.write_text(json.dumps(doc), encoding="utf-8")
+
     out = tmp_path / "out"
     build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
     page = (out / "index.html").read_text(encoding="utf-8")

@@ -61,6 +61,9 @@ from rs57.admin.screens import (
     split_league_form,
     override_form,
     override_row,
+    trade_form,
+    trade_rows,
+    unlinked_override_issues,
 )
 from rs57.admin.store import DATA, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, MAX_PROSPECTS
@@ -124,6 +127,9 @@ def create_app(
             "slot_choices": SLOT_CHOICES,
             "seasons_available": derived.seasons(),
             "current_season": current,
+            # The override form appears on two pages and needs the trade list on both, so it
+            # is shared rather than passed by each route that happens to render the form.
+            "trade_choices": store.trades(),
         }
 
     def season_or_404(year: int):
@@ -166,7 +172,7 @@ def create_app(
             derived.load(year - 1),
             store,
             first_nfl_season=derived.first_nfl_seasons(),
-            gate=keeper_gate(year, store, now=now()),
+            gate=keeper_gate(current, now=now()),
         )
         return render_template("team.html", screen=screen, source=current)
 
@@ -190,7 +196,7 @@ def create_app(
             store,
             claims=claims,
             first_nfl_season=derived.first_nfl_seasons(),
-            gate=keeper_gate(year, store, now=now()),
+            gate=keeper_gate(current, now=now()),
         )
         return render_template(
             "_claim_form.html", screen=screen, source=current, problems=problems
@@ -206,7 +212,7 @@ def create_app(
         every save rather than read off the screen that was rendered.
         """
         current = season_or_404(year)
-        gate = keeper_gate(year, store, now=now())
+        gate = keeper_gate(current, now=now())
         if not gate.editable:
             screen = build_team_screen(
                 year,
@@ -271,7 +277,7 @@ def create_app(
         tab opened before the deadline still posts.
         """
         current = season_or_404(year)
-        gate = keeper_gate(year, store, now=now())
+        gate = keeper_gate(current, now=now())
         posted = split_league_form(request.form.to_dict())
         recorded: list[str] = []
         skipped: list[tuple[str, str]] = []
@@ -392,8 +398,6 @@ def create_app(
                 year=year,
                 season_start=when("season_start"),
                 trade_deadline=when("trade_deadline"),
-                keeper_deadline=when("keeper_deadline"),
-                draft_date=when("draft_date"),
                 draft_doodle_url=doodle_url,
                 consolation_winner_id=winner,
             )
@@ -457,21 +461,24 @@ def create_app(
 
     @app.get("/overrides")
     def overrides():
-        current_year = derived.current_season()
-        current = derived.load(current_year) if current_year else None
-        rows = [
-            override_row(override, derived.load(override.season))
-            for override in sorted(
-                store.overrides(), key=lambda o: (o.season, o.espn_player_id), reverse=True
-            )
-        ]
-        return render_template(
-            "overrides.html", rows=rows, year=current_year, source=current
-        )
+        """Kept as a permanent redirect target, not a page.
+
+        Overrides and trades merged onto one tab — an override *is* a leg of a trade, and
+        keeping them apart meant recording a trade on one screen and the legs that express it
+        on another. This endpoint stays because ``_back_to("overrides")`` and any bookmark
+        still name it.
+        """
+        return redirect(url_for("trades"))
 
     @app.post("/overrides")
     def add_override():
-        override, problems = override_form(request.form.to_dict(), now=now())
+        # `to_dict()` keeps only the first value of a multi-select, so the trade links are
+        # re-joined from `getlist` before the form sees them.
+        posted = request.form.to_dict()
+        posted["trade_ids"] = ",".join(request.form.getlist("trade_ids"))
+        override, problems = override_form(
+            posted, now=now(), known_trades=store.trade_ids()
+        )
         if override is None:
             for problem in problems:
                 flash(problem, "error")
@@ -513,6 +520,193 @@ def create_app(
             store.save_overrides(season, updated)
             flash("Marked reverted — ESPN's value wins again for that player.", "ok")
         return _back_to("overrides")
+
+    @app.post("/overrides/edit")
+    def edit_override():
+        """Amend a recorded override in place.
+
+        The row is identified by where it is now — draft, player and creation stamp — and the
+        stamp is carried onto the replacement rather than reissued, because that stamp is the
+        row's identity and is how a leg is told apart from a second override on the same player
+        in the same draft.
+
+        ``reverted`` is carried over too: it is flipped by its own button, and letting an edit
+        of the salary silently un-revert a row would hand ESPN's value back without anybody
+        saying so.
+        """
+        try:
+            orig_season = int(request.form.get("orig_season", ""))
+            orig_player = int(request.form.get("orig_espn_player_id", ""))
+            created = datetime.fromisoformat(request.form.get("created_at", ""))
+        except ValueError:
+            flash("could not identify which override to edit", "error")
+            return _back_to("trades")
+
+        current = next(
+            (
+                o
+                for o in store.overrides(orig_season)
+                if (o.espn_player_id, o.created_at) == (orig_player, created)
+            ),
+            None,
+        )
+        if current is None:
+            flash("no matching override", "error")
+            return _back_to("trades")
+
+        posted = request.form.to_dict()
+        posted["trade_ids"] = ",".join(request.form.getlist("trade_ids"))
+        posted.setdefault("reason", current.reason)
+        replacement, problems = override_form(
+            posted, now=created, known_trades=store.trade_ids()
+        )
+        if replacement is None:
+            for problem in problems:
+                flash(problem, "error")
+        elif store.update_override(
+            orig_season,
+            orig_player,
+            created,
+            replacement.model_copy(update={"reverted": current.reverted}),
+        ):
+            flash(f"Updated the override for player {replacement.espn_player_id}.", "ok")
+        else:
+            flash("no matching override", "error")
+        return _back_to("trades")
+
+    # -- cash trades ------------------------------------------------------------
+
+    @app.get("/trades")
+    def trades():
+        """The trade-level ledger: every cash trade, with its legs nested under it.
+
+        Every season at once and one engine call for all of them. ``check_cash_trades`` matches
+        a leg on ``(player, season)``, so handing it every shown season's roster at once cannot
+        make two seasons of one player collide.
+        """
+        all_trades = store.trades()
+        all_overrides = store.overrides()
+        years = {t.draft_year for t in all_trades} | {o.season for o in all_overrides}
+        seasons = {year: derived.load(year) for year in years}
+        roster = [
+            entry for season in seasons.values() if season for entry in season.roster
+        ]
+        current_year = derived.current_season()
+        current = derived.load(current_year) if current_year else None
+        return render_template(
+            "trades.html",
+            rows=trade_rows(all_trades, all_overrides, seasons, roster),
+            override_rows=[
+                override_row(override, derived.load(override.season))
+                for override in sorted(
+                    all_overrides, key=lambda o: (o.season, o.espn_player_id), reverse=True
+                )
+            ],
+            unlinked=unlinked_override_issues(all_overrides, all_trades, roster),
+            year=current_year,
+            source=current,
+            managers=[(mid, current.name_of(mid)) for mid in current.manager_ids]
+            if current
+            else [],
+        )
+
+    @app.post("/trades")
+    def add_trade():
+        current_year = derived.current_season()
+        current = derived.load(current_year) if current_year else None
+        trade, problems = trade_form(
+            request.form.to_dict(),
+            now=now(),
+            taken=store.trade_ids(),
+            known_managers=current.manager_ids if current else (),
+        )
+        if trade is None:
+            for problem in problems:
+                flash(problem, "error")
+            return _back_to("trades")
+        store.add_trade(trade)
+        flash(
+            f"Recorded ${trade.amount} from {trade.from_manager_id} to "
+            f"{trade.to_manager_id} at the {trade.draft_year} draft. It stays unbalanced until "
+            f"both legs are attached — the salary overrides that express it in ESPN.",
+            "ok",
+        )
+        return _back_to("trades")
+
+    @app.post("/trades/<trade_id>/delete")
+    def delete_trade(trade_id: str):
+        """Remove a trade entered in error.
+
+        Its legs are deliberately left alone. An override is a real ESPN edit that happened,
+        and deleting the trade it was filed under must not quietly erase the record of money
+        moving — the legs are reported as naming a trade that is not on file, which is a
+        finding somebody has to answer rather than a silence.
+        """
+        if store.delete_trade(trade_id):
+            orphaned = sum(1 for o in store.overrides() if trade_id in o.trade_ids)
+            flash(
+                f"Deleted {trade_id}."
+                + (
+                    f" {orphaned} override(s) still name it and now report as unattached — "
+                    f"re-attach or delete them too."
+                    if orphaned
+                    else ""
+                ),
+                "ok",
+            )
+        else:
+            flash(f"no trade {trade_id} on file", "error")
+        return _back_to("trades")
+
+    @app.post("/overrides/delete")
+    def delete_override():
+        """Remove an override entered in error.
+
+        Not the same as reverting. A reverted row stays on file because it explains why a base
+        moved and ``check_base_continuity`` sends people looking for it; this is for a row that
+        should never have been recorded at all.
+        """
+        try:
+            season = int(request.form.get("season", ""))
+            player_id = int(request.form.get("espn_player_id", ""))
+            created = datetime.fromisoformat(request.form.get("created_at", ""))
+        except ValueError:
+            flash("could not identify which override to delete", "error")
+            return _back_to("trades")
+        if store.delete_override(season, player_id, created):
+            flash(f"Deleted the {season} override for player {player_id}.", "ok")
+        else:
+            flash("no matching override", "error")
+        return _back_to("trades")
+
+    @app.post("/trades/<trade_id>/edit")
+    def edit_trade(trade_id: str):
+        """Amend a recorded trade in place, keeping its id.
+
+        The id is what every leg names, so it survives the edit even when the season or the two
+        parties change. Changing the parties can legitimately make an attached leg belong to
+        neither of them — that is reported rather than prevented, because the fix might be the
+        trade or might be the leg and only a human knows which.
+        """
+        if trade_id not in store.trade_ids():
+            abort(404, f"no trade {trade_id} on file")
+        current_year = derived.current_season()
+        current = derived.load(current_year) if current_year else None
+        trade, problems = trade_form(
+            request.form.to_dict(),
+            now=now(),
+            taken=store.trade_ids() - {trade_id},
+            known_managers=current.manager_ids if current else (),
+            existing_id=trade_id,
+        )
+        if trade is None:
+            for problem in problems:
+                flash(problem, "error")
+        elif store.update_trade(trade):
+            flash(f"Updated {trade.id}.", "ok")
+        else:
+            flash(f"no trade {trade_id} on file", "error")
+        return _back_to("trades")
 
     # -- payouts ----------------------------------------------------------------
 

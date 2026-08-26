@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 
 from rs57.admin import create_app
-from rs57.admin.derived import Derived
+from rs57.admin.derived import Derived, DerivedSeason
 from rs57.admin.gitops import Git, GitError
 from rs57 import admin
 from rs57.admin.reconcile import (
@@ -44,7 +44,7 @@ from rs57.admin.screens import (
 )
 from rs57.admin.store import CLAIMS, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, IssueCode, Severity, compute_team_keepers
-from rs57.models import KeeperClaim, KeeperSlot, SalaryOverride, Season
+from rs57.models import CashTrade, KeeperClaim, KeeperSlot, SalaryOverride, Season
 
 SEASON = 2026
 PRIOR = 2025
@@ -109,6 +109,16 @@ def keeper_doc(season: int = SEASON, **overrides):
     }
     doc.update(overrides)
     return doc
+
+
+def set_keeper_deadline(data_dir: Path, deadline: datetime | None, season: int = SEASON) -> None:
+    """Rewrite ``{season}.json``'s ``source.keeper_deadline`` — the way ``rs57.sync`` would,
+    since the gate now reads ESPN's own deadline off the derived file rather than a settings row.
+    """
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["source"]["keeper_deadline"] = deadline.isoformat() if deadline else None
+    path.write_text(json.dumps(doc), encoding="utf-8")
 
 
 @pytest.fixture
@@ -234,7 +244,7 @@ def test_derived_files_are_untouched_by_a_full_session(client, data_dir: Path):
         if path.is_file()
     }
     client.post(f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0)))
-    client.post(f"/season/{SEASON}/settings", data={"keeper_deadline": "2026-08-30 17:00"})
+    client.post(f"/season/{SEASON}/settings", data={"trade_deadline": "2026-12-02 17:00"})
     client.post("/overrides", data={"season": SEASON, "espn_player_id": PLAIN,
                                     "actual_salary": 45, "reason": "draft cash"})
     after = {
@@ -311,7 +321,9 @@ def test_an_override_reason_is_escaped_not_executed(client, store: ManualStore):
     # Rendered on BOTH pages now. A second render site is a second chance to get it wrong, and
     # this string ends up on a public site either way.
     for url in ("/overrides", f"/season/{SEASON}"):
-        page = client.get(url).get_data(as_text=True)
+        # /overrides redirects to the merged draft-cash tab; follow it and assert on the page
+        # that actually renders the reason.
+        page = client.get(url, follow_redirects=True).get_data(as_text=True)
         assert nasty not in page, f"{url} rendered the reason unescaped"
         assert "&lt;script&gt;" in page, f"{url} did not render the reason at all"
 
@@ -328,7 +340,7 @@ def test_a_franchise_name_is_escaped(client, data_dir: Path):
 def test_nothing_rendered_looks_like_a_person_or_an_email(client):
     for url in [f"/season/{SEASON}", f"/season/{SEASON}/team/t1", "/overrides",
                 f"/season/{SEASON}/settings"]:
-        page = client.get(url).get_data(as_text=True)
+        page = client.get(url, follow_redirects=True).get_data(as_text=True)
         assert not re.search(r"[\w.%+-]+@[\w.-]+\.\w{2,}", page), f"{url} holds an email"
         for forbidden in ("firstName", "lastName", "data/private"):
             assert forbidden not in page, f"{url} mentions {forbidden}"
@@ -766,41 +778,36 @@ def test_a_request_missing_a_field_does_not_blank_it(client, store: ManualStore)
     stray submit that happened not to carry the field."""
     client.post(
         f"/season/{PRIOR}/settings",
-        data={"consolation_winner_id": "t1", "keeper_deadline": "2025-08-30 21:00"},
+        data={"consolation_winner_id": "t1", "trade_deadline": "2025-08-30 21:00"},
     )
     assert store.season(PRIOR).consolation_winner_id == "t1"
 
     client.post(f"/season/{PRIOR}/settings", data={})
     recorded = store.season(PRIOR)
     assert recorded.consolation_winner_id == "t1", "an absent field must be left alone"
-    assert recorded.keeper_deadline == datetime(2025, 8, 30, 21, 0)
+    assert recorded.trade_deadline == datetime(2025, 8, 30, 21, 0)
 
     # Submitted-but-empty is a deliberate clear, and still works.
     client.post(f"/season/{PRIOR}/settings", data={"consolation_winner_id": ""})
     assert store.season(PRIOR).consolation_winner_id is None
 
 
-def test_draft_date_and_doodle_link_follow_the_same_omit_versus_blank_rule(
-    client, store: ManualStore
-):
-    """The two fields the pre-draft home page reads — same present/absent/blank rule as every
-    other setting here, checked separately because ``draft_doodle_url`` is a plain string, not
-    a date, and takes a different branch in ``save_settings``."""
+def test_the_doodle_link_follows_the_same_omit_versus_blank_rule(client, store: ManualStore):
+    """The one pre-draft home page field left in the admin tool — ``draft_date`` and
+    ``keeper_deadline`` used to be checked here too, but both are ESPN facts now and have no
+    settings field to post to at all."""
     client.post(
         f"/season/{SEASON}/settings",
-        data={
-            "draft_date": "2026-08-31 19:00",
-            "draft_doodle_url": "https://doodle.com/rs57-2026",
-        },
+        data={"draft_doodle_url": "https://doodle.com/rs57-2026"},
     )
     recorded = store.season(SEASON)
-    assert recorded.draft_date == datetime(2026, 8, 31, 19, 0)
     assert recorded.draft_doodle_url == "https://doodle.com/rs57-2026"
 
     client.post(f"/season/{SEASON}/settings", data={})
     recorded = store.season(SEASON)
-    assert recorded.draft_date == datetime(2026, 8, 31, 19, 0), "an absent field must be left alone"
-    assert recorded.draft_doodle_url == "https://doodle.com/rs57-2026"
+    assert recorded.draft_doodle_url == "https://doodle.com/rs57-2026", (
+        "an absent field must be left alone"
+    )
 
     client.post(f"/season/{SEASON}/settings", data={"draft_doodle_url": ""})
     assert store.season(SEASON).draft_doodle_url is None
@@ -978,14 +985,30 @@ def test_the_same_player_cannot_fill_two_slots():
 # ---------------------------------------------------------------------------
 
 
-def test_an_override_needs_a_reason(client, store: ManualStore):
-    page = client.post(
+def test_a_blank_reason_takes_the_default_rather_than_being_refused(client, store: ManualStore):
+    """An override is a draft-cash trade every single time.
+
+    Requiring the commissioner to retype that on every row bought nothing, so a blank reason is
+    filled in rather than rejected. The field is still stored and still escaped at render — the
+    rows already on file carry real provenance and keep it.
+    """
+    client.post(
         "/overrides",
         data={"season": SEASON, "espn_player_id": PLAIN, "actual_salary": 45, "reason": "  "},
         follow_redirects=True,
-    ).get_data(as_text=True)
-    assert "a reason is required" in page
-    assert store.overrides() == []
+    )
+    assert [o.reason for o in store.overrides()] == ["Draft-cash trade"]
+
+
+def test_a_typed_reason_is_kept_verbatim(client, store: ManualStore):
+    """The default must not overwrite provenance somebody bothered to record."""
+    client.post(
+        "/overrides",
+        data={"season": SEASON, "espn_player_id": PLAIN, "actual_salary": 45,
+              "reason": "2025 workbook, Manually Changed Salaries"},
+        follow_redirects=True,
+    )
+    assert store.overrides()[0].reason == "2025 workbook, Manually Changed Salaries"
 
 
 def test_a_live_override_replaces_the_espn_base(data_dir: Path, store: ManualStore):
@@ -1046,12 +1069,17 @@ def test_the_keeper_page_shows_only_its_own_season(client, store: ManualStore):
         reason="cash moved last season", created_at=NOW, reverted=False,
     ))
 
-    keeper_page = client.get(f"/season/{SEASON}").get_data(as_text=True)
-    assert "cash moved this season" in text(keeper_page)
-    assert "cash moved last season" not in text(keeper_page)
+    # Anchored on the true salary, which is a visible cell. The reason used to be the marker
+    # and is now a tooltip — `text()` strips attributes, so a version of this test that kept
+    # reading the reason would have gone quiet rather than failing.
+    def true_salaries(html):
+        return re.findall(r'name="actual_salary"[^>]*value="(\d+)"', html)
 
-    ledger = text(client.get("/overrides").get_data(as_text=True))
-    assert "cash moved this season" in ledger and "cash moved last season" in ledger, (
+    keeper_page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert true_salaries(keeper_page) == ["45"], "only this season's override is shown"
+
+    ledger = client.get("/overrides", follow_redirects=True).get_data(as_text=True)
+    assert sorted(true_salaries(ledger)) == ["30", "45"], (
         "check_override_balance is league-wide; only the tab can show both legs of a trade"
     )
 
@@ -1079,7 +1107,7 @@ def test_an_unknowable_override_total_is_not_guessed_at_zero(client, store: Manu
 
 def test_the_overrides_page_does_not_offer_to_fix_espn(client):
     """The plan doc calls an override a correction. The plan doc is wrong."""
-    body = text(client.get("/overrides").get_data(as_text=True)).lower()
+    body = text(client.get("/overrides", follow_redirects=True).get_data(as_text=True)).lower()
     assert "draft-cash trade" in body or "draft cash" in body
     assert "not for fixing a wrong espn value" in body
 
@@ -1495,7 +1523,7 @@ def test_an_open_board_has_exactly_one_record_button(client, data_dir: Path):
     assert re.search(r'<form[^>]*hx-post="/season/\d+/record"', page)
 
 
-def test_no_card_renders_an_empty_row(client, store: ManualStore):
+def test_no_card_renders_an_empty_row(client, data_dir: Path):
     """An element that renders nothing should not exist.
 
     A locked card has no status — nothing to record and nothing recorded — but the row was
@@ -1510,11 +1538,11 @@ def test_no_card_renders_an_empty_row(client, store: ManualStore):
 
     # A locked card may still carry a row — an unverified tag is something to say. What it must
     # never be is present and empty.
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     locked = rows(client.get(f"/season/{SEASON}").get_data(as_text=True))
     assert all(locked), f"a locked card rendered an empty row: {locked}"
 
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))
     open_rows = rows(client.get(f"/season/{SEASON}").get_data(as_text=True))
     assert open_rows, "an open board still says what each franchise's state is"
     assert all(open_rows), f"an open card rendered an empty row: {open_rows}"
@@ -1573,7 +1601,11 @@ def test_a_pruned_roster_drops_the_picker(client, data_dir: Path, store: ManualS
     own the day rosters prune, and comes back if they do not.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
-    assert "<select" not in page, "nothing to pick from a pruned roster"
+    # Named on the keeper pickers rather than on "<select" anywhere, because the page carries
+    # unrelated selects now — the override form's "leg of" trade picker is on this page too.
+    # The guard is that no *slot* can be chosen; it is asserted against the same name the
+    # full-roster test above asserts is present, so the two cannot drift apart.
+    assert '<select name="t1__player_' not in page, "nothing to pick from a pruned roster"
     assert '<input type="hidden" name="t1__player_K1"' in page
     assert "Puka Nacua" in page, "the kept players are still named"
 
@@ -1698,14 +1730,14 @@ def test_each_card_targets_only_itself(client, data_dir: Path):
         )
 
 
-def test_the_lock_is_shown_without_a_banner_or_a_dead_button(client, store: ManualStore):
+def test_the_lock_is_shown_without_a_banner_or_a_dead_button(client, data_dir: Path):
     """A league fact belongs on the page once, and here it needs no prose and no control.
 
     The deadline line carries the tag and the fee boxes are disabled where you would type. A
     paragraph on top of that, or twelve greyed-out buttons offering an action that does not
     exist, is the same fact told over and over — which is how a real flag stops being read.
     """
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
 
     managers = Derived(
@@ -1786,9 +1818,9 @@ def test_the_league_record_names_what_it_skipped_and_why(client, store: ManualSt
     assert "fees total $99, expected $0" in body
 
 
-def test_the_league_record_is_refused_before_the_deadline(client, store: ManualStore):
+def test_the_league_record_is_refused_before_the_deadline(client, store: ManualStore, data_dir: Path):
     """The same guard as the per-team save, for the same reason: a stale tab still posts."""
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     page = client.post(
         f"/season/{SEASON}/record", data=form((TAXED, "K1", 0))
     ).get_data(as_text=True)
@@ -1854,16 +1886,16 @@ def test_the_report_totals_come_from_the_engine(client, store: ManualStore, data
     assert screen.league_salary == 5 + KEEPER_TAX
 
 
-def test_the_deadline_is_enforced_before_it_and_never_after(client, store: ManualStore):
+def test_the_deadline_is_enforced_before_it_and_never_after(client, store: ManualStore, data_dir: Path):
     """The rule this tool was built on, reversed by the commissioner 2026-08-04.
 
     It used to be "shown and stamped, never enforced". It is now enforced *until* the deadline
     and never after: no salary is entered before it, so a lock costs nothing and stops a number
     being recorded while managers can still change their minds. The second half is unchanged and
     matters as much — nothing ever re-locks, so there is still no state that forces a hand edit
-    of ``data/manual/seasons.json``.
+    of the derived file ESPN's deadline lives in.
     """
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
     assert "passed" in text(page)
 
@@ -1874,14 +1906,14 @@ def test_the_deadline_is_enforced_before_it_and_never_after(client, store: Manua
     assert len(store.claims(SEASON)) == 1
 
 
-def test_a_claim_before_the_deadline_is_refused_by_the_route(client, store: ManualStore):
+def test_a_claim_before_the_deadline_is_refused_by_the_route(client, store: ManualStore, data_dir: Path):
     """The guard is the route, not the ``disabled`` attribute.
 
     A tab opened before the deadline, or an htmx request already in flight, posts a form that
     carries no ``disabled`` anything. If the only lock were in the template this write would
     land.
     """
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     body = client.post(
         f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
     ).get_data(as_text=True)
@@ -1890,9 +1922,9 @@ def test_a_claim_before_the_deadline_is_refused_by_the_route(client, store: Manu
     assert "locked" in text(body).lower()
 
 
-def test_a_locked_season_still_prices_the_roster(client, store: ManualStore):
+def test_a_locked_season_still_prices_the_roster(client, store: ManualStore, data_dir: Path):
     """Looking is the harmless half. The lock is about recording a number, not seeing one."""
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     body = client.post(
         f"/season/{SEASON}/team/t1/preview", data=form((TAXED, "K1", 0))
     ).get_data(as_text=True)
@@ -1900,15 +1932,14 @@ def test_a_locked_season_still_prices_the_roster(client, store: ManualStore):
     assert store.claims(SEASON) == []
 
 
-def test_an_unrecorded_deadline_does_not_lock_the_console(client, store: ManualStore):
+def test_an_unrecorded_deadline_does_not_lock_the_console(client, store: ManualStore, data_dir: Path):
     """The lockout this would otherwise be.
 
-    ``store.season(year)`` returns ``None`` for a year with no settings row, so an unrecorded
-    deadline and a future one both used to read as "not passed". Gating on that single flag
-    freezes a freshly synced season with no way out on screen — and the deadline is recorded in
-    this very tool.
+    A season ESPN has not given a ``keeperDeadlineDate`` returns ``None`` for it, so an
+    unrecorded deadline and a future one both used to read as "not passed". Gating on that
+    single flag freezes a freshly synced season with no way out on screen.
     """
-    assert store.season(SEASON) is None
+    assert Derived(derived_dir=data_dir / "derived").load(SEASON).keeper_deadline is None
 
     saved = client.post(
         f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
@@ -1920,17 +1951,27 @@ def test_an_unrecorded_deadline_does_not_lock_the_console(client, store: ManualS
     assert "nothing is locked" in page, "say why it is open, and where to record one"
 
 
-def test_the_three_deadline_states_are_distinct(store: ManualStore):
+def _derived_season(keeper_deadline: datetime | None) -> DerivedSeason:
+    return DerivedSeason(
+        season=SEASON,
+        drafted=False,
+        base_salary_field="keeperValue",
+        trade_deadline=None,
+        draft_date=None,
+        keeper_deadline=keeper_deadline,
+        franchises=(),
+        players=(),
+        roster=(),
+    )
+
+
+def test_the_three_deadline_states_are_distinct():
     """Unrecorded is not the same fact as future, and only one of them locks."""
-    assert keeper_gate(SEASON, store, now=NOW).state == "unrecorded"
+    assert keeper_gate(_derived_season(None), now=NOW).state == "unrecorded"
+    assert keeper_gate(_derived_season(datetime(2026, 12, 1, 12, 0)), now=NOW).state == "locked"
+    assert keeper_gate(_derived_season(datetime(2026, 1, 1, 12, 0)), now=NOW).state == "open"
 
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 12, 1, 12, 0)))
-    assert keeper_gate(SEASON, store, now=NOW).state == "locked"
-
-    store.save_season(Season(year=SEASON, keeper_deadline=datetime(2026, 1, 1, 12, 0)))
-    assert keeper_gate(SEASON, store, now=NOW).state == "open"
-
-    assert keeper_gate(SEASON, store, now=NOW).editable
+    assert keeper_gate(_derived_season(datetime(2026, 1, 1, 12, 0)), now=NOW).editable
     assert not KeeperGate(deadline=NOW, state="locked").editable
 
 
@@ -1962,3 +2003,386 @@ def test_there_is_no_salary_cap_anywhere(client):
         # Hard-wrapped prose: "there is no\n  salary cap" has to normalise before it matches.
         source = re.sub(r"\s+", " ", template.read_text(encoding="utf-8").lower())
         assert "salary cap" not in source or "no salary cap" in source
+
+
+# ---------------------------------------------------------------------------
+# Cash trades
+#
+# The balance RULE is tested in test_keeper_rules.py, against a roster those tests control
+# exactly. What is tested here is the plumbing: the form's refusals, the escaping, the write,
+# and the linking. The fixture roster deliberately carries one player on two teams, so it is
+# the wrong place to assert dollar sums.
+# ---------------------------------------------------------------------------
+
+
+def a_trade(client, **over):
+    data = {"draft_year": SEASON, "from_manager_id": "t1", "to_manager_id": "t2", "amount": 5,
+            "note": "agreed in the group chat"}
+    data.update(over)
+    return client.post("/trades", data=data, follow_redirects=True).get_data(as_text=True)
+
+
+def test_recording_a_trade_writes_it_with_its_direction(client, store: ManualStore):
+    a_trade(client)
+    recorded = store.trades(SEASON)
+    assert len(recorded) == 1
+    assert (recorded[0].from_manager_id, recorded[0].to_manager_id) == ("t1", "t2")
+    assert recorded[0].amount == 5
+
+
+def test_a_trade_records_when_it_happened_not_when_it_was_typed(client, store: ManualStore):
+    """Those are routinely months apart — the 2025 legs are being reconstructed now — so the
+    date is a field, not a clock read."""
+    a_trade(client, agreed_at="2025-10-29")
+    assert store.trades(SEASON)[0].agreed_at == datetime(2025, 10, 29, 0, 0)
+
+
+def test_a_trade_with_no_date_falls_back_to_today(client, store: ManualStore):
+    """Optional, so the common case of recording one as it happens stays a four-field form."""
+    a_trade(client, agreed_at="")
+    assert store.trades(SEASON)[0].agreed_at == NOW
+
+
+def test_a_trade_date_that_is_not_a_date_is_refused(client, store: ManualStore):
+    page = text(a_trade(client, agreed_at="last tuesday"))
+    assert "not a date" in page
+    assert store.trades() == [], "nothing is written when the form is refused"
+
+
+def test_a_trade_id_is_readable_and_unique(client, store: ManualStore):
+    """It is what a leg carries in overrides.json and what an audit message names, so it has
+    to survive being read in a diff. A second trade between the same two teams gets a suffix
+    rather than colliding — a reused id would let a leg balance against the wrong trade."""
+    a_trade(client)
+    a_trade(client)
+    ids = sorted(trade.id for trade in store.trades(SEASON))
+    assert ids == [f"{SEASON}-t1-to-t2", f"{SEASON}-t1-to-t2-2"]
+
+
+@pytest.mark.parametrize(
+    "bad, expected",
+    [
+        ({"amount": 0}, "records nothing"),
+        ({"amount": -5}, "records nothing"),
+        ({"to_manager_id": "t1"}, "not from a team to itself"),
+        ({"to_manager_id": ""}, "both a paying and a receiving"),
+        ({"to_manager_id": "t99"}, "not a franchise"),
+    ],
+)
+def test_a_trade_that_could_not_have_happened_is_refused(client, store, bad, expected):
+    assert expected in text(a_trade(client, **bad))
+    assert store.trades() == [], "nothing is written when the form is refused"
+
+
+def edit(client, trade_id, **over):
+    data = {"draft_year": SEASON, "from_manager_id": "t1", "to_manager_id": "t2", "amount": 5,
+            "note": "agreed in the group chat"}
+    data.update(over)
+    return client.post(f"/trades/{trade_id}/edit", data=data,
+                       follow_redirects=True).get_data(as_text=True)
+
+
+def test_a_trade_can_be_edited_in_place(client, store: ManualStore):
+    a_trade(client)
+    tid = store.trades()[0].id
+    edit(client, tid, amount=9, note="corrected", agreed_at="2025-11-25")
+    after = store.trades()
+    assert len(after) == 1, "editing replaces the row, it does not add one"
+    assert (after[0].amount, after[0].note) == (9, "corrected")
+    assert after[0].agreed_at == datetime(2025, 11, 25, 0, 0)
+
+
+def test_editing_keeps_the_id_its_legs_name(client, store: ManualStore):
+    """The id is the only thing a leg holds. Mint a new one on edit and every leg is orphaned.
+
+    The edit **changes a party**, deliberately. An id is derived from the season and the two
+    franchises, so re-minting one on an edit that changed neither returns the identical string
+    and proves nothing — this asserts against an edit where a regenerated id would differ.
+    """
+    a_trade(client)
+    tid = store.trades()[0].id
+    assert tid == f"{SEASON}-t1-to-t2"
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="leg",
+        created_at=NOW, trade_ids=(tid,),
+    ))
+    edit(client, tid, from_manager_id="t2", to_manager_id="t1")
+    saved = store.trades()[0]
+    # Both halves matter. "id unchanged" alone is also what a silently-failed edit produces,
+    # so the direction is asserted too: the edit has to have actually landed.
+    assert saved.from_manager_id == "t2", "the edit did not apply"
+    assert saved.id == tid, "a regenerated id would read t2-to-t1 and orphan the leg"
+    assert store.overrides(SEASON)[0].trade_ids == (tid,)
+
+
+def test_updating_a_trade_the_store_does_not_hold_reports_a_miss(store: ManualStore):
+    """Store-level: the route 404s first, so this path is only reachable if the row went away
+    between the check and the write. It must report rather than quietly create the row."""
+    absent = CashTrade(id="never-recorded", draft_year=SEASON, from_manager_id="t1",
+                       to_manager_id="t2", amount=5, agreed_at=NOW)
+    assert store.update_trade(absent) is False
+    assert store.trades() == [], "a miss writes nothing"
+
+
+def test_editing_a_trade_into_another_draft_moves_it(client, store: ManualStore):
+    """Rows are stored under a draft-year key, so the old year has to lose it as well as the
+    new year gaining it — otherwise the id is on file twice and a leg cannot say which it
+    means."""
+    a_trade(client)
+    tid = store.trades()[0].id
+    edit(client, tid, draft_year=PRIOR)
+    assert [(t.id, t.draft_year) for t in store.trades()] == [(tid, PRIOR)]
+    assert store.trades(SEASON) == []
+
+
+def test_an_edit_is_held_to_the_same_rules_as_the_original(client, store: ManualStore):
+    a_trade(client)
+    tid = store.trades()[0].id
+    assert "not from a team to itself" in text(edit(client, tid, to_manager_id="t1"))
+    assert "records nothing" in text(edit(client, tid, amount=0))
+    assert store.trades()[0].amount == 5, "a refused edit changes nothing"
+
+
+def test_editing_a_trade_that_does_not_exist_is_a_404(client):
+    assert client.post("/trades/made-up/edit", data={"season": SEASON}).status_code == 404
+
+
+def test_every_row_is_an_edit_form_prefilled(client, store: ManualStore):
+    """A row's controls sit in the table and its <form> sits outside it, joined by id.
+
+    That join is the whole mechanism — a `<form>` cannot wrap a `<tr>` — and it fails silently:
+    drop the `form` attribute and the inputs belong to no form at all, so Save posts an empty
+    body and the row quietly stops working while still looking right. Asserted explicitly.
+    """
+    a_trade(client, amount=7)
+    tid = store.trades()[0].id
+    raw = client.get("/trades").get_data(as_text=True)
+    assert f'<form id="trade-{tid}"' in raw
+    assert f'action="/trades/{tid}/edit"' in raw
+    assert f'form="trade-{tid}"' in raw, "the row's inputs must name the form that submits them"
+    assert 'value="7"' in raw, "the edit form starts from what is on file"
+
+
+def test_the_insert_row_is_the_same_form_in_the_same_table(client):
+    """Adding and amending look and work alike because they are the same controls."""
+    raw = client.get("/trades").get_data(as_text=True)
+    assert '<form id="trade-new"' in raw and 'action="/trades"' in raw
+    assert 'form="trade-new"' in raw
+
+
+def test_a_trade_can_be_deleted(client, store: ManualStore):
+    a_trade(client)
+    tid = store.trades()[0].id
+    client.post(f"/trades/{tid}/delete", follow_redirects=True)
+    assert store.trades() == []
+
+
+def test_deleting_a_trade_leaves_its_legs_on_file(client, store: ManualStore):
+    """An override is a real ESPN edit that happened. Deleting the trade it was filed under
+    must not quietly erase the record of the money moving — the leg survives and reports as
+    naming a trade that is not on file, which is a finding somebody has to answer."""
+    a_trade(client)
+    tid = store.trades()[0].id
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="leg",
+        created_at=NOW, trade_ids=(tid,),
+    ))
+    page = client.post(f"/trades/{tid}/delete", follow_redirects=True).get_data(as_text=True)
+    assert len(store.overrides(SEASON)) == 1, "the leg is not deleted with its trade"
+    assert store.overrides(SEASON)[0].trade_ids == (tid,), "and still says what it belonged to"
+    assert "still name it" in text(page), "the orphaning is reported, not silent"
+
+
+def test_deleting_a_trade_that_does_not_exist_says_so(client, store: ManualStore):
+    page = client.post("/trades/made-up/delete", follow_redirects=True).get_data(as_text=True)
+    assert "no trade made-up on file" in text(page)
+
+
+def test_an_override_can_be_deleted(client, store: ManualStore):
+    """Deleting is for a row that should never have been recorded. Reverting is the tool for
+    one that has served its purpose — that row stays on file as the explanation."""
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="typed in error",
+        created_at=NOW,
+    ))
+    client.post("/overrides/delete", data={
+        "season": SEASON, "espn_player_id": TAXED, "created_at": NOW.isoformat(),
+    }, follow_redirects=True)
+    assert store.overrides() == []
+
+
+def test_deleting_an_override_that_does_not_exist_says_so(client, store: ManualStore):
+    page = client.post("/overrides/delete", data={
+        "season": SEASON, "espn_player_id": 999, "created_at": NOW.isoformat(),
+    }, follow_redirects=True).get_data(as_text=True)
+    assert "no matching override" in text(page)
+
+
+def test_a_trade_note_is_escaped_not_executed(client, store: ManualStore):
+    """The same injection path as an override's reason: typed here, stored, committed to a
+    public repo, published."""
+    nasty = "<script>alert(1)</script>"
+    a_trade(client, note=nasty)
+    assert store.trades(SEASON)[0].note == nasty, "stored exactly as typed"
+    page = client.get("/trades").get_data(as_text=True)
+    assert nasty not in page
+    assert "&lt;script&gt;" in page
+
+
+def test_an_override_can_be_recorded_as_a_leg(client, store: ManualStore):
+    a_trade(client)
+    trade_id = store.trades(SEASON)[0].id
+    client.post("/overrides", data={
+        "season": SEASON, "espn_player_id": TAXED, "actual_salary": 2,
+        "reason": "leg of a cash trade", "trade_ids": trade_id,
+    })
+    assert store.overrides(SEASON)[0].trade_ids == (trade_id,)
+
+
+def test_an_override_naming_a_trade_that_does_not_exist_is_refused(client, store: ManualStore):
+    """A dangling reference falls out of BOTH audits at once: the per-trade check has no trade
+    to balance it against, and the league-wide one skips anything carrying a trade_id."""
+    page = client.post("/overrides", data={
+        "season": SEASON, "espn_player_id": TAXED, "actual_salary": 2,
+        "reason": "leg of nothing", "trade_ids": "made-up",
+    }, follow_redirects=True).get_data(as_text=True)
+    assert "no trade made-up on file" in text(page)
+    assert store.overrides() == [], "the override is not written at all"
+
+
+def test_a_leg_can_be_attached_and_detached_after_the_fact(client, store: ManualStore):
+    """The two are recorded in either order — a leg entered before its counterparty was agreed
+    has nowhere to point yet."""
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="cash", created_at=NOW,
+    ))
+    a_trade(client)
+    trade_id = store.trades(SEASON)[0].id
+    ident = {"season": SEASON, "espn_player_id": TAXED, "created_at": NOW.isoformat()}
+
+    edit_ov = {"orig_season": SEASON, "orig_espn_player_id": TAXED,
+               "created_at": NOW.isoformat(), "season": SEASON,
+               "espn_player_id": TAXED, "actual_salary": 2}
+    client.post("/overrides/edit", data={**edit_ov, "trade_ids": trade_id})
+    assert store.overrides(SEASON)[0].trade_ids == (trade_id,)
+
+    client.post("/overrides/edit", data={**edit_ov, "trade_ids": ""})
+    assert store.overrides(SEASON)[0].trade_ids == ()
+
+
+def test_attaching_to_a_trade_that_does_not_exist_is_refused(client, store: ManualStore):
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="cash", created_at=NOW,
+    ))
+    page = client.post("/overrides/edit", data={
+        "orig_season": SEASON, "orig_espn_player_id": TAXED,
+        "created_at": NOW.isoformat(), "season": SEASON, "espn_player_id": TAXED,
+        "actual_salary": 2, "trade_ids": "made-up",
+    }, follow_redirects=True).get_data(as_text=True)
+    assert "no trade made-up on file" in text(page)
+    assert store.overrides(SEASON)[0].trade_ids == ()
+
+
+def test_the_ledger_shows_a_one_legged_trade_as_needing_review(client, store: ManualStore):
+    """A trade with only one leg is the case the whole feature exists to name."""
+    a_trade(client)
+    trade_id = store.trades(SEASON)[0].id
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="one leg",
+        created_at=NOW, trade_ids=(trade_id,),
+    ))
+    page = text(client.get("/trades").get_data(as_text=True))
+    assert "needs review" in page
+    assert trade_id in page, "the finding names the trade that is missing a leg"
+
+
+def test_a_trade_with_no_legs_says_so(client):
+    """In the chip's tooltip, which is the row's only alert.
+
+    Asserted against the raw HTML on purpose: ``text()`` strips tags, and with it the attribute
+    the message now lives in — so a version of this test that kept using ``text()`` would pass
+    only while the message was ALSO printed somewhere else, which is the duplication that was
+    removed.
+    """
+    a_trade(client)
+    raw = client.get("/trades").get_data(as_text=True)
+    assert "no salary override points at it" in raw
+    assert ">None<" in raw, "the Legs cell says None, in the red badge"
+    assert "no salary override points at it" not in text(raw), (
+        "the finding belongs in the tooltip only — a second copy in the body is the thing "
+        "this table stopped doing"
+    )
+    # The badge IS the whole cell. A muted "none" above a "needs review" chip stated the same
+    # fact twice, which is what this replaced.
+    assert '<div class="muted">none</div>' not in raw
+    assert "needs review" not in raw, "a legless trade has one signal, not two"
+
+
+def test_the_ledger_surfaces_overrides_attached_to_no_trade(client, store: ManualStore):
+    """A ledger of balanced trades is not a complete account of the season's cash while these
+    are outstanding, so they go on the page rather than only into validate's output.
+
+    Surfaced two ways since trades and overrides merged onto one tab: one summary warning, and
+    an "attach to…" picker on the row itself. Both are asserted — the summary is what gets
+    read, the picker is what gets acted on, and a page with only one of them is half a feature.
+    """
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="unattached",
+        created_at=NOW,
+    ))
+    raw = client.get("/trades").get_data(as_text=True)
+    assert "attached to no cash trade" in text(raw)
+    assert 'name="trade_ids"' in raw and "multiple" in raw, (
+        "the row needs its own picker — one salary edit can be a leg of several trades"
+    )
+
+
+def test_trades_json_carries_its_about_prose(client, store: ManualStore):
+    """It is the only written explanation of the sign convention, and getting that backwards
+    silently reprices both teams."""
+    a_trade(client)
+    doc = json.loads((store.manual / "trades.json").read_text(encoding="utf-8"))
+    prose = " ".join(doc["_about"])
+    assert "POSITIVE" in prose
+    assert "public" in prose.lower()
+
+
+def test_an_emptied_year_is_removed_not_left_as_an_empty_bucket(client, store: ManualStore):
+    """`"2026": []` says nothing and shows up in the diff of a public repo as if it did."""
+    import json as _json
+    a_trade(client)
+    tid = store.trades()[0].id
+    store.delete_trade(tid)
+    doc = _json.loads((store.manual / "trades.json").read_text(encoding="utf-8"))
+    assert doc.get("drafts") == {}, "the emptied draft year is dropped"
+    assert "_about" in doc, "and the prose survives the pruning"
+
+
+def test_destroying_something_takes_two_clicks(client, store: ManualStore):
+    """A delete is one stray click from gone otherwise, and neither file it touches is
+    recoverable from the UI. Guarded structurally: the destructive submit has to sit inside a
+    closed <details>, not loose in the row beside Save.
+
+    Reverting is deliberately NOT behind the gate — it is reversible and the row survives it.
+    """
+    a_trade(client)
+    store.add_override(SalaryOverride(
+        espn_player_id=TAXED, season=SEASON, actual_salary=2, reason="leg", created_at=NOW,
+    ))
+    raw = client.get("/trades").get_data(as_text=True)
+
+    for action in (f"/trades/{store.trades()[0].id}/delete", "/overrides/delete"):
+        head, _, _ = raw.partition(f'action="{action}"')
+        assert head.rstrip().endswith("<form method=\"post\"") or 'class="confirm"' in head, (
+            f"the {action} form must be reachable only through a confirm step"
+        )
+        # The confirm wrapper must be the nearest enclosing details, and it must start closed.
+        opened = head.rsplit('<details class="confirm">', 1)
+        assert len(opened) == 2, f"{action} is not inside a confirm step"
+        assert "</details>" not in opened[1], f"{action} sits outside its confirm step"
+
+    assert 'class="confirm"' in raw
+    assert "<details class=\"confirm\" open" not in raw, "the confirm step starts closed"
+    # Mark reverted stays a single click.
+    reverted_at = raw.index('action="/overrides/revert"')
+    assert '<details class="confirm">' not in raw[reverted_at - 400:reverted_at]

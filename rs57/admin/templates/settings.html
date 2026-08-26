@@ -31,19 +31,9 @@
       <input type="text" id="trade_deadline" name="trade_deadline" placeholder="2026-12-02 17:00"
              value="{{ espn.trade_deadline if espn and espn.trade_deadline else (settings.trade_deadline.isoformat(' ', 'minutes') if settings and settings.trade_deadline else '') }}">
     </div>
-    <div class="field">
-      <label for="keeper_deadline">Keeper deadline</label>
-      <input type="text" id="keeper_deadline" name="keeper_deadline" placeholder="2026-08-30 17:00"
-             value="{{ espn.keeper_deadline if espn and espn.keeper_deadline else (settings.keeper_deadline.isoformat(' ', 'minutes') if settings and settings.keeper_deadline else '') }}">
-    </div>
   </div>
 
   <div class="row" style="margin-top:1rem">
-    <div class="field">
-      <label for="draft_date">Draft date</label>
-      <input type="text" id="draft_date" name="draft_date" placeholder="2026-08-31 19:00"
-             value="{{ settings.draft_date.isoformat(' ', 'minutes') if settings and settings.draft_date else '' }}">
-    </div>
     <div class="field">
       <label for="draft_doodle_url">Draft Doodle link</label>
       <input type="text" id="draft_doodle_url" name="draft_doodle_url" placeholder="https://doodle.com/..."
@@ -51,8 +41,24 @@
     </div>
   </div>
   <p class="small muted" style="margin-top:0.25rem">
-    Shown on the public home page while {{ year }} has not drafted yet. Nobody reads ESPN for
-    these — enter them by hand.
+    The Doodle link is shown on the public home page while {{ year }} has not drafted yet, and
+    has no ESPN equivalent — it stays hand-entered.
+  </p>
+
+  <div class="row" style="margin-top:1rem">
+    <div class="field">
+      <label>Draft date <span class="small muted">(from ESPN, read-only)</span></label>
+      <div>{{ source.draft_date.strftime('%Y-%m-%d %H:%M') if source.draft_date else 'not set yet' }}</div>
+    </div>
+    <div class="field">
+      <label>Keeper deadline <span class="small muted">(from ESPN, read-only)</span></label>
+      <div>{{ source.keeper_deadline.strftime('%Y-%m-%d %H:%M') if source.keeper_deadline else 'not set yet' }}</div>
+    </div>
+  </div>
+  <p class="small muted" style="margin-top:0.25rem">
+    Both come straight from ESPN's own <code>draftSettings</code>, synced nightly. Nothing here
+    can change them — an ESPN fact and a hand-typed copy of it can drift apart, and one already
+    had.
   </p>
 
   <div class="row" style="margin-top:1rem">
@@ -77,10 +83,10 @@
 </form>
 
 <form method="post" action="{{ url_for('settings_from_espn', year=year) }}" style="margin-top:0.5rem">
-  <button type="submit" class="quiet">Read the deadlines from ESPN</button>
+  <button type="submit" class="quiet">Read the trade deadline from ESPN</button>
   <span class="small muted">
-    Fills the form from the league's own <code>draftSettings</code>. Saves nothing until you
-    submit above.
+    Fills the field above from the league's own <code>tradeSettings</code>. Saves nothing until
+    you submit above.
   </span>
 </form>
 
@@ -98,10 +104,11 @@
   </div>
 {% endif %}
 
-<h2>The deadline is recorded, never enforced</h2>
+<h2>The deadline locks until it passes, never after</h2>
 <p class="small">
-  A claim stays editable after the keeper deadline passes. The tool stamps every submission and
-  says on the report when the deadline has gone by, so a late change is visible as a deliberate
-  correction — rather than being something to work around by editing JSON by hand.
+  Claims cannot be saved before the keeper deadline above, so nothing is recorded while managers
+  can still change their minds. Once it passes the console opens and stays open for good — a
+  claim entered late is still visible as a deliberate correction, not something to work around by
+  editing JSON by hand.
 </p>
 {% endblock %}

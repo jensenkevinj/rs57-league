@@ -472,6 +472,36 @@
       "case": "two prospects",
       "expect_code": "too_many_prospects",
       "severity": "error"
+    },
+    {
+      "case": "cash trade's live legs do not match its declared amount",
+      "expect_code": "cash_trade_unbalanced",
+      "severity": "review"
+    },
+    {
+      "case": "cash trade recorded but no override points at it",
+      "expect_code": "cash_trade_no_legs",
+      "severity": "review"
+    },
+    {
+      "case": "cash trade leg whose ESPN base is unknown, so no sum can be formed",
+      "expect_code": "cash_trade_uncheckable",
+      "severity": "review"
+    },
+    {
+      "case": "cash trade leg on a team that is neither party",
+      "expect_code": "cash_trade_stranger_leg",
+      "severity": "review"
+    },
+    {
+      "case": "live override attached to no cash trade",
+      "expect_code": "override_not_on_a_trade",
+      "severity": "review"
+    },
+    {
+      "case": "cash trade leg filed under a different draft than its trade",
+      "expect_code": "cash_trade_leg_wrong_draft",
+      "severity": "review"
     }
   ]
 }

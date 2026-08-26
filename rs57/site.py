@@ -654,10 +654,9 @@ def load_claims(season: int, manual_dir: Path = MANUAL) -> list[KeeperClaim]:
 def load_season_settings(season: int, manual_dir: Path = MANUAL) -> Season | None:
     """One season's settings from ``data/manual/seasons.json``. Read-only.
 
-    The admin tool owns that file. The site reads it for the pre-draft home page — the draft
-    date, keeper deadline and Doodle link — and never writes it. A malformed file is skipped
-    rather than allowed to take the nightly build down; ``validate.py`` is the place that
-    reports it.
+    The admin tool owns that file. The site reads it for the pre-draft home page's Doodle link
+    and never writes it. A malformed file is skipped rather than allowed to take the nightly
+    build down; ``validate.py`` is the place that reports it.
     """
     path = manual_dir / "seasons.json"
     if not path.exists():
@@ -669,13 +668,43 @@ def load_season_settings(season: int, manual_dir: Path = MANUAL) -> Season | Non
         return None
 
 
-def _trade_deadline(derived_dir: Path, season: int) -> datetime | None:
-    """``season``'s trade deadline, or ``None`` when that season is not on disk."""
+@dataclass(frozen=True)
+class PredraftInfo:
+    """What the pre-draft home page shows.
+
+    ``draft_date`` and ``keeper_deadline`` are read straight off the season's derived file —
+    ESPN's own ``draftSettings``, synced nightly — so the page can never show a stale hand-typed
+    guess (commissioner, 2026-08-26). ``draft_doodle_url`` has no ESPN equivalent and is the one
+    piece still commissioner-entered, in ``data/manual/seasons.json``.
+    """
+
+    draft_date: datetime | None
+    keeper_deadline: datetime | None
+    draft_doodle_url: str | None
+
+
+def _source_datetime(derived_dir: Path, season: int, key: str) -> datetime | None:
+    """One ISO datetime out of ``{season}.json``'s ``source`` block, or ``None`` if unset."""
     path = derived_dir / f"{season}.json"
     if not path.exists():
         return None
-    raw = (_load(path).get("source") or {}).get("trade_deadline")
+    raw = (_load(path).get("source") or {}).get(key)
     return datetime.fromisoformat(raw) if raw else None
+
+
+def _trade_deadline(derived_dir: Path, season: int) -> datetime | None:
+    """``season``'s trade deadline, or ``None`` when that season is not on disk."""
+    return _source_datetime(derived_dir, season, "trade_deadline")
+
+
+def load_predraft_info(season: int, derived_dir: Path, manual_dir: Path = MANUAL) -> PredraftInfo:
+    """The pre-draft home page's three facts, from their two separate sources."""
+    settings = load_season_settings(season, manual_dir)
+    return PredraftInfo(
+        draft_date=_source_datetime(derived_dir, season, "draft_date"),
+        keeper_deadline=_source_datetime(derived_dir, season, "keeper_deadline"),
+        draft_doodle_url=settings.draft_doodle_url if settings else None,
+    )
 
 
 def _prospect_state(
@@ -1523,7 +1552,7 @@ def build_site(
     # `predraft` carries the settings the pre-draft home page shows instead; it is None once
     # `current.drafted` flips, at which point the page above reverts to `home` on its own.
     predraft = (
-        load_season_settings(current.season, manual_dir)
+        load_predraft_info(current.season, derived_dir, manual_dir)
         if current is not None and not current.drafted
         else None
     )

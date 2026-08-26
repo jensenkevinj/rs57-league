@@ -22,6 +22,7 @@ key survives a round trip. There is a test.
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -29,6 +30,7 @@ from typing import Any
 
 from rs57.history import HistoryStore
 from rs57.models import (
+    CashTrade,
     KeeperClaim,
     KeeperSlot,
     Payment,
@@ -43,6 +45,7 @@ DATA = ROOT / "data"
 
 CLAIMS = "claims.json"
 OVERRIDES = "overrides.json"
+TRADES = "trades.json"
 SEASONS = "seasons.json"
 PAYMENTS = "payments.json"
 PAYOUTS = "payouts.json"
@@ -83,6 +86,35 @@ ABOUT: dict[str, list[str]] = {
         "",
         "'reason' is free text typed by a human and rendered on a PUBLIC site. Autoescaping is",
         "on and no template may pass it through the safe filter.",
+        "",
+        "trade_id names the row in trades.json this override is a leg of. Optional: rows that",
+        "predate that file have none, and a leg with no recoverable counterparty never will.",
+    ],
+    TRADES: [
+        "Draft-cash trades, keyed by DRAFT YEAR. Written by the admin tool and by nothing else.",
+        "",
+        "draft_year is the auction the cash moves at, NOT the season the deal was struck in.",
+        "A trade agreed 25 Nov 2025 spends its money at the 2026 auction: draft_year 2026,",
+        "agreed_at in 2025. This is the only file where those two years come apart -- for a",
+        "roster or a claim, season Y and draft Y are the same integer.",
+        "",
+        "ESPN cannot move auction budget between teams, so a cash trade is EXPRESSED as",
+        "hand-edited player salaries -- the overrides.json rows that name this trade's id in",
+        "their trade_id. Those rows are the legs; these rows are the trades themselves.",
+        "",
+        "amount dollars move FROM from_manager_id TO to_manager_id. The receiving team is",
+        "under-charged by ESPN, which frees that much budget, so its leg's (actual_salary -",
+        "espn base) is POSITIVE and the paying team's is negative by the same amount.",
+        "check_cash_trades audits each side against the declared amount -- per side, not",
+        "netted, because a net of zero is also what two legs on the same team would give and",
+        "that moves no budget at all.",
+        "",
+        "This exists because netting the whole league cannot tell one balanced trade from two",
+        "unrelated mistakes that happen to cancel.",
+        "",
+        "'note' is free text typed by a human and rendered on a PUBLIC site, exactly like an",
+        "override's reason. Autoescaping is on and no template may pass it through the safe",
+        "filter. No manager real names -- franchise ids only.",
     ],
     SEASONS: [
         "Per-season settings, keyed by year. Written by the admin tool and by nothing else.",
@@ -93,15 +125,20 @@ ABOUT: dict[str, list[str]] = {
         "decision -- until a year is recorded, the tool prices that year's keepers with fees ON",
         "and says the waiver is unconfirmed.",
         "",
-        "keeper_deadline is enforced UNTIL it passes and never after (commissioner,",
+        "keeper_deadline and draft_date do NOT live here (commissioner, 2026-08-26). Both are",
+        "ESPN facts -- draftSettings.keeperDeadlineDate and .date -- and a hand-typed copy of",
+        "one had already drifted from what ESPN actually held. They are read straight off the",
+        "nightly sync in data/derived/{year}.json (DerivedSeason.keeper_deadline / .draft_date)",
+        "and nothing in this tool can override them.",
+        "",
+        "The keeper deadline is enforced UNTIL it passes and never after (commissioner,",
         "2026-08-04). No salary is entered before the deadline, so holding claims until then",
         "costs nothing and stops a number being recorded while managers can still change their",
-        "minds. Nothing ever re-locks: after the deadline the console stays open for good, so",
-        "there is still no state that forces a hand edit of this file.",
+        "minds. Nothing ever re-locks: after the deadline the console stays open for good.",
         "",
-        "A year with no row here is NOT locked. An unrecorded deadline and a future one are",
-        "different facts, and the deadline is recorded in the same tool the lock would close --",
-        "collapsing them would freeze a freshly synced season with no way out on screen.",
+        "A season not yet synced, or one ESPN has not given a keeperDeadlineDate, is NOT",
+        "locked. An unrecorded deadline and a future one are different facts -- collapsing",
+        "them would freeze a freshly synced season with no way out on screen.",
     ],
     PAYMENTS: [
         "Which prizes have actually been handed over. Written by the admin tool and by nothing",
@@ -275,16 +312,154 @@ class ManualStore:
     def save_overrides(self, season: int, overrides: list[SalaryOverride]) -> Path:
         doc = self.load(OVERRIDES)
         seasons = dict(doc.get("seasons") or {})
-        seasons[str(season)] = sorted(
+        rows = sorted(
             (override.model_dump(mode="json") for override in overrides),
             key=lambda row: (row["espn_player_id"], row["created_at"]),
         )
+        # An emptied year is removed, not left as `"2026": []`. A bucket holding nothing says
+        # nothing, and it shows up in the diff of a public repo as if something were there.
+        if rows:
+            seasons[str(season)] = rows
+        else:
+            seasons.pop(str(season), None)
         return self._merge(OVERRIDES, seasons=seasons)
 
     def add_override(self, override: SalaryOverride) -> Path:
         return self.save_overrides(
             override.season, self.overrides(override.season) + [override]
         )
+
+    def update_override(
+        self,
+        season: int,
+        espn_player_id: int,
+        created_at: datetime,
+        replacement: SalaryOverride,
+    ) -> bool:
+        """Replace an override, **including when its draft or its player changed**.
+
+        The three arguments identify the row as it is on file now; ``replacement`` is what it
+        becomes. Rows are stored under a draft-year key, so an edit that moves one to a
+        different year has to be removed from the old year as well as written to the new — the
+        same trap ``update_trade`` has, and the same fix.
+
+        ``created_at`` is carried over by the caller, not reissued: it is the row's identity and
+        re-stamping it on every save would break the link a leg holds to it.
+        """
+        rows = self.overrides(season)
+        kept = [
+            row
+            for row in rows
+            if (row.espn_player_id, row.created_at) != (espn_player_id, created_at)
+        ]
+        if len(kept) == len(rows):
+            return False
+        if replacement.season == season:
+            self.save_overrides(season, kept + [replacement])
+        else:
+            self.save_overrides(season, kept)
+            self.save_overrides(
+                replacement.season, self.overrides(replacement.season) + [replacement]
+            )
+        return True
+
+    # -- cash trades ------------------------------------------------------------
+
+    def trades(self, draft_year: int | None = None) -> list[CashTrade]:
+        doc = self.load(TRADES)
+        out: list[CashTrade] = []
+        for year, rows in sorted((doc.get("drafts") or {}).items()):
+            if draft_year is not None and int(year) != draft_year:
+                continue
+            for row in rows:
+                trade = CashTrade(**row)
+                if trade.draft_year != int(year):
+                    raise ValueError(
+                        f"trades.json: a row under draft {year} says draft {trade.draft_year}"
+                    )
+                out.append(trade)
+        return out
+
+    def save_trades(self, draft_year: int, trades: list[CashTrade]) -> Path:
+        doc = self.load(TRADES)
+        drafts = dict(doc.get("drafts") or {})
+        rows = sorted(
+            (trade.model_dump(mode="json") for trade in trades), key=lambda row: row["id"]
+        )
+        # Emptied drafts are dropped rather than left as `"2025": []` — see save_overrides.
+        if rows:
+            drafts[str(draft_year)] = rows
+        else:
+            drafts.pop(str(draft_year), None)
+        return self._merge(TRADES, drafts=drafts)
+
+    def add_trade(self, trade: CashTrade) -> Path:
+        return self.save_trades(trade.draft_year, self.trades(trade.draft_year) + [trade])
+
+    def update_trade(self, trade: CashTrade) -> bool:
+        """Replace a trade by id, **including when its season changed**.
+
+        Rows are stored under a season key, so an edit that moves a trade from 2025 to 2026 has
+        to be removed from the old year as well as written to the new one. Writing only the new
+        year would leave the id present twice, and a leg names its trade by id alone — it would
+        then be ambiguous which of the two it balanced against.
+
+        Returns whether anything matched, so the caller can say "no such trade" rather than
+        reporting a successful write that created a row nobody asked for.
+        """
+        existing = self.trades()
+        if not any(row.id == trade.id for row in existing):
+            return False
+        touched = {row.draft_year for row in existing if row.id == trade.id} | {trade.draft_year}
+        kept = [row for row in existing if row.id != trade.id] + [trade]
+        for year in sorted(touched):
+            self.save_trades(year, [row for row in kept if row.draft_year == year])
+        return True
+
+    def delete_trade(self, trade_id: str) -> bool:
+        """Remove a trade entirely. For a row entered in error — nothing else.
+
+        Its legs are **not** touched: an override is a real ESPN edit that happened, and
+        deleting the trade it was filed under must not quietly erase the record of the money
+        moving. They are left pointing at an id that is now absent, which
+        ``check_cash_trades`` reports as a dangling reference rather than passing over.
+        """
+        existing = self.trades()
+        if not any(row.id == trade_id for row in existing):
+            return False
+        for year in {row.draft_year for row in existing if row.id == trade_id}:
+            self.save_trades(
+                year, [r for r in existing if r.draft_year == year and r.id != trade_id]
+            )
+        return True
+
+    def delete_override(
+        self, season: int, espn_player_id: int, created_at: datetime
+    ) -> bool:
+        """Remove an override entirely. For a row entered in error — nothing else.
+
+        Reverting is the tool for one that has served its purpose: a reverted row stays on file
+        because it is the explanation for why a base moved, and ``check_base_continuity`` sends
+        people looking for it. Deleting is for a row that should never have existed.
+        """
+        rows = self.overrides(season)
+        kept = [
+            row
+            for row in rows
+            if (row.espn_player_id, row.created_at) != (espn_player_id, created_at)
+        ]
+        if len(kept) == len(rows):
+            return False
+        self.save_overrides(season, kept)
+        return True
+
+    def trade_ids(self) -> set[str]:
+        """Every id in use, across every draft — ids are unique league-wide, not per draft.
+
+        A leg names a trade by id alone, so two seasons reusing one id would make that
+        reference ambiguous and quietly let a leg balance against the wrong trade.
+        """
+        return {trade.id for trade in self.trades()}
 
     # -- season settings --------------------------------------------------------
 

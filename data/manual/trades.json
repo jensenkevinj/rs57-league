@@ -1,0 +1,70 @@
+{
+  "_about": [
+    "Draft-cash trades, keyed by DRAFT YEAR. Written by the admin tool and by nothing else.",
+    "",
+    "draft_year is the auction the cash moves at, NOT the season the deal was struck in.",
+    "A trade agreed 25 Nov 2025 spends its money at the 2026 auction: draft_year 2026,",
+    "agreed_at in 2025. This is the only file where those two years come apart -- for a",
+    "roster or a claim, season Y and draft Y are the same integer.",
+    "",
+    "ESPN cannot move auction budget between teams, so a cash trade is EXPRESSED as",
+    "hand-edited player salaries -- the overrides.json rows that name this trade's id in",
+    "their trade_id. Those rows are the legs; these rows are the trades themselves.",
+    "",
+    "amount dollars move FROM from_manager_id TO to_manager_id. The receiving team is",
+    "under-charged by ESPN, which frees that much budget, so its leg's (actual_salary -",
+    "espn base) is POSITIVE and the paying team's is negative by the same amount.",
+    "check_cash_trades audits each side against the declared amount -- per side, not",
+    "netted, because a net of zero is also what two legs on the same team would give and",
+    "that moves no budget at all.",
+    "",
+    "This exists because netting the whole league cannot tell one balanced trade from two",
+    "unrelated mistakes that happen to cancel.",
+    "",
+    "'note' is free text typed by a human and rendered on a PUBLIC site, exactly like an",
+    "override's reason. Autoescaping is on and no template may pass it through the safe",
+    "filter. No manager real names -- franchise ids only."
+  ],
+  "drafts": {
+    "2025": [
+      {
+        "agreed_at": "2025-08-31T00:00:00",
+        "amount": 3,
+        "draft_year": 2025,
+        "from_manager_id": "t1",
+        "id": "2025-t1-to-t2",
+        "note": "",
+        "to_manager_id": "t2"
+      },
+      {
+        "agreed_at": "2024-08-26T00:00:00",
+        "amount": 5,
+        "draft_year": 2025,
+        "from_manager_id": "t10",
+        "id": "2025-t10-to-t3",
+        "note": "",
+        "to_manager_id": "t3"
+      },
+      {
+        "agreed_at": "2025-08-31T00:00:00",
+        "amount": 4,
+        "draft_year": 2025,
+        "from_manager_id": "t3",
+        "id": "2025-t3-to-t10",
+        "note": "",
+        "to_manager_id": "t10"
+      }
+    ],
+    "2026": [
+      {
+        "agreed_at": "2025-11-25T00:00:00",
+        "amount": 15,
+        "draft_year": 2026,
+        "from_manager_id": "t10",
+        "id": "2026-t10-to-t6",
+        "note": "",
+        "to_manager_id": "t6"
+      }
+    ]
+  }
+}

@@ -1,0 +1,172 @@
+{# Cash trades as one editable table: every row live, plus an insert row at the bottom.
+
+   A `<form>` cannot wrap a `<tr>` — the parser hoists it out and the row falls apart — so each
+   row's controls are associated by id through the HTML5 `form` attribute, and the form elements
+   themselves sit after the table. No JavaScript: the tool renders without it.
+
+   The legs are NOT repeated here. Every leg is already a row in the overrides table below, with
+   a "Leg of" column naming its trade; nesting them again duplicated Player, Team, ESPN says,
+   True and State. What that table cannot show is the per-trade arithmetic, so that is what the
+   Legs column carries — the count and what the two sides actually move.
+
+   Nothing here computes money. `row.paid` and `row.received` are summed in screens.py, and
+   whether a trade is acceptable is decided by keeper_rules.check_cash_trades — this template
+   renders `row.issues` and never forms its own opinion. #}
+
+{% macro franchises(name, form_id, selected) %}
+  <select name="{{ name }}" form="{{ form_id }}">
+    <option value="">—</option>
+    {% for mid, fname in managers %}
+      <option value="{{ mid }}" {% if mid == selected %}selected{% endif %}>{{ fname }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro drafts(form_id, selected) %}
+  <select name="draft_year" form="{{ form_id }}">
+    {% if selected and selected not in seasons_available %}
+      <option value="{{ selected }}" selected>{{ selected }}</option>
+    {% endif %}
+    {% for yr in seasons_available | reverse %}
+      <option value="{{ yr }}" {% if yr == selected %}selected{% endif %}>{{ yr }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+<div class="scroll">
+  <table class="trades">
+    {# Percentages, not rem. Fixed widths that happened to overrun the container left the two
+       franchise columns sharing whatever was left — about 30px each, which is a dropdown arrow
+       and no name. #}
+    <colgroup>
+      <col style="width:9%"><col style="width:12%">
+      <col style="width:17%"><col style="width:17%">
+      <col style="width:7%"><col style="width:12%">
+      <col style="width:13%"><col style="width:13%">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Draft</th>
+        <th>Date</th>
+        <th>From (pays)</th>
+        <th>To (receives)</th>
+        <th class="num">Amount</th>
+        {# Legs and state are one column: the numbers and the verdict on them are one thought,
+           and splitting them cost a column the franchise names needed. #}
+        <th>Legs</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        {% set fid = 'trade-' ~ row.trade.id %}
+        <tr>
+          <td>{{ drafts(fid, row.trade.draft_year) }}</td>
+          <td>
+            <input type="date" name="agreed_at" form="{{ fid }}"
+                   value="{{ row.trade.agreed_at.strftime('%Y-%m-%d') }}">
+            <div class="row-id"><code>{{ row.trade.id }}</code></div>
+          </td>
+          <td>{{ franchises('from_manager_id', fid, row.trade.from_manager_id) }}</td>
+          <td>{{ franchises('to_manager_id', fid, row.trade.to_manager_id) }}</td>
+          <td class="num">
+            <input type="number" step="1" min="1" name="amount" form="{{ fid }}"
+                   value="{{ row.trade.amount }}">
+          </td>
+          {# ONE signal per row. The chip IS the alert — its tooltip carries the engine's own
+             wording, so the finding is never restated elsewhere. Several findings join into
+             the one tooltip rather than sprouting a box each.
+
+             With no legs the badge says "None", and that is the whole cell: a muted "none"
+             above a "needs review" chip was the same fact twice over. A legless trade always
+             lands here — CASH_TRADE_NO_LEGS makes `balanced` false, and `settled` needs legs
+             to be settled — so the red badge is never the wrong read of it. #}
+          <td class="small">
+            {% if not row.legs %}
+              <span class="tag-inline bad"
+                    title="{% for issue in row.issues %}{{ issue.message }}{% if not loop.last %}&#10;&#10;{% endif %}{% endfor %}"
+              >None</span>
+            {% else %}
+              {% if row.netted %}
+                {# The edits express this trade AND others, so no dollar in them belongs to
+                   one trade rather than another. The verdict is the group's. #}
+                <div class="muted"
+                     title="Netted with {{ row.netted_with | join(', ') }} — one salary edit covers them all, so there is no per-trade split">
+                  {{ row.legs | length }} &middot; netted
+                </div>
+              {% elif row.paid is none or row.received is none %}
+                <div class="muted"
+                     title="A leg has no ESPN base, so its movement is unknown and the sides cannot be summed">
+                  {{ row.legs | length }} &middot; unknown
+                </div>
+              {% else %}
+                <div>
+                  {{ row.legs | length }} &middot;
+                  <span class="money">${{ row.paid }} / ${{ row.received }}</span>
+                </div>
+              {% endif %}
+              <div class="row-state">
+                {% if row.settled %}
+                  <span class="tag-inline flat">settled</span>
+                {% elif row.balanced %}
+                  <span class="tag-inline ok">balances</span>
+                {% else %}
+                  <span class="tag-inline bad"
+                        title="{% for issue in row.issues %}{{ issue.message }}{% if not loop.last %}&#10;&#10;{% endif %}{% endfor %}"
+                  >needs review</span>
+                {% endif %}
+              </div>
+            {% endif %}
+          </td>
+          <td><input type="text" name="note" form="{{ fid }}" value="{{ row.trade.note }}"></td>
+          <td>
+            <div class="row-actions">
+              <button type="submit" form="{{ fid }}">Save</button>
+              {# Its own form, and two clicks. A delete must not be able to ride along on the
+                 edit form's submit, and it must not be one stray click from gone. #}
+              <details class="confirm">
+                <summary>
+                  <span class="on-closed">Delete</span><span class="on-open">Cancel</span>
+                </summary>
+                <div class="confirm-body">
+                  <form method="post"
+                        action="{{ url_for('delete_trade', trade_id=row.trade.id) }}">
+                    <button type="submit">Delete</button>
+                  </form>
+                </div>
+              </details>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+
+      {# Same columns, same controls: adding a trade and amending one look and work alike. #}
+      <tr class="insert-row">
+        <td>{{ drafts('trade-new', year) }}</td>
+        <td><input type="date" name="agreed_at" form="trade-new"></td>
+        <td>{{ franchises('from_manager_id', 'trade-new', none) }}</td>
+        <td>{{ franchises('to_manager_id', 'trade-new', none) }}</td>
+        <td class="num">
+          <input type="number" step="1" min="1" name="amount" form="trade-new">
+        </td>
+        <td class="small muted">—</td>
+        <td>
+          <input type="text" name="note" form="trade-new"
+                 placeholder="Agreed in the group chat">
+        </td>
+        <td><button type="submit" form="trade-new">Add</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{# The form elements the rows above point at. Empty by design — every control lives in its row
+   and is associated by id. `note` is free text a human types, stored in data/manual/, committed
+   to a public repo and rendered on a public site; it is escaped at render time and no template
+   in this directory uses the `safe` filter. #}
+{% for row in rows %}
+  <form id="trade-{{ row.trade.id }}" method="post"
+        action="{{ url_for('edit_trade', trade_id=row.trade.id) }}"></form>
+{% endfor %}
+<form id="trade-new" method="post" action="{{ url_for('add_trade') }}"></form>

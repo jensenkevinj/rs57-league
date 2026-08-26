@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "preview",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "http.server", "8787", "--directory", ".preview"],
+      "port": 8787
+    },
+    {
+      "name": "admin",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "rs57.admin", "--no-push", "--port", "5100"],
+      "port": 5100
+    }
+  ]
+}

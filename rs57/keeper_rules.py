@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 
-from rs57.models import KeeperClaim, KeeperSlot, RosterEntry, SalaryOverride
+from rs57.models import CashTrade, KeeperClaim, KeeperSlot, RosterEntry, SalaryOverride
 
 KEEPER_TAX = 5
 """Charged when the player was kept the previous season. Waived on a drop, NOT on a trade."""
@@ -86,6 +86,12 @@ class IssueCode(StrEnum):
     PROSPECT_REPEAT_CLAIM = "prospect_repeat_claim"
     BASE_DISCONTINUITY = "base_discontinuity"
     OVERRIDES_UNBALANCED = "overrides_unbalanced"
+    CASH_TRADE_UNBALANCED = "cash_trade_unbalanced"
+    CASH_TRADE_NO_LEGS = "cash_trade_no_legs"
+    CASH_TRADE_UNCHECKABLE = "cash_trade_uncheckable"
+    CASH_TRADE_STRANGER_LEG = "cash_trade_stranger_leg"
+    CASH_TRADE_LEG_WRONG_DRAFT = "cash_trade_leg_wrong_draft"
+    OVERRIDE_NOT_ON_A_TRADE = "override_not_on_a_trade"
 
 
 @dataclass(frozen=True)
@@ -96,6 +102,13 @@ class ValidationIssue:
     manager_id: str | None = None
     espn_player_id: int | None = None
     slot: KeeperSlot | None = None
+    trade_id: str | None = None
+    """Which cash trade this is about, for the screens that group issues by trade.
+
+    Carried as a field rather than parsed back out of ``message``: the message is prose meant
+    for a human and it changes whenever the wording is improved, which would silently break
+    any grouping that depended on reading it.
+    """
 
 
 @dataclass(frozen=True)
@@ -266,6 +279,13 @@ def check_override_balance(
 
     Rows flagged ``unpaired_ok`` are excluded, so a known-unrecoverable orphan doesn't cry
     wolf forever. REVIEW severity, never blocking.
+
+    **This is the weak check, and it only covers what the strong one cannot.** Netting the
+    whole league cannot tell one balanced trade from two unrelated mistakes that cancel, and
+    when it does fail it names every live player at once. A row carrying a ``trade_id`` is
+    audited by ``check_cash_trades`` against its own trade's declared amount and parties
+    instead, and is excluded here — reporting it twice would make this message a duplicate
+    that moves whenever an unrelated trade changes.
     """
     bases = {(entry.espn_player_id, entry.season): entry.base_salary for entry in roster}
     live = [
@@ -273,6 +293,7 @@ def check_override_balance(
         for override in overrides
         if not override.reverted
         and not override.unpaired_ok
+        and not override.trade_ids
         and (override.espn_player_id, override.season) in bases
     ]
     if not live:
@@ -296,6 +317,257 @@ def check_override_balance(
             ),
         )
     ]
+
+
+def trade_groups(
+    trades: Sequence[CashTrade],
+    legs_of: Mapping[str, list[SalaryOverride]] | None = None,
+    overrides: Sequence[SalaryOverride] = (),
+) -> list[list[CashTrade]]:
+    """Trades that share a salary edit, grouped together.
+
+    Two trades belong together when one override is a leg of both — which is what netting
+    produces. Union-find over the trade ids; a trade nothing is netted with comes back as a
+    group of one, which is why the ordinary case needs no special handling anywhere below.
+    """
+    if legs_of is None:
+        legs_of = {}
+        for override in overrides:
+            for trade_id in override.trade_ids:
+                legs_of.setdefault(trade_id, []).append(override)
+    parent = {trade.id: trade.id for trade in trades}
+
+    def find(x: str) -> str:
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for legs in legs_of.values():
+        shared = [tid for leg in legs for tid in leg.trade_ids if tid in parent]
+        for other in shared[1:]:
+            parent[find(shared[0])] = find(other)
+
+    grouped: dict[str, list[CashTrade]] = {}
+    for trade in sorted(trades, key=lambda t: (t.draft_year, t.id)):
+        grouped.setdefault(find(trade.id), []).append(trade)
+    return list(grouped.values())
+
+
+def check_cash_trades(
+    roster: Sequence[RosterEntry],
+    overrides: Sequence[SalaryOverride],
+    trades: Sequence[CashTrade],
+) -> list[ValidationIssue]:
+    """Audit draft-cash trades against the salary edits that express them.
+
+    **The unit of audit is a franchise's net, over a group of trades that share edits.** One
+    salary edit routinely covers several trades — a franchise owing $1 from one deal and $2
+    from another gets a single $3 edit, and a franchise that both pays and receives $5 gets no
+    edit at all. Once that netting happens, per-trade balancing is impossible in principle:
+    nothing records which dollar belonged to which deal, and inventing a split would be
+    recording a number nobody decided.
+
+    What is exactly checkable survives::
+
+        expected[manager] = sum over the group's trades of
+                            (-amount to from_manager_id, +amount to to_manager_id)
+        actual[manager]   = sum of that manager's live legs' (actual_salary - espn_base)
+
+    A trade netted with nothing is a group of one, and then ``expected`` is ``{payer: -amount,
+    payee: +amount}`` — exactly the two-sided check this replaced. Nothing got weaker for the
+    simple case; the netted case went from unrepresentable to checked.
+
+    The sign convention is unchanged and is still the thing to get right: ESPN **under**-charges
+    the receiving side, freeing that much auction budget, so a receiving leg's delta is positive
+    and a paying leg's is negative.
+
+    Everything reported is REVIEW and nothing blocks — consistent with ``check_override_balance``
+    and deliberate, because rows predating the trades file are legitimately unlinked and a fresh
+    ERROR would turn the existing record red.
+
+    * a trade nothing points at — declared, but never expressed in ESPN
+    * a leg whose ESPN base is unknown, so no sum can be formed. **Reported, not skipped**: the
+      remaining legs would otherwise total to something that looks like an answer
+    * a leg on a franchise that is party to none of the group's trades
+    * a leg filed under a different draft than the trades it names. A trade is expressed at the
+      auction it spends its money at, so the two are the same year or one of them is wrong
+    * a franchise whose edits do not net to what its trades say it owes, including the
+      half-reverted case — one leg put back and one left live is a distortion the ratchet then
+      carries forward every year
+    * a live override attached to no trade at all, or naming one that is not on file
+
+    A group whose legs are **all** reverted is finished, not broken: ESPN has been put back and
+    that is the intended end state.
+    """
+    entries = {(entry.espn_player_id, entry.season): entry for entry in roster}
+    legs_of: dict[str, list[SalaryOverride]] = {}
+    for override in overrides:
+        for trade_id in override.trade_ids:
+            legs_of.setdefault(trade_id, []).append(override)
+
+    issues: list[ValidationIssue] = []
+    for group in trade_groups(trades, legs_of):
+        ids = [trade.id for trade in group]
+        label = ids[0] if len(ids) == 1 else " + ".join(ids)
+        # Deduplicated: one override netting two of the group's trades is still one edit.
+        legs = {
+            (leg.espn_player_id, leg.season, leg.created_at): leg
+            for tid in ids
+            for leg in legs_of.get(tid, [])
+        }
+        if not legs:
+            for trade in group:
+                issues.append(
+                    ValidationIssue(
+                        code=IssueCode.CASH_TRADE_NO_LEGS,
+                        severity=Severity.REVIEW,
+                        message=(
+                            f"trade {trade.id} declares ${trade.amount} from "
+                            f"{trade.from_manager_id} to {trade.to_manager_id}, but no salary "
+                            f"override points at it — nothing expresses it in ESPN"
+                        ),
+                        trade_id=trade.id,
+                    )
+                )
+            continue
+
+        live = [leg for leg in legs.values() if not leg.reverted]
+        if not live:
+            continue  # Every side put back. Finished, not broken.
+
+        parties: set[str] = set()
+        expected: dict[str, int] = {}
+        for trade in group:
+            parties |= {trade.from_manager_id, trade.to_manager_id}
+            expected[trade.from_manager_id] = (
+                expected.get(trade.from_manager_id, 0) - trade.amount
+            )
+            expected[trade.to_manager_id] = expected.get(trade.to_manager_id, 0) + trade.amount
+
+        drafts = {trade.draft_year for trade in group}
+        actual: dict[str, int] = {manager: 0 for manager in parties}
+        unknown = False
+        for leg in sorted(live, key=lambda o: (o.season, o.espn_player_id)):
+            entry = entries.get((leg.espn_player_id, leg.season))
+            if entry is None:
+                issues.append(
+                    ValidationIssue(
+                        code=IssueCode.CASH_TRADE_UNCHECKABLE,
+                        severity=Severity.REVIEW,
+                        message=(
+                            f"{label} cannot be balanced: ESPN has no {leg.season} base for "
+                            f"player {leg.espn_player_id}, so that leg's dollar movement is "
+                            f"unknown and the rest would not add up to an answer"
+                        ),
+                        espn_player_id=leg.espn_player_id,
+                        trade_id=ids[0],
+                    )
+                )
+                unknown = True
+                continue
+            if leg.season not in drafts:
+                issues.append(
+                    ValidationIssue(
+                        code=IssueCode.CASH_TRADE_LEG_WRONG_DRAFT,
+                        severity=Severity.REVIEW,
+                        message=(
+                            f"{label} is for the {sorted(drafts)} draft, but its leg on player "
+                            f"{leg.espn_player_id} distorts a {leg.season} price — a trade is "
+                            f"expressed at the auction it spends its money at, so the two are "
+                            f"the same year or one of them is wrong"
+                        ),
+                        espn_player_id=leg.espn_player_id,
+                        trade_id=ids[0],
+                    )
+                )
+                unknown = True
+                continue
+            if entry.manager_id not in parties:
+                issues.append(
+                    ValidationIssue(
+                        code=IssueCode.CASH_TRADE_STRANGER_LEG,
+                        severity=Severity.REVIEW,
+                        message=(
+                            f"{label} is between {', '.join(sorted(parties))}, but player "
+                            f"{leg.espn_player_id} is on {entry.manager_id} — a cash trade is "
+                            f"only ever expressed on the teams that agreed it"
+                        ),
+                        manager_id=entry.manager_id,
+                        espn_player_id=leg.espn_player_id,
+                        trade_id=ids[0],
+                    )
+                )
+                unknown = True
+                continue
+            actual[entry.manager_id] += leg.actual_salary - entry.base_salary
+
+        if unknown:
+            continue
+
+        off = {
+            manager: actual.get(manager, 0) - owed
+            for manager, owed in expected.items()
+            if actual.get(manager, 0) != owed
+        }
+        if not off:
+            continue
+
+        half_reverted = len(live) != len(legs)
+        because = (
+            " — some legs are marked reverted and some are not, which leaves the distortion "
+            "live and carries it into next season's base"
+            if half_reverted
+            else ""
+        )
+        detail = ", ".join(
+            f"{manager} is ${amount:+d} against an expected ${expected[manager]:+d}"
+            for manager, amount in sorted(off.items())
+        )
+        issues.append(
+            ValidationIssue(
+                code=IssueCode.CASH_TRADE_UNBALANCED,
+                severity=Severity.REVIEW,
+                message=(
+                    f"{label}: the salary edits do not net to what the trades say is owed — "
+                    f"{detail}{because}"
+                ),
+                trade_id=ids[0],
+            )
+        )
+
+    known = {trade.id for trade in trades}
+    for override in sorted(overrides, key=lambda o: (o.season, o.espn_player_id)):
+        if override.reverted or override.unpaired_ok:
+            continue
+        if not override.trade_ids:
+            issues.append(
+                ValidationIssue(
+                    code=IssueCode.OVERRIDE_NOT_ON_A_TRADE,
+                    severity=Severity.REVIEW,
+                    message=(
+                        f"the live {override.season} override for player "
+                        f"{override.espn_player_id} is not attached to a cash trade, so it can "
+                        f"only be checked by netting the whole league — record the trade it is "
+                        f"a leg of, or flag it unpaired_ok if the counterparty is unrecoverable"
+                    ),
+                    espn_player_id=override.espn_player_id,
+                )
+            )
+        for dangling in sorted(set(override.trade_ids) - known):
+            issues.append(
+                ValidationIssue(
+                    code=IssueCode.OVERRIDE_NOT_ON_A_TRADE,
+                    severity=Severity.REVIEW,
+                    message=(
+                        f"the live {override.season} override for player "
+                        f"{override.espn_player_id} names trade {dangling}, which is not on file"
+                    ),
+                    espn_player_id=override.espn_player_id,
+                    trade_id=dangling,
+                )
+            )
+    return issues
 
 
 def _ordinal(n: int) -> str:

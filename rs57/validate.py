@@ -14,7 +14,9 @@ What it checks
 * cross-file references: no roster entry for an unknown franchise, no orphan player
 * keeper claims: no duplicate slot, no duplicate player, fee sums match the tier
 * the ratchet, via ``keeper_rules.check_base_continuity``
-* draft-cash trades net to zero, via ``keeper_rules.check_override_balance``
+* each draft-cash trade balances against its own declared amount, via
+  ``keeper_rules.check_cash_trades``, and any override attached to no trade still nets to zero
+  league-wide via ``keeper_rules.check_override_balance``
 * derived stats reference franchises that exist, and the payouts add up
 
 **A skipped check is reported, never assumed passed.** ``data/history/`` is empty today, so
@@ -42,10 +44,12 @@ from rs57.keeper_rules import (
     PROSPECT_RULES_TIGHTENED,
     Severity,
     check_base_continuity,
+    check_cash_trades,
     check_override_balance,
     validate_team_claims,
 )
 from rs57.models import (
+    CashTrade,
     FranchiseName,
     KeeperClaim,
     KeeperSlot,
@@ -401,7 +405,9 @@ def validate_history(report: Report) -> LoadedHistory:
     return loaded
 
 
-def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[SalaryOverride]]:
+def validate_manual_records(
+    report: Report,
+) -> tuple[list[KeeperClaim], list[SalaryOverride], list[CashTrade]]:
     """Load the claims and overrides the admin tool records in ``data/manual/``.
 
     ``history/`` holds a *completed* season, frozen; ``manual/`` holds the season being decided.
@@ -413,6 +419,7 @@ def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[Sal
     """
     claims: list[KeeperClaim] = []
     overrides: list[SalaryOverride] = []
+    trades: list[CashTrade] = []
 
     claims_path = DATA / "manual" / "claims.json"
     if claims_path.exists():
@@ -443,6 +450,29 @@ def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[Sal
         except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
             report.error(f"overrides.json: {exc}")
 
+    trades_path = DATA / "manual" / "trades.json"
+    if trades_path.exists():
+        try:
+            for year, rows in (_load(trades_path).get("drafts") or {}).items():
+                for row in rows:
+                    trade = CashTrade(**row)
+                    if trade.draft_year != int(year):
+                        report.error(
+                            f"trades.json: a row under draft {year} says draft "
+                            f"{trade.draft_year}"
+                        )
+                    trades.append(trade)
+            duplicates = len(trades) - len({trade.id for trade in trades})
+            if duplicates:
+                report.error(
+                    f"trades.json: {duplicates} duplicate trade id(s) — a leg names its trade "
+                    f"by id alone, so a reused one would let a leg balance against the wrong "
+                    f"trade"
+                )
+            report.ok(f"trades.json: {len(trades)} draft-cash trades load cleanly")
+        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            report.error(f"trades.json: {exc}")
+
     seasons_path = DATA / "manual" / "seasons.json"
     if seasons_path.exists():
         try:
@@ -461,7 +491,7 @@ def validate_manual_records(report: Report) -> tuple[list[KeeperClaim], list[Sal
         except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
             report.error(f"payments.json: {exc}")
 
-    return claims, overrides
+    return claims, overrides, trades
 
 
 def audit_ratchet(
@@ -740,7 +770,7 @@ def run(report: Report | None = None) -> Report:
             )
 
     history = validate_history(report)
-    manual_claims, manual_overrides = validate_manual_records(report)
+    manual_claims, manual_overrides, trades = validate_manual_records(report)
 
     # A season that has graduated into data/history/ may still be sitting in
     # data/manual/claims.json — the importer cannot clear it, because that file has one writer
@@ -813,6 +843,26 @@ def run(report: Report | None = None) -> Report:
         report.skip(
             "check_override_balance: no salary overrides recorded, so no draft-cash trade "
             "could be checked for a missing leg"
+        )
+
+    # Runs on trades OR overrides, not on both being present. With trades and no legs it
+    # reports trades nothing points at; with legs and no trades it reports overrides attached
+    # to nothing. Requiring both would go quiet in exactly the two states worth hearing about.
+    if (trades or overrides) and all_roster:
+        for issue in check_cash_trades(all_roster, overrides, trades):
+            report.review(f"cash trade: {issue.message}")
+        report.ok(
+            f"check_cash_trades ran against {len(trades)} recorded trade(s) and their legs"
+        )
+    elif not all_roster:
+        report.skip(
+            "check_cash_trades: no roster loaded, so no leg's dollar movement could be worked "
+            "out and no trade could be balanced"
+        )
+    else:
+        report.skip(
+            "check_cash_trades: no draft-cash trades and no salary overrides recorded, so "
+            "there was nothing to balance"
         )
 
     for path in stats_files:

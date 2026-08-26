@@ -1,64 +1,169 @@
-{# Recorded overrides. Shared by the overrides tab (every season) and the season page (one).
+{# Salary overrides as one editable table: every row live, plus an insert row at the bottom.
+   Same shape as the trades table above it — a `<form>` cannot wrap a `<tr>`, so each row's
+   controls are joined to a form element after the table by the HTML5 `form` attribute.
 
-   `show_season` is off on the season page, where the column would repeat one value down the
-   whole table. Nothing here computes money: `row.delta` is summed and subtracted in screens.py,
-   which is the rule the whole tool is built on. #}
+   Player name and ESPN base are read-only: they come from the synced roster, not from typing.
+   What the commissioner decides is the draft, the player id, the true salary, which trades the
+   edit is a leg of, and whether the counterparty is unrecoverable.
+
+   `Leg of` is a MULTI-select. One salary edit routinely expresses more than one trade — see
+   SalaryOverride.trade_ids — and selecting none detaches it.
+
+   `show_season` is off on the season page, where the draft column would repeat one value down
+   the whole table. Nothing here computes money: `row.delta` is summed in screens.py. #}
+
+{% macro trade_options(form_id, chosen) %}
+  <select name="trade_ids" form="{{ form_id }}" multiple size="3">
+    {% for trade in trade_choices %}
+      <option value="{{ trade.id }}" {% if trade.id in chosen %}selected{% endif %}>
+        {{ trade.draft_year }} &middot; {{ trade.from_manager_id }}&rarr;{{ trade.to_manager_id }} (${{ trade.amount }})
+      </option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro draft_options(form_id, chosen) %}
+  <select name="season" form="{{ form_id }}">
+    {% if chosen and chosen not in seasons_available %}
+      <option value="{{ chosen }}" selected>{{ chosen }}</option>
+    {% endif %}
+    {% for yr in seasons_available | reverse %}
+      <option value="{{ yr }}" {% if yr == chosen %}selected{% endif %}>{{ yr }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
 <div class="scroll">
-  <table>
+  <table class="overrides">
     <thead>
       <tr>
-        {% if show_season %}<th>Season</th>{% endif %}
+        {% if show_season %}<th>Draft</th>{% endif %}
         <th>Player</th>
         <th>Team</th>
-        <th class="num">ESPN says</th>
+        <th class="num">ESPN</th>
         <th class="num">True</th>
-        <th class="num">Moved</th>
-        <th>Reason</th>
+        <th>Leg of</th>
         <th>State</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       {% for row in rows %}
+        {% set oid = 'ov-' ~ row.override.season ~ '-' ~ row.override.espn_player_id ~ '-' ~ loop.index %}
         <tr>
-          {% if show_season %}<td>{{ row.override.season }}</td>{% endif %}
-          <td>{{ row.name }} <span class="small muted">{{ row.override.espn_player_id }}</span></td>
-          <td class="small">{{ row.manager or '—' }}</td>
-          <td class="num">{% if row.espn_base is none %}—{% else %}${{ row.espn_base }}{% endif %}</td>
-          <td class="num money">${{ row.override.actual_salary }}</td>
-          <td class="num">
-            {% if row.delta is none %}
-              <span class="muted" title="ESPN has no base for this player, so nothing to compare">—</span>
-            {% else %}
-              ${{ row.delta }}
-            {% endif %}
+          {% if show_season %}<td>{{ draft_options(oid, row.override.season) }}</td>{% endif %}
+          {# The reason lost its column — it reads "draft-cash trade" every time — but rows
+             already on file carry real provenance, so it moves to the row's tooltip. Free text
+             a human typed, escaped here exactly as it was in the cell. #}
+          <td title="{{ row.override.reason }}">
+            <div class="small">{{ row.name }}</div>
+            <input type="number" step="1" name="espn_player_id" form="{{ oid }}"
+                   value="{{ row.override.espn_player_id }}">
           </td>
-          <td class="small">{{ row.override.reason }}</td>
+          <td class="small">{{ row.manager or '—' }}</td>
+          {# `Moved` is gone: it was True minus ESPN, and both sit right here. #}
+          <td class="num">{% if row.espn_base is none %}—{% else %}${{ row.espn_base }}{% endif %}</td>
+          <td class="num">
+            <input type="number" step="1" min="0" name="actual_salary" form="{{ oid }}"
+                   value="{{ row.override.actual_salary }}">
+          </td>
+          <td class="small">{{ trade_options(oid, row.override.trade_ids) }}</td>
           <td class="small">
             {% if row.override.reverted %}
-              <span class="tag-inline flat">reverted — ESPN wins</span>
+              <span class="tag-inline flat"
+                    title="ESPN has been put back, so ESPN's value wins again">reverted</span>
             {% else %}
-              <span class="tag-inline">live — overrides ESPN</span>
+              <span class="tag-inline"
+                    title="This value overrides ESPN's until it is marked reverted">live</span>
             {% endif %}
-            {% if row.override.unpaired_ok %}
-              <span class="tag-inline flat">unpaired ok</span>
-            {% endif %}
+            <label class="small muted"
+                   title="Counterparty unrecoverable — excluded from the league-wide balance check">
+              <input type="checkbox" name="unpaired_ok" value="1" form="{{ oid }}"
+                     {% if row.override.unpaired_ok %}checked{% endif %}> unpaired
+            </label>
           </td>
           <td>
-            {% if not row.override.reverted %}
-              <form method="post" action="{{ url_for('revert_override') }}">
-                {% if return_year %}
-                  <input type="hidden" name="return_year" value="{{ return_year }}">
-                {% endif %}
-                <input type="hidden" name="season" value="{{ row.override.season }}">
-                <input type="hidden" name="espn_player_id" value="{{ row.override.espn_player_id }}">
-                <input type="hidden" name="created_at" value="{{ row.override.created_at.isoformat() }}">
-                <button type="submit" class="quiet">Mark reverted</button>
-              </form>
-            {% endif %}
+            <div class="row-actions">
+              <button type="submit" form="{{ oid }}">Save</button>
+              {% if not row.override.reverted %}
+                <form method="post" action="{{ url_for('revert_override') }}">
+                  {% if return_year %}
+                    <input type="hidden" name="return_year" value="{{ return_year }}">
+                  {% endif %}
+                  <input type="hidden" name="season" value="{{ row.override.season }}">
+                  <input type="hidden" name="espn_player_id"
+                         value="{{ row.override.espn_player_id }}">
+                  <input type="hidden" name="created_at"
+                         value="{{ row.override.created_at.isoformat() }}">
+                  <button type="submit">Revert</button>
+                </form>
+              {% endif %}
+              {# Two clicks, same as a trade. Reverting is the everyday action and stays one
+                 click — it is reversible and the row survives it. Deleting is neither. #}
+              <details class="confirm">
+                <summary>
+                  <span class="on-closed">Delete</span><span class="on-open">Cancel</span>
+                </summary>
+                <div class="confirm-body">
+                  <form method="post" action="{{ url_for('delete_override') }}">
+                    <input type="hidden" name="season" value="{{ row.override.season }}">
+                    <input type="hidden" name="espn_player_id"
+                           value="{{ row.override.espn_player_id }}">
+                    <input type="hidden" name="created_at"
+                           value="{{ row.override.created_at.isoformat() }}">
+                    <button type="submit">Delete</button>
+                  </form>
+                </div>
+              </details>
+            </div>
           </td>
         </tr>
       {% endfor %}
+
+      {% if show_season %}
+        {# Same columns, same controls: adding an override and amending one look and work
+           alike. Ledger only — the season page is a read-and-amend view of one year. #}
+        <tr class="insert-row">
+          <td>{{ draft_options('ov-new', year) }}</td>
+          <td>
+            <input type="number" step="1" name="espn_player_id" form="ov-new"
+                   placeholder="ESPN id">
+          </td>
+          <td class="small muted">—</td>
+          <td class="num muted">—</td>
+          <td class="num">
+            <input type="number" step="1" min="0" name="actual_salary" form="ov-new">
+          </td>
+          <td class="small">{{ trade_options('ov-new', []) }}</td>
+          <td class="small">
+            <label class="small muted">
+              <input type="checkbox" name="unpaired_ok" value="1" form="ov-new"> unpaired
+            </label>
+          </td>
+          <td><button type="submit" form="ov-new">Add</button></td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
+
+{# The form elements the rows above point at. Empty by design — every control lives in its row.
+   `created_at` and the original draft/player identify the row being replaced: the stamp is the
+   row's identity and a leg holds it, so it is carried over rather than reissued on save. #}
+{% for row in rows %}
+  {% set oid = 'ov-' ~ row.override.season ~ '-' ~ row.override.espn_player_id ~ '-' ~ loop.index %}
+  <form id="{{ oid }}" method="post" action="{{ url_for('edit_override') }}">
+    <input type="hidden" name="orig_season" value="{{ row.override.season }}">
+    <input type="hidden" name="orig_espn_player_id" value="{{ row.override.espn_player_id }}">
+    <input type="hidden" name="created_at" value="{{ row.override.created_at.isoformat() }}">
+    {% if not show_season %}
+      <input type="hidden" name="season" value="{{ row.override.season }}">
+    {% endif %}
+    {% if return_year %}
+      <input type="hidden" name="return_year" value="{{ return_year }}">
+    {% endif %}
+  </form>
+{% endfor %}
+{% if show_season %}
+  <form id="ov-new" method="post" action="{{ url_for('add_override') }}"></form>
+{% endif %}

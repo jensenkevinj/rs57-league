@@ -454,23 +454,17 @@ def _epoch_ms(value: int | None) -> datetime | None:
 
 
 def fetch_deadlines(season: int) -> tuple[dict[str, datetime | None], str | None]:
-    """ESPN's own keeper and trade deadlines for ``season``, as naive UTC datetimes.
+    """ESPN's own trade deadline for ``season``, as a naive UTC datetime.
 
-    Offered to the settings screen so the deadline is read off the league rather than retyped
-    from memory. ``rs57.sync`` does not record ``keeperDeadlineDate`` — widening the derived
-    file's shape would be a change to what the nightly Action writes, which is not this phase's
-    to make — so the admin tool reads it directly and stores it in ``data/manual/seasons.json``.
+    Offered to the settings screen so the field is read off the league rather than retyped from
+    memory. ``keeperDeadlineDate`` used to be fetched here too, but it is no longer a settings
+    field at all — ``rs57.sync`` now records it (and ``draftSettings.date``) straight into
+    ``data/derived/{year}.json`` on every nightly run, exactly like ``trade_deadline`` already
+    was, so there is nothing left for this screen to fill in by hand (commissioner, 2026-08-26).
     """
     try:
         settings = (EspnClient.from_env(season).fetch_league().get("settings") or {})
     except EspnError as exc:
         return {}, str(exc)
-    draft = settings.get("draftSettings") or {}
     trade = settings.get("tradeSettings") or {}
-    return (
-        {
-            "keeper_deadline": _epoch_ms(draft.get("keeperDeadlineDate")),
-            "trade_deadline": _epoch_ms(trade.get("deadlineDate")),
-        },
-        None,
-    )
+    return ({"trade_deadline": _epoch_ms(trade.get("deadlineDate"))}, None)
