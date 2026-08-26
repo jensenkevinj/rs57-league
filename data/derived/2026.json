@@ -2895,7 +2895,9 @@
   "season": 2026,
   "source": {
     "base_salary_field": "keeperValue",
+    "draft_date": "2026-09-04T01:00:00",
     "drafted": false,
+    "keeper_deadline": "2026-09-02T03:00:00",
     "trade_deadline": "2026-12-02T17:00:00"
   }
 }
