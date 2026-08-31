@@ -433,6 +433,21 @@
   .leader-money { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
   .leaders li.top .leader-money { color: var(--gold); }
 
+  /* --- the home page: who still owes their dues ------------------------- */
+
+  /* The panel disappears once everyone has paid (site.build_site decides), so this styles
+     a list that is always part unpaid. "owes" is a word and not just a colour: the state
+     has to survive being read aloud, printed, or seen by someone who cannot tell the two
+     greys apart. */
+  .dues { list-style: none; margin: 0.4rem 0 1.6rem; padding: 0;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+          gap: 0.1rem 1.2rem; }
+  .dues li { display: flex; align-items: baseline; gap: 0.5rem;
+             padding: 0.3rem 0; border-bottom: 1px solid var(--line); }
+  .dues .dues-team { flex: 1; }
+  .dues li.owing .dues-team { font-weight: 600; }
+  .dues li.settled .dues-team { color: var(--muted); }
+
 </style>
 </head>
 <body>
@@ -469,6 +484,55 @@
   <p>
       <span class="muted">Draft scheduling link coming soon.</span>
   </p>
+
+  <h2>Dues</h2>
+  <p class="muted small">4 of 12 paid for 2026.</p>
+  <ul class="dues">
+      <li class="owing">
+        <span class="dues-team">100yd Reverse Hurdles</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="settled">
+        <span class="dues-team">Aiyukiddinme? I&#39;m Odunze here</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">Belichick&#39;s Spy</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">Bijan&#39;s Mustard</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">Calling Audibles</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">CeeDee Drive</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">Cooking Rice</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="settled">
+        <span class="dues-team">Fake News</span>
+      </li>
+      <li class="settled">
+        <span class="dues-team">Jaxian McJigberson</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">Lonely at the Top</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="owing">
+        <span class="dues-team">The Infirmary</span>
+          <span class="tag-inline">owes</span>
+      </li>
+      <li class="settled">
+        <span class="dues-team">Too Much Moxie</span>
+      </li>
+  </ul>
 
 </div>
 </body>
