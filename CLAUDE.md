@@ -267,6 +267,44 @@ amount field there (that stays in `payouts.json`, `stats`'s to compute — two c
 are two numbers) and no payment method, handle, or note: this file is committed to a public
 repo.
 
+## Dues — money paid IN
+
+Three things in this repo are called money and only two of them are. Keep them apart:
+
+- **Dues** (`data/manual/dues.json`, the `Dues` model) — real dollars a manager pays **into**
+  the league for a season. Recorded at the start of it.
+- **Prize payments** (`data/manual/payments.json`, `Payment`) — real dollars paid **out** to a
+  winner. Recorded at the end of the same season.
+- **Keeper fees, the $5 tax, and draft-cash trades** — **not money at all.** Auction budget,
+  which never changes hands. The word "fee" is taken by this meaning throughout; do not
+  overload it for dues.
+
+Dues and prizes are the same season's two ends, which is why one admin screen — the **Money**
+tab, `/season/<year>/money` — shows both, keyed on one year. The nav lands on `current_season`
+because that is where collection happens; a season still being played has live dues and an
+empty prize half, and that half fills in on the same page once the season derives. The old
+`/season/<year>/payouts` URL redirects there. **Draft cash** is the separate tab next to it and
+is auction budget, per above.
+
+**Dues record no amount, and no franchise-level anything else.** A row is
+`(season, manager_id, paid, paid_at)`. The buy-in is one figure the whole league knows and
+nothing in `data/` records it today — putting it on twelve rows would be twelve copies of a
+number nobody has written down once, and the panel exists to say who still owes, not what it
+costs. No payment method, handle, or note either: public repo.
+
+**Absence means unpaid.** Un-marking removes the row rather than storing `paid: false`, so a
+mistyped id cannot linger after it is undone. This is why `all_paid` must be counted against
+the **season's franchise list**, never against the dues file — zero of twelve would otherwise
+read as the finished state and hide the panel exactly when it is most wanted.
+
+The admin tool refuses a `manager_id` that has no franchise in that season: the season's own
+derived file is the league's own record, so it blocks rather than flags. `check_dues` in
+`validate.py` is the second line, and reports SKIPPED — never silence — when a season it names
+has no derived file to check against.
+
+The public homepage panel shows dues only, and **removes itself once every franchise has paid**
+(decided in `site.build_site`, not in the template). Prize *handoff* status stays admin-only.
+
 ## Conventions
 - Key franchises on espn_team_id. Display names change yearly and are unreliable
   (one carries a double space: `Belichick's  Spy`).

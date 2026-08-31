@@ -641,3 +641,63 @@ class TestExitCodes:
     def test_a_clean_run_passes(self, data_dir):
         write(data_dir / "derived" / "2025.json", SEASON)
         assert validate.main([]) == 0
+
+
+class TestDuesNameRealFranchises:
+    """Dues are money paid IN, keyed on (season, manager_id).
+
+    An id resolving to nobody would sit in the file reading as somebody's payment while the
+    public panel kept showing that franchise as owing.
+    """
+
+    def _dues(self, *rows: dict) -> dict:
+        return {"_about": ["who has paid in"], "dues": list(rows)}
+
+    def _row(self, manager_id: str = "t1", season: int = 2025) -> dict:
+        return {
+            "season": season,
+            "manager_id": manager_id,
+            "paid": True,
+            "paid_at": "2026-08-30T12:00:00",
+        }
+
+    def test_a_clean_file_passes(self, data_dir):
+        write(data_dir / "derived" / "2025.json", SEASON)
+        write(data_dir / "manual" / "dues.json", self._dues(self._row()))
+        report = validate.run()
+        assert report.errors == []
+        assert any("dues record(s) load cleanly" in message for message in report.checked)
+
+    def test_dues_for_a_franchise_that_does_not_exist_is_an_error(self, data_dir):
+        write(data_dir / "derived" / "2025.json", SEASON)
+        write(data_dir / "manual" / "dues.json", self._dues(self._row("t99")))
+        report = validate.run()
+        assert any(
+            "has no franchise in that season" in message for message in report.errors
+        )
+
+    def test_a_season_with_no_derived_file_is_reported_not_assumed(self, data_dir):
+        """The rule the validator is built around: silence reads exactly like success."""
+        write(data_dir / "derived" / "2025.json", SEASON)
+        write(data_dir / "manual" / "dues.json", self._dues(self._row(season=2024)))
+        report = validate.run()
+        assert report.errors == [], "an uncheckable id must not be called wrong"
+        assert any(
+            "could not be checked against that season's franchises" in message
+            for message in report.skipped
+        )
+
+    def test_a_missing_file_says_so_rather_than_passing_silently(self, data_dir):
+        write(data_dir / "derived" / "2025.json", SEASON)
+        report = validate.run()
+        assert any("dues.json is not on disk" in message for message in report.skipped)
+
+    def test_schema_drift_is_an_error_rather_than_a_silently_dropped_row(self, data_dir):
+        write(data_dir / "derived" / "2025.json", SEASON)
+        row = self._row()
+        row["amount"] = 100
+        write(data_dir / "manual" / "dues.json", self._dues(row))
+        report = validate.run()
+        assert any("dues.json" in message for message in report.errors), (
+            "an amount field was accepted — dues deliberately record no money"
+        )

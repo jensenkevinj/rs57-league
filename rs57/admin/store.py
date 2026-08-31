@@ -31,6 +31,7 @@ from typing import Any
 from rs57.history import HistoryStore
 from rs57.models import (
     CashTrade,
+    Dues,
     KeeperClaim,
     KeeperSlot,
     Payment,
@@ -49,6 +50,7 @@ TRADES = "trades.json"
 SEASONS = "seasons.json"
 PAYMENTS = "payments.json"
 PAYOUTS = "payouts.json"
+DUES = "dues.json"
 PROSPECTS = "prospects.json"
 
 ABOUT: dict[str, list[str]] = {
@@ -150,6 +152,26 @@ ABOUT: dict[str, list[str]] = {
         "",
         "The AMOUNT is deliberately not here -- it lives in payouts.json and the split is",
         "stats.award_prizes' to compute. Two copies of a number are two numbers.",
+        "",
+        "No payment method, no handles, no notes: this file is committed to a PUBLIC repo.",
+    ],
+    DUES: [
+        "Which franchises have paid their buy-in, by season. Written by the admin tool and by",
+        "nothing else.",
+        "",
+        "This is money paid IN. payments.json is the other direction -- a prize handed OUT to a",
+        "winner. They are the same season's two ends, dues at the start and prizes at the",
+        "finish, which is why one admin screen shows both.",
+        "",
+        "Neither is a keeper fee. Fees and the $5 tax are auction budget and never change",
+        "hands; these are real dollars.",
+        "",
+        "Absence means unpaid. An unpaid franchise has no row here rather than one saying",
+        "paid: false, so a mistyped manager id cannot linger in the file after it is undone.",
+        "",
+        "The AMOUNT is deliberately not here. The buy-in is one figure the whole league knows",
+        "and nothing in data/ records it today; putting it on twelve rows would be twelve",
+        "copies of a number nobody has written down once.",
         "",
         "No payment method, no handles, no notes: this file is committed to a PUBLIC repo.",
     ],
@@ -534,6 +556,40 @@ class ManualStore:
             key=lambda row: (row["season"], row["label"], row["winner_manager_id"]),
         )
         return self._merge(PAYMENTS, payments=rows)
+
+    # -- dues -------------------------------------------------------------------
+
+    def dues(self, season: int | None = None) -> list[Dues]:
+        rows = self.load(DUES).get("dues") or []
+        dues = [Dues(**row) for row in rows]
+        if season is None:
+            return dues
+        return [row for row in dues if row.season == season]
+
+    def set_dues_paid(
+        self, season: int, manager_id: str, paid: bool, *, now: datetime
+    ) -> Path:
+        """Record (or un-record) that one franchise paid its buy-in.
+
+        Un-marking **removes** the row rather than storing ``paid: false``, exactly as
+        ``set_paid`` does. Absence already means unpaid — the join reads only rows where
+        ``paid`` is true — so a negative row carries no information and would leave a mistyped
+        manager id in the file for good.
+        """
+        kept = [
+            row
+            for row in self.dues()
+            if (row.season, row.manager_id) != (season, manager_id)
+        ]
+        if paid:
+            kept.append(
+                Dues(season=season, manager_id=manager_id, paid=True, paid_at=now)
+            )
+        rows = sorted(
+            (row.model_dump(mode="json") for row in kept),
+            key=lambda row: (row["season"], row["manager_id"]),
+        )
+        return self._merge(DUES, dues=rows)
 
     # -- prize schedule (read-only here; amounts are transcribed by hand) --------
 
