@@ -1291,6 +1291,111 @@ def repo(tmp_path: Path) -> Path:
     return root
 
 
+@pytest.fixture
+def cloned(tmp_path: Path) -> tuple[Path, Path]:
+    """A repo with a real origin, so a push can be run for real. Returns (local, remote)."""
+    remote = tmp_path / "remote.git"
+    remote.mkdir()
+    Git(repo=remote).run("init", "-q", "--bare", "--initial-branch", "main")
+
+    root = tmp_path / "clone"
+    (root / "data" / "manual").mkdir(parents=True)
+    (root / "data" / "derived").mkdir(parents=True)
+    git = Git(repo=root)
+    git.run("init", "-q", "--initial-branch", "main")
+    git.run("config", "user.email", "test@example.invalid")
+    git.run("config", "user.name", "Test")
+    (root / "data" / "derived" / "2026.json").write_text("{}\n", encoding="utf-8")
+    git.run("add", "-A")
+    git.run("commit", "-qm", "seed")
+    git.run("remote", "add", "origin", str(remote))
+    git.run("push", "-q", "-u", "origin", "main")
+    return root, remote
+
+
+def nightly_commit(tmp_path: Path, remote: Path, content: str = '{"synced": true}') -> None:
+    """A nightly run landing on the remote: data/derived/ only, which is all it owns."""
+    work = tmp_path / f"nightly-{content and len(content)}"
+    Git(repo=tmp_path).run("clone", "-q", str(remote), str(work))
+    git = Git(repo=work)
+    git.run("config", "user.email", "nightly@example.invalid")
+    git.run("config", "user.name", "Nightly")
+    (work / "data" / "derived" / "2026.json").write_text(content + "\n", encoding="utf-8")
+    git.run("commit", "-qam", "Nightly: sync 2026, rebuild site")
+    git.run("push", "-q")
+
+
+def test_a_branch_behind_the_nightly_still_pushes(cloned):
+    """The nightly commits every night, so a laptop that pushed yesterday is behind by morning.
+
+    A bare push is rejected there. The commit button replays onto the remote first, and both
+    sides survive: the Action's derived file and the commissioner's manual one.
+    """
+    root, remote = cloned
+    nightly_commit(root.parent, remote)
+
+    (root / "data" / "manual" / "dues.json").write_text('{"a": 1}\n', encoding="utf-8")
+    git = Git(repo=root)
+    log = git.commit_and_push("Admin: update league dues (2026)")
+
+    assert any("replayed onto origin/main" in line for line in log)
+    assert any("pushed to main" in line for line in log)
+
+    # Both writers' work is on the remote, and neither clobbered the other.
+    landed = Git(repo=remote).run("show", "main:data/manual/dues.json")
+    assert '"a": 1' in landed
+    assert "synced" in Git(repo=remote).run("show", "main:data/derived/2026.json")
+
+
+def test_being_up_to_date_costs_no_rebase(cloned):
+    """The common case must stay a plain push — a rebase that always runs rewrites history
+    nobody asked it to."""
+    root, _ = cloned
+    (root / "data" / "manual" / "dues.json").write_text('{"a": 1}\n', encoding="utf-8")
+    git = Git(repo=root)
+    log = git.commit_and_push("Admin: update league dues (2026)")
+
+    assert not any("replayed" in line for line in log)
+    assert any("pushed to main" in line for line in log)
+
+
+def test_a_dirty_derived_file_stops_the_push_without_losing_the_commit(cloned):
+    """A local `rs57.sync` leaves data/derived/ dirty, and git then refuses the rebase.
+
+    The commit has already been made at that point. It has to stay made, the repo must not be
+    left mid-rebase, and the commissioner has to be told which of the two happened.
+    """
+    root, remote = cloned
+    nightly_commit(root.parent, remote)
+
+    (root / "data" / "manual" / "dues.json").write_text('{"a": 1}\n', encoding="utf-8")
+    (root / "data" / "derived" / "2026.json").write_text('{"local": true}\n', encoding="utf-8")
+
+    git = Git(repo=root)
+    with pytest.raises(GitError, match="committed, but not pushed"):
+        git.commit_and_push("Admin: update league dues (2026)")
+
+    # The commit survived, the repo is not mid-rebase, and nothing reached the remote.
+    assert "dues.json" in git.run("show", "--name-only", "--format=", "HEAD")
+    assert not (root / ".git" / "rebase-merge").exists()
+    assert not (root / ".git" / "rebase-apply").exists()
+    assert "dues.json" not in Git(repo=remote).run("ls-tree", "-r", "--name-only", "main")
+
+
+def test_a_push_is_never_attempted_when_pushing_is_off(cloned):
+    """--no-push must not reach the network, so it must not fetch either."""
+    root, remote = cloned
+    nightly_commit(root.parent, remote)
+
+    (root / "data" / "manual" / "dues.json").write_text('{"a": 1}\n', encoding="utf-8")
+    git = Git(repo=root)
+    log = git.commit_and_push("Admin: update league dues (2026)", push=False)
+
+    assert any("not pushed" in line for line in log)
+    assert not any("replayed" in line for line in log)
+    assert ["fetch", "origin"] not in git._ran
+
+
 def test_the_button_commits_only_data_manual(repo: Path):
     (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
     (repo / "data" / "derived" / "2026.json").write_text("{}\n", encoding="utf-8")
