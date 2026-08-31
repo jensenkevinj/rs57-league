@@ -2019,10 +2019,11 @@ def test_every_franchise_appears_with_the_unpaid_ones_marked(tmp_path: Path, der
 
 
 def test_the_panel_is_on_the_home_page_while_anyone_still_owes(tmp_path: Path, derived: Path):
-    body = text(render_with_dues(tmp_path, derived, "t1")["index.html"])
+    body = html.unescape(text(render_with_dues(tmp_path, derived, "t1")["index.html"]))
     assert "Dues" in body
     assert "1 of 2 paid" in body
-    assert "Belichick's Spy owes" in html.unescape(body), "the franchise that owes is not marked"
+    assert "Belichick's Spy Not paid" in body, "the franchise that owes is not marked"
+    assert "Fake News Paid" in body, "the franchise that has paid is not marked either"
 
 
 def test_the_panel_disappears_once_every_franchise_has_paid(tmp_path: Path, derived: Path):
@@ -2052,7 +2053,7 @@ def test_nobody_having_paid_is_not_mistaken_for_everybody_having_paid(tmp_path: 
 
     body = text(render_with_dues(tmp_path, derived)["index.html"])
     assert "0 of 2 paid" in body
-    assert body.count("owes") == 2
+    assert body.count("Not paid") == 2
 
 
 def test_the_panel_shows_on_the_results_home_page_too(tmp_path: Path, derived: Path):
@@ -2096,6 +2097,31 @@ def test_a_broken_dues_file_leaves_everyone_unpaid_rather_than_breaking_the_buil
     build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
     body = text((out / "index.html").read_text(encoding="utf-8"))
     assert "0 of 2 paid" in body
+
+
+def test_every_row_states_its_status_in_words_not_only_in_colour(tmp_path: Path, derived: Path):
+    """Green and red are the two hues most often indistinguishable, and the page is also
+    printed and read aloud. The colour is the fast signal; the word is the actual one.
+
+    Asserted per row rather than per page: a regression that dropped the label from only the
+    paid rows would leave "Not paid" on the page and look correct from a distance.
+    """
+    page = render_with_dues(tmp_path, derived, "t1")["index.html"]
+    rows = re.findall(r"<li>(.*?)</li>", re.search(r'<ul class="dues">.*?</ul>', page, re.S).group(0), re.S)
+
+    assert len(rows) == 2, "one row per franchise"
+    for row in rows:
+        label = re.search(r'<span class="dues-status [^"]*">\s*([^<]+?)\s*</span>', row)
+        assert label, f"a row carries colour but no word: {row.strip()!r}"
+        assert label.group(1) in ("Paid", "Not paid")
+
+
+def test_the_panel_is_one_row_per_franchise(tmp_path: Path, derived: Path):
+    """Twelve franchises, twelve rows. A wrapped multi-column grid read as a block of names."""
+    page = render_with_dues(tmp_path, derived, "t1")["index.html"]
+    panel = re.search(r'<ul class="dues">.*?</ul>', page, re.S).group(0)
+    assert panel.count("<li>") == 2
+    assert panel.count('class="dues-status') == 2, "a status on every row, not only the unpaid"
 
 
 def test_the_dues_panel_records_no_money(tmp_path: Path, derived: Path):
