@@ -18,6 +18,9 @@
     --bad: #96200f;
     --bad-bg: #fdf0ee;
     --bad-line: #e4a99e;
+    --good: #1a6b3c;
+    --good-bg: #eef7f1;
+    --good-line: #a8ceb8;
     --gold: #b8860b;
     --silver: #98a0aa;
     --bronze: #a2704a;
@@ -435,18 +438,29 @@
 
   /* --- the home page: who still owes their dues ------------------------- */
 
-  /* The panel disappears once everyone has paid (site.build_site decides), so this styles
-     a list that is always part unpaid. "owes" is a word and not just a colour: the state
-     has to survive being read aloud, printed, or seen by someone who cannot tell the two
-     greys apart. */
-  .dues { list-style: none; margin: 0.4rem 0 1.6rem; padding: 0;
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-          gap: 0.1rem 1.2rem; }
-  .dues li { display: flex; align-items: baseline; gap: 0.5rem;
-             padding: 0.3rem 0; border-bottom: 1px solid var(--line); }
+  /* One row per franchise, twelve of them, name left and status right. A single column
+     rather than a wrapped grid: this reads as a roll being called, and a reader scanning
+     for their own team should only have to go down. */
+  .dues { list-style: none; margin: 0.4rem 0 1.6rem; padding: 0; max-width: 30rem; }
+  .dues li { display: flex; align-items: baseline; justify-content: space-between;
+             gap: 0.75rem; padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
+  .dues li:last-child { border-bottom: 0; }
   .dues .dues-team { flex: 1; }
-  .dues li.owing .dues-team { font-weight: 600; }
-  .dues li.settled .dues-team { color: var(--muted); }
+
+  /* Every row carries its status in WORDS. The colour is the fast signal and the word is
+     the actual one — green and red are the two hues most often indistinguishable, and the
+     page still has to work printed, read aloud, or seen by someone who cannot tell them
+     apart. There is a test that every row has a label. */
+  .dues-status {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    border-radius: 3px; padding: 0.05rem 0.4rem; white-space: nowrap;
+  }
+  .dues-status.paid {
+    color: var(--good); background: var(--good-bg); border: 1px solid var(--good-line);
+  }
+  .dues-status.unpaid {
+    color: var(--bad); background: var(--bad-bg); border: 1px solid var(--bad-line);
+  }
 
 </style>
 </head>
