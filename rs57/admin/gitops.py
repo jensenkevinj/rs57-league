@@ -16,6 +16,11 @@ Three things this deliberately does not do:
 * **It never writes anything in order to render the preview.** See ``Git.preview`` — the
   ``--intent-to-add`` this used to run left index entries behind that another commit would
   write out as empty files.
+* **It catches the branch up before pushing, and only then.** The nightly Action commits
+  ``data/derived/`` and ``site/`` every night, so a laptop that pushed yesterday is behind by
+  morning and a bare push is rejected. ``Git.catch_up`` rebases first. It is safe precisely
+  because the two writers are disjoint — the Action fails its own run if anything wrote
+  ``data/manual/`` — so there is nothing for the replay to conflict over.
 """
 
 from __future__ import annotations
@@ -245,9 +250,59 @@ class Git:
         if self.remote() is None:
             log.append("no origin remote — committed locally, nothing pushed")
             return log
+        log.extend(self.catch_up())
         self.run("push")
         log.append(f"pushed to {self.branch()}")
         return log
+
+    def catch_up(self) -> list[str]:
+        """Replay this branch onto the remote when it has moved on, so the push can go.
+
+        The nightly Action commits ``data/derived/`` and ``site/`` every night, so a laptop
+        that pushed yesterday is behind by morning and a bare push is rejected. Rebasing here
+        turns that from something to remember into something that does not happen.
+
+        **Safe because the two writers are disjoint.** This tool commits ``data/manual/`` and
+        the Action fails its own run if anything wrote it, so a manual commit and a nightly
+        commit can never touch the same file and the replay has nothing to conflict over. That
+        invariant is the whole reason this is a rebase and not a merge with a conflict story.
+
+        A dirty ``data/derived/`` — what a local ``rs57.sync`` leaves behind — makes git refuse
+        the rebase outright rather than start one, so there is no half-finished rebase to land
+        in. The refusal is reported as itself: the commit is already made and safe, and the
+        fix is the commissioner's to choose, not this tool's to guess at.
+        """
+        self.run("fetch", "origin")
+        branch = self.branch()
+        upstream = f"origin/{branch}"
+        counts = self.run(
+            "rev-list", "--left-right", "--count", f"{branch}...{upstream}", check=False
+        ).split()
+        if len(counts) != 2:
+            # No upstream yet — the first push of a new branch. Nothing to catch up to.
+            return []
+        behind = int(counts[1])
+        if not behind:
+            return []
+
+        try:
+            self.run("rebase", upstream)
+        except GitError as exc:
+            # Defensive: git refuses a rebase it cannot start, but if one *did* begin, leaving
+            # the repo mid-rebase behind a web button is the worst possible end state.
+            if (self.repo / ".git" / "rebase-merge").exists() or (
+                self.repo / ".git" / "rebase-apply"
+            ).exists():
+                self.run("rebase", "--abort", check=False)
+            raise GitError(
+                f"committed, but not pushed: this branch is {behind} commit(s) behind "
+                f"{upstream} and could not be replayed on top of it. {exc} "
+                f"Your commit is safe. Resolve it in a terminal — `git status` will say what "
+                f"is in the way, and a dirty data/derived/ from a local sync is the usual "
+                f"cause — then run `git pull && git push`."
+            ) from exc
+
+        return [f"replayed onto {upstream} ({behind} commit(s) behind)"]
 
 
 def commit_message(season: int, summary: str) -> str:
