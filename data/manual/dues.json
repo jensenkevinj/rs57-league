@@ -1,0 +1,48 @@
+{
+  "_about": [
+    "Which franchises have paid their buy-in, by season. Written by the admin tool and by",
+    "nothing else.",
+    "",
+    "This is money paid IN. payments.json is the other direction -- a prize handed OUT to a",
+    "winner. They are the same season's two ends, dues at the start and prizes at the",
+    "finish, which is why one admin screen shows both.",
+    "",
+    "Neither is a keeper fee. Fees and the $5 tax are auction budget and never change",
+    "hands; these are real dollars.",
+    "",
+    "Absence means unpaid. An unpaid franchise has no row here rather than one saying",
+    "paid: false, so a mistyped manager id cannot linger in the file after it is undone.",
+    "",
+    "The AMOUNT is deliberately not here. The buy-in is one figure the whole league knows",
+    "and nothing in data/ records it today; putting it on twelve rows would be twelve",
+    "copies of a number nobody has written down once.",
+    "",
+    "No payment method, no handles, no notes: this file is committed to a PUBLIC repo."
+  ],
+  "dues": [
+    {
+      "manager_id": "t1",
+      "paid": true,
+      "paid_at": "2026-08-31T18:00:36.052722",
+      "season": 2026
+    },
+    {
+      "manager_id": "t12",
+      "paid": true,
+      "paid_at": "2026-08-31T18:00:45.682533",
+      "season": 2026
+    },
+    {
+      "manager_id": "t3",
+      "paid": true,
+      "paid_at": "2026-08-31T18:00:41.723516",
+      "season": 2026
+    },
+    {
+      "manager_id": "t7",
+      "paid": true,
+      "paid_at": "2026-08-31T18:00:50.767594",
+      "season": 2026
+    }
+  ]
+}
