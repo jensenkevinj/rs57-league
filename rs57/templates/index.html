@@ -188,10 +188,12 @@
   <p class="muted small">{{ dues.paid_count }} of {{ dues.total }} paid for {{ dues.season }}.</p>
   <ul class="dues">
     {% for line in dues.rows %}
-      <li class="{% if line.paid %}settled{% else %}owing{% endif %}">
+      <li>
         <span class="dues-team">{{ ui.team(line.team) }}</span>
-        {% if not line.paid %}
-          <span class="tag-inline">owes</span>
+        {% if line.paid %}
+          <span class="dues-status paid">Paid</span>
+        {% else %}
+          <span class="dues-status unpaid">Not paid</span>
         {% endif %}
       </li>
     {% endfor %}
