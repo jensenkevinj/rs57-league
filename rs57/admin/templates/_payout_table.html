@@ -1,8 +1,12 @@
-{# Payout tracking. The amounts and winners are derived; only "paid" is a human fact.
+{# The season's prizes: what was won, by whom, for how much.
 
-   Keyed on season, label AND winner: a tie splits one prize across two managers, so marking
-   one paid must not mark the other. #}
-<div id="payout-table">
+   Deliberately says NOTHING about who has been handed their money. That was tracked here and
+   is not any more (commissioner, 2026-08-31) -- the dues table above is where a paid/unpaid
+   state belongs, because dues are the thing the league chases. A prize is settled when it is
+   won.
+
+   Read-only, so nothing here is an htmx target and there is no form. #}
+<div class="payout-table">
   <div class="panel">
     <div class="stats">
       <div class="stat">
@@ -10,18 +14,9 @@
         <div class="label">Pot</div>
       </div>
       <div class="stat">
-        <div class="figure">${{ totals.paid }}</div>
-        <div class="label">Paid</div>
-      </div>
-      <div class="stat">
-        <div class="figure">${{ totals.outstanding }}</div>
-        <div class="label">Outstanding</div>
-      </div>
-      <div class="stat">
         <div class="figure">${{ totals.unawarded }}</div>
         <div class="label">Unawarded</div>
       </div>
-      <div class="spin">saving…</div>
     </div>
   </div>
 
@@ -32,7 +27,6 @@
           <th>Prize</th>
           <th>Winner</th>
           <th class="num">Amount</th>
-          <th>Paid</th>
         </tr>
       </thead>
       <tbody>
@@ -47,25 +41,6 @@
               {% endif %}
             </td>
             <td class="num money">${{ row.amount }}</td>
-            <td>
-              {% if row.winner_manager_id %}
-                <form hx-post="{{ url_for('toggle_payout_paid', year=year) }}"
-                      hx-target="#payout-table"
-                      hx-swap="outerHTML">
-                  <input type="hidden" name="label" value="{{ row.label }}">
-                  <input type="hidden" name="winner_manager_id" value="{{ row.winner_manager_id }}">
-                  <input type="hidden" name="paid" value="{% if row.paid %}0{% else %}1{% endif %}">
-                  <button type="submit" class="quiet">
-                    {% if row.paid %}paid{% else %}mark paid{% endif %}
-                  </button>
-                </form>
-                {% if row.paid_at %}
-                  <span class="small muted">{{ row.paid_at.strftime('%Y-%m-%d') }}</span>
-                {% endif %}
-              {% else %}
-                <span class="muted">—</span>
-              {% endif %}
-            </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -73,7 +48,6 @@
         <tr>
           <td colspan="2">Total</td>
           <td class="num">${{ totals.pot }}</td>
-          <td></td>
         </tr>
       </tfoot>
     </table>

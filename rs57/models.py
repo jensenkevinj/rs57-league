@@ -506,27 +506,36 @@ class Payout(Base):
     paid: bool = False
 
 
+PAYOUT_LEDGER_FROM = 2026
+"""First season whose prize money is settled through this app.
+
+Every season before it was paid out and reconciled outside the repo and is **settled**
+(commissioner, 2026-08-31). The boundary is recorded because the console must not print a red
+"not paid" against a 2021 franchise: that is a debt the league does not have, and a screen that
+invents one is worse than a screen that says nothing.
+"""
+
+
 class Payment(Base):
-    """That a prize has actually been handed over, recorded by the admin tool.
+    """That a franchise has been paid out for a season, recorded by the admin tool.
 
-    ``Payout`` rows carry a ``paid`` flag, but they are **derived**: ``stats.award_prizes``
-    computes them and the nightly Action rewrites ``data/derived/{year}-stats.json`` every run,
-    so a flag set there would vanish on the next sync. Payment is a human fact about the real
-    world, so it lives in ``data/manual/`` and is joined to the derived rows on
-    ``(season, label, winner_manager_id)``.
+    The mirror of :class:`Dues`, and keyed the same way — ``(season, manager_id)``. Dues come
+    IN at the start of a season and the prize money goes OUT at the end of it.
 
-    All three parts of that key are needed: a tie splits one label across several winners, so
-    ``(season, label)`` alone would mark both halves paid when only one had been.
+    **Per franchise, not per prize.** Prizes accrue all season and are settled in one payment
+    at the end of it, so "has the Week 6 high score been paid?" is a question nobody asks and
+    could not answer: the money moves once, in aggregate (commissioner, 2026-08-31). What a
+    franchise is owed is the sum of what it won, which ``stats`` already derives.
 
-    **No amount field, deliberately.** What a prize pays is already in
-    ``data/manual/payouts.json`` and the split is ``stats``'s to compute; a second copy here
-    could disagree with the first. And **no payment method, handle, or note** — this row is
-    committed to a public repo.
+    **No amount field, deliberately.** What is owed is that sum, computed from the derived
+    payout rows; copying it here would be a second figure that could disagree with the first.
+    And no payment method, handle, or note — this row is committed to a public repo.
+
+    Absence means unsettled, so a franchise that has not been paid has no row at all.
     """
 
     season: int
-    label: str
-    winner_manager_id: str
+    manager_id: str
     paid: bool = False
     paid_at: datetime | None = None
 

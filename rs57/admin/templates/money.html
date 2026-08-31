@@ -52,7 +52,14 @@
   </p>
 {% endif %}
 
-<h2>Money out · {{ year }} prizes</h2>
+<h2>Money out · {{ year }} payouts</h2>
+<p class="small muted">
+  Prizes accrue all season and are settled in one payment at the end of it, so this is per
+  franchise rather than per prize — what each is owed, and who has been paid.
+</p>
+{% include "_settlement_table.html" %}
+
+<h3>What was won</h3>
 {% if not rows %}
   <div class="flag">
     <span class="tag">Nothing to track</span>
@@ -67,10 +74,11 @@
   {% include "_payout_table.html" %}
   <p class="small">
     The prizes and winners above are <strong>derived</strong> — <code>stats</code> computes them and
-    the nightly Action rewrites that file every run. Only the paid flag is a human fact, so only
-    the paid flag is stored, in <code>data/manual/payments.json</code>. The amount is deliberately
-    not copied there: it lives in <code>payouts.json</code>, and two copies of a number are two
-    numbers.
+    the nightly Action rewrites <code>data/derived/{{ year }}-stats.json</code> every run. This
+    breakdown is a read-only report; the paid flag lives on the settlement table above it, per
+    franchise, because that is how the money actually moves. Only that flag is stored, in
+    <code>data/manual/payments.json</code> — the amount is not copied there, since it is the sum
+    <code>stats</code> already computed.
   </p>
   {% if schedule %}
     <p class="small muted">

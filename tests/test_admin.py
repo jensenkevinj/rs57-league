@@ -851,7 +851,7 @@ def test_the_recorded_salary_is_frozen_at_submission(client, store: ManualStore,
 def test_about_prose_survives_a_write(store: ManualStore):
     """``payouts.json`` holds the only explanation of why 2023 is missing."""
     before = json.loads((store.manual / "payouts.json").read_text())
-    store.set_paid(PRIOR, "Champion", "t1", True, now=NOW)
+    store.set_paid(PRIOR, "t1", True, now=NOW)
     store.save_season(Season(year=PRIOR, consolation_winner_id="t1"))
 
     after = json.loads((store.manual / "payouts.json").read_text())
@@ -870,7 +870,7 @@ def test_every_written_file_is_deterministic_and_ends_in_a_newline(store: Manual
                        created_at=NOW)
     )
     store.save_season(Season(year=PRIOR))
-    store.set_paid(PRIOR, "Champion", "t1", True, now=NOW)
+    store.set_paid(PRIOR, "t1", True, now=NOW)
 
     for name in ("claims.json", "overrides.json", "seasons.json", "payments.json"):
         raw = (store.manual / name).read_text(encoding="utf-8")
@@ -916,25 +916,31 @@ def test_a_claim_row_disagreeing_with_its_season_key_is_refused(store: ManualSto
         store.claims()
 
 
-def test_a_payment_is_keyed_on_the_winner_too(store: ManualStore):
-    """A tie splits one label across two managers. Marking one paid must not touch the other."""
-    store.set_paid(PRIOR, "Week 6 High Score", "t1", True, now=NOW)
-    store.set_paid(PRIOR, "Week 6 High Score", "t2", True, now=NOW)
-    assert {p.winner_manager_id for p in store.payments(PRIOR)} == {"t1", "t2"}
+def test_a_payout_is_keyed_on_the_franchise_and_the_season(store: ManualStore):
+    """Per franchise, not per prize: the money moves once, at the end, for everything won.
 
-    store.set_paid(PRIOR, "Week 6 High Score", "t2", False, now=NOW)
+    Settling one franchise must not settle another, and settling 2025 must not settle 2026.
+    """
+    store.set_paid(PRIOR, "t1", True, now=NOW)
+    store.set_paid(PRIOR, "t2", True, now=NOW)
+    store.set_paid(SEASON, "t1", True, now=NOW)
+    assert {p.manager_id for p in store.payments(PRIOR)} == {"t1", "t2"}
+    assert {p.manager_id for p in store.payments(SEASON)} == {"t1"}
+
+    store.set_paid(PRIOR, "t2", False, now=NOW)
     remaining = store.payments(PRIOR)
-    assert [p.winner_manager_id for p in remaining] == ["t1"], (
-        "un-marking removes the row; absence is what unpaid means"
+    assert [p.manager_id for p in remaining] == ["t1"], (
+        "un-marking removes the row; absence is what unsettled means"
     )
     assert remaining[0].paid
+    assert {p.manager_id for p in store.payments(SEASON)} == {"t1"}, "the other season moved"
 
 
-def test_payments_record_no_amount_and_no_method(store: ManualStore):
-    """The amount lives in payouts.json; a payment method would be personal data on a public repo."""
-    store.set_paid(PRIOR, "Champion", "t1", True, now=NOW)
+def test_payouts_record_no_amount_and_no_method(store: ManualStore):
+    """What is owed is the sum stats derives; a second copy here could disagree with it."""
+    store.set_paid(PRIOR, "t1", True, now=NOW)
     row = json.loads((store.manual / "payments.json").read_text())["payments"][0]
-    assert set(row) == {"season", "label", "winner_manager_id", "paid", "paid_at"}
+    assert set(row) == {"season", "manager_id", "paid", "paid_at"}
 
 
 # ---------------------------------------------------------------------------
@@ -1009,7 +1015,7 @@ def test_the_money_page_shows_both_directions_for_one_season(client, data_dir: P
                      "winner_manager_id": "t1"})
     body = text(client.get(f"/season/{PRIOR}/money").get_data(as_text=True))
     assert "Money in" in body and f"{PRIOR} dues" in body
-    assert "Money out" in body and f"{PRIOR} prizes" in body
+    assert "Money out" in body and f"{PRIOR} payouts" in body
     assert "Champion" in body
     assert "Fake News" in body
 
@@ -1049,6 +1055,176 @@ def test_both_dues_buttons_name_an_action(client):
     assert "mark paid" in body and "mark unpaid" in body
 
 
+def test_the_prizes_table_says_nothing_about_who_has_been_paid(client, data_dir: Path, store):
+    """A prize is settled when it is won. Dues are the thing the league chases.
+
+    Paid/unpaid tracking was on this table and was taken off (commissioner, 2026-08-31). The
+    recorded payment below is deliberately still on disk and must not surface here: it is the
+    state a regression would reintroduce, so the fixture arranges for one to exist.
+    """
+    award(data_dir,
+          {"season": PRIOR, "label": "Champion", "amount": 500, "winner_manager_id": "t1"},
+          {"season": PRIOR, "label": "Survivor", "amount": 40, "winner_manager_id": "t2"})
+    store.set_paid(PRIOR, "t1", True, now=NOW)
+
+    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
+    table = re.search(r'<div class="payout-table">.*?</table>', raw, re.S).group(0)
+
+    assert "Champion" in table and "$500" in table, "the prize itself is still shown"
+    for gone in ("Not paid", "tag-inline ok", "tag-inline bad", "mark paid", "mark unpaid",
+                 "Outstanding", "<form"):
+        assert gone not in table, f"the prizes table is still tracking payment: {gone!r}"
+
+
+def test_the_prizes_table_still_names_the_unawarded(client, data_dir: Path):
+    """Unawarded is about the PRIZE, not about payment, so it survives the removal."""
+    award(data_dir,
+          {"season": PRIOR, "label": "Champion", "amount": 500, "winner_manager_id": "t1"},
+          {"season": PRIOR, "label": "Unlucky", "amount": 20, "winner_manager_id": None})
+
+    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
+    table = re.search(r'<div class="payout-table">.*?</table>', raw, re.S).group(0)
+    assert "unawarded" in table
+    assert "$20" in table
+
+
+def test_only_the_dues_table_is_interactive(client, data_dir: Path):
+    """One htmx target on the page now. The prizes half is a read-only report."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
+
+    assert raw.count('id="dues-table"') == 1
+    assert 'hx-target="#dues-table"' in raw
+    assert 'id="payout-table"' not in raw, "the prizes table is still a swap target"
+    assert "toggle_payout_paid" not in raw
+
+
+def settlement_block(page: str) -> str:
+    """The settlement table's own markup, sliced out of the Money page.
+
+    Plain indexing rather than a regex, and it raises rather than returning "" when either
+    marker is missing. A pattern that quietly matched nothing made every "this must not appear"
+    assertion below pass without reading a single byte of the table.
+    """
+    start = page.index('<div id="settlement-table">')
+    end = page.index("<h3", start)
+    block = page[start:end]
+    assert len(block) > 100, f"the settlement table rendered almost nothing: {block!r}"
+    return block
+
+
+def test_a_franchise_is_owed_the_sum_of_everything_it_won(client, data_dir: Path):
+    """The whole point of settling per franchise: one line, one figure, one payment.
+
+    Per prize, t1 here is four rows and no total; per franchise it is $625, which is the
+    number the commissioner actually sends.
+    """
+    award(data_dir,
+          {"season": PRIOR, "label": "Champion", "amount": 500, "winner_manager_id": "t1"},
+          {"season": PRIOR, "label": "Most Points", "amount": 100, "winner_manager_id": "t1"},
+          {"season": PRIOR, "label": "QB Stud", "amount": 25, "winner_manager_id": "t1"},
+          {"season": PRIOR, "label": "Survivor", "amount": 40, "winner_manager_id": "t2"},
+          {"season": PRIOR, "label": "Unlucky", "amount": 20, "winner_manager_id": None})
+
+    rows, totals = admin._settlement_rows(
+        Derived(derived_dir=Path(client.application.config["DERIVED_DIR"])),
+        ManualStore(data_dir=client.application.config["DATA_DIR"]),
+        PRIOR,
+    )
+    assert [(r["manager_id"], r["amount"]) for r in rows] == [("t1", 625), ("t2", 40)]
+    assert totals["owed"] == 665, "the unawarded $20 is owed to nobody"
+    assert totals["outstanding"] == 665
+    assert totals["paid"] == 0
+
+
+def test_a_franchise_that_won_nothing_is_not_a_line_on_the_settlement_sheet(client, data_dir):
+    """Twelve franchises, but only the winners are owed anything."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    rows, totals = admin._settlement_rows(
+        Derived(derived_dir=Path(client.application.config["DERIVED_DIR"])),
+        ManualStore(data_dir=client.application.config["DATA_DIR"]),
+        PRIOR,
+    )
+    assert [r["manager_id"] for r in rows] == ["t1"]
+    assert totals["teams"] == 1
+
+
+def test_settling_a_franchise_moves_the_outstanding_figure(client, data_dir: Path, store):
+    award(data_dir,
+          {"season": SEASON, "label": "Champion", "amount": 500, "winner_manager_id": "t1"},
+          {"season": SEASON, "label": "Survivor", "amount": 40, "winner_manager_id": "t2"},
+          season=SEASON)
+
+    fragment = client.post(f"/season/{SEASON}/money/payouts",
+                           data={"manager_id": "t1", "paid": "1"}).get_data(as_text=True)
+    assert 'id="settlement-table"' in fragment
+    assert 'id="dues-table"' not in fragment, "the payout swap carried the dues table with it"
+    assert [p.manager_id for p in store.payments(SEASON)] == ["t1"]
+
+    client.post(f"/season/{SEASON}/money/payouts", data={"manager_id": "t1", "paid": "0"})
+    assert store.payments(SEASON) == [], "un-marking removes the row"
+
+
+def test_a_season_settled_before_the_ledger_is_never_shown_as_owing(client, data_dir: Path):
+    """2025 and everything before it was paid out before this app tracked it.
+
+    Rendering those as twelve red debts would invent money the league does not owe, which is
+    the same mistake as marking an unawarded prize unpaid. The boundary is recorded rather
+    than assumed -- see PAYOUT_LEDGER_FROM.
+    """
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
+    settle = settlement_block(raw)
+
+    assert "Not paid" not in settle, "a settled season is being reported as a debt"
+    assert "mark paid" not in settle
+    assert "Settled" in settle
+
+    # And the endpoint refuses it too, so the guard is not only in the template.
+    assert client.post(f"/season/{PRIOR}/money/payouts",
+                       data={"manager_id": "t1", "paid": "1"}).status_code == 400
+
+
+def test_the_current_season_is_settleable(client, data_dir: Path):
+    """The mirror of the test above: the ledger's own seasons must not be locked out."""
+    award(data_dir, {"season": SEASON, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"}, season=SEASON)
+    raw = client.get(f"/season/{SEASON}/money").get_data(as_text=True)
+    assert "mark paid" in raw
+    assert client.post(f"/season/{SEASON}/money/payouts",
+                       data={"manager_id": "t1", "paid": "1"}).status_code == 200
+
+
+def test_a_payout_to_a_franchise_that_won_nothing_is_refused(client, data_dir: Path, store):
+    """It is a real franchise, but it is owed nothing and is not a line on the sheet.
+
+    Found by hand-posting an id I had guessed wrong. The row was written, contributed $0 to
+    every total, and never appeared on screen — so it could not be undone through the console
+    either. A payment that never happened, recorded permanently.
+    """
+    award(data_dir, {"season": SEASON, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"}, season=SEASON)
+
+    response = client.post(f"/season/{SEASON}/money/payouts",
+                           data={"manager_id": "t2", "paid": "1"})
+    assert response.status_code == 400
+    assert store.payments() == [], "a payout was recorded for a franchise owed nothing"
+
+    # The one that did win is still settleable, so the guard is not refusing everything.
+    assert client.post(f"/season/{SEASON}/money/payouts",
+                       data={"manager_id": "t1", "paid": "1"}).status_code == 200
+
+
+def test_a_payout_for_a_franchise_the_season_does_not_have_is_refused(client, store):
+    award_year = SEASON
+    assert client.post(f"/season/{award_year}/money/payouts",
+                       data={"manager_id": "t99", "paid": "1"}).status_code == 400
+    assert store.payments() == []
+
+
 def test_a_season_still_being_played_has_live_dues_and_no_prizes_yet(client):
     """The normal state of the current season, and it must read as that rather than as broken."""
     body = text(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
@@ -1061,7 +1237,7 @@ def test_marking_dues_paid_leaves_the_payout_table_alone(client, data_dir: Path,
     """Two htmx targets on one page. A swap that returned the whole page would clobber the other."""
     award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
                      "winner_manager_id": "t1"})
-    store.set_paid(PRIOR, "Champion", "t1", True, now=NOW)
+    store.set_paid(PRIOR, "t1", True, now=NOW)
 
     fragment = client.post(
         f"/season/{PRIOR}/money/dues", data={"manager_id": "t1", "paid": "1"}
@@ -1069,17 +1245,6 @@ def test_marking_dues_paid_leaves_the_payout_table_alone(client, data_dir: Path,
     assert 'id="dues-table"' in fragment
     assert 'id="payout-table"' not in fragment, "the dues swap carried the payout table with it"
     assert store.payments(PRIOR)[0].paid, "the recorded payout was disturbed by a dues write"
-
-
-def test_the_two_tables_swap_into_different_targets(client, data_dir: Path):
-    """Both fragments live on one page; sharing an id would make each button replace the other."""
-    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
-                     "winner_manager_id": "t1"})
-    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
-    assert raw.count('id="dues-table"') == 1
-    assert raw.count('id="payout-table"') == 1
-    assert 'hx-target="#dues-table"' in raw
-    assert 'hx-target="#payout-table"' in raw
 
 
 def test_the_old_payouts_url_still_lands_on_the_money_tab(client):

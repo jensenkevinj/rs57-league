@@ -52,6 +52,7 @@ from rs57.models import (
     CashTrade,
     Dues,
     FranchiseName,
+    PAYOUT_LEDGER_FROM,
     KeeperClaim,
     KeeperSlot,
     Payment,
@@ -483,14 +484,6 @@ def validate_manual_records(
         except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
             report.error(f"seasons.json: {exc}")
 
-    payments_path = DATA / "manual" / "payments.json"
-    if payments_path.exists():
-        try:
-            rows = _load(payments_path).get("payments") or []
-            payments = [Payment(**row) for row in rows]
-            report.ok(f"payments.json: {len(payments)} payment records load cleanly")
-        except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
-            report.error(f"payments.json: {exc}")
 
     return claims, overrides, trades
 
@@ -545,6 +538,64 @@ def check_dues(franchises_by_season: dict[str, set[str]], report: Report) -> Non
         )
     elif not dues:
         report.ok("dues.json: no dues recorded yet, and the file loads cleanly")
+
+
+def check_payouts(franchises_by_season: dict[str, set[str]], report: Report) -> None:
+    """Recorded payouts must name franchises that exist in the season they settle.
+
+    The mirror of :func:`check_dues`. A payout row says a franchise has been handed its prize
+    money for a season, keyed on ``(season, manager_id)`` — per franchise, because the money
+    moves once at the end for everything that franchise won.
+
+    Seasons before ``PAYOUT_LEDGER_FROM`` were settled outside the repo, so a row against one
+    is not a fact this file is entitled to assert and is reported for the commissioner's eyes.
+    """
+    path = DATA / "manual" / "payments.json"
+    if not path.exists():
+        report.skip(
+            "payments.json is not on disk, so no franchise is recorded as having been paid "
+            "out. That is the normal state until a season's prizes are settled — record them "
+            "in the admin tool's Money tab."
+        )
+        return
+
+    try:
+        rows = _load(path).get("payments") or []
+        payments = [Payment(**row) for row in rows]
+    except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        report.error(f"payments.json: {exc}")
+        return
+
+    checked = 0
+    for row in payments:
+        if row.season < PAYOUT_LEDGER_FROM:
+            report.review(
+                f"payments.json: {row.season} predates the payout ledger "
+                f"(PAYOUT_LEDGER_FROM={PAYOUT_LEDGER_FROM}) — that season was settled outside "
+                f"this repo, so a row here asserts something the file cannot know"
+            )
+            continue
+        known = franchises_by_season.get(str(row.season))
+        if known is None:
+            report.skip(
+                f"payments.json: {row.season} has no data/derived/{row.season}.json, so "
+                f"{row.manager_id!r} could not be checked against that season's franchises. "
+                f"Run `python -m rs57.sync --year {row.season}`."
+            )
+            continue
+        checked += 1
+        if row.manager_id not in known:
+            report.error(
+                f"payments.json: {row.season} records a payout to {row.manager_id!r}, which "
+                f"has no franchise in that season"
+            )
+    if checked:
+        report.ok(
+            f"payments.json: {len(payments)} payout record(s) load cleanly, {checked} checked "
+            f"against their season's franchises"
+        )
+    elif not payments:
+        report.ok("payments.json: no payouts recorded yet, and the file loads cleanly")
 
 
 def audit_ratchet(
@@ -920,6 +971,7 @@ def run(report: Report | None = None) -> Report:
 
     # Called even with no dues file: a check that cannot run has to SAY it did not run.
     check_dues(franchises_by_season, report)
+    check_payouts(franchises_by_season, report)
 
     for path in stats_files:
         season = path.stem.removesuffix("-stats")
