@@ -143,15 +143,24 @@ ABOUT: dict[str, list[str]] = {
         "them would freeze a freshly synced season with no way out on screen.",
     ],
     PAYMENTS: [
-        "Which prizes have actually been handed over. Written by the admin tool and by nothing",
-        "else.",
+        "Which franchises have been paid out for a season. Written by the admin tool and by",
+        "nothing else.",
         "",
-        "Joined to the derived payout rows on (season, label, winner_manager_id). All three",
-        "parts are needed: a tie splits one label across two winners, so (season, label) alone",
-        "would mark both halves paid when only one had been.",
+        "The mirror of dues.json and keyed the same way, on (season, manager_id). Dues come IN",
+        "at the start of a season; the prize money goes OUT at the end of it.",
         "",
-        "The AMOUNT is deliberately not here -- it lives in payouts.json and the split is",
-        "stats.award_prizes' to compute. Two copies of a number are two numbers.",
+        "PER FRANCHISE, NOT PER PRIZE. Prizes accrue all season and are settled in one payment",
+        "at the end, so 'has the Week 6 high score been paid?' is a question nobody asks. The",
+        "money moves once, in aggregate (commissioner, 2026-08-31).",
+        "",
+        "Absence means unsettled. A franchise that has not been paid has no row here rather",
+        "than one saying paid: false.",
+        "",
+        "The AMOUNT is deliberately not here. What a franchise is owed is the sum of what it",
+        "won, which stats already derives; a copy here could disagree with it.",
+        "",
+        "Seasons before 2026 were settled outside this repo and are not tracked here at all.",
+        "See PAYOUT_LEDGER_FROM in rs57/models.py.",
         "",
         "No payment method, no handles, no notes: this file is committed to a PUBLIC repo.",
     ],
@@ -523,37 +532,28 @@ class ManualStore:
             return payments
         return [payment for payment in payments if payment.season == season]
 
-    def set_paid(
-        self, season: int, label: str, winner_manager_id: str, paid: bool, *, now: datetime
-    ) -> Path:
-        """Record (or un-record) that one prize was handed over.
+    def set_paid(self, season: int, manager_id: str, paid: bool, *, now: datetime) -> Path:
+        """Record (or un-record) that one franchise has been paid out for a season.
 
-        Keyed on all three of season, label and winner: a tie splits one label between two
-        managers, and marking one paid must not mark the other.
+        Keyed on the franchise and the season, not on a prize: the money moves once, at the
+        end, for everything that franchise won.
 
-        Un-marking **removes** the row rather than storing ``paid: false``. Absence already means
-        unpaid — the join reads only rows where ``paid`` is true — so a negative row carries no
-        information and would leave a mistyped winner in the file for good.
+        Un-marking **removes** the row rather than storing ``paid: false``, exactly as
+        ``set_dues_paid`` does. Absence already means unsettled, so a negative row carries no
+        information and would leave a mistyped manager id in the file for good.
         """
         kept = [
             payment
             for payment in self.payments()
-            if (payment.season, payment.label, payment.winner_manager_id)
-            != (season, label, winner_manager_id)
+            if (payment.season, payment.manager_id) != (season, manager_id)
         ]
         if paid:
             kept.append(
-                Payment(
-                    season=season,
-                    label=label,
-                    winner_manager_id=winner_manager_id,
-                    paid=True,
-                    paid_at=now,
-                )
+                Payment(season=season, manager_id=manager_id, paid=True, paid_at=now)
             )
         rows = sorted(
             (payment.model_dump(mode="json") for payment in kept),
-            key=lambda row: (row["season"], row["label"], row["winner_manager_id"]),
+            key=lambda row: (row["season"], row["manager_id"]),
         )
         return self._merge(PAYMENTS, payments=rows)
 

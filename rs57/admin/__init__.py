@@ -67,6 +67,7 @@ from rs57.admin.screens import (
 )
 from rs57.admin.store import DATA, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, MAX_PROSPECTS
+from rs57.models import PAYOUT_LEDGER_FROM
 from rs57.models import Season
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -715,6 +716,7 @@ def create_app(
         season_or_404(year)
         dues_rows, dues_totals = _dues_rows(derived, store, year)
         payout_rows, payout_totals = _payout_rows(derived, store, year)
+        settle_rows, settle_totals = _settlement_rows(derived, store, year)
         return render_template(
             "money.html",
             year=year,
@@ -722,6 +724,9 @@ def create_app(
             dues_totals=dues_totals,
             rows=payout_rows,
             totals=payout_totals,
+            settle_rows=settle_rows,
+            settle_totals=settle_totals,
+            ledger_from=PAYOUT_LEDGER_FROM,
             schedule=store.prize_schedule(year),
         )
 
@@ -746,14 +751,29 @@ def create_app(
 
     @app.post("/season/<int:year>/money/payouts")
     def toggle_payout_paid(year: int):
-        label = request.form.get("label", "")
-        winner = request.form.get("winner_manager_id", "")
+        """Mark one franchise settled for the season. Refused before the ledger begins."""
+        loaded = season_or_404(year)
+        if year < PAYOUT_LEDGER_FROM:
+            abort(400, f"{year} was settled before this ledger began — nothing to record")
+        manager_id = request.form.get("manager_id", "")
         paid = request.form.get("paid") == "1"
-        if not label or not winner:
-            abort(400, "a payment needs a label and a winner")
-        store.set_paid(year, label, winner, paid, now=now())
-        rows, totals = _payout_rows(derived, store, year)
-        return render_template("_payout_table.html", year=year, rows=rows, totals=totals)
+        if not manager_id:
+            abort(400, "a payout needs a franchise")
+        if manager_id not in loaded.names:
+            abort(400, f"{manager_id!r} has no franchise in {year}")
+        # A franchise that won nothing is owed nothing, and is not a line on the settlement
+        # sheet. Recording a payout to one writes a row the screen cannot show and therefore
+        # cannot undo — it would sit in the file asserting a payment that never happened.
+        settle_rows, settle_totals = _settlement_rows(derived, store, year)
+        if manager_id not in {row["manager_id"] for row in settle_rows}:
+            abort(400, f"{manager_id!r} won nothing in {year} — there is nothing to pay")
+        store.set_paid(year, manager_id, paid, now=now())
+        settle_rows, settle_totals = _settlement_rows(derived, store, year)
+        return render_template(
+            "_settlement_table.html", year=year,
+            settle_rows=settle_rows, settle_totals=settle_totals,
+            ledger_from=PAYOUT_LEDGER_FROM,
+        )
 
     @app.get("/season/<int:year>/payouts")
     def payouts(year: int):
@@ -857,34 +877,68 @@ def _dues_rows(derived: Derived, store: ManualStore, year: int):
     return rows, totals
 
 
-def _payout_rows(derived: Derived, store: ManualStore, year: int):
-    """Join derived payout rows to recorded payments. Totals are added here, not in a template."""
-    paid = {
-        (payment.label, payment.winner_manager_id): payment
-        for payment in store.payments(year)
-        if payment.paid
-    }
+def _settlement_rows(derived: Derived, store: ManualStore, year: int):
+    """What each franchise is owed for the season, and whether it has been handed over.
+
+    One row per franchise that won something. A franchise that won nothing is owed nothing and
+    is not a line on a settlement sheet.
+
+    The amount is summed from the derived payout rows rather than stored: it is what ``stats``
+    already computed, and a second copy could disagree with the first.
+    """
+    paid = {row.manager_id: row for row in store.payments(year) if row.paid}
     loaded = derived.load(year)
     names = loaded.names if loaded else {}
 
-    rows = []
+    won: dict[str, int] = {}
     for payout in derived.payouts(year):
-        payment = paid.get((payout.label, payout.winner_manager_id or ""))
+        if payout.winner_manager_id:
+            won[payout.winner_manager_id] = won.get(payout.winner_manager_id, 0) + payout.amount
+
+    rows = []
+    for manager_id, amount in sorted(won.items(), key=lambda item: (-item[1], item[0])):
+        record = paid.get(manager_id)
         rows.append(
             {
-                "label": payout.label,
-                "amount": payout.amount,
-                "winner_manager_id": payout.winner_manager_id,
-                "winner": names.get(payout.winner_manager_id or "", payout.winner_manager_id),
-                "paid": payment is not None,
-                "paid_at": payment.paid_at if payment else None,
+                "manager_id": manager_id,
+                "name": names.get(manager_id, manager_id),
+                "amount": amount,
+                "paid": record is not None,
+                "paid_at": record.paid_at if record else None,
             }
         )
 
     totals = {
-        "pot": sum(row["amount"] for row in rows),
+        "owed": sum(row["amount"] for row in rows),
         "paid": sum(row["amount"] for row in rows if row["paid"]),
+        "teams": len(rows),
+        "settled": sum(1 for row in rows if row["paid"]),
+    }
+    totals["outstanding"] = totals["owed"] - totals["paid"]
+    return rows, totals
+
+
+def _payout_rows(derived: Derived, store: ManualStore, year: int):
+    """The season's derived prizes, named. Totals are added here, not in a template.
+
+    Carries nothing about who has been handed their money: that is not tracked on this screen
+    (commissioner, 2026-08-31). Dues are what the league chases, and that lives above.
+    """
+    loaded = derived.load(year)
+    names = loaded.names if loaded else {}
+
+    rows = [
+        {
+            "label": payout.label,
+            "amount": payout.amount,
+            "winner_manager_id": payout.winner_manager_id,
+            "winner": names.get(payout.winner_manager_id or "", payout.winner_manager_id),
+        }
+        for payout in derived.payouts(year)
+    ]
+
+    totals = {
+        "pot": sum(row["amount"] for row in rows),
         "unawarded": sum(row["amount"] for row in rows if not row["winner_manager_id"]),
     }
-    totals["outstanding"] = totals["pot"] - totals["paid"] - totals["unawarded"]
     return rows, totals

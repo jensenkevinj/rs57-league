@@ -257,15 +257,26 @@ float would put floats into every salary in the league. 2019-2022 predate the `R
 entirely and have no source. Those seasons derive stats and award nothing, which `validate`
 reports as REVIEW rather than passing over.
 
-**Whether a prize was actually paid is a separate fact from what it pays.** `Payout.paid` is
-derived — `stats.award_prizes` computes it and the nightly Action rewrites it every run, so a
-flag set there vanishes on the next sync. `data/manual/payments.json` (the `Payment` model) is
-the human record of a handoff that really happened, joined to the derived payout on
-`(season, label, winner_manager_id)` — all three, because a tie splits one label across two
-winners and `(season, label)` alone would mark both halves paid when only one had been. No
-amount field there (that stays in `payouts.json`, `stats`'s to compute — two copies of a number
-are two numbers) and no payment method, handle, or note: this file is committed to a public
-repo.
+**Whether a prize was actually paid is a separate fact from what it pays**, and it is recorded
+**per franchise, not per prize.** Prizes accrue all season and are settled in one payment at the
+end of it, so "has the Week 6 high score been paid?" is a question nobody asks and could not
+answer — the money moves once, in aggregate (commissioner, 2026-08-31). `Payment` in
+`data/manual/payments.json` is keyed on `(season, manager_id)`, exactly like `Dues`, and what a
+franchise is owed is the **sum of what it won**, computed from the derived payout rows rather
+than stored. No amount field, and no payment method, handle, or note: public repo.
+
+`Payout.paid` is derived and is not that record — `stats.award_prizes` computes it and the
+nightly Action rewrites it every run, so a flag set there vanishes on the next sync.
+
+**`PAYOUT_LEDGER_FROM` (2026) is the boundary.** Every earlier season was paid out and
+reconciled outside this repo and is settled (commissioner, 2026-08-31). The console renders
+those as *settled* and the endpoint refuses them, because printing a red "not paid" against a
+2021 franchise invents a debt the league does not have. `check_payouts` reports a row against
+an earlier season as REVIEW rather than accepting it.
+
+A franchise that **won nothing is owed nothing** and is not a line on the settlement sheet; the
+endpoint refuses a payout to one. Such a row would be invisible on screen and therefore
+impossible to undo there — a payment that never happened, recorded permanently.
 
 ## Dues — money paid IN
 
@@ -274,7 +285,8 @@ Three things in this repo are called money and only two of them are. Keep them a
 - **Dues** (`data/manual/dues.json`, the `Dues` model) — real dollars a manager pays **into**
   the league for a season. Recorded at the start of it.
 - **Prize payments** (`data/manual/payments.json`, `Payment`) — real dollars paid **out** to a
-  winner. Recorded at the end of the same season.
+  franchise. Recorded at the end of the same season, per franchise and in one lump: see the
+  Prize rules section and `PAYOUT_LEDGER_FROM`.
 - **Keeper fees, the $5 tax, and draft-cash trades** — **not money at all.** Auction budget,
   which never changes hands. The word "fee" is taken by this meaning throughout; do not
   overload it for dues.

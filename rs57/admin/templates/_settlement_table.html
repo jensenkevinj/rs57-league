@@ -1,0 +1,95 @@
+{# What each franchise is owed for the season, and whether it has been handed over.
+
+   PER FRANCHISE, NOT PER PRIZE. Prizes accrue all season and are settled in one payment at the
+   end of it, so this is the sheet the commissioner actually works from: who to pay, how much,
+   and who is done (commissioner, 2026-08-31).
+
+   Seasons before `ledger_from` were settled outside the repo. They render as settled rather
+   than as twelve red debts the league does not have -- see PAYOUT_LEDGER_FROM. #}
+<div id="settlement-table">
+  {% if year < ledger_from %}
+    <div class="flag">
+      <span class="tag">Settled</span>
+      <div>
+        {{ year }} was paid out and reconciled before this ledger began, so there is nothing to
+        record here. The prizes below are the season's own history.
+      </div>
+    </div>
+  {% elif not settle_rows %}
+    <div class="flag">
+      <span class="tag">Nothing to settle</span>
+      <div>
+        Nobody has won anything in {{ year }} yet, so there is nobody to pay. This fills in as
+        the season derives.
+      </div>
+    </div>
+  {% else %}
+    <div class="panel">
+      <div class="stats">
+        <div class="stat">
+          <div class="figure">${{ settle_totals.owed }}</div>
+          <div class="label">Owed</div>
+        </div>
+        <div class="stat">
+          <div class="figure">${{ settle_totals.paid }}</div>
+          <div class="label">Paid</div>
+        </div>
+        <div class="stat">
+          <div class="figure">${{ settle_totals.outstanding }}</div>
+          <div class="label">Outstanding</div>
+        </div>
+        <div class="spin">saving…</div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Franchise</th>
+            <th class="num">Winnings</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in settle_rows %}
+            <tr>
+              <td>{{ row.name }}</td>
+              <td class="num money">${{ row.amount }}</td>
+              <td>
+                {% if row.paid %}
+                  <span class="tag-inline ok">Paid</span>
+                {% else %}
+                  <span class="tag-inline bad">Not paid</span>
+                {% endif %}
+              </td>
+              <td>
+                <form hx-post="{{ url_for('toggle_payout_paid', year=year) }}"
+                      hx-target="#settlement-table"
+                      hx-swap="outerHTML">
+                  <input type="hidden" name="manager_id" value="{{ row.manager_id }}">
+                  <input type="hidden" name="paid" value="{% if row.paid %}0{% else %}1{% endif %}">
+                  <button type="submit" class="quiet">
+                    {% if row.paid %}mark unpaid{% else %}mark paid{% endif %}
+                  </button>
+                </form>
+                {% if row.paid_at %}
+                  <span class="small muted">{{ row.paid_at.strftime('%Y-%m-%d') }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            <td class="num">${{ settle_totals.owed }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  {% endif %}
+</div>
