@@ -30,16 +30,21 @@
       <thead>
         <tr>
           <th>Franchise</th>
-          <th>Paid</th>
+          <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         {% for row in dues_rows %}
           <tr>
+            <td>{{ row.name }}</td>
+            {# The same green/red pair the published panel shows, so the console and the site
+               never disagree about who is paid. In WORDS on every row, not colour alone. #}
             <td>
-              {{ row.name }}
-              {% if not row.paid %}
-                <span class="tag-inline flat">owes</span>
+              {% if row.paid %}
+                <span class="tag-inline ok">Paid</span>
+              {% else %}
+                <span class="tag-inline bad">Not paid</span>
               {% endif %}
             </td>
             <td>
@@ -48,8 +53,10 @@
                     hx-swap="outerHTML">
                 <input type="hidden" name="manager_id" value="{{ row.manager_id }}">
                 <input type="hidden" name="paid" value="{% if row.paid %}0{% else %}1{% endif %}">
+                {# Both states name the action. With a status column beside it, a button
+                   reading "paid" is a label sitting where a verb belongs. #}
                 <button type="submit" class="quiet">
-                  {% if row.paid %}paid{% else %}mark paid{% endif %}
+                  {% if row.paid %}mark unpaid{% else %}mark paid{% endif %}
                 </button>
               </form>
               {% if row.paid_at %}

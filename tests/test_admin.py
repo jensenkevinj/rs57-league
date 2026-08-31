@@ -1025,6 +1025,30 @@ def test_the_money_page_reads_the_year_in_the_url(client, data_dir: Path):
     assert "Champion" not in current, "the coming season showed a completed season's prizes"
 
 
+def test_every_dues_row_states_its_status_in_words(client):
+    """The console shows the same green/red pair the published panel does, and in WORDS.
+
+    Per row, not per page: dropping the label from only the paid rows would leave "Not paid"
+    on screen and look right from a distance. Colour is the fast signal, the word is the real
+    one -- and this console is where the record actually gets set.
+    """
+    client.post(f"/season/{SEASON}/money/dues", data={"manager_id": "t1", "paid": "1"})
+    raw = client.get(f"/season/{SEASON}/money").get_data(as_text=True)
+    body = re.search(r'<div id="dues-table">.*?</table>', raw, re.S).group(0)
+
+    assert '<span class="tag-inline ok">Paid</span>' in body
+    assert '<span class="tag-inline bad">Not paid</span>' in body
+    assert body.count('class="tag-inline') == 2, "a status on every row, not only the unpaid"
+    assert "owes" not in body, "the old one-sided tag is still being rendered"
+
+
+def test_both_dues_buttons_name_an_action(client):
+    """With a status column beside it, a button reading "paid" is a label where a verb goes."""
+    client.post(f"/season/{SEASON}/money/dues", data={"manager_id": "t1", "paid": "1"})
+    body = text(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
+    assert "mark paid" in body and "mark unpaid" in body
+
+
 def test_a_season_still_being_played_has_live_dues_and_no_prizes_yet(client):
     """The normal state of the current season, and it must read as that rather than as broken."""
     body = text(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
