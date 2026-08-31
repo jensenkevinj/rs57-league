@@ -50,6 +50,7 @@ from rs57.keeper_rules import (
 )
 from rs57.models import (
     CashTrade,
+    Dues,
     FranchiseName,
     KeeperClaim,
     KeeperSlot,
@@ -494,6 +495,58 @@ def validate_manual_records(
     return claims, overrides, trades
 
 
+def check_dues(franchises_by_season: dict[str, set[str]], report: Report) -> None:
+    """Recorded dues must name franchises that exist in the season they are recorded against.
+
+    Dues are money paid INTO the league, keyed on ``(season, manager_id)``. A manager id that
+    resolves to nobody is a row that will never be joined to a franchise, so it would sit in
+    the file reading as somebody's payment while the public panel goes on showing that team as
+    owing.
+
+    Reported SKIPPED rather than passed when the season it names has no derived file: without
+    the franchise list nothing checked the id, and silence there reads exactly like success.
+    """
+    path = DATA / "manual" / "dues.json"
+    if not path.exists():
+        report.skip(
+            "dues.json is not on disk, so no franchise's buy-in is recorded. That is the "
+            "normal state before a season's dues are collected — record them in the admin "
+            "tool's Money tab."
+        )
+        return
+
+    try:
+        rows = _load(path).get("dues") or []
+        dues = [Dues(**row) for row in rows]
+    except (ValidationError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        report.error(f"dues.json: {exc}")
+        return
+
+    checked = 0
+    for row in dues:
+        known = franchises_by_season.get(str(row.season))
+        if known is None:
+            report.skip(
+                f"dues.json: {row.season} has no data/derived/{row.season}.json, so "
+                f"{row.manager_id!r} could not be checked against that season's franchises. "
+                f"Run `python -m rs57.sync --year {row.season}`."
+            )
+            continue
+        checked += 1
+        if row.manager_id not in known:
+            report.error(
+                f"dues.json: {row.season} records dues for {row.manager_id!r}, which has no "
+                f"franchise in that season"
+            )
+    if checked:
+        report.ok(
+            f"dues.json: {len(dues)} dues record(s) load cleanly, {checked} checked against "
+            f"their season's franchises"
+        )
+    elif not dues:
+        report.ok("dues.json: no dues recorded yet, and the file loads cleanly")
+
+
 def audit_ratchet(
     carried_in_by_season: dict[int, list[RosterEntry]],
     claims: Sequence[KeeperClaim],
@@ -864,6 +917,9 @@ def run(report: Report | None = None) -> Report:
             "check_cash_trades: no draft-cash trades and no salary overrides recorded, so "
             "there was nothing to balance"
         )
+
+    # Called even with no dues file: a check that cannot run has to SAY it did not run.
+    check_dues(franchises_by_season, report)
 
     for path in stats_files:
         season = path.stem.removesuffix("-stats")

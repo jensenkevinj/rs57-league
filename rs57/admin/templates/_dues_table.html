@@ -1,0 +1,64 @@
+{# Dues tracking -- money paid INTO the league for this season.
+
+   Every franchise in the season gets a row, whether or not it has a record: the screen is a
+   list of who still owes, and a team that has paid nothing would otherwise be the one missing
+   from it. Absence in dues.json means unpaid, so "mark paid" writes a row and un-marking
+   removes it.
+
+   Counts, not dollars. No amount is recorded -- see dues.json's _about. #}
+<div id="dues-table">
+  <div class="panel">
+    <div class="stats">
+      <div class="stat">
+        <div class="figure">{{ dues_totals.teams }}</div>
+        <div class="label">Franchises</div>
+      </div>
+      <div class="stat">
+        <div class="figure">{{ dues_totals.paid }}</div>
+        <div class="label">Paid</div>
+      </div>
+      <div class="stat">
+        <div class="figure">{{ dues_totals.outstanding }}</div>
+        <div class="label">Still owing</div>
+      </div>
+      <div class="spin">saving…</div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Franchise</th>
+          <th>Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in dues_rows %}
+          <tr>
+            <td>
+              {{ row.name }}
+              {% if not row.paid %}
+                <span class="tag-inline flat">owes</span>
+              {% endif %}
+            </td>
+            <td>
+              <form hx-post="{{ url_for('toggle_dues_paid', year=year) }}"
+                    hx-target="#dues-table"
+                    hx-swap="outerHTML">
+                <input type="hidden" name="manager_id" value="{{ row.manager_id }}">
+                <input type="hidden" name="paid" value="{% if row.paid %}0{% else %}1{% endif %}">
+                <button type="submit" class="quiet">
+                  {% if row.paid %}paid{% else %}mark paid{% endif %}
+                </button>
+              </form>
+              {% if row.paid_at %}
+                <span class="small muted">{{ row.paid_at.strftime('%Y-%m-%d') }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+{# The Money tab: one season's real dollars, both directions.
+
+   Dues are collected at the start of a season and prizes handed out at the end of that same
+   season, so they belong on one screen keyed on one year rather than on two tabs a year apart.
+   A season still being played has live dues and no prizes yet; the prize half fills in on this
+   same page once the season derives.
+
+   Real dollars only. The "Draft cash" tab next door moves auction budget, which never changes
+   hands, and keeper fees are that same budget -- neither is money. #}
+{% extends "base.html" %}
+{% set page = 'money' %}
+{% block title %}Money {{ year }}{% endblock %}
+
+{% block content %}
+<h1>Money {{ year }}</h1>
+<p class="page-intro">
+  What the league took in and what it paid out for {{ year }}. Dues at the start of the season,
+  prizes at the end of it.
+</p>
+
+{% if seasons_available | length > 1 %}
+  <p class="small muted">
+    Season:
+    {% for yr in seasons_available | reverse %}
+      {% if yr == year %}
+        <strong>{{ yr }}</strong>
+      {% else %}
+        <a href="{{ url_for('money', year=yr) }}">{{ yr }}</a>
+      {% endif %}
+    {% endfor %}
+  </p>
+{% endif %}
+
+<h2>Money in · {{ year }} dues</h2>
+{% if not dues_rows %}
+  <div class="flag">
+    <span class="tag">Nothing to track</span>
+    <div>
+      No franchises are recorded for {{ year }} in
+      <code>data/derived/{{ year }}.json</code>, so there is nobody to bill. Sync that season
+      first.
+    </div>
+  </div>
+{% else %}
+  {% include "_dues_table.html" %}
+  <p class="small">
+    Only the paid flag is stored, in <code>data/manual/dues.json</code>. <strong>No amount</strong> —
+    the buy-in is one figure the whole league knows and nothing in <code>data/</code> records it
+    today, so putting it on every row would be twelve copies of a number nobody has written down
+    once. No payment method or handle either: this file is committed to a public repo.
+    Un-marking a franchise removes its row rather than storing <code>paid: false</code>.
+  </p>
+{% endif %}
+
+<h2>Money out · {{ year }} prizes</h2>
+{% if not rows %}
+  <div class="flag">
+    <span class="tag">Nothing to track</span>
+    <div>
+      No payout rows exist for {{ year }}. Either the season has not been derived into
+      <code>data/derived/{{ year }}-stats.json</code> yet — which is the normal state of a season
+      still being played — or it has no recorded prize amounts. 2023 is deliberately absent from
+      <code>payouts.json</code> because its $9.29 weekly prize is not an integer dollar.
+    </div>
+  </div>
+{% else %}
+  {% include "_payout_table.html" %}
+  <p class="small">
+    The prizes and winners above are <strong>derived</strong> — <code>stats</code> computes them and
+    the nightly Action rewrites that file every run. Only the paid flag is a human fact, so only
+    the paid flag is stored, in <code>data/manual/payments.json</code>. The amount is deliberately
+    not copied there: it lives in <code>payouts.json</code>, and two copies of a number are two
+    numbers.
+  </p>
+  {% if schedule %}
+    <p class="small muted">
+      {{ year }} prize schedule: champion ${{ schedule.champion }}, second ${{ schedule.second }},
+      third ${{ schedule.third }}, most points ${{ schedule.most_points }},
+      survivor ${{ schedule.survivor }}, stud ${{ schedule.stud }} per position,
+      unlucky ${{ schedule.unlucky }}, weekly high ${{ schedule.weekly_high }} per week.
+    </p>
+  {% endif %}
+{% endif %}
+{% endblock %}

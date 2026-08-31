@@ -340,8 +340,8 @@
            class="{% if page == 'season' %}on{% endif %}">Keepers {{ current_season }}</a>
         <a href="{{ url_for('settings', year=current_season) }}"
            class="{% if page == 'settings' %}on{% endif %}">Season settings</a>
-        <a href="{{ url_for('payouts', year=prior_season) }}"
-           class="{% if page == 'payouts' %}on{% endif %}">Payouts</a>
+        <a href="{{ url_for('money', year=current_season) }}"
+           class="{% if page == 'money' %}on{% endif %}">Money</a>
       {% endif %}
       <a href="{{ url_for('trades') }}" class="{% if page == 'trades' %}on{% endif %}">Draft cash</a>
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">Commit</a>

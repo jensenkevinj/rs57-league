@@ -109,16 +109,9 @@ def create_app(
 
     @app.context_processor
     def shared() -> dict[str, Any]:
-        """Facts every page needs. Read off the engine rather than retyped into a template.
-
-        ``prior_season`` is here because the payouts link points at the completed season, and
-        ``current_season - 1`` in a template is arithmetic — which is exactly what the templates
-        are tested for not doing. The rule is worth keeping literal: the moment a year subtraction
-        is acceptable in a template, so is a salary addition.
-        """
+        """Facts every page needs. Read off the engine rather than retyped into a template."""
         current = derived.current_season()
         return {
-            "prior_season": current - 1 if current is not None else None,
             "keeper_tax": KEEPER_TAX,
             "max_keepers": MAX_KEEPERS,
             "max_prospects": MAX_PROSPECTS,
@@ -708,21 +701,51 @@ def create_app(
             flash(f"no trade {trade_id} on file", "error")
         return _back_to("trades")
 
-    # -- payouts ----------------------------------------------------------------
+    # -- money: dues in, prizes out ---------------------------------------------
 
-    @app.get("/season/<int:year>/payouts")
-    def payouts(year: int):
-        rows, totals = _payout_rows(derived, store, year)
+    @app.get("/season/<int:year>/money")
+    def money(year: int):
+        """One season's real dollars, both directions.
+
+        Dues are collected at the start of a season and prizes handed out at the end of that
+        same season, so they belong on one screen keyed on one year. A season still being
+        played has live dues and no prizes yet; that is the true state of it, and the prize
+        half fills in on this same page once the season derives.
+        """
+        season_or_404(year)
+        dues_rows, dues_totals = _dues_rows(derived, store, year)
+        payout_rows, payout_totals = _payout_rows(derived, store, year)
         return render_template(
-            "payouts.html",
+            "money.html",
             year=year,
-            rows=rows,
-            totals=totals,
+            dues_rows=dues_rows,
+            dues_totals=dues_totals,
+            rows=payout_rows,
+            totals=payout_totals,
             schedule=store.prize_schedule(year),
         )
 
-    @app.post("/season/<int:year>/payouts")
-    def toggle_paid(year: int):
+    @app.post("/season/<int:year>/money/dues")
+    def toggle_dues_paid(year: int):
+        loaded = season_or_404(year)
+        manager_id = request.form.get("manager_id", "")
+        paid = request.form.get("paid") == "1"
+        if not manager_id:
+            abort(400, "a dues record needs a franchise")
+        # The season's own franchise list is the league's own record, so a manager id it does
+        # not contain is refused here rather than written and reported later. An unrecognised
+        # id would sit in the file reading as somebody's payment while the public panel went
+        # on showing that franchise as owing.
+        if manager_id not in loaded.names:
+            abort(400, f"{manager_id!r} has no franchise in {year}")
+        store.set_dues_paid(year, manager_id, paid, now=now())
+        dues_rows, dues_totals = _dues_rows(derived, store, year)
+        return render_template(
+            "_dues_table.html", year=year, dues_rows=dues_rows, dues_totals=dues_totals
+        )
+
+    @app.post("/season/<int:year>/money/payouts")
+    def toggle_payout_paid(year: int):
         label = request.form.get("label", "")
         winner = request.form.get("winner_manager_id", "")
         paid = request.form.get("paid") == "1"
@@ -731,6 +754,15 @@ def create_app(
         store.set_paid(year, label, winner, paid, now=now())
         rows, totals = _payout_rows(derived, store, year)
         return render_template("_payout_table.html", year=year, rows=rows, totals=totals)
+
+    @app.get("/season/<int:year>/payouts")
+    def payouts(year: int):
+        """Kept as a permanent redirect target, not a page.
+
+        Payouts and dues merged onto one Money tab — they are one season's two ends. This
+        endpoint stays because bookmarks still name it, the same way ``/overrides`` does.
+        """
+        return redirect(url_for("money", year=year))
 
     # -- verification against ESPN ----------------------------------------------
 
@@ -792,6 +824,37 @@ def create_app(
         )
 
     return app
+
+
+def _dues_rows(derived: Derived, store: ManualStore, year: int):
+    """Join the season's franchises to recorded dues. Counts are added here, not in a template.
+
+    Every franchise in the season gets a row whether or not it has a dues record: the screen
+    is a list of who still owes, and a franchise that has paid nothing would otherwise be the
+    one team missing from it.
+    """
+    paid = {row.manager_id: row for row in store.dues(year) if row.paid}
+    loaded = derived.load(year)
+    names = loaded.names if loaded else {}
+
+    rows = []
+    for manager_id, name in sorted(names.items(), key=lambda item: item[1].strip().lower()):
+        record = paid.get(manager_id)
+        rows.append(
+            {
+                "manager_id": manager_id,
+                "name": name,
+                "paid": record is not None,
+                "paid_at": record.paid_at if record else None,
+            }
+        )
+
+    totals = {
+        "teams": len(rows),
+        "paid": sum(1 for row in rows if row["paid"]),
+    }
+    totals["outstanding"] = totals["teams"] - totals["paid"]
+    return rows, totals
 
 
 def _payout_rows(derived: Derived, store: ManualStore, year: int):

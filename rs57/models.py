@@ -531,6 +531,31 @@ class Payment(Base):
     paid_at: datetime | None = None
 
 
+class Dues(Base):
+    """That one franchise has paid its buy-in for one season, recorded by the admin tool.
+
+    Not ``Payment`` — that is a prize handed OUT to a winner. This is money paid IN. The two
+    are the same season's two ends: dues at the start of a season, prizes at the finish, which
+    is why one admin screen shows both.
+
+    Neither is a keeper fee. Fees and the $5 tax are auction budget and never change hands;
+    these are real dollars.
+
+    Keyed on ``(season, manager_id)`` — a franchise pays once a season. Absence means unpaid,
+    so an unpaid franchise has no row at all rather than one saying ``paid: false``.
+
+    **No amount field, deliberately.** The buy-in is one figure the whole league knows and
+    nothing in ``data/`` records it today; putting it on twelve rows would be twelve copies of
+    a number nobody has written down once. And **no payment method, handle, or note** — this
+    row is committed to a public repo.
+    """
+
+    season: int
+    manager_id: str
+    paid: bool = False
+    paid_at: datetime | None = None
+
+
 def _jsonable(obj: Any) -> Any:
     if isinstance(obj, BaseModel):
         return obj.model_dump(mode="json")

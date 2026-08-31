@@ -49,7 +49,7 @@
             <td class="num money">${{ row.amount }}</td>
             <td>
               {% if row.winner_manager_id %}
-                <form hx-post="{{ url_for('toggle_paid', year=year) }}"
+                <form hx-post="{{ url_for('toggle_payout_paid', year=year) }}"
                       hx-target="#payout-table"
                       hx-swap="outerHTML">
                   <input type="hidden" name="label" value="{{ row.label }}">

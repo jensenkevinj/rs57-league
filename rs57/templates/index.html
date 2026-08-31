@@ -175,4 +175,26 @@
     No season has been synced yet, so there are no prizes to show.
   </p>
 {% endif %}
+
+{# Who still owes their buy-in. Outside the branch above on purpose: dues are about the season
+   being PLAYED, so the panel belongs on the pre-draft page and the results page alike, while
+   everything above it is about a season's results.
+
+   `dues` is only ever passed to the live home page, never to an archived season-{year}.html —
+   the same way `predraft` is — and site.build_site drops it entirely once every franchise has
+   paid, so this block has no "all paid" state to render. #}
+{% if page == 'home' and dues %}
+  <h2>Dues</h2>
+  <p class="muted small">{{ dues.paid_count }} of {{ dues.total }} paid for {{ dues.season }}.</p>
+  <ul class="dues">
+    {% for line in dues.rows %}
+      <li class="{% if line.paid %}settled{% else %}owing{% endif %}">
+        <span class="dues-team">{{ ui.team(line.team) }}</span>
+        {% if not line.paid %}
+          <span class="tag-inline">owes</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
 {% endblock %}

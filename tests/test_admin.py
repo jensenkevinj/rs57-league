@@ -938,6 +938,164 @@ def test_payments_record_no_amount_and_no_method(store: ManualStore):
 
 
 # ---------------------------------------------------------------------------
+# The Money tab: dues in, prizes out, one season
+# ---------------------------------------------------------------------------
+
+
+def award(data_dir: Path, *payouts: dict, season: int = PRIOR) -> None:
+    """Derive a season's prizes, the way ``rs57.stats_sync`` writes them."""
+    (data_dir / "derived" / f"{season}-stats.json").write_text(
+        json.dumps({"payouts": list(payouts), "review": {}}), encoding="utf-8"
+    )
+
+
+def test_every_franchise_gets_a_dues_row_including_one_that_has_paid_nothing(client):
+    """The screen is a list of who still owes.
+
+    Building it from the dues file instead of the season's franchises would drop exactly the
+    teams the commissioner is looking for — a franchise with no record is the whole point.
+    """
+    rows, totals = admin._dues_rows(
+        Derived(derived_dir=Path(client.application.config["DERIVED_DIR"])),
+        ManualStore(data_dir=client.application.config["DATA_DIR"]),
+        SEASON,
+    )
+    assert [row["manager_id"] for row in rows] == ["t2", "t1"], "sorted by franchise name"
+    assert not any(row["paid"] for row in rows)
+    assert totals == {"teams": 2, "paid": 0, "outstanding": 2}
+
+
+def test_marking_dues_paid_writes_a_row_and_un_marking_removes_it(client, store: ManualStore):
+    """Absence is what unpaid means, so un-marking must not leave ``paid: false`` behind."""
+    client.post(f"/season/{SEASON}/money/dues", data={"manager_id": "t1", "paid": "1"})
+    assert [row.manager_id for row in store.dues(SEASON)] == ["t1"]
+    assert store.dues(SEASON)[0].paid_at == NOW
+
+    client.post(f"/season/{SEASON}/money/dues", data={"manager_id": "t1", "paid": "0"})
+    assert store.dues(SEASON) == [], "un-marking removes the row"
+
+
+def test_dues_are_keyed_on_the_season_too(store: ManualStore):
+    """Paying into 2026 must not mark 2025 paid — one franchise pays once a season, each season."""
+    store.set_dues_paid(SEASON, "t1", True, now=NOW)
+    store.set_dues_paid(PRIOR, "t1", True, now=NOW)
+    assert {row.season for row in store.dues()} == {SEASON, PRIOR}
+
+    store.set_dues_paid(PRIOR, "t1", False, now=NOW)
+    assert [row.season for row in store.dues()] == [SEASON]
+
+
+def test_dues_record_no_amount_and_no_method(store: ManualStore):
+    """The buy-in is one figure nothing records; a handle would be personal data on a public repo."""
+    store.set_dues_paid(SEASON, "t1", True, now=NOW)
+    row = json.loads((store.manual / "dues.json").read_text())["dues"][0]
+    assert set(row) == {"season", "manager_id", "paid", "paid_at"}
+
+
+def test_the_dues_file_explains_itself_when_it_is_created(store: ManualStore):
+    """``dues.json`` is the only place saying it is not ``payments.json``. A write must keep it."""
+    store.set_dues_paid(SEASON, "t1", True, now=NOW)
+    about = json.loads((store.manual / "dues.json").read_text())["_about"]
+
+    store.set_dues_paid(SEASON, "t2", True, now=NOW)
+    after = json.loads((store.manual / "dues.json").read_text())
+    assert after["_about"] == about, "a second write dropped the prose"
+    assert any("payments.json" in line for line in about)
+
+
+def test_the_money_page_shows_both_directions_for_one_season(client, data_dir: Path):
+    """Dues at the start of a season and prizes at the end of it are one screen, one year."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    body = text(client.get(f"/season/{PRIOR}/money").get_data(as_text=True))
+    assert "Money in" in body and f"{PRIOR} dues" in body
+    assert "Money out" in body and f"{PRIOR} prizes" in body
+    assert "Champion" in body
+    assert "Fake News" in body
+
+
+def test_the_money_page_reads_the_year_in_the_url(client, data_dir: Path):
+    """Not ``current_season``. Both seasons are reachable, and each shows only its own prizes."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+
+    prior = text(client.get(f"/season/{PRIOR}/money").get_data(as_text=True))
+    current = text(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
+    assert "Champion" in prior
+    assert "Champion" not in current, "the coming season showed a completed season's prizes"
+
+
+def test_a_season_still_being_played_has_live_dues_and_no_prizes_yet(client):
+    """The normal state of the current season, and it must read as that rather than as broken."""
+    body = text(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
+    assert "mark paid" in body, "dues are not markable on the season being collected for"
+    assert "Nothing to track" in body, "the empty prize half says nothing about why"
+    assert "has not been derived" in body
+
+
+def test_marking_dues_paid_leaves_the_payout_table_alone(client, data_dir: Path, store):
+    """Two htmx targets on one page. A swap that returned the whole page would clobber the other."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    store.set_paid(PRIOR, "Champion", "t1", True, now=NOW)
+
+    fragment = client.post(
+        f"/season/{PRIOR}/money/dues", data={"manager_id": "t1", "paid": "1"}
+    ).get_data(as_text=True)
+    assert 'id="dues-table"' in fragment
+    assert 'id="payout-table"' not in fragment, "the dues swap carried the payout table with it"
+    assert store.payments(PRIOR)[0].paid, "the recorded payout was disturbed by a dues write"
+
+
+def test_the_two_tables_swap_into_different_targets(client, data_dir: Path):
+    """Both fragments live on one page; sharing an id would make each button replace the other."""
+    award(data_dir, {"season": PRIOR, "label": "Champion", "amount": 500,
+                     "winner_manager_id": "t1"})
+    raw = client.get(f"/season/{PRIOR}/money").get_data(as_text=True)
+    assert raw.count('id="dues-table"') == 1
+    assert raw.count('id="payout-table"') == 1
+    assert 'hx-target="#dues-table"' in raw
+    assert 'hx-target="#payout-table"' in raw
+
+
+def test_the_old_payouts_url_still_lands_on_the_money_tab(client):
+    """Payouts and dues merged onto one tab. A bookmark must not 404."""
+    response = client.get(f"/season/{PRIOR}/payouts")
+    assert response.status_code in (301, 302)
+    assert response.headers["Location"].endswith(f"/season/{PRIOR}/money")
+
+
+def test_the_money_page_refuses_a_season_that_was_never_synced(client):
+    """Without a derived season there are no franchises, so there is nobody to bill."""
+    assert client.get("/season/1999/money").status_code == 404
+
+
+def test_a_dues_post_without_a_franchise_is_refused(client, store: ManualStore):
+    """An empty manager id would write a row keyed on nothing at all."""
+    assert client.post(f"/season/{SEASON}/money/dues", data={"paid": "1"}).status_code == 400
+    assert store.dues() == []
+
+
+def test_dues_for_a_franchise_the_season_does_not_have_are_refused(client, store: ManualStore):
+    """The season's own franchise list blocks; it is the league's own record, not an outside one.
+
+    Caught by hand-posting a manager id that was really a whole shell variable. An id nothing
+    recognises would sit in the file reading as somebody's payment while the public panel went
+    on showing that franchise as owing, and `validate` would only say so afterwards.
+    """
+    response = client.post(
+        f"/season/{SEASON}/money/dues", data={"manager_id": "t1 t2 t3", "paid": "1"}
+    )
+    assert response.status_code == 400
+    assert store.dues() == [], "an unrecognised franchise was written"
+
+    assert client.post(
+        f"/season/{SEASON}/money/dues", data={"manager_id": "t99", "paid": "1"}
+    ).status_code == 400
+    assert store.dues() == []
+
+
+# ---------------------------------------------------------------------------
 # Form parsing
 # ---------------------------------------------------------------------------
 

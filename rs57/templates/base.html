@@ -438,6 +438,21 @@
   .leader-money { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
   .leaders li.top .leader-money { color: var(--gold); }
 
+  /* --- the home page: who still owes their dues ------------------------- */
+
+  /* The panel disappears once everyone has paid (site.build_site decides), so this styles
+     a list that is always part unpaid. "owes" is a word and not just a colour: the state
+     has to survive being read aloud, printed, or seen by someone who cannot tell the two
+     greys apart. */
+  .dues { list-style: none; margin: 0.4rem 0 1.6rem; padding: 0;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+          gap: 0.1rem 1.2rem; }
+  .dues li { display: flex; align-items: baseline; gap: 0.5rem;
+             padding: 0.3rem 0; border-bottom: 1px solid var(--line); }
+  .dues .dues-team { flex: 1; }
+  .dues li.owing .dues-team { font-weight: 600; }
+  .dues li.settled .dues-team { color: var(--muted); }
+
 </style>
 </head>
 <body>

@@ -23,11 +23,13 @@ from rs57.stats import SeasonStats
 from rs57.stats_sync import stats_document
 from rs57.site import (
     TEMPLATES,
+    build_dues_board,
     build_home,
     build_keeper_season,
     build_site,
     build_stats_season,
     environment,
+    load_dues,
     render_markdown,
     season_files,
 )
@@ -1242,8 +1244,13 @@ def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
     assert {line.total for line in home.leaders} == {100}
 
     # Neither is shown as second on a board whose ordering is the only thing saying who led.
-    body = text(render(tmp_path, derived, drafted=True)["index.html"])
-    assert " 2 " not in body.split("Moneylist")[1][:200]
+    # Scoped to the leaders list itself rather than to a slice of the page after "Moneylist":
+    # the list is what the claim is about, and a fixed-width window silently takes in whatever
+    # is rendered next.
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    leaders = re.search(r'<ol class="leaders">.*?</ol>', page, flags=re.S)
+    assert leaders, "the Moneylist is not on the page at all"
+    assert " 2 " not in text(leaders.group(0))
 
 
 def test_the_home_page_survives_a_season_with_no_stats_at_all(tmp_path: Path):
@@ -1959,3 +1966,141 @@ def test_both_override_sources_are_read(tmp_path: Path, derived: Path):
 
     found = {o.espn_player_id for o in load_overrides(data / "history", data / "manual")}
     assert found == {7, 8}, f"a source was dropped: {found}"
+
+
+
+# ---------------------------------------------------------------------------
+# Dues: who still owes, and the panel that removes itself
+# ---------------------------------------------------------------------------
+
+
+def dues_manual(tmp_path: Path, *paid: str, season: int = SEASON) -> Path:
+    """A ``data/manual/`` whose dues file marks ``paid`` franchises and nobody else.
+
+    Absence is what unpaid means, so an unpaid franchise is written as no row at all — the
+    same shape the admin tool produces.
+    """
+    manual = tmp_path / "manual"
+    manual.mkdir(exist_ok=True)
+    (manual / "dues.json").write_text(
+        json.dumps({
+            "_about": ["who has paid in"],
+            "dues": [
+                {"season": season, "manager_id": mid, "paid": True,
+                 "paid_at": "2026-08-30T12:00:00"}
+                for mid in paid
+            ],
+        }),
+        encoding="utf-8",
+    )
+    return manual
+
+
+def render_with_dues(tmp_path: Path, derived: Path, *paid: str, drafted: bool = False):
+    """Render the site with a dues file on disk. Returns every page's HTML by filename."""
+    manual = dues_manual(tmp_path, *paid)
+    if drafted:
+        keeper_path = derived / f"{SEASON}.json"
+        doc = json.loads(keeper_path.read_text(encoding="utf-8"))
+        doc["source"]["drafted"] = True
+        keeper_path.write_text(json.dumps(doc), encoding="utf-8")
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    return {path.name: path.read_text(encoding="utf-8") for path in out.iterdir()}
+
+
+def test_every_franchise_appears_with_the_unpaid_ones_marked(tmp_path: Path, derived: Path):
+    """A franchise that has paid nothing has no row in the file, and is the point of the panel."""
+    board = build_dues_board(derived, SEASON, dues_manual(tmp_path, "t1"))
+
+    assert [line.team.manager_id for line in board.rows] == ["t2", "t1"], "sorted by name"
+    assert [line.paid for line in board.rows] == [False, True]
+    assert (board.paid_count, board.total, board.all_paid) == (1, 2, False)
+
+
+def test_the_panel_is_on_the_home_page_while_anyone_still_owes(tmp_path: Path, derived: Path):
+    body = text(render_with_dues(tmp_path, derived, "t1")["index.html"])
+    assert "Dues" in body
+    assert "1 of 2 paid" in body
+    assert "Belichick's Spy owes" in html.unescape(body), "the franchise that owes is not marked"
+
+
+def test_the_panel_disappears_once_every_franchise_has_paid(tmp_path: Path, derived: Path):
+    """The mutation the hiding rule exists for.
+
+    With one team still owing the panel is there; marking that last team paid has to remove it
+    outright, not leave a board of ticks sitting on the home page until January.
+    """
+    still_owing = render_with_dues(tmp_path, derived, "t1")["index.html"]
+    assert 'class="dues"' in still_owing
+
+    page = render_with_dues(tmp_path, derived, "t1", "t2")["index.html"]
+    assert 'class="dues"' not in page, "the panel outlived the last unpaid franchise"
+    assert "Dues" not in text(page)
+
+
+def test_nobody_having_paid_is_not_mistaken_for_everybody_having_paid(tmp_path: Path, derived: Path):
+    """An empty dues file is the start of the season, not the end of collecting.
+
+    ``all_paid`` counts rows; deriving it from the file rather than from the franchise list
+    would make zero-of-twelve look like the finished state and hide the panel exactly when it
+    is most wanted.
+    """
+    board = build_dues_board(derived, SEASON, dues_manual(tmp_path))
+    assert not board.all_paid
+    assert board.paid_count == 0
+
+    body = text(render_with_dues(tmp_path, derived)["index.html"])
+    assert "0 of 2 paid" in body
+    assert body.count("owes") == 2
+
+
+def test_the_panel_shows_on_the_results_home_page_too(tmp_path: Path, derived: Path):
+    """Dues are about the season being played, not about whether it has been drafted yet."""
+    preseason = text(render_with_dues(tmp_path, derived, "t1")["index.html"])
+    results = text(render_with_dues(tmp_path, derived, "t1", drafted=True)["index.html"])
+
+    assert "Preseason" in preseason and "Dues" in preseason
+    assert "Preseason" not in results and "Dues" in results
+
+
+def test_an_archived_season_page_never_shows_dues(tmp_path: Path, derived: Path):
+    """Last season's collection is not news, and the archived pages share this template."""
+    pages = render_with_dues(tmp_path, derived, "t1", drafted=True)
+    assert 'class="dues"' in pages["index.html"], "the live page must still have it"
+    # The markup, not the word: "owes" is a substring of "lowest", which the survivor
+    # caption on every one of these pages happens to contain.
+    assert 'class="dues"' not in pages[f"season-{PRIOR}.html"]
+    assert "Dues" not in text(pages[f"season-{PRIOR}.html"])
+
+
+def test_the_dues_panel_is_about_the_season_being_played(tmp_path: Path, derived: Path):
+    """Keyed on the current keeper season. Read a year out and the panel bills the wrong season."""
+    manual = dues_manual(tmp_path, "t1", "t2", season=PRIOR)
+    board = build_dues_board(derived, SEASON, manual)
+    assert board.paid_count == 0, "last season's dues were counted against this season"
+    assert not board.all_paid
+
+
+@pytest.mark.parametrize("content", ["{ not json", '{"dues": [{"manager_id": 5}]}'])
+def test_a_broken_dues_file_leaves_everyone_unpaid_rather_than_breaking_the_build(
+    tmp_path: Path, derived: Path, content: str
+):
+    """The nightly build must not go down over a file the admin tool owns. validate.py reports it."""
+    manual = tmp_path / "manual"
+    manual.mkdir()
+    (manual / "dues.json").write_text(content, encoding="utf-8")
+
+    assert load_dues(SEASON, manual) == []
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
+    body = text((out / "index.html").read_text(encoding="utf-8"))
+    assert "0 of 2 paid" in body
+
+
+def test_the_dues_panel_records_no_money(tmp_path: Path, derived: Path):
+    """The buy-in is not in data/ and the panel must not imply a figure it does not have."""
+    page = render_with_dues(tmp_path, derived, "t1")["index.html"]
+    panel = re.search(r'<ul class="dues">.*?</ul>', page, flags=re.S)
+    assert panel, "the dues panel is not on the page"
+    assert "$" not in text(panel.group(0))

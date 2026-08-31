@@ -56,6 +56,7 @@ from rs57.keeper_rules import (
 )
 from rs57.models import (
     Base,
+    Dues,
     FranchiseName,
     KeeperClaim,
     KeeperSlot,
@@ -454,6 +455,34 @@ class Home:
     notes: tuple[Note, ...]
 
 
+@dataclass(frozen=True)
+class DuesLine:
+    """One franchise, and whether it has paid into the league this season."""
+
+    team: Named
+    paid: bool
+
+
+@dataclass(frozen=True)
+class DuesBoard:
+    """Who has paid their buy-in for the season being played.
+
+    Counts, not money. What the buy-in costs is not recorded anywhere in ``data/`` and this is
+    not the place to start — the panel says who still owes, which is the whole of what anyone
+    reads it for.
+
+    ``all_paid`` is the signal to stop showing it. A board of twelve ticks tells a reader
+    nothing and would sit on the home page until January, so ``build_site`` drops the panel
+    once this is true.
+    """
+
+    season: int
+    rows: tuple[DuesLine, ...]
+    paid_count: int
+    total: int
+    all_paid: bool
+
+
 # ---------------------------------------------------------------------------
 # Markdown
 # ---------------------------------------------------------------------------
@@ -666,6 +695,50 @@ def load_season_settings(season: int, manual_dir: Path = MANUAL) -> Season | Non
         return Season(**row) if row else None
     except (ValidationError, TypeError, json.JSONDecodeError):
         return None
+
+
+def load_dues(season: int, manual_dir: Path = MANUAL) -> list[Dues]:
+    """Recorded dues for one season, from ``data/manual/dues.json``. Read-only.
+
+    The admin tool owns that file. The site reads it and never writes it, exactly as it reads
+    ``claims.json``. A malformed file is skipped rather than allowed to take the nightly build
+    down — ``validate.py`` is the place that reports it.
+    """
+    path = manual_dir / "dues.json"
+    if not path.exists():
+        return []
+    try:
+        rows = _load(path).get("dues") or []
+        return [row for row in (Dues(**row) for row in rows) if row.season == season]
+    except (ValidationError, TypeError, json.JSONDecodeError):
+        return []
+
+
+def build_dues_board(
+    derived_dir: Path, season: int, manual_dir: Path = MANUAL
+) -> DuesBoard | None:
+    """Every franchise in the season, marked paid or not. ``None`` when the season has none.
+
+    The franchise list comes from the season's own derived file rather than from the dues
+    file, so a franchise that has paid nothing still appears — which is the only reason anyone
+    reads this. Absence in ``dues.json`` is what unpaid means.
+    """
+    names = franchise_names(derived_dir, season)
+    if not names:
+        return None
+    paid = {row.manager_id for row in load_dues(season, manual_dir) if row.paid}
+    rows = tuple(
+        DuesLine(team=_named(manager_id, names), paid=manager_id in paid)
+        for manager_id in sorted(names, key=lambda mid: names[mid].strip().lower())
+    )
+    paid_count = sum(1 for row in rows if row.paid)
+    return DuesBoard(
+        season=season,
+        rows=rows,
+        paid_count=paid_count,
+        total=len(rows),
+        all_paid=paid_count == len(rows),
+    )
 
 
 @dataclass(frozen=True)
@@ -1557,6 +1630,18 @@ def build_site(
         else None
     )
 
+    # Dues are about the season being played, so this rides on `current` rather than on the
+    # most recent *finished* season — it shows on the pre-draft home page and the results one
+    # alike. It removes itself once every franchise has paid: a panel of twelve ticks tells a
+    # reader nothing and would sit there until January. Decided here rather than in the
+    # template so the board itself stays an honest record of who has paid.
+    board = (
+        build_dues_board(derived_dir, current.season, manual_dir)
+        if current is not None
+        else None
+    )
+    dues = board if board is not None and not board.all_paid else None
+
     shared = {
         "current": current,
         "seasons": seasons,
@@ -1577,7 +1662,7 @@ def build_site(
         )
         written.append(path)
 
-    write("index.html", "index.html", page="home", predraft=predraft)
+    write("index.html", "index.html", page="home", predraft=predraft, dues=dues)
     write("keepers.html", "keepers.html", page="keepers")
     write("seasons.html", "seasons.html", page="seasons")
     # A past season's page is the home page, archived: same template, same prize board, just
