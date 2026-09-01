@@ -48,11 +48,11 @@
   <div class="row" style="margin-top:1rem">
     <div class="field">
       <label>Draft date <span class="small muted">(from ESPN, read-only)</span></label>
-      <div>{{ source.draft_date.strftime('%Y-%m-%d %H:%M') if source.draft_date else 'not set yet' }}</div>
+      <div>{{ (source.draft_date | et).strftime('%Y-%m-%d %H:%M') ~ ' ET' if source.draft_date else 'not set yet' }}</div>
     </div>
     <div class="field">
       <label>Keeper deadline <span class="small muted">(from ESPN, read-only)</span></label>
-      <div>{{ source.keeper_deadline.strftime('%Y-%m-%d %H:%M') if source.keeper_deadline else 'not set yet' }}</div>
+      <div>{{ (source.keeper_deadline | et).strftime('%Y-%m-%d %H:%M') ~ ' ET' if source.keeper_deadline else 'not set yet' }}</div>
     </div>
   </div>
   <p class="small muted" style="margin-top:0.25rem">

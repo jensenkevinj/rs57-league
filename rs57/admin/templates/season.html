@@ -17,7 +17,7 @@
   <div>
     Keeper deadline:
     {% if screen.gate.deadline %}
-      {{ screen.gate.deadline.strftime('%Y-%m-%d %H:%M') }}
+      {{ screen.gate.local_deadline.strftime('%Y-%m-%d %H:%M') }} ET
       {% if screen.gate.state == 'locked' %}
         <span class="tag-inline">locked until then</span>
       {% else %}

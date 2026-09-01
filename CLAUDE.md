@@ -324,6 +324,20 @@ The public homepage panel shows dues only, and **removes itself once every franc
   the current spreadsheet under-charges James Cook by $5 because its keeper list says
   `James Cook` and ESPN now returns `James Cook III`.
 - All money is integer dollars. No floats.
+- **Every stored datetime is naive UTC; every displayed one is Eastern.** `espn._epoch_ms`
+  converts on the way in and naive is deliberate — `keeper_rules` compares `acquired_at`
+  against `trade_deadline` directly, and an aware value would raise from inside the engine.
+  What was missing for a while was the way back: nothing converted for display, so the 2026
+  home page published the draft as 9/4 when ESPN says 9/3 at 9pm ET. Every league date is in
+  the evening, so UTC has already crossed midnight and *all of them* printed a day late,
+  including every auction-day acquisition on the keepers page. `models.to_league_time()` is
+  the one border — the `mdy` filter on the site and the `et` filter in the admin tool both go
+  through it, and `models.utc_now()` is the only clock allowed to meet a stored deadline.
+  It is a real tz database and not a fixed offset: the draft is in September and the trade
+  deadline is in December, so a hardcoded `-5` is wrong for half the calendar.
+  - **`CashTrade.agreed_at` is the exception and must never be converted.** It is a calendar
+    date a human types into a date input, not an instant — converting it walks the date
+    backwards a day every time the form is reopened.
 - Load JSON into Pydantic models immediately. Never pass raw dicts around.
 - Models enforce types; keeper_rules enforces rules. A negative fee is a ValidationIssue,
   not a Pydantic error.

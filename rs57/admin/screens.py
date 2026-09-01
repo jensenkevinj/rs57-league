@@ -48,7 +48,14 @@ from rs57.keeper_rules import (
     is_keeper_slot,
     keeper_salary,
 )
-from rs57.models import CashTrade, KeeperClaim, KeeperSlot, RosterEntry, SalaryOverride
+from rs57.models import (
+    CashTrade,
+    KeeperClaim,
+    KeeperSlot,
+    RosterEntry,
+    SalaryOverride,
+    to_league_time,
+)
 
 SLOT_CHOICES = (KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3, KeeperSlot.PROSPECT)
 
@@ -311,6 +318,8 @@ class KeeperGate:
     """
 
     deadline: datetime | None
+    """Naive **UTC**, exactly as ESPN gave it and as the derived file stores it. It is compared
+    against the app's clock, which is UTC for the same reason. Print ``local_deadline``."""
     state: str
 
     @property
@@ -318,11 +327,21 @@ class KeeperGate:
         return self.state != "locked"
 
     @property
+    def local_deadline(self) -> datetime | None:
+        """The same instant on the league's own wall clock, for printing and nothing else.
+
+        A deadline of ``2026-09-02 03:00`` UTC is 11pm ET on 9/1, which is what ESPN shows and
+        what a manager was told. Printing the UTC form named the wrong day.
+        """
+        return to_league_time(self.deadline)
+
+    @property
     def message(self) -> str:
         if self.state == "locked":
             return (
                 f"Claims are locked until the keeper deadline "
-                f"({self.deadline:%Y-%m-%d %H:%M}). Salaries are entered after it passes, so "
+                f"({self.local_deadline:%Y-%m-%d %H:%M} ET). Salaries are entered after it "
+                f"passes, so "
                 f"nothing is recorded while managers can still change their minds. Prices "
                 f"below are live — you can look, you just cannot record."
             )
@@ -333,13 +352,19 @@ class KeeperGate:
                 "holding claims automatically once ESPN sets one and the season re-syncs."
             )
         return (
-            f"The keeper deadline ({self.deadline:%Y-%m-%d %H:%M}) has passed. The console is "
-            f"open and stays open — nothing re-locks."
+            f"The keeper deadline ({self.local_deadline:%Y-%m-%d %H:%M} ET) has passed. The "
+            f"console is open and stays open — nothing re-locks."
         )
 
 
 def keeper_gate(current: DerivedSeason, *, now: datetime) -> KeeperGate:
-    """Read the gate off ESPN's own deadline. The one place the three states are decided."""
+    """Read the gate off ESPN's own deadline. The one place the three states are decided.
+
+    ``now`` must be **naive UTC** — ``models.utc_now``, which is what the app injects.
+    ``deadline`` is naive UTC off ESPN, so a local-time clock here compares two different
+    timezones and keeps the console shut for the length of the offset after the deadline has
+    actually passed.
+    """
     deadline = current.keeper_deadline
     if deadline is None:
         return KeeperGate(deadline=None, state="unrecorded")

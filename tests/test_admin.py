@@ -44,7 +44,14 @@ from rs57.admin.screens import (
 )
 from rs57.admin.store import CLAIMS, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, IssueCode, Severity, compute_team_keepers
-from rs57.models import CashTrade, KeeperClaim, KeeperSlot, SalaryOverride, Season
+from rs57.models import (
+    CashTrade,
+    KeeperClaim,
+    KeeperSlot,
+    SalaryOverride,
+    Season,
+    utc_now,
+)
 
 SEASON = 2026
 PRIOR = 2025
@@ -2425,6 +2432,66 @@ def test_the_three_deadline_states_are_distinct():
 
     assert keeper_gate(_derived_season(datetime(2026, 1, 1, 12, 0)), now=NOW).editable
     assert not KeeperGate(deadline=NOW, state="locked").editable
+
+
+def test_the_default_clock_is_utc_and_not_the_machines_local_time(tmp_path: Path):
+    """The clock the gate compares against a UTC deadline has to be UTC itself.
+
+    ``datetime.now()`` returns the machine's local time. Compared against
+    ``keeper_deadline`` — naive UTC, straight off ESPN — it kept the console locked for the
+    length of the UTC offset after the deadline had actually passed, and it quietly assumed
+    whoever ran the tool sat in the league's own timezone.
+
+    Asserted by identity rather than by comparing two clocks, deliberately: CI runs on a UTC
+    machine, where ``datetime.now()`` and ``utc_now()`` agree to the microsecond and a
+    value-based test could never fail. A test that cannot fail is worse than no test.
+    """
+    empty = tmp_path / "data"
+    (empty / "manual").mkdir(parents=True)
+    (empty / "derived").mkdir(parents=True)
+    app = create_app(data_dir=empty, derived_dir=empty / "derived", repo=tmp_path, push=False)
+    assert app.config["CLOCK"] is utc_now
+
+
+def test_the_gate_prints_the_deadline_on_the_league_clock(client, data_dir: Path):
+    """ESPN's real 2026 keeper deadline: 11pm ET on 9/1, which is 03:00 UTC on 9/2.
+
+    Stored UTC and printed UTC, the console named the wrong day for it — the same failure the
+    public home page had. The banner is what a commissioner reads to know whether the thing is
+    open, so it has to say the time the managers were given.
+    """
+    set_keeper_deadline(data_dir, datetime(2026, 9, 2, 3, 0))
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+
+    assert "2026-09-01 23:00" in page, "the deadline on the league's clock"
+    assert "2026-09-02 03:00" not in page, "the stored UTC form is a day late"
+
+
+def test_the_settings_page_prints_espns_dates_on_the_league_clock(client, data_dir: Path):
+    """Both read-only ESPN facts, at their real 2026 values — the draft 9pm ET on 9/3."""
+    path = data_dir / "derived" / f"{SEASON}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["source"]["draft_date"] = "2026-09-04T01:00:00"
+    doc["source"]["keeper_deadline"] = "2026-09-02T03:00:00"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+    page = text(client.get(f"/season/{SEASON}/settings").get_data(as_text=True))
+    assert "2026-09-03 21:00" in page, "the draft date"
+    assert "2026-09-01 23:00" in page, "the keeper deadline"
+    assert "2026-09-04" not in page and "2026-09-02" not in page, "neither UTC form"
+
+
+def test_a_cash_trades_agreed_date_is_not_shifted(client, data_dir: Path):
+    """The one datetime here that must NOT be converted, and why it is a separate rule.
+
+    ``agreed_at`` is a calendar date the commissioner types into a date input — a wall-clock
+    day with no timezone in it, unlike everything that arrives from ESPN as an instant.
+    Running it through the Eastern conversion would drag midnight back to 7pm the evening
+    before, and the date would walk backwards a day every time the form was reopened.
+    """
+    page = a_trade(client, agreed_at="2026-03-01")
+    assert 'value="2026-03-01"' in page
+    assert "2026-02-28" not in page
 
 
 def test_a_season_with_no_derived_file_is_a_404(client):

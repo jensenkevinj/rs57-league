@@ -60,7 +60,7 @@
                 </button>
               </form>
               {% if row.paid_at %}
-                <span class="small muted">{{ row.paid_at.strftime('%Y-%m-%d') }}</span>
+                <span class="small muted">{{ (row.paid_at | et).strftime('%Y-%m-%d') }}</span>
               {% endif %}
             </td>
           </tr>
