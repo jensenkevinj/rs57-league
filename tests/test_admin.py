@@ -1592,6 +1592,168 @@ def test_a_push_is_never_attempted_when_pushing_is_off(cloned):
     assert ["fetch", "origin"] not in git._ran
 
 
+def test_discarding_restores_a_tracked_file_to_the_last_commit(repo: Path):
+    """The undo for a mistake typed into the console."""
+    manual = repo / "data" / "manual" / "dues.json"
+    manual.write_text('{"dues": []}\n', encoding="utf-8")
+    git = Git(repo=repo)
+    git.commit_and_push("Admin: record dues (2026)", push=False)
+
+    manual.write_text('{"dues": ["a mistake"]}\n', encoding="utf-8")
+    log = git.discard(["data/manual/dues.json"])
+
+    assert manual.read_text() == '{"dues": []}\n', "the mistake was not rolled back"
+    assert any("restored" in line for line in log)
+
+
+def test_discarding_a_never_committed_file_deletes_it(repo: Path):
+    """There is no earlier version to go back to, so discarding one means removing it."""
+    manual = repo / "data" / "manual" / "dues.json"
+    manual.write_text('{"dues": []}\n', encoding="utf-8")
+
+    log = Git(repo=repo).discard(["data/manual/dues.json"])
+    assert not manual.exists()
+    assert any("deleted" in line for line in log)
+
+
+@pytest.mark.parametrize(
+    "target",
+    ["data/derived/2026.json", "data/history/2025.json", "site/index.html", "CLAUDE.md"],
+)
+def test_discarding_outside_data_manual_is_refused(repo: Path, target: str):
+    """The one operation here that destroys data. A dirty data/derived/ is not its to clean up."""
+    path = repo / target
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("belongs to somebody else\n", encoding="utf-8")
+
+    with pytest.raises(GitError, match="outside data/manual/"):
+        Git(repo=repo).discard([target])
+    assert path.exists(), "a file this tool does not own was destroyed"
+
+
+def test_discarding_something_that_is_not_a_change_is_refused(repo: Path):
+    """A stale page offering a discard for a file that is already clean must not act on it."""
+    with pytest.raises(GitError, match="nothing to discard"):
+        Git(repo=repo).discard(["data/manual/dues.json"])
+    with pytest.raises(GitError, match="nothing selected"):
+        Git(repo=repo).discard([])
+
+
+def test_the_save_page_offers_a_discard_for_each_change(repo: Path, data_dir: Path):
+    """The engine having a discard is not the same as the page offering one.
+
+    Removing the whole discard block from the template broke no test until this one existed —
+    every other discard test calls Git.discard directly and would have kept passing against a
+    page with no way to reach it.
+    """
+    (repo / "data" / "manual" / "dues.json").write_text("{}\n", encoding="utf-8")
+    (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    raw = app.test_client().get("/commit").get_data(as_text=True)
+
+    assert raw.count('action="/discard"') == 3, "one form per file, plus discard-all"
+    for path in ("data/manual/dues.json", "data/manual/claims.json"):
+        assert f'value="{path}"' in raw
+    assert "cannot be undone" in raw, "a destructive control with no warning on it"
+    assert 'class="confirm"' in raw, "discard is one click away, with no confirmation step"
+
+
+def test_discard_all_only_appears_when_there_is_more_than_one_change(repo: Path, data_dir: Path):
+    """With a single file, "discard all" and "discard it" are the same button twice."""
+    (repo / "data" / "manual" / "dues.json").write_text("{}\n", encoding="utf-8")
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    raw = app.test_client().get("/commit").get_data(as_text=True)
+    assert raw.count('action="/discard"') == 1
+    assert "Discard all" not in raw
+
+
+def test_the_discard_route_rolls_the_file_back(repo: Path, data_dir: Path):
+    """End to end through the button, not just the engine."""
+    manual = repo / "data" / "manual" / "dues.json"
+    manual.write_text('{"dues": []}\n', encoding="utf-8")
+    Git(repo=repo).commit_and_push("Admin: record dues (2026)", push=False)
+    manual.write_text('{"dues": ["a mistake"]}\n', encoding="utf-8")
+
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    response = app.test_client().post(
+        "/discard", data={"path": "data/manual/dues.json"}, follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert manual.read_text() == '{"dues": []}\n'
+
+
+def test_the_discard_route_refuses_a_path_it_does_not_own(repo: Path, data_dir: Path):
+    """A path arriving from a form is exactly where a bad one would come from."""
+    target = repo / "data" / "derived" / "2026.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("the Action's\n", encoding="utf-8")
+
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    body = app.test_client().post(
+        "/discard", data={"path": "data/derived/2026.json"}, follow_redirects=True
+    ).get_data(as_text=True)
+
+    assert target.exists(), "a file this tool does not own was destroyed through the route"
+    assert "outside data/manual/" in body, "and the refusal was not reported"
+
+
+def test_the_nav_counts_unsaved_changes(repo: Path, data_dir: Path, tmp_path: Path):
+    """Nothing recorded here reaches the league until it is saved, and before this badge the
+    only way to find that out was to go looking on one tab."""
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    client = app.test_client()
+
+    assert 'class="badge"' not in client.get(f"/season/{SEASON}/money").get_data(as_text=True)
+
+    (repo / "data" / "manual" / "dues.json").write_text("{}\n", encoding="utf-8")
+    (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
+    body = client.get(f"/season/{SEASON}/money").get_data(as_text=True)
+    assert '<span class="badge">2</span>' in body, "the nav does not say anything is unsaved"
+
+
+def test_a_change_outside_data_manual_never_reaches_the_badge(repo: Path, data_dir: Path):
+    """A dirty data/derived/ from a local sync is not something this tool can save."""
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    (repo / "data" / "derived").mkdir(parents=True, exist_ok=True)
+    (repo / "data" / "derived" / "2026.json").write_text("{}\n", encoding="utf-8")
+
+    body = app.test_client().get(f"/season/{SEASON}/money").get_data(as_text=True)
+    assert 'class="badge"' not in body, "the badge is counting files this tool cannot commit"
+
+
+def test_the_save_page_warns_when_the_branch_is_not_the_published_one(repo: Path, data_dir: Path):
+    """A commit onto a feature branch is recorded and never published. It happened twice."""
+    git = Git(repo=repo)
+    git.run("checkout", "-q", "-b", "some-other-work")
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    body = text(app.test_client().get("/commit").get_data(as_text=True))
+
+    assert "Not on main" in body
+    assert "never published" in body
+
+
+def test_the_save_page_is_quiet_on_the_published_branch(repo: Path, data_dir: Path):
+    """The mirror: the warning must not be permanent furniture."""
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    body = text(app.test_client().get("/commit").get_data(as_text=True))
+    assert "never published" not in body
+
+
+def test_the_summary_is_prefilled_from_what_changed(repo: Path):
+    """A blank required box is where "asdf" comes from. It stays editable."""
+    (repo / "data" / "manual" / "dues.json").write_text("{}\n", encoding="utf-8")
+    (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
+    assert Git(repo=repo).preview().suggested_summary == "update claims, dues"
+
+
 def test_the_button_commits_only_data_manual(repo: Path):
     (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
     (repo / "data" / "derived" / "2026.json").write_text("{}\n", encoding="utf-8")

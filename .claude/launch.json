@@ -4,14 +4,37 @@
     {
       "name": "preview",
       "runtimeExecutable": ".venv/bin/python",
-      "runtimeArgs": ["-m", "http.server", "8787", "--directory", ".preview"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8787",
+        "--directory",
+        ".preview"
+      ],
       "port": 8787
     },
     {
       "name": "admin",
       "runtimeExecutable": ".venv/bin/python",
-      "runtimeArgs": ["-m", "rs57.admin", "--no-push", "--port", "5100"],
+      "runtimeArgs": [
+        "-m",
+        "rs57.admin",
+        "--port",
+        "5100"
+      ],
       "port": 5100
+    },
+    {
+      "name": "admin-no-push",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-m",
+        "rs57.admin",
+        "--no-push",
+        "--port",
+        "5101"
+      ],
+      "port": 5101
     }
   ]
 }

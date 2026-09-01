@@ -134,6 +134,11 @@ def create_app(
             "slot_choices": SLOT_CHOICES,
             "seasons_available": derived.seasons(),
             "current_season": current,
+            # The badge in the nav. Without it the only way to learn that something is
+            # unsaved is to go looking on the Commit tab, and a change recorded but never
+            # committed reaches nobody. Failure-tolerant on purpose: a git problem must not
+            # take down every page in the tool, and the Commit tab reports it properly.
+            "unsaved": _unsaved_count(app.config["REPO"]),
             # The override form appears on two pages and needs the trade list on both, so it
             # is shared rather than passed by each route that happens to render the form.
             "trade_choices": store.trades(),
@@ -833,6 +838,19 @@ def create_app(
 
     # -- the commit button ------------------------------------------------------
 
+    @app.post("/discard")
+    def discard():
+        """Throw away working-tree changes to data/manual/. Destroys work, so it confirms."""
+        paths = request.form.getlist("path")
+        try:
+            log = git().discard(paths)
+        except GitError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("commit"))
+        for line in log:
+            flash(line, "ok")
+        return redirect(url_for("commit"))
+
     @app.get("/commit")
     def commit():
         return render_template(
@@ -857,6 +875,18 @@ def create_app(
         )
 
     return app
+
+
+def _unsaved_count(repo: Path) -> int:
+    """How many files in ``data/manual/`` differ from the last commit.
+
+    Returns 0 rather than raising when git cannot answer — no repo, no git, a broken index.
+    The nav badge is a convenience; the Commit tab is where a git problem is reported in full.
+    """
+    try:
+        return sum(1 for change in Git(repo=repo).changes() if change.owned)
+    except (GitError, OSError):
+        return 0
 
 
 def _dues_rows(derived: Derived, store: ManualStore, year: int):
