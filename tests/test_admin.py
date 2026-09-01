@@ -2289,6 +2289,84 @@ def test_a_card_with_a_record_is_never_prefilled_around(data_dir: Path, store: M
     assert shown == ["Tyjae Spears"], f"the card invented {shown[1:]}"
 
 
+def test_a_recorded_card_is_told_when_espn_kept_somebody_it_does_not_claim(
+    data_dir: Path, store: ManualStore
+):
+    """The prefill runs only on an empty card, so a card recorded early can go stale in silence.
+
+    A claim naming somebody ESPN dropped is already an ERROR. The mirror image — ESPN kept a
+    player nobody declared — has no slot on the card to be missing from, so without this note
+    it is invisible: the card shows three keepers, prices them, and looks finished.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    # Three of the four kept players declared. Tyjae Spears is the one ESPN kept and nobody did.
+    store.save_team_claims(
+        SEASON, "t1",
+        [
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                        slot=KeeperSlot.K1, fee_allocated=0, computed_salary=5 + KEEPER_TAX),
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=PLAIN,
+                        slot=KeeperSlot.K2, fee_allocated=5, computed_salary=10),
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=LATE,
+                        slot=KeeperSlot.PROSPECT, fee_allocated=0, computed_salary=1),
+        ],
+    )
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+
+    assert screen.keepers_only
+    stale = [note for note in screen.unverified if "Tyjae Spears" in note.message]
+    assert stale, "ESPN kept a player this card does not claim, and nothing said so"
+    assert stale[0].kind == "review", "an outside source flags, it does not block"
+    assert screen.review_count, "it has to be counted, not just rendered"
+
+
+def test_a_card_that_claims_everyone_espn_kept_is_not_nagged(data_dir: Path, store: ManualStore):
+    """The note fires on a real disagreement only. A clean card stays clean."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    roster = derived.load(SEASON).roster_for("t1")
+    slots = [KeeperSlot.K1, KeeperSlot.K2, KeeperSlot.K3, KeeperSlot.PROSPECT]
+    store.save_team_claims(
+        SEASON, "t1",
+        [
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=entry.espn_player_id,
+                        slot=slot, fee_allocated=0, computed_salary=None)
+            for slot, entry in zip(slots, sorted(roster, key=lambda e: e.espn_player_id))
+        ],
+    )
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+    assert not [n for n in screen.notes if "not claimed on this card" in n.message]
+
+
+def test_an_empty_pruned_card_is_prefilled_not_scolded(data_dir: Path, store: ManualStore):
+    """Nothing recorded is the state the prefill exists for, not a disagreement with ESPN.
+
+    Every slot on such a card is unclaimed by definition, so without the "has a record" guard
+    the note fires on all twelve empty cards and names the players the card is already showing.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+    assert screen.keepers_only and not store.claims(SEASON)
+    assert not [n for n in screen.notes if "not claimed on this card" in n.message]
+
+
+def test_a_full_roster_never_reports_undeclared_keepers(data_dir: Path, store: ManualStore):
+    """Before ESPN prunes, eleven undeclared players is what a roster looks like, not a finding.
+
+    Without the pruned-roster guard this note would fire on every card in the league for the
+    whole month before the deadline, naming a dozen players each time.
+    """
+    write_full_roster(data_dir)
+    derived = Derived(derived_dir=data_dir / "derived")
+    store.save_team_claims(
+        SEASON, "t1",
+        [KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                     slot=KeeperSlot.K1, fee_allocated=0, computed_salary=5 + KEEPER_TAX)],
+    )
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+    assert not screen.keepers_only
+    assert not [n for n in screen.notes if "not claimed on this card" in n.message]
+
+
 def test_the_prefill_is_a_default_on_screen_not_a_record(data_dir: Path, store: ManualStore):
     """Nothing reaches claims.json until the card is submitted."""
     derived = Derived(derived_dir=data_dir / "derived")
@@ -2488,12 +2566,21 @@ def test_both_screens_agree_whether_the_rookie_rule_ran(data_dir: Path, store: M
     contradicted the very screen the commissioner would open to check it.
     """
     derived = Derived(derived_dir=data_dir / "derived")
+    # All four of the pruned roster's players are declared, not just the prospect: an
+    # undeclared keeper on a pruned roster is its own REVIEW, and leaving three of them
+    # undeclared would put a second, unrelated review into the count this test reads.
     store.save_team_claims(
         SEASON,
         "t1",
         [
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                        slot=KeeperSlot.K1, fee_allocated=15),
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=PLAIN,
+                        slot=KeeperSlot.K2, fee_allocated=0),
+            KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=EX_PROSPECT,
+                        slot=KeeperSlot.K3, fee_allocated=0),
             KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=LATE,
-                        slot=KeeperSlot.PROSPECT, fee_allocated=0)
+                        slot=KeeperSlot.PROSPECT, fee_allocated=0),
         ],
     )
     origins = {LATE: SEASON - 1}
