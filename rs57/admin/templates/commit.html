@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% set page = 'commit' %}
-{% block title %}Commit data/manual/{% endblock %}
+{% block title %}Save data/manual/{% endblock %}
 
 {% block content %}
-<h1>Commit</h1>
+<h1>Save</h1>
 <p class="page-intro">
-  Nothing recorded in this tool reaches the league until it is committed — the site is rebuilt from
-  what is in the repo. This is the diff that will land.
+  Nothing recorded in this tool reaches the league until it is saved — the site is rebuilt from
+  what is in the repo. This is exactly what will land.
 </p>
 
 {% if log %}
@@ -33,6 +33,18 @@
   </div>
   <div>Staging <code>data/manual/</code> only. Every other path is left alone.</div>
 </div>
+
+{% if not preview.publishes_from_this_branch %}
+  <div class="flag bad">
+    <span class="tag">Not on {{ preview.default_branch }}</span>
+    <div>
+      You are on <code>{{ preview.branch }}</code>. The nightly Action builds the site from
+      <code>{{ preview.default_branch }}</code>, so anything saved here is recorded but
+      <strong>never published</strong> until that branch has it. Switch with
+      <code>git checkout {{ preview.default_branch }}</code> before saving, or merge afterwards.
+    </div>
+  </div>
+{% endif %}
 
 {% if not preview.has_changes %}
   <div class="flag plain">
@@ -73,15 +85,16 @@
     </div>
   {% endif %}
 
+  <h2>Save</h2>
   <form method="post" action="{{ url_for('do_commit') }}">
     <div class="field">
       <label for="summary">What changed</label>
       <input type="text" id="summary" name="summary" size="60"
-             placeholder="record keeper claims" required>
+             value="{{ preview.suggested_summary }}" required>
     </div>
     <div class="actions">
       <button type="submit">
-        {% if push %}Commit and push{% else %}Commit locally{% endif %}
+        {% if push %}Save and publish{% else %}Save locally{% endif %}
       </button>
       <span class="small muted">
         {% if push %}
@@ -93,6 +106,49 @@
       </span>
     </div>
   </form>
+
+  <h2>Made a mistake?</h2>
+  <p class="small">
+    Discarding throws the change away and <strong>cannot be undone</strong>. A file that has
+    never been committed is deleted, because there is no earlier version to go back to. Only
+    <code>data/manual/</code> can be discarded here — a dirty <code>data/derived/</code> from a
+    local sync is not this button's to clean up.
+  </p>
+  <div class="actions">
+    {% for change in preview.changes %}
+      <details class="confirm">
+        <summary>
+          <span class="on-closed">Discard {{ change.path.split('/') | last }}</span><span
+            class="on-open">Cancel</span>
+        </summary>
+        <div class="confirm-body">
+          <form method="post" action="{{ url_for('discard') }}">
+            <input type="hidden" name="path" value="{{ change.path }}">
+            <button type="submit">
+              {% if change.label == 'new' %}Delete{% else %}Restore{% endif %}
+              {{ change.path }}
+            </button>
+          </form>
+        </div>
+      </details>
+    {% endfor %}
+    {% if preview.file_count > 1 %}
+      <details class="confirm">
+        <summary>
+          <span class="on-closed">Discard all {{ preview.file_count }}</span><span
+            class="on-open">Cancel</span>
+        </summary>
+        <div class="confirm-body">
+          <form method="post" action="{{ url_for('discard') }}">
+            {% for change in preview.changes %}
+              <input type="hidden" name="path" value="{{ change.path }}">
+            {% endfor %}
+            <button type="submit">Discard every change above</button>
+          </form>
+        </div>
+      </details>
+    {% endif %}
+  </div>
 {% endif %}
 
 <h2>Why this only ever stages one directory</h2>

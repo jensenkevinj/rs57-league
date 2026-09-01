@@ -56,9 +56,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -245,16 +245,20 @@ jobs:
       # set because GITHUB_TOKEN cannot create a Pages site — it returns "Resource not
       # accessible by integration" — so enabling it is a one-time human step, done once.
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
+      # v4 of this action stopped including hidden files in the artifact. `site/` has no
+      # dotfiles today, so there is nothing to lose — but a `.nojekyll` added here later would
+      # be dropped silently, and Pages would then refuse to serve any path starting with an
+      # underscore. Set `include-hidden-files: true` if one ever appears.
       - name: Upload the site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
       - name: Deploy to Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       # Deliberately last. A season that failed to sync still lets the others publish, but the
       # run then goes red so nobody reads a green tick as "ESPN answered".

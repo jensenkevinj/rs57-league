@@ -26,6 +26,7 @@ Three things this deliberately does not do:
 from __future__ import annotations
 
 import subprocess
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -75,10 +76,35 @@ class CommitPreview:
     other_changes: tuple[Change, ...]
     remote: str | None
     error: str | None = None
+    default_branch: str = "main"
+    """The branch the nightly builds from. A commit onto any other one is recorded but never
+    published, which has happened twice — the page says so rather than leaving it to be
+    noticed later."""
+
+    @property
+    def publishes_from_this_branch(self) -> bool:
+        """Whether a save here would reach the site.
+
+        With **no remote** nothing is published from anywhere, so there is no wrong branch to
+        be on: the panel above already says commits stay local, and a branch warning on top of
+        that is noise. Only a repo that actually has a remote can be on the wrong side of it.
+        """
+        return self.remote is None or self.branch == self.default_branch
 
     @property
     def has_changes(self) -> bool:
         return bool(self.changes)
+
+    @property
+    def suggested_summary(self) -> str:
+        """A starting point for the commit message, from the files that changed.
+
+        Prefilled rather than required-from-blank: the summary is the one thing standing
+        between a save and an unlabelled commit, and a blank box is where "asdf" comes from.
+        It stays editable — this is a default, not a decision.
+        """
+        stems = sorted({Path(change.path).stem for change in self.changes})
+        return f"update {', '.join(stems)}" if stems else ""
 
     @property
     def file_count(self) -> int:
@@ -201,6 +227,7 @@ class Git:
 
         return CommitPreview(
             branch=self.branch(),
+            default_branch=self.default_branch(),
             changes=tuple(change for change in every if change.owned),
             diff=diff,
             other_changes=tuple(change for change in every if not change.owned),
@@ -254,6 +281,60 @@ class Git:
         self.run("push")
         log.append(f"pushed to {self.branch()}")
         return log
+
+    def discard(self, paths: Sequence[str]) -> list[str]:
+        """Throw away working-tree changes to ``paths``. **This destroys work.**
+
+        The undo for a mistake typed into the console. A tracked file is restored to the last
+        commit; an untracked one is *deleted*, because that is what discarding a file that has
+        never been committed means — there is no earlier version to go back to.
+
+        Refuses anything outside ``data/manual/``, checked here rather than trusted from the
+        caller: this is the one operation in the tool that removes data, and a path arriving
+        from a form is exactly where a mistake would come from. A dirty ``data/derived/`` from
+        a local sync is not this button's to clean up.
+        """
+        if not paths:
+            raise GitError("nothing selected to discard")
+
+        trespass = [path for path in paths if not path.startswith(OWNED)]
+        if trespass:
+            raise GitError(
+                f"refusing to discard {len(trespass)} path(s) outside {OWNED} "
+                f"({', '.join(trespass[:5])}). This tool owns data/manual/ and nothing else."
+            )
+
+        known = {change.path: change for change in self.changes()}
+        unknown = [path for path in paths if path not in known]
+        if unknown:
+            raise GitError(
+                f"nothing to discard for {', '.join(unknown[:5])} — no such change in the "
+                f"working tree. The page may be showing a stale view; reload it."
+            )
+
+        log: list[str] = []
+        for path in paths:
+            if known[path].status.strip() == "??":
+                # `git clean` rather than Path.unlink: this module runs git and nothing else,
+                # and store.py is the only place in the package allowed a write call. There
+                # is a test on that, and it caught this line.
+                self.run("clean", "-f", "--", path)
+                log.append(f"deleted {path} (never committed, so there was nothing to go back to)")
+            else:
+                self.run("checkout", "HEAD", "--", path)
+                log.append(f"restored {path} to the last commit")
+        return log
+
+    def default_branch(self) -> str:
+        """The branch the nightly Action builds from, as the remote reports it.
+
+        Falls back to ``main`` when there is no remote or the symbolic ref is not set up — the
+        point is to warn about a mismatch, and a guess that is usually right beats no warning.
+        """
+        ref = self.run(
+            "symbolic-ref", "refs/remotes/origin/HEAD", check=False
+        ).strip()
+        return ref.rsplit("/", 1)[-1] if ref else "main"
 
     def catch_up(self) -> list[str]:
         """Replay this branch onto the remote when it has moved on, so the push can go.
