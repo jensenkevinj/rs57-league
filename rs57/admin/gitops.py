@@ -82,8 +82,14 @@ class CommitPreview:
     noticed later."""
 
     @property
-    def on_default_branch(self) -> bool:
-        return self.branch == self.default_branch
+    def publishes_from_this_branch(self) -> bool:
+        """Whether a save here would reach the site.
+
+        With **no remote** nothing is published from anywhere, so there is no wrong branch to
+        be on: the panel above already says commits stay local, and a branch warning on top of
+        that is noise. Only a repo that actually has a remote can be on the wrong side of it.
+        """
+        return self.remote is None or self.branch == self.default_branch
 
     @property
     def has_changes(self) -> bool:

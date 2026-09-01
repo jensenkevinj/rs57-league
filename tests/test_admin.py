@@ -1730,6 +1730,7 @@ def test_a_change_outside_data_manual_never_reaches_the_badge(repo: Path, data_d
 def test_the_save_page_warns_when_the_branch_is_not_the_published_one(repo: Path, data_dir: Path):
     """A commit onto a feature branch is recorded and never published. It happened twice."""
     git = Git(repo=repo)
+    git.run("remote", "add", "origin", "https://example.invalid/repo.git")
     git.run("checkout", "-q", "-b", "some-other-work")
     app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
                      repo=repo, push=False, clock=lambda: NOW)
@@ -1741,10 +1742,28 @@ def test_the_save_page_warns_when_the_branch_is_not_the_published_one(repo: Path
 
 def test_the_save_page_is_quiet_on_the_published_branch(repo: Path, data_dir: Path):
     """The mirror: the warning must not be permanent furniture."""
+    git = Git(repo=repo)
+    git.run("remote", "add", "origin", "https://example.invalid/repo.git")
+    git.run("checkout", "-q", "-B", "main")
     app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
                      repo=repo, push=False, clock=lambda: NOW)
     body = text(app.test_client().get("/commit").get_data(as_text=True))
     assert "never published" not in body
+
+
+def test_a_repo_with_no_remote_is_never_warned_about_its_branch(repo: Path, data_dir: Path):
+    """Nothing is published from anywhere, so there is no wrong branch to be on.
+
+    Caught by CI, not locally: the runner's `git init` picks a branch name that is not `main`,
+    and with no remote to ask, default_branch() falls back to "main" and the warning fired on
+    every page. The panel already says commits stay local.
+    """
+    Git(repo=repo).run("checkout", "-q", "-b", "whatever-git-called-it")
+    app = create_app(data_dir=data_dir, derived_dir=data_dir / "derived",
+                     repo=repo, push=False, clock=lambda: NOW)
+    body = text(app.test_client().get("/commit").get_data(as_text=True))
+    assert "never published" not in body
+    assert "Not on" not in body
 
 
 def test_the_summary_is_prefilled_from_what_changed(repo: Path):

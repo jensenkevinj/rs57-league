@@ -34,7 +34,7 @@
   <div>Staging <code>data/manual/</code> only. Every other path is left alone.</div>
 </div>
 
-{% if not preview.on_default_branch %}
+{% if not preview.publishes_from_this_branch %}
   <div class="flag bad">
     <span class="tag">Not on {{ preview.default_branch }}</span>
     <div>
