@@ -19,6 +19,10 @@ The other half of this module's job is saying what has **not** been checked.
   being read.
 * the fee waiver needs a recorded consolation winner. Until one exists, fees are priced in
   full and the screen says the waiver is unconfirmed.
+* a card recorded *before* ESPN pruned the roster is never prefilled around, so it can drift
+  out of agreement with ESPN in silence. A claim naming somebody ESPN dropped is already an
+  ERROR from the engine; the mirror image — ESPN kept a player nobody declared — has no slot
+  on the card to be missing from, so it is named here as REVIEW.
 
 A prospect screen that looks clean had better have checked something. Everything unverified
 renders as unverified.
@@ -783,6 +787,30 @@ def build_team_screen(
                 f"the ${KEEPER_TAX} tax, and a prospect charged as a keeper pays it.",
             )
         )
+    # The prefill in ``TeamScreen.slots`` runs only on a card with nothing recorded, so a
+    # franchise entered *before* ESPN pruned keeps whatever was typed then and never learns
+    # that ESPN went on to disagree. The engine catches half of that already — a claim naming
+    # somebody ESPN dropped is PLAYER_NOT_ON_ROSTER, an ERROR. This is the other half, and it
+    # is the silent one: ESPN kept a player nobody declared, and an undeclared keeper is a
+    # slot that simply is not there to look at.
+    #
+    # REVIEW, not ERROR, and by the same split as the rookie rule: the claim is the league's
+    # record and ESPN is downstream of it, so an outside source flags and never blocks.
+    if 0 < len(rows) <= ROSTER_IS_KEEPERS_ONLY and active:
+        undeclared = [row.name for row in rows if not row.claimed]
+        if undeclared:
+            notes.append(
+                Note(
+                    "review",
+                    f"ESPN has pruned this roster to its kept players and "
+                    f"{', '.join(undeclared)} "
+                    f"{'is' if len(undeclared) == 1 else 'are'} not claimed on this card. "
+                    f"Either the card was recorded before ESPN pruned and the manager has "
+                    f"since changed their mind, or a slot is missing. The card shows what was "
+                    f"recorded, not what ESPN says — reconcile the two before the auction.",
+                )
+            )
+
     notes += _prospect_notes(
         season, active, deadline, season - 1, origins, {p.espn_player_id: p.name for p in players.values()}
     )
