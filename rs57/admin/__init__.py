@@ -68,7 +68,7 @@ from rs57.admin.screens import (
 from rs57.admin.store import DATA, ManualStore, OwnershipError
 from rs57.keeper_rules import KEEPER_TAX, MAX_KEEPERS, MAX_PROSPECTS
 from rs57.models import PAYOUT_LEDGER_FROM
-from rs57.models import Season
+from rs57.models import Season, to_league_time, utc_now
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -86,6 +86,13 @@ def create_app(
     ``clock`` exists because two screens depend on the current time — whether the keeper
     deadline has passed, and the ``submitted_at`` stamp on a claim — and a test that has to wait
     for a real clock is a test nobody runs.
+
+    **The clock reads UTC, not the machine's local time.** It is compared against
+    ``keeper_deadline``, which came off ESPN as a naive UTC instant, so ``datetime.now()`` was
+    comparing two different timezones and unlocking the console a full UTC offset late. It also
+    assumed whoever ran the tool sat in the league's timezone, which nothing guarantees. Every
+    stamp this clock writes is therefore UTC too, like every other datetime in ``data/``, and
+    the templates convert to Eastern to print one.
     """
     app = Flask(__name__)
     # Localhost, single user, no accounts: the session is used for flash messages and nothing
@@ -96,8 +103,14 @@ def create_app(
         DERIVED_DIR=derived_dir,
         REPO=repo,
         PUSH=push,
-        CLOCK=clock or datetime.now,
+        CLOCK=clock or utc_now,
     )
+
+    # Stored UTC, shown Eastern, and this filter is the only border between them — the same
+    # job ``site.mdy`` does for the public pages. Note what it is deliberately NOT applied to:
+    # ``CashTrade.agreed_at`` is a calendar date the commissioner types into a date input, not
+    # an instant, and converting it would drag it back to the previous evening.
+    app.jinja_env.filters["et"] = to_league_time
 
     store = ManualStore(data_dir=data_dir)
     derived = Derived(derived_dir=derived_dir)

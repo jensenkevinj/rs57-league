@@ -107,8 +107,10 @@
             <td class="pstate">{% if line.prospect_state == "eligible" %}Eligible{%
               elif line.prospect_state == "unknown" %}Unknown{% else %}Not eligible{% endif %}</td>
             {# ISO, so the text sort is chronological and needs no date parsing in the script —
-               the same reason money sorts off `data-v` rather than off "$12". #}
-            <td class="acq" data-k="{{ line.acquired_at.strftime('%Y-%m-%d') }}">
+               the same reason money sorts off `data-v` rather than off "$12". Eastern, like the
+               date printed beside it: `acquired_at` is naive UTC, so an evening add lands on the
+               next calendar day and the key would have named a different date than the cell. #}
+            <td class="acq" data-k="{{ (line.acquired_at | et).strftime('%Y-%m-%d') }}">
               <span{% if line.after_deadline %} class="late-date"
                 title="Acquired after the {{ current.qualifying_season }} keeper deadline"{% endif
                 %}>{{ line.acquired_at | mdy }}</span>

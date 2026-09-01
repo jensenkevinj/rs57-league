@@ -12,10 +12,11 @@ allocation is legal — that is the engine's job, and it reports violations as s
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Any
+from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -24,6 +25,49 @@ from pydantic import BaseModel, ConfigDict, Field
 # spreadsheet import would silently succeed for whole dollars and explode for cents.
 Money = Annotated[int, Field(strict=True)]
 NonNegMoney = Annotated[int, Field(strict=True, ge=0)]
+
+# ---------------------------------------------------------------------------
+# Time — stored in UTC, displayed in Eastern, and this is the only border
+# ---------------------------------------------------------------------------
+
+LEAGUE_TZ = ZoneInfo("America/New_York")
+"""The league's wall clock. ESPN states its dates in it and so does every manager."""
+
+
+def to_league_time(when: datetime | None) -> datetime | None:
+    """A stored naive-UTC datetime as the league's own wall clock, still naive. Display only.
+
+    ``espn._epoch_ms`` converts every ESPN instant to naive UTC deliberately — the models, the
+    fixtures and the derived files are naive throughout, and ``keeper_rules`` compares a
+    prospect's ``acquired_at`` against a ``trade_deadline`` directly, so mixing an aware value
+    in would raise from inside the engine. That decision stands. What was missing is the way
+    back: nothing converted to Eastern for display, so the 2026 home page published the draft
+    as 9/4 when ESPN says 9/3 at 9pm ET. Both league dates fall in the evening, UTC has already
+    rolled past midnight by then, and every one of them printed a day late.
+
+    Naive out as well as in, on purpose. An aware return value would leak into a comparison
+    against a naive one somewhere downstream — the exact failure being fixed here, not a second
+    copy of it. Use the result to **print**, never to store and never to compare against
+    anything that came off ESPN.
+
+    A real tz database rather than a fixed offset: the trade deadline is in December and the
+    draft is in September, so a hardcoded ``-5`` is wrong for half the calendar.
+    """
+    if when is None:
+        return None
+    return when.replace(tzinfo=UTC).astimezone(LEAGUE_TZ).replace(tzinfo=None)
+
+
+def utc_now() -> datetime:
+    """Now, as a naive UTC datetime — the only clock comparable to a stored ESPN instant.
+
+    ``datetime.now()`` returns the *machine's* local time, and the admin console compared that
+    against a naive-UTC keeper deadline. It erred in the safe direction — the console unlocked
+    late, never early — but by the UTC offset, and it quietly assumed whoever ran the tool sat
+    in the league's own timezone.
+    """
+    return datetime.now(UTC).replace(tzinfo=None)
+
 
 
 class Position(StrEnum):

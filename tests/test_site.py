@@ -23,6 +23,7 @@ from rs57.stats import SeasonStats
 from rs57.stats_sync import stats_document
 from rs57.site import (
     TEMPLATES,
+    mdy,
     build_dues_board,
     build_home,
     build_keeper_season,
@@ -715,8 +716,13 @@ def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, 
     )
     keeper_path = derived / f"{SEASON}.json"
     doc = json.loads(keeper_path.read_text(encoding="utf-8"))
-    doc["source"]["keeper_deadline"] = "2026-08-30T21:00:00"
-    doc["source"]["draft_date"] = "2026-08-31T19:00:00"
+    # ESPN's real 2026 values, naive UTC exactly as ``rs57.sync`` writes them: the draft at
+    # 9/3 9:00 PM ET and the keeper deadline at 9/1 11:00 PM ET. Both are evening ET, so both
+    # have already crossed midnight in UTC — which is the whole reason this page once published
+    # 9/4 and 9/2. Afternoon times here would let the conversion be deleted with every test
+    # still green.
+    doc["source"]["keeper_deadline"] = "2026-09-02T03:00:00"
+    doc["source"]["draft_date"] = "2026-09-04T01:00:00"
     keeper_path.write_text(json.dumps(doc), encoding="utf-8")
 
     out = tmp_path / "out"
@@ -725,10 +731,37 @@ def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, 
     body = text(page)
 
     assert f"{SEASON} Preseason" in body
-    assert "8/31/2026" in body, "the draft date"
-    assert "8/30/2026" in body, "the keeper deadline"
+    assert "9/3/2026" in body, "the draft date, on the league's clock and not on UTC's"
+    assert "9/1/2026" in body, "the keeper deadline, likewise"
+    assert "9/4/2026" not in body, "the UTC calendar date is a day late and must not appear"
+    assert "9/2/2026" not in body, "likewise"
     assert 'href="https://doodle.com/rs57-2026"' in page
     assert f"{PRIOR} Final Results" not in body, "last season's board must not also be showing"
+
+
+def test_mdy_prints_the_league_clock_and_not_utc():
+    """The filter every published date goes through, at the boundary that broke.
+
+    Two instants, four hours apart, both stored as naive UTC the way ESPN gives them. The
+    second one has crossed midnight in UTC and has not crossed it in Eastern, so a filter that
+    prints the stored parts names the wrong day for it — which is exactly what the 2026 home
+    page did.
+    """
+    assert mdy(datetime(2026, 9, 3, 21, 0)) == "9/3/2026", "5pm ET, same day either way"
+    assert mdy(datetime(2026, 9, 4, 1, 0)) == "9/3/2026", "9pm ET on the 3rd, not the 4th"
+    assert mdy(None) == ""
+
+
+def test_mdy_follows_daylight_saving_rather_than_a_fixed_offset():
+    """The reason this is a tz database lookup and not ``- timedelta(hours=5)``.
+
+    The league's calendar straddles the change: the draft is in September (EDT, -4) and the
+    trade deadline is in December (EST, -5). Both instants below are 4:30am UTC, and they fall
+    on different sides of midnight Eastern *because* the offset differs. A hardcoded -5 gets
+    the summer one wrong; a hardcoded -4 gets the winter one wrong; only a real zone gets both.
+    """
+    assert mdy(datetime(2026, 7, 1, 4, 30)) == "7/1/2026", "EDT is -4: still 00:30 on the 1st"
+    assert mdy(datetime(2026, 1, 1, 4, 30)) == "12/31/2025", "EST is -5: 23:30 the night before"
 
 
 def test_the_preseason_page_says_tbd_with_nothing_recorded_yet(tmp_path: Path, derived: Path):

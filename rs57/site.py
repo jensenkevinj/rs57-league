@@ -71,6 +71,7 @@ from rs57.models import (
     SurvivorElimination,
     UnluckyAward,
     WeeklyHigh,
+    to_league_time,
 )
 from rs57.history import HistoryStore
 from rs57.origins import load_first_season_bounds, load_player_origins
@@ -1198,17 +1199,25 @@ def money(amount: int) -> str:
 def mdy(when: datetime | None) -> str:
     """A date the way the league writes one: ``8/5/2025``. Display only.
 
+    **Converts to Eastern first, and that is the whole point of it being a function.** Every
+    datetime that reaches a template is naive UTC, straight off ESPN. Printing the UTC calendar
+    date published the 2026 draft as 9/4 when ESPN says 9/3 at 9pm ET — an evening ET instant
+    has already crossed midnight in UTC, so every league date fell a day late. ``to_league_time``
+    is the one border between how these are stored and how they are shown.
+
     Built from the parts rather than with ``strftime``. The no-pad directive that would do this
     in one go is ``%-m`` on Linux and macOS but ``%#m`` on Windows and absent from the C
     standard, so a format string here is a portability bug waiting for whoever next runs the
     site generator somewhere new.
 
     One filter, so the deadline banner, the Acquired column and the folded phone line cannot
-    drift into three formats — which is exactly what they had done before this existed.
+    drift into three formats — which is exactly what they had done before this existed, and now
+    so they cannot drift into three timezones either.
     """
-    if when is None:
+    local = to_league_time(when)
+    if local is None:
         return ""
-    return f"{when.month}/{when.day}/{when.year}"
+    return f"{local.month}/{local.day}/{local.year}"
 
 
 def _points(value: float) -> str:
@@ -1550,6 +1559,10 @@ def environment(templates: Path = TEMPLATES) -> Environment:
     # Formatting money is Python's job. A template that could format it could also compute it.
     env.filters["money"] = money
     env.filters["mdy"] = mdy
+    # A datetime on the league's own wall clock. ``mdy`` already converts; this is for the
+    # one place a template needs another format of the same instant — the Acquired
+    # column's ISO sort key, which has to agree with the date printed beside it.
+    env.filters["et"] = to_league_time
     return env
 
 
