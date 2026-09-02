@@ -18,6 +18,286 @@
     "filled. That gap is what taxed a prospect $5 in the old spreadsheet."
   ],
   "seasons": {
-    "2026": []
+    "2026": [
+      {
+        "computed_salary": 25,
+        "espn_player_id": 4429615,
+        "fee_allocated": 5,
+        "manager_id": "t1",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.260909"
+      },
+      {
+        "computed_salary": 12,
+        "espn_player_id": 4596448,
+        "fee_allocated": 0,
+        "manager_id": "t1",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.260909"
+      },
+      {
+        "computed_salary": 0,
+        "espn_player_id": 5083076,
+        "fee_allocated": 0,
+        "manager_id": "t1",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.260909"
+      },
+      {
+        "computed_salary": 37,
+        "espn_player_id": 4242335,
+        "fee_allocated": 0,
+        "manager_id": "t10",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.331748"
+      },
+      {
+        "computed_salary": 5,
+        "espn_player_id": 4431452,
+        "fee_allocated": 5,
+        "manager_id": "t10",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.331748"
+      },
+      {
+        "computed_salary": 27,
+        "espn_player_id": 4685472,
+        "fee_allocated": 0,
+        "manager_id": "t10",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.331748"
+      },
+      {
+        "computed_salary": 35,
+        "espn_player_id": 4047646,
+        "fee_allocated": 5,
+        "manager_id": "t12",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.339475"
+      },
+      {
+        "computed_salary": 28,
+        "espn_player_id": 4429160,
+        "fee_allocated": 0,
+        "manager_id": "t12",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.339475"
+      },
+      {
+        "computed_salary": 5,
+        "espn_player_id": 4431459,
+        "fee_allocated": 0,
+        "manager_id": "t12",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.339475"
+      },
+      {
+        "computed_salary": 17,
+        "espn_player_id": 4258173,
+        "fee_allocated": 0,
+        "manager_id": "t2",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.285361"
+      },
+      {
+        "computed_salary": 10,
+        "espn_player_id": 4426515,
+        "fee_allocated": 0,
+        "manager_id": "t2",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.285361"
+      },
+      {
+        "computed_salary": 15,
+        "espn_player_id": 3915511,
+        "fee_allocated": 15,
+        "manager_id": "t2",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T16:46:45.285361"
+      },
+      {
+        "computed_salary": 0,
+        "espn_player_id": 4685278,
+        "fee_allocated": 0,
+        "manager_id": "t2",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.285361"
+      },
+      {
+        "computed_salary": 35,
+        "espn_player_id": 4262921,
+        "fee_allocated": 0,
+        "manager_id": "t3",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.294315"
+      },
+      {
+        "computed_salary": 24,
+        "espn_player_id": 4430878,
+        "fee_allocated": 0,
+        "manager_id": "t3",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.294315"
+      },
+      {
+        "computed_salary": 16,
+        "espn_player_id": 4361370,
+        "fee_allocated": 0,
+        "manager_id": "t3",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T16:46:45.294315"
+      },
+      {
+        "computed_salary": 7,
+        "espn_player_id": 4723086,
+        "fee_allocated": 0,
+        "manager_id": "t3",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.294315"
+      },
+      {
+        "computed_salary": 52,
+        "espn_player_id": 4379399,
+        "fee_allocated": 5,
+        "manager_id": "t4",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.301458"
+      },
+      {
+        "computed_salary": 25,
+        "espn_player_id": 4428331,
+        "fee_allocated": 0,
+        "manager_id": "t4",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.301458"
+      },
+      {
+        "computed_salary": 20,
+        "espn_player_id": 4567750,
+        "fee_allocated": 0,
+        "manager_id": "t4",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.301458"
+      },
+      {
+        "computed_salary": 45,
+        "espn_player_id": 4362628,
+        "fee_allocated": 0,
+        "manager_id": "t5",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.307552"
+      },
+      {
+        "computed_salary": 33,
+        "espn_player_id": 4595348,
+        "fee_allocated": 0,
+        "manager_id": "t5",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.307552"
+      },
+      {
+        "computed_salary": 16,
+        "espn_player_id": 3046439,
+        "fee_allocated": 15,
+        "manager_id": "t5",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T16:46:45.307552"
+      },
+      {
+        "computed_salary": 44,
+        "espn_player_id": 4685382,
+        "fee_allocated": 0,
+        "manager_id": "t5",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.307552"
+      },
+      {
+        "computed_salary": 23,
+        "espn_player_id": 4432665,
+        "fee_allocated": 0,
+        "manager_id": "t7",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.318076"
+      },
+      {
+        "computed_salary": 50,
+        "espn_player_id": 4429795,
+        "fee_allocated": 0,
+        "manager_id": "t8",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.322990"
+      },
+      {
+        "computed_salary": 30,
+        "espn_player_id": 4569618,
+        "fee_allocated": 5,
+        "manager_id": "t8",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.322990"
+      },
+      {
+        "computed_salary": 10,
+        "espn_player_id": 3929645,
+        "fee_allocated": 10,
+        "manager_id": "t8",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T16:46:45.322990"
+      },
+      {
+        "computed_salary": 13,
+        "espn_player_id": 4362238,
+        "fee_allocated": 0,
+        "manager_id": "t9",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T16:46:45.327529"
+      },
+      {
+        "computed_salary": 7,
+        "espn_player_id": 4239996,
+        "fee_allocated": 5,
+        "manager_id": "t9",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T16:46:45.327529"
+      },
+      {
+        "computed_salary": 5,
+        "espn_player_id": 4696981,
+        "fee_allocated": 0,
+        "manager_id": "t9",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T16:46:45.327529"
+      }
+    ]
   }
 }
