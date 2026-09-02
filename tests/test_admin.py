@@ -29,6 +29,8 @@ from rs57.admin.gitops import Git, GitError
 from rs57 import admin
 from rs57.admin.reconcile import (
     EspnKeeperPick,
+    ReconcileRow,
+    Verification,
     keeper_picks,
     reconcile,
     roster_salaries,
@@ -2211,6 +2213,84 @@ def test_verify_writes_nothing(client, data_dir: Path, monkeypatch):
     assert before == after, "verify touched a file"
 
 
+def test_conflicts_is_every_row_that_is_not_an_agreement(client):
+    """Defined as the complement of `checked`, so a state added later lands where it is read.
+
+    `not_yet_entered` is in it deliberately. ESPN has not been *told* the number rather than
+    disagreeing about it, but the row still differs, and it is the list of players still to
+    type in — the one thing the screen is for in the weeks before the auction.
+    """
+    agrees = ReconcileRow(manager_id="t1", name="A", espn_player_id=1,
+                          recorded_salary=10, espn_value=10, slot="K1", claimed=True)
+    mismatch = ReconcileRow(manager_id="t1", name="B", espn_player_id=2,
+                            recorded_salary=10, espn_value=99, slot="K2", claimed=True)
+    pending = ReconcileRow(manager_id="t2", name="C", espn_player_id=3, recorded_salary=15,
+                           espn_value=10, slot="K1", claimed=True, base_at_sync=10)
+    unpriced = ReconcileRow(manager_id="t2", name="D", espn_player_id=4,
+                            recorded_salary=None, espn_value=10, slot="K2", claimed=True)
+
+    assert (agrees.state, mismatch.state, pending.state, unpriced.state) == (
+        "agrees", "mismatch", "not_yet_entered", "unpriced"
+    ), "the fixture must cover an agreement and three ways of differing"
+
+    run = Verification(
+        season=SEASON, rows=(agrees, mismatch, pending, unpriced),
+        regime="keepers", unrecorded_checked=True, draft_picks_seen=0,
+    )
+    assert run.conflicts == (mismatch, pending, unpriced)
+    assert run.checked == (agrees,)
+    # The whole point: nothing falls between the two halves and out of sight.
+    assert len(run.conflicts) + len(run.checked) == len(run.rows)
+
+
+def test_the_espn_check_shows_conflicts_and_folds_the_agreements(client, store, data_dir, monkeypatch):
+    """Rows that differ are read; rows that agree are the least interesting thing on the screen.
+
+    Folded, never dropped — the count is on the summary whether it is open or shut. A run that
+    silently showed fewer rows than it checked would be this repo's own failure mode.
+    """
+    store.save_team_claims(SEASON, "t1", [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=PLAIN, slot="K1",
+                    fee_allocated=0, computed_salary=42, submitted_at=NOW),
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot="K2",
+                    fee_allocated=0, computed_salary=17, submitted_at=NOW),
+    ])
+    monkeypatch.setattr(
+        admin, "fetch_roster_salaries",
+        lambda season, field, ids: (
+            [EspnKeeperPick(espn_team_id=1, espn_player_id=PLAIN, bid=42),   # agrees
+             EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=99)],  # mismatch
+            _sizes(3), None,
+        ),
+    )
+    monkeypatch.setattr(admin, "fetch_keeper_picks", lambda season: ([], None))
+
+    body = client.post(f"/season/{SEASON}/verify").get_data(as_text=True)
+    fold = body[body.index("<details"):]
+    above = body[:body.index("<details")]
+
+    assert "mismatch" in above, "a row ESPN disagrees about must be read without opening anything"
+    assert "1 row(s) agree with ESPN" in fold, "and the agreements are counted on the summary"
+    assert body.count("<details") == 1
+
+
+def test_the_espn_check_opens_in_a_dialog_over_the_board(client):
+    """It answers one question and is done. Thirty rows above the cards pushed the screen's own
+    job down the page every time it ran.
+
+    The target has to be INSIDE the dialog, or the result lands on the page again and the modal
+    stays empty.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    dialog = re.search(r'<dialog id="verify-modal"[^>]*>(.*?)</dialog>', page, re.S)
+    assert dialog, "no dialog for the ESPN check"
+    assert 'id="verify-result"' in dialog.group(1), "the result would land outside the modal"
+
+    button = re.search(r'<button[^>]*hx-post="/season/\d+/verify"[^>]*>', page)
+    assert button and 'hx-target="#verify-result"' in button.group(0)
+
+
 def test_verify_is_never_a_get(client):
     """An unreachable ESPN must not take down the page the offseason is entered on."""
     assert client.get(f"/season/{SEASON}/verify").status_code == 405
@@ -2301,9 +2381,12 @@ def test_the_boards_spinner_has_somewhere_to_show(client):
     assert indicated, "the board form names no indicator"
 
     target = indicated.group(1)
-    wrapper = re.search(rf'<span id="{target}"[^>]*>(.*?)</span>\s*</div>', page, re.S)
-    assert wrapper, f"#{target} is not on the page"
-    assert 'class="spin"' in wrapper.group(1), f"#{target} contains no spinner to reveal"
+    opened = page.find(f'id="{target}"')
+    assert opened != -1, f"#{target} is not on the page"
+    # To the first close tag: the indicator wraps the spinner and nothing else.
+    assert 'class="spin"' in page[opened:page.index("</span>", opened)], (
+        f"#{target} contains no spinner to reveal"
+    )
 
 
 def test_the_board_does_not_print_the_keeper_deadline(client, data_dir: Path):

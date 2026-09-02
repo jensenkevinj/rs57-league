@@ -92,13 +92,12 @@
       </div>
     {% endif %}
 
-    {% if result.rows %}
+    {# One table, rendered twice: the rows that differ, and the rows that do not folded away.
+       Two copies of this markup would drift, and the second copy is the one nobody reads. #}
+    {% macro rows_table(rows, caption) %}
       <div class="scroll">
         <table>
-          <caption>
-            Compared against each claim's recorded <code>computed_salary</code> — what the
-            manager was told they owed — never against a fresh recomputation.
-          </caption>
+          <caption>{{ caption }}</caption>
           <thead>
             <tr>
               <th>Team</th>
@@ -111,7 +110,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for row in result.rows %}
+            {% for row in rows %}
               <tr>
                 <td class="small">{{ row.manager_id }}</td>
                 <td>{{ row.name }}</td>
@@ -145,7 +144,25 @@
           </tbody>
         </table>
       </div>
-    {% else %}
+    {% endmacro %}
+
+    {% if result.conflicts %}
+      {{ rows_table(result.conflicts, caption='Compared against each claim\'s recorded computed_salary — what the manager was told they owed — never against a fresh recomputation.') }}
+    {% endif %}
+
+    {% if result.checked %}
+      {# Folded, not dropped. A row that agrees is the least interesting thing on this screen
+         and the easiest to mistake the absence of for a clean run, so the count is on the
+         summary whether it is open or shut. #}
+      <details class="fold">
+        <summary>{{ result.checked | length }} row(s) agree with ESPN</summary>
+        <div class="fold-body">
+          {{ rows_table(result.checked, caption='These carry exactly the salary this tool computed. Nothing to do.') }}
+        </div>
+      </details>
+    {% endif %}
+
+    {% if not result.rows %}
       <p class="muted small">Nothing recorded for {{ year }} yet, so there was nothing to check.</p>
     {% endif %}
 

@@ -19,30 +19,38 @@
    thing on this page that touches the network — so a button, never something the page does on
    its way in: an unreachable ESPN must not take down the screen the whole offseason is entered
    on. Save posts the board form it sits outside of, by id. #}
+{# Spinners first, then the two buttons. `.spin` hides with `visibility`, which keeps its box:
+   trailing, the invisible "saving…" wedged the buttons apart and held Save off the right edge.
+   Ahead of them the reserved space falls in the empty part of the row, where it costs nothing
+   and the text still appears beside the button it belongs to. #}
 <div class="page-actions">
-  <span id="verify-run">
-    {# Spinner BEFORE its button, in both groups. `.spin` hides with `visibility`, which keeps
-       its box — trailing, it reserved a gap that held Save off the right edge. #}
-    <span class="spin">reading ESPN…</span>
-    <button type="button" class="quiet"
-            hx-post="{{ url_for('verify_espn', year=screen.season) }}"
-            hx-target="#verify-result"
-            hx-swap="outerHTML"
-            hx-indicator="#verify-run">
-      Verify with ESPN
-    </button>
-  </span>
-  <span id="board-save">
-    {# The year is no longer on this button, so the header picker directly above it is what
-       says which season a click writes to — and a prior one also carries the amber tag. This
-       button clears any franchise it posts empty, so which year it is remains the thing to
-       know before pressing it. #}
-    <span class="spin">saving…</span>
-    <button type="submit" form="board">Save</button>
-  </span>
+  <span id="verify-run"><span class="spin">reading ESPN…</span></span>
+  <span id="board-save"><span class="spin">saving…</span></span>
+  <button type="button" class="quiet"
+          hx-post="{{ url_for('verify_espn', year=screen.season) }}"
+          hx-target="#verify-result"
+          hx-swap="outerHTML"
+          hx-indicator="#verify-run">
+    Verify with ESPN
+  </button>
+  {# The year is no longer on this button, so the header picker directly above it is what says
+     which season a click writes to — and a prior one also carries the amber tag. This button
+     clears any franchise it posts empty, so which year it is remains the thing to know before
+     pressing it. #}
+  <button type="submit" form="board">Save</button>
 </div>
 
-<div id="verify-result"></div>
+{# The ESPN comparison opens over the board rather than on top of it. It is a read that answers
+   one question and is then done with — thirty rows pushing the twelve cards down the page made
+   the screen's own job harder every time it ran. Empty until a verify fills it; the dialog is
+   only shown once htmx has swapped something in. #}
+<dialog id="verify-modal" class="modal">
+  <div class="modal-head">
+    <strong>Checked against ESPN</strong>
+    <button type="button" class="quiet modal-close">Close</button>
+  </div>
+  <div id="verify-result"></div>
+</dialog>
 
 {# The season is chosen in the header, on every tab, and the "not the current season" warning
    moved there with it — it belongs beside the control that caused it, and on Money and Season

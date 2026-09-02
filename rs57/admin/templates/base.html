@@ -90,6 +90,20 @@
     gap: 0.8rem; margin: 0.85rem 0 0;
   }
   .page-actions > span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  /* The ESPN check, over the board rather than on top of it. `max-height` plus `overflow` and
+     not a fixed height: the run that finds nothing is three lines and should not open a
+     full-screen panel to say so. */
+  dialog.modal {
+    width: min(62rem, 92vw); max-height: 85vh; overflow: auto;
+    padding: 1.1rem 1.3rem; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel); color: var(--ink);
+  }
+  dialog.modal::backdrop { background: rgba(20, 24, 30, 0.45); }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-bottom: 0.7rem;
+  }
+  .modal-head strong { font-size: 1.05rem; }
   table {
     border-collapse: collapse; width: 100%; margin: 0.7rem 0 1.3rem; font-size: 0.94rem;
     background: var(--bg);
@@ -428,6 +442,33 @@
     document.addEventListener("change", function (event) {
       var picker = event.target.closest("select.season-pick");
       if (picker && picker.value) window.location.assign(picker.value);
+    });
+
+    /* The ESPN check opens its dialog only once htmx has put something in it — an empty modal
+       on the way in would be a panel that says nothing, and a failed request must leave the
+       board exactly as it was. `showModal` and not the `open` attribute: only the former
+       brings the backdrop, the focus trap and Escape. */
+    document.addEventListener("htmx:afterSwap", function (event) {
+      var dialog = document.getElementById("verify-modal");
+      if (!dialog) return;
+      /* Matched on the id and NOT on `dialog.contains(target)`: the swap is `outerHTML`, so by
+         the time this fires the element in `detail.target` has been replaced and detached, and
+         asking whether the dialog still contains it always answers no. Where that id lives is
+         the template's business, and a test holds it inside the dialog. */
+      var swapped = event.detail && event.detail.target;
+      if (!swapped || swapped.id !== "verify-result") return;
+      if (!dialog.open) dialog.showModal();
+    });
+
+    document.addEventListener("click", function (event) {
+      /* A click that lands on the DIALOG itself is a click on its backdrop — anything inside
+         hits a child. */
+      if (event.target.tagName === "DIALOG") return event.target.close();
+      var closer = event.target.closest("button.modal-close");
+      if (closer) {
+        var open = closer.closest("dialog");
+        if (open) open.close();
+      }
     });
   })();
 </script>
