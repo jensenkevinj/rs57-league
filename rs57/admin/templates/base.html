@@ -84,6 +84,12 @@
     color: var(--muted);
   }
   .page-meta a { color: var(--accent); }
+  /* The board's two actions, in the corner above what they act on. */
+  .page-actions {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 0.8rem; margin: 0.85rem 0 0;
+  }
+  .page-actions > span { display: inline-flex; align-items: center; gap: 0.5rem; }
   table {
     border-collapse: collapse; width: 100%; margin: 0.7rem 0 1.3rem; font-size: 0.94rem;
     background: var(--bg);
@@ -292,13 +298,6 @@
     display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem;
     font-size: 0.82rem;
   }
-  .board-actions {
-    display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
-    margin: 0 0 1.6rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line);
-    border-radius: 8px; background: var(--panel);
-  }
-  .board-actions .small { flex: 1 1 20rem; }
-
   /* Everything that belongs on the tab but is not what the tab is for. */
   /* The cash-trade table: every row is live, and the last row is the insert form.
 
@@ -453,7 +452,7 @@
            class="{% if page == 'money' %}on{% endif %}">Money</a>
       {% endif %}
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">
-        Save{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
+        Commit{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
       </a>
       {% if picker_year %}
         {# The one place the working year is stated, which is why the tabs above no longer

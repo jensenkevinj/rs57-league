@@ -2,10 +2,14 @@
 
    Recorded and skipped are named, never counted alone. "10 recorded" leaves you hunting for the
    two; naming them is the difference between a result and a puzzle. #}
+{# The Save button lives at the top of the page, outside this form, and reaches it by id.
+   That is also why the spinner needs naming: `.htmx-request .spin` is a descendant rule, and
+   the spin beside that button is not inside the element making the request. #}
 <form id="board"
       hx-post="{{ url_for('record_league', year=screen.season) }}"
       hx-target="#board"
-      hx-swap="outerHTML">
+      hx-swap="outerHTML"
+      hx-indicator="#board-save">
 
   {% if recorded %}
     <div class="flag ok">
@@ -42,18 +46,5 @@
         {% include "_claim_form.html" %}
       {% endwith %}
     {% endfor %}
-  </div>
-
-  <div class="board-actions">
-    {# The year is on the button because the season switcher makes a prior season a routine
-       destination, and this button clears any franchise it posts empty. "Record all 12
-       franchises" on a page you did not mean to be on is one click from wiping 2025. #}
-    <button type="submit">Record all {{ screen.teams | length }} franchises for {{ screen.season }}</button>
-    <span class="spin">recording…</span>
-    <span class="small muted">
-        Writes <code>data/manual/claims.json</code> on this machine. Nothing is published until
-        you <a href="{{ url_for('commit') }}">commit</a>. A franchise with an error is skipped
-        and named — the rest still record.
-    </span>
   </div>
 </form>

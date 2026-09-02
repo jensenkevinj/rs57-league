@@ -2255,15 +2255,68 @@ def test_the_report_counts_a_league_wide_flag_once(data_dir: Path, store: Manual
     )
 
 
-def test_an_open_board_has_exactly_one_record_button(client, data_dir: Path):
+def test_an_open_board_has_exactly_one_save_button(client, data_dir: Path):
     """One action, taken once. Twelve buttons is twelve chances to forget a franchise.
 
     Also the other half of the lock test — removing the button unconditionally would pass that
-    one on its own.
+    one on its own. The button sits above the board and reaches it by id, so `form="board"` is
+    what identifies it now that the label no longer names the season.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # no deadline = open
-    assert page.count("Record all") == 1
+    assert page.count('form="board"') == 1
     assert re.search(r'<form[^>]*hx-post="/season/\d+/record"', page)
+
+
+def test_the_save_button_posts_the_board_from_outside_it(client):
+    """The button sits above the board and the board is a form, so it reaches it by id.
+
+    Native form association — the same thing the trade and override tables do with their own
+    rows. Drop the `form=` and the button becomes inert: it submits nothing, silently, and the
+    only way to record twelve franchises is gone.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    button = re.search(r'<button[^>]*form="board"[^>]*>', page)
+    assert button, "no button reaches the board form"
+    assert 'type="submit"' in button.group(0)
+
+    form = re.search(r'<form[^>]*id="board"[^>]*>', page, re.S)
+    assert form, "no form for it to reach"
+    assert f'/season/{SEASON}/record' in form.group(0), "and it must post the record endpoint"
+
+    assert button.start() < form.start(), "the button is above the board, not inside it"
+
+
+def test_the_boards_spinner_has_somewhere_to_show(client):
+    """`.htmx-request .spin` is a DESCENDANT rule and the form is what makes the request.
+
+    The spinner used to sit inside that form and matched for free. It sits beside the button
+    now, outside it, so the form has to name it — without `hx-indicator` the spinner is dead
+    markup and a record gives no sign it is running.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    form = re.search(r'<form[^>]*id="board"[^>]*>', page, re.S)
+    indicated = re.search(r'hx-indicator="#([\w-]+)"', form.group(0))
+    assert indicated, "the board form names no indicator"
+
+    target = indicated.group(1)
+    wrapper = re.search(rf'<span id="{target}"[^>]*>(.*?)</span>\s*</div>', page, re.S)
+    assert wrapper, f"#{target} is not on the page"
+    assert 'class="spin"' in wrapper.group(1), f"#{target} contains no spinner to reveal"
+
+
+def test_the_board_does_not_print_the_keeper_deadline(client, data_dir: Path):
+    """It moved to Season settings (commissioner, 2026-09-02), and it moved — it did not vanish.
+
+    Both halves matter. A board still printing it means the top of the screen never got
+    cleared; a settings page that stopped means the console prints ESPN's deadline nowhere at
+    all, and the date would be gone from the tool rather than relocated in it.
+    """
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
+
+    assert "2026-12-01" not in client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "2026-12-01" in client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
 
 def test_no_card_renders_an_empty_row(client, data_dir: Path):
@@ -2629,15 +2682,19 @@ def test_a_future_deadline_disables_nothing(client, data_dir: Path):
     ESPN publishes keeper selections to nobody but an authenticated league member, so manual
     entry is the only way they reach this tool — and the window that entry happens in is
     exactly the window the lock used to close. Both halves are asserted here: the date is still
-    on the page, and not one control on it is dead.
+    displayed somewhere, and not one control on the board is dead.
+
+    "Somewhere" is Season settings since 2026-09-02 — the board's own deadline line went when
+    the actions moved to the top of it. The board's half of the rule is that nothing gates.
     """
     set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    settings = client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
-    assert "2026-12-01" in page, "the deadline is still displayed — it just does not gate"
-    assert "not yet" in page, "and the page says it has not passed"
+    assert "2026-12-01" in settings, "the deadline is still displayed — it just does not gate"
+    assert "2026-12-01" not in page, "and no longer on the board, where nothing acts on it"
     assert "Claims are locked until the keeper deadline" not in page
-    assert page.count("Record all") == 1, "one board, one live button"
+    assert page.count('form="board"') == 1, "one board, one live button"
     assert not re.findall(r'name="t\d+__(?:fee|player)_[A-Z0-9]+"[^>]*\sdisabled', page, re.S), (
         "no fee box and no picker may be disabled before the deadline — that was the lock"
     )
@@ -2989,26 +3046,32 @@ def test_a_click_on_the_badge_cannot_record_the_league(client):
     """The board wraps all twelve cards in ONE form, and a bare <button> submits it.
 
     So an unmarked button anywhere inside a card is a click that records twelve franchises —
-    from an element whose whole job is to show a reason. Exactly one button on this page is
-    allowed to submit, and it is the one that says so.
+    from an element whose whole job is to show a reason.
+
+    Since the Save button moved above the board it reaches the form by id, which makes the rule
+    stricter than it was: **no** unscoped submitter may exist anywhere on the page, and the one
+    button allowed to record names the form it records.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
     # Prose first: the stylesheet's own comments say the word "<button>", and scanning them
     # reported an untyped button that does not exist.
     markup = re.sub(r"<(style|script)\b.*?</\1>", "", page, flags=re.S)
     buttons = re.findall(r"<button([^>]*)>", markup)
-    assert len(buttons) > 1, "the fixture must render both a badge and the Record button"
+    assert len(buttons) > 1, "the fixture must render both a badge and the Save button"
 
-    # A `form=` attribute points the button at a different form, so it cannot submit the board
-    # whatever its type. What is dangerous is an unscoped button that is not type="button".
+    # A `form=` attribute scopes the button to a named form, so it cannot submit whatever
+    # happens to enclose it. What is dangerous is an unscoped button that is not type="button".
     submitters = [
         b for b in buttons if 'type="button"' not in b and "form=" not in b
     ]
-    assert len(submitters) == 1, (
-        f"{len(submitters)} buttons can submit the board; only Record may. Offenders: "
-        f"{[b.strip()[:60] for b in submitters]}"
+    assert submitters == [], (
+        f"{len(submitters)} unscoped button(s) can submit whatever form encloses them. "
+        f"Offenders: {[b.strip()[:60] for b in submitters]}"
     )
-    assert 'type="submit"' in submitters[0], "and it must say so rather than rely on a default"
+
+    records = [b for b in buttons if 'form="board"' in b]
+    assert len(records) == 1, "exactly one button records the league"
+    assert 'type="submit"' in records[0], "and it must say so rather than rely on a default"
 
 
 def test_the_reason_panel_is_wired_up(client):
@@ -3234,10 +3297,12 @@ def test_the_deadline_is_shown_and_never_enforced(client, store: ManualStore, da
     that no salary is entered that early, so a lock cost nothing. The premise was wrong: ESPN
     hands the selections to nobody, so manual entry before the deadline is the only input path
     there is. Both sides of the deadline save now, and neither ever re-locks.
+
+    "Shown" is Season settings — the board stopped printing the date on 2026-09-02. "Never
+    enforced" is the board, and is the half with teeth.
     """
     set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))
-    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
-    assert "passed" in text(page)
+    assert "2026-01-01" in client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
     saved = client.post(
         f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
@@ -3361,22 +3426,14 @@ def test_the_default_clock_is_utc_and_not_the_machines_local_time(tmp_path: Path
     assert app.config["CLOCK"] is utc_now
 
 
-def test_the_gate_prints_the_deadline_on_the_league_clock(client, data_dir: Path):
-    """ESPN's real 2026 keeper deadline: 11pm ET on 9/1, which is 03:00 UTC on 9/2.
-
-    Stored UTC and printed UTC, the console named the wrong day for it — the same failure the
-    public home page had. The banner is what a commissioner reads to know whether the thing is
-    open, so it has to say the time the managers were given.
-    """
-    set_keeper_deadline(data_dir, datetime(2026, 9, 2, 3, 0))
-    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
-
-    assert "2026-09-01 23:00" in page, "the deadline on the league's clock"
-    assert "2026-09-02 03:00" not in page, "the stored UTC form is a day late"
-
-
 def test_the_settings_page_prints_espns_dates_on_the_league_clock(client, data_dir: Path):
-    """Both read-only ESPN facts, at their real 2026 values — the draft 9pm ET on 9/3."""
+    """Both read-only ESPN facts, at their real 2026 values — the draft 9pm ET on 9/3.
+
+    **The only place the console prints the keeper deadline**, and so the only guard left on
+    printing it in the league's own timezone. The keeper board carried the same assertion until
+    2026-09-02; stored UTC and printed UTC, it named the wrong day — ESPN's 2026 deadline is
+    11pm ET on 9/1, which is 03:00 UTC on 9/2, and the whole console read a day late.
+    """
     path = data_dir / "derived" / f"{SEASON}.json"
     doc = json.loads(path.read_text(encoding="utf-8"))
     doc["source"]["draft_date"] = "2026-09-04T01:00:00"
@@ -3574,15 +3631,22 @@ def test_deleting_an_override_returns_to_the_season_it_was_deleted_from(
     assert landed.headers["Location"].endswith(f"/season/{SEASON}")
 
 
-def test_the_board_names_the_season_it_would_record(client):
-    """The picker makes a prior season a routine destination, and Record clears empties.
+def test_the_save_button_is_told_apart_by_the_header_above_it(client):
+    """The picker makes a prior season a routine destination, and Save clears empties.
 
-    "Record all 12 franchises" on a page you did not mean to be on is one click from wiping a
-    settled year. Nothing gates it — the year is on the button instead.
+    A Save on a page you did not mean to be on is one click from wiping a settled year. The
+    button used to name its own season — "Record all 12 franchises for 2025" — and no longer
+    does (commissioner, 2026-09-02). **This is a weaker guarantee than the one it replaces**,
+    and it is asserted here rather than assumed: the header picker names the year directly
+    above the button, and a prior season also carries the amber tag beside it.
     """
     page = client.get(f"/season/{PRIOR}").get_data(as_text=True)
-    assert f"franchises for {PRIOR}" in page
+    assert f'value="/season/{PRIOR}"' in page and "selected" in page, "the picker names the year"
     assert "not the current season" in text(page)
+    assert 'form="board"' in page, "and the button it warns about is on the same screen"
+
+    # Nothing on the button itself distinguishes the two seasons, which is the cost.
+    assert page.count('form="board"') == 1
 
 
 def test_recording_a_trade_writes_it_with_its_direction(client, store: ManualStore):

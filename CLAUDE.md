@@ -100,7 +100,11 @@ and **from 2026 on the admin tool is the record** and its rows are copied across
   whose `submitted_at` precedes the deadline renders as provisional REVIEW until it is
   re-recorded. Weaker guarantee, wider net — the lock said nothing about the claims stamped
   2026-07-29, six days before the lock existed. `KeeperDeadline` is display-only and no route
-  may gate on it. **The deadline and the draft
+  may gate on it. **Where it is shown is Season settings** — read-only, straight off ESPN, on
+  the league clock. The keeper board printed it too until the actions moved to the top of that
+  screen (commissioner, 2026-09-02); what the board carries instead is the per-claim provisional
+  REVIEW, which is the half that has a consequence. The unrecorded state is still a REVIEW note
+  on the board, because a missing deadline is a gap in the season's record. **The deadline and the draft
   date are ESPN facts, not admin fields** (commissioner, 2026-08-26) — `DerivedSeason.keeper_deadline`
   and `.draft_date` come straight from `draftSettings.keeperDeadlineDate` / `.date`, synced into
   `data/derived/{year}.json` by the nightly Action the same way `trade_deadline` already was.
