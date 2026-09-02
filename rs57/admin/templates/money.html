@@ -18,18 +18,7 @@
   prizes at the end of it.
 </p>
 
-{% if seasons_available | length > 1 %}
-  <p class="small muted">
-    Season:
-    {% for yr in seasons_available | reverse %}
-      {% if yr == year %}
-        <strong>{{ yr }}</strong>
-      {% else %}
-        <a href="{{ url_for('money', year=yr) }}">{{ yr }}</a>
-      {% endif %}
-    {% endfor %}
-  </p>
-{% endif %}
+{# The season is chosen in the header, and switching there keeps you on this tab. #}
 
 <h2>Money in · {{ year }} dues</h2>
 {% if not dues_rows %}

@@ -39,6 +39,12 @@
   }
   nav a:hover { color: var(--ink); }
   nav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  /* Pushed to the far end of the tab row, and given the same bottom padding as a tab so it
+     sits on their baseline rather than floating above it. */
+  .season-pick-wrap {
+    margin-left: auto; display: flex; align-items: center; gap: 0.4rem;
+    padding-bottom: 0.7rem;
+  }
   h1 { font-size: 1.7rem; letter-spacing: -0.02em; margin: 0 0 0.35rem; }
   h2 { font-size: 1.18rem; margin: 2rem 0 0.6rem; letter-spacing: -0.01em; }
   h3 { font-size: 1rem; margin: 1.4rem 0 0.45rem; }
@@ -417,6 +423,13 @@
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") closeAll(null);
     });
+
+    /* The header season control. Its options carry whole URLs written by url_for, so this
+       navigates to a string it was handed and derives nothing from the year itself. */
+    document.addEventListener("change", function (event) {
+      var picker = event.target.closest("select.season-pick");
+      if (picker && picker.value) window.location.assign(picker.value);
+    });
   })();
 </script>
 </head>
@@ -427,18 +440,37 @@
       <a href="{{ url_for('home') }}">RS57 Admin</a>
       <span class="where">localhost &middot; writes data/manual/</span>
     </div>
+    {# The tabs follow `picker_year` — the season the page in front of you is about — not
+       `current_season`. Wired to the latter, Season settings and Money moved you to a
+       different year than the one you were reading, without saying so. #}
     <nav>
-      {% if current_season %}
-        <a href="{{ url_for('season', year=current_season) }}"
-           class="{% if page == 'season' %}on{% endif %}">Keepers {{ current_season }}</a>
-        <a href="{{ url_for('settings', year=current_season) }}"
+      {% if picker_year %}
+        <a href="{{ url_for('season', year=picker_year) }}"
+           class="{% if page == 'season' %}on{% endif %}">Keepers</a>
+        <a href="{{ url_for('settings', year=picker_year) }}"
            class="{% if page == 'settings' %}on{% endif %}">Season settings</a>
-        <a href="{{ url_for('money', year=current_season) }}"
+        <a href="{{ url_for('money', year=picker_year) }}"
            class="{% if page == 'money' %}on{% endif %}">Money</a>
       {% endif %}
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">
         Save{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
       </a>
+      {% if picker_year %}
+        {# The one place the working year is stated, which is why the tabs above no longer
+           carry it. Each option is a whole URL built here, so the handler navigates to a
+           string and computes nothing. #}
+        <span class="season-pick-wrap">
+          <select class="season-pick" aria-label="Season">
+            {% for yr in seasons_available | reverse %}
+              <option value="{{ url_for(picker_endpoint, year=yr) }}"
+                      {% if yr == picker_year %}selected{% endif %}>{{ yr }}</option>
+            {% endfor %}
+          </select>
+          {% if picker_year != current_season %}
+            <span class="tag-inline">not the current season</span>
+          {% endif %}
+        </span>
+      {% endif %}
     </nav>
   </div>
 </header>

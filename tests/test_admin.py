@@ -1470,12 +1470,14 @@ def test_the_keeper_page_shows_only_its_own_season(client, store: ManualStore):
     keeper_page = client.get(f"/season/{SEASON}").get_data(as_text=True)
     assert true_salaries(keeper_page) == ["45"], "only this season's override is shown"
 
-    # The cross-season ledger tab is gone (commissioner, 2026-09-01). The season switcher is
-    # how the other year is reached, and the league-wide net below is what replaces the
+    # The cross-season ledger tab is gone (commissioner, 2026-09-01). The header season picker
+    # is how the other year is reached, and the league-wide net below is what replaces the
     # league-wide *check* the tab used to be the only home for.
     prior_page = client.get(f"/season/{PRIOR}").get_data(as_text=True)
     assert true_salaries(prior_page) == ["30"]
-    assert f'href="/season/{PRIOR}"' in keeper_page, "the switcher reaches the other season"
+    # `value=`, not `href=`: an href to the same year is also what the "Not shown here" cash
+    # note renders, so an href assertion would go on passing with the picker deleted.
+    assert f'value="/season/{PRIOR}"' in keeper_page, "the picker reaches the other season"
 
 
 def test_overrides_that_do_not_cancel_are_reported(client, store: ManualStore):
@@ -1754,6 +1756,67 @@ def test_the_nav_counts_unsaved_changes(repo: Path, data_dir: Path, tmp_path: Pa
     (repo / "data" / "manual" / "claims.json").write_text("{}\n", encoding="utf-8")
     body = client.get(f"/season/{SEASON}/money").get_data(as_text=True)
     assert '<span class="badge">2</span>' in body, "the nav does not say anything is unsaved"
+
+
+def _picker_options(html: str) -> list[str]:
+    """The header season control's option values, and only those.
+
+    Scoped to the control rather than grepping every ``<option>`` on the page: the trade and
+    override tables carry year pickers of their own, and the settings form carries a franchise
+    one, so a page-wide grep would pass on markup that has nothing to do with the header.
+    """
+    block = re.search(r'<select class="season-pick".*?</select>', html, re.S)
+    assert block, "the header has no season picker"
+    return re.findall(r'value="([^"]+)"', block.group(0))
+
+
+def test_the_season_picker_keeps_the_tab_you_are_on(client):
+    """Switching season on Money lands on Money — not back on the keeper board.
+
+    This is the behaviour the two hand-rolled switchers had before they moved into the header,
+    and it is the whole reason the header knows which endpoint it is rendering for.
+    """
+    money = _picker_options(client.get(f"/season/{SEASON}/money").get_data(as_text=True))
+    assert money and all(url.endswith("/money") for url in money), money
+
+    settings = _picker_options(client.get(f"/season/{SEASON}/settings").get_data(as_text=True))
+    assert settings and all(url.endswith("/settings") for url in settings), settings
+
+    board = _picker_options(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert board == [f"/season/{SEASON}", f"/season/{PRIOR}"], "newest first, keeper board"
+
+
+def test_the_nav_tabs_follow_the_season_you_are_reading(client):
+    """Not ``current_season``.
+
+    Wired to the current season, the tabs moved you to a different year than the one on screen
+    without saying so — you opened Money from a 2025 page and were quietly billing 2026.
+    """
+    page = client.get(f"/season/{PRIOR}").get_data(as_text=True)
+    assert f'href="/season/{PRIOR}/settings"' in page
+    assert f'href="/season/{PRIOR}/money"' in page
+    assert f'href="/season/{SEASON}/settings"' not in page, "the tab jumped to another year"
+
+
+def test_there_is_one_season_control_and_it_is_in_the_header(client):
+    """Three pages, one control. Two of them used to print their own copy above the content."""
+    for url in (f"/season/{SEASON}", f"/season/{SEASON}/money", f"/season/{SEASON}/settings",
+                f"/season/{SEASON}/team/t1"):
+        page = client.get(url).get_data(as_text=True)
+        assert page.count('class="season-pick"') == 1, f"{url} has the wrong number of pickers"
+        # The two deleted paragraphs both opened with this label. Counting pickers alone would
+        # not notice one of them coming back, because it listed years as plain links.
+        assert "Season:" not in text(page), f"{url} kept a switcher of its own"
+
+
+def test_a_prior_season_says_so_on_every_tab(client):
+    """The warning sits beside the control that causes it, so it is not the keeper board's
+    alone — Money and Season settings can be a settled year just as easily."""
+    for url in (f"/season/{PRIOR}", f"/season/{PRIOR}/money", f"/season/{PRIOR}/settings"):
+        assert "not the current season" in text(client.get(url).get_data(as_text=True)), url
+    assert "not the current season" not in text(
+        client.get(f"/season/{SEASON}").get_data(as_text=True)
+    )
 
 
 def test_a_change_outside_data_manual_never_reaches_the_badge(repo: Path, data_dir: Path):
@@ -3512,7 +3575,7 @@ def test_deleting_an_override_returns_to_the_season_it_was_deleted_from(
 
 
 def test_the_board_names_the_season_it_would_record(client):
-    """The switcher makes a prior season a routine destination, and Record clears empties.
+    """The picker makes a prior season a routine destination, and Record clears empties.
 
     "Record all 12 franchises" on a page you did not mean to be on is one click from wiping a
     settled year. Nothing gates it — the year is on the button instead.
