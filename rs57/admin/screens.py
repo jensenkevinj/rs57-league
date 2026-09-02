@@ -53,6 +53,7 @@ from rs57.keeper_rules import (
     keeper_salary,
 )
 from rs57.models import (
+    STALE_WAIVER_WARNING,
     CashTrade,
     KeeperClaim,
     KeeperSlot,
@@ -111,6 +112,8 @@ class Note:
     kind: str
     message: str
     team_specific: bool = True
+
+
 
 
 @dataclass(frozen=True)
@@ -1400,13 +1403,17 @@ def build_team_screen(
     # Wider than the lock ever was, and that is the point: the lock said nothing about the four
     # claims stamped 2026-07-29, six days before the lock itself was written. This does.
     # It clears itself the moment the card is re-recorded after the deadline.
-    keeper_deadline = current.keeper_deadline
-    if keeper_deadline is not None:
+    # `deadline_at`, not `keeper_deadline`: this used to shadow the parameter of that name, so
+    # the KeeperDeadline passed in was never read and the raw datetime went into TeamScreen's
+    # `keeper_deadline` field, which is declared KeeperDeadline. Nothing read it, so nothing
+    # broke — but the parameter is live below and needs its own name back.
+    deadline_at = current.keeper_deadline
+    if deadline_at is not None:
         provisional = sorted(
             {
                 claim.submitted_at
                 for claim in stored
-                if claim.submitted_at is not None and claim.submitted_at < keeper_deadline
+                if claim.submitted_at is not None and claim.submitted_at < deadline_at
             }
         )
         if provisional:
@@ -1415,7 +1422,7 @@ def build_team_screen(
                 Note(
                     "review",
                     f"Recorded {when:%Y-%m-%d %H:%M} ET, before this season's keeper deadline "
-                    f"({to_league_time(keeper_deadline):%Y-%m-%d %H:%M} ET) — so managers could "
+                    f"({to_league_time(deadline_at):%Y-%m-%d %H:%M} ET) — so managers could "
                     f"still change their minds after it was entered. Provisional until you "
                     f"re-record this card, which clears this note.",
                 )
@@ -1447,12 +1454,21 @@ def build_team_screen(
                 team_specific=False,
             )
         )
+    # Not while ESPN holds the entered keeper prices. In that window its field is base + fee +
+    # tax rather than the price the player was acquired for, so every waiver add carrying a fee
+    # "disagrees" with its own FAAB bid by exactly that fee. `espn.py` stops recording these at
+    # sync time; this is what keeps a file synced before that fix from reporting them.
+    entered_prices = (
+        not current.drafted and keeper_deadline is not None and keeper_deadline.passed
+    )
     for warning in current.warnings:
+        if entered_prices and STALE_WAIVER_WARNING in warning:
+            continue
         notes.append(Note("review", f"{season} sync: {warning}", team_specific=False))
     mismatched = [
         row.name for row in rows if row.espn_player_id in current.waiver_base_mismatches
     ]
-    if mismatched:
+    if mismatched and not entered_prices:
         notes.append(
             Note(
                 "review",

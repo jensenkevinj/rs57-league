@@ -44,7 +44,7 @@ from rs57.espn import (
     keeper_pick_ids,
     winning_bids,
 )
-from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS
+from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS, charges_in_base
 from rs57.models import dump_json, json_dumps
 from rs57.sync import season_document
 
@@ -438,6 +438,107 @@ def test_a_waiver_base_that_contradicts_the_faab_record_is_caught(doc_2025, doc_
     )
     assert entry["playerPoolEntry"]["player"]["id"] in season.waiver_base_mismatches
     assert any("FAAB" in w for w in season.warnings)
+
+
+DEADLINE_MS = 1_756_780_800_000  # 2025-09-02 00:00 UTC, a fixed point for the window tests
+
+
+def _with_deadline(doc, epoch_ms):
+    doc["league"]["settings"]["draftSettings"]["keeperDeadlineDate"] = epoch_ms
+    return doc
+
+
+def _break_one_waiver_base(doc, field="keeperValue"):
+    """Push one waiver add's base off its FAAB bid, so there is something to catch.
+
+    The field is a parameter because which one the sync reads depends on whether the season has
+    drafted — break the wrong one and the test asserts against a number nobody looked at.
+    """
+    entry = next(
+        e
+        for roster in doc["rosters"].values()
+        for e in roster["teams"][0]["roster"]["entries"]
+        if e["acquisitionType"] == "ADD"
+    )
+    entry["playerPoolEntry"][field] += 7
+    return entry["playerPoolEntry"]["player"]["id"]
+
+
+def test_the_waiver_check_does_not_run_once_espn_holds_the_entered_prices(
+    doc_2025, doc_2026, faab_2025
+):
+    """The premise expires at the keeper deadline, and the check has to expire with it.
+
+    Between the deadline and the auction ESPN's field is base + allocated fee + $5 tax, not the
+    price the player was acquired for — so every waiver add carrying a fee differs from its own
+    FAAB bid by exactly that fee. Against live 2026 that reported three real keepers as
+    disagreements: Burrow, Johnson and Maye, whose ESPN values equal their recorded claims to
+    the dollar.
+    """
+    broken = _break_one_waiver_base(_with_deadline(doc_2026, DEADLINE_MS))
+    season = build_season(
+        ReplayClient(2026, doc_2026),
+        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        faab_bids=faab_2025,
+        now=datetime(2025, 9, 3),  # after the deadline, and 2026 has not drafted
+    )
+
+    assert season.waiver_base_mismatches == (), "a check that cannot run reports nothing"
+    assert broken not in season.waiver_base_mismatches
+    assert season.waiver_bases_verified == 0
+    # SKIPPED, never silence: it has not passed, it has not run, and the reason is on the page.
+    assert any("did not run" in w for w in season.warnings), season.warnings
+    assert not any("disagree with the FAAB" in w for w in season.warnings)
+
+
+def test_the_waiver_check_still_runs_before_the_deadline(doc_2025, doc_2026, faab_2025):
+    """The other side of the window. A deadline still ahead is not the entered-prices state."""
+    broken = _break_one_waiver_base(_with_deadline(doc_2026, DEADLINE_MS))
+    season = build_season(
+        ReplayClient(2026, doc_2026),
+        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        faab_bids=faab_2025,
+        now=datetime(2025, 9, 1),  # before the deadline
+    )
+
+    assert broken in season.waiver_base_mismatches
+    assert any("disagree with the FAAB" in w for w in season.warnings)
+
+
+def test_the_waiver_check_still_runs_once_the_season_has_drafted(doc_2025, doc_2026, faab_2025):
+    """A drafted season is out of the window whatever its deadline says.
+
+    This is the test that stops the fix becoming "the check never runs", which is the cheap way
+    to make an inconvenient finding go away and the expensive way to lose a real one.
+    """
+    # Drafted, so the sync reads keeperValueFuture — that is the number to push off its bid.
+    broken = _break_one_waiver_base(_with_deadline(doc_2026, DEADLINE_MS), "keeperValueFuture")
+    doc_2026["draft"]["drafted"] = True
+
+    season = build_season(
+        ReplayClient(2026, doc_2026),
+        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        faab_bids=faab_2025,
+        now=datetime(2025, 9, 3),  # past the deadline, but the auction has run
+    )
+
+    assert broken in season.waiver_base_mismatches
+    assert any("disagree with the FAAB" in w for w in season.warnings)
+
+
+def test_the_entered_prices_window_has_three_states_not_two():
+    """A season ESPN has set no deadline for cannot place itself in the window.
+
+    A missing fact is not a past one. Read the other way, every season without a deadline on
+    file would price as though the commissioner had already entered this year's keepers.
+    """
+    passed, ahead = datetime(2026, 9, 1), datetime(2026, 9, 30)
+    now = datetime(2026, 9, 15)
+
+    assert charges_in_base(False, passed, now) is True
+    assert charges_in_base(False, ahead, now) is False
+    assert charges_in_base(False, None, now) is False, "no deadline is not a passed deadline"
+    assert charges_in_base(True, passed, now) is False, "the auction ends the window"
 
 
 def test_unchecked_waiver_bases_say_so(season_2026):

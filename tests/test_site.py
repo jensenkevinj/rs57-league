@@ -586,6 +586,42 @@ def test_an_unrecorded_keeper_deadline_leaves_the_tax_alone(derived: Path):
     assert lines["Puka Nacua"].price == 5 + KEEPER_TAX
 
 
+def _store_waiver_mismatch(derived: Path, player_id: int, warning: str = "") -> Path:
+    """A stored mismatch, the way a sync from before the window fix left one behind.
+
+    Both forms it was written in: the structured list, and the sentence beside it.
+    """
+    path = derived / f"{SEASON}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["waiver_base_mismatches"] = [player_id]
+    doc["review"]["warnings"] = [warning] if warning else []
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    return derived
+
+
+def test_a_stored_waiver_mismatch_is_not_published_in_the_entered_prices_window(derived: Path):
+    """`data/derived/` belongs to the nightly Action, so a file synced before the fix still
+    carries the finding — and publishing it names real keepers on a public page as errors.
+
+    The second half is the point: outside the window a wrong waiver base is exactly the quiet
+    error the ratchet carries forward, and suppressing it everywhere would be the costly way to
+    quiet a note.
+    """
+    _store_waiver_mismatch(derived, 1, "3 waiver adds disagree with the FAAB actually bid")
+
+    _, in_window = priced(with_deadline(derived), now=AFTER)
+    assert not any("waiver pickups" in n.message for n in in_window.notes)
+    # Both forms. Publishing the sentence while dropping the list would name nobody on a public
+    # page and still assert three disagreements.
+    assert not any("disagree with the FAAB" in n.message for n in in_window.notes)
+
+    _, still_checked = priced(with_deadline(derived), now=BEFORE)
+    assert any("waiver pickups" in n.message for n in still_checked.notes), (
+        "the check must survive the fix"
+    )
+    assert any("disagree with the FAAB" in n.message for n in still_checked.notes)
+
+
 def test_the_tax_column_reads_as_a_dash_rather_than_zero_dollars(tmp_path: Path, derived: Path):
     """A taxed player owing nothing this week must not render "$0" — that reads as a figure
     somebody computed, when the truth is the charge is sitting inside the base beside it.

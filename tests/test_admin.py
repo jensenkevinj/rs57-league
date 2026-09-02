@@ -2274,6 +2274,65 @@ def test_the_espn_check_shows_conflicts_and_folds_the_agreements(client, store, 
     assert body.count("<details") == 1
 
 
+def _set_waiver_mismatch(data_dir: Path, player_id: int, season: int = SEASON) -> None:
+    """Put a stored mismatch in the derived file, the way a sync before the fix left one."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["waiver_base_mismatches"] = [player_id]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def _set_sync_warning(data_dir: Path, warning: str, season: int = SEASON) -> None:
+    """A sync warning stored in the derived file, as a run before the window gate left one."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["warnings"] = [warning]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def test_a_stored_waiver_mismatch_is_ignored_once_espn_holds_entered_prices(
+    client, data_dir: Path
+):
+    """`data/derived/` belongs to the nightly Action, so a file synced before the fix still
+    carries the finding. Reading it in that window reports three real keepers as errors.
+
+    Both halves are asserted. Suppressing it outright would throw away a check that catches the
+    quiet kind of error — a wrong waiver base the ratchet carries forward every season after.
+    """
+    set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))  # passed, and 2026 has not drafted
+    _set_waiver_mismatch(data_dir, LATE)
+    _set_sync_warning(data_dir, "3 waiver adds disagree with the FAAB actually bid")
+
+    in_window = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "disagree about the waiver price" not in in_window
+    # Both forms, or the card names nobody while still claiming three disagreements.
+    assert "disagree with the FAAB" not in in_window, "the stale sentence goes with the list"
+
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))  # deadline still ahead
+    still_checked = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "disagree about the waiver price" in still_checked, "the check must survive the fix"
+    assert "disagree with the FAAB" in still_checked
+
+
+def test_the_card_states_whether_it_recorded_without_stamping_when(client, store: ManualStore):
+    """The minute a card was saved is not something anyone reads off this screen
+    (commissioner, 2026-09-02). Whether anything is on file still is — it is the one thing the
+    status badge does not answer.
+
+    `submitted_at` keeps being recorded either way: it is what decides whether a claim entered
+    before the keeper deadline reads as provisional.
+    """
+    before = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert "Not recorded yet" in before
+
+    client.post(f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0)))
+    after = text(client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True))
+
+    assert "Recorded" in after, "whether it saved is still the line's job"
+    assert store.claims(SEASON)[0].submitted_at is not None, "and the stamp is still recorded"
+    assert not re.search(r"Recorded \d{4}-\d{2}-\d{2}", after), "but it is not printed"
+
+
 def test_the_player_picker_does_not_mark_rookies(client, data_dir: Path):
     """Dropped 2026-09-02 (commissioner).
 

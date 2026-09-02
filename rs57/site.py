@@ -51,10 +51,12 @@ from rs57.keeper_rules import (
     MAX_KEEPERS,
     MAX_PROSPECTS,
     Severity,
+    charges_in_base as _charges_in_base,
     effective_base_salary,
     keeper_salary,
 )
 from rs57.models import (
+    STALE_WAIVER_WARNING,
     Base,
     Dues,
     FranchiseName,
@@ -904,27 +906,10 @@ def build_keeper_season(
     roster = _rows(RosterEntry, doc.get("roster"), notes, f"{season}.json roster")
 
     review = doc.get("review") or {}
-    for warning in review.get("warnings") or []:
-        notes.append(Note("review", warning, where=f"{season} keepers"))
-    mismatches = review.get("waiver_base_mismatches") or []
-    if mismatches:
-        notes.append(
-            Note(
-                "review",
-                f"{len(mismatches)} waiver pickups have a base ESPN and the transaction log "
-                f"disagree about, so their price below is unconfirmed "
-                f"(player ids: {', '.join(str(i) for i in mismatches)})",
-                where=f"{season} keepers",
-            )
-        )
 
-    declared = {(claim.manager_id, claim.espn_player_id): claim for claim in claims}
-
-    # The phase pivot, computed once. Everything below reads these two rather than doing the
+    # The phase pivot, computed once. Everything below reads these rather than doing the
     # arithmetic again, so no rule can end up judging a different season from its neighbours.
     drafted = bool(source.get("drafted"))
-    decision_season = season + 1 if drafted else season
-    qualifying_season = decision_season - 1
 
     # Between the keeper deadline and the auction, ESPN's `keeperValue` is the price the
     # commissioner has entered for each keeper — allocated fee and $5 tax already inside it —
@@ -939,11 +924,36 @@ def build_keeper_season(
     # An unrecorded deadline is a distinct state from a past one: a season ESPN has set no
     # deadline for cannot place itself in this window, so the tax applies as usual.
     keeper_deadline = _source_time(source, "keeper_deadline")
-    charges_in_base = (
-        not drafted
-        and keeper_deadline is not None
-        and keeper_deadline < (now if now is not None else utc_now())
+    charges_in_base = _charges_in_base(
+        drafted, keeper_deadline, now if now is not None else utc_now()
     )
+
+    for warning in review.get("warnings") or []:
+        # Transitional, and narrowly scoped: a season synced before the window gate landed still
+        # carries the old sentence, and `data/derived/` belongs to the nightly Action. Dropping
+        # the structured list below while publishing the prose would name nobody and still claim
+        # three disagreements. **Delete once every season file has been re-synced.**
+        if charges_in_base and STALE_WAIVER_WARNING in warning:
+            continue
+        notes.append(Note("review", warning, where=f"{season} keepers"))
+    # Nothing to report in that window: the field the check compared is not an acquisition
+    # price there, so a waiver add carrying a fee differs from its own FAAB bid by design.
+    mismatches = [] if charges_in_base else (review.get("waiver_base_mismatches") or [])
+    if mismatches:
+        notes.append(
+            Note(
+                "review",
+                f"{len(mismatches)} waiver pickups have a base ESPN and the transaction log "
+                f"disagree about, so their price below is unconfirmed "
+                f"(player ids: {', '.join(str(i) for i in mismatches)})",
+                where=f"{season} keepers",
+            )
+        )
+
+    declared = {(claim.manager_id, claim.espn_player_id): claim for claim in claims}
+
+    decision_season = season + 1 if drafted else season
+    qualifying_season = decision_season - 1
     origins = first_nfl_season or {}
     bounds = first_season_bounds or {}
 

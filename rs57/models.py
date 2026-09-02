@@ -632,3 +632,19 @@ def json_dumps(obj: Any) -> str:
 def dump_json(obj: Any, path: Path) -> None:
     """Write ``obj`` to ``path`` deterministically. The only sanctioned way to write data/."""
     path.write_text(json_dumps(obj), encoding="utf-8")
+
+
+STALE_WAIVER_WARNING = "disagree with the FAAB"
+"""Marker for a sync warning whose premise has since expired. **Transitional.**
+
+Until 2026-09-02 the sync compared every waiver add's base against the FAAB actually bid, and
+kept comparing it after the keeper deadline — when ESPN's field has stopped being an acquisition
+price and holds the keeper price the commissioner entered, fee and tax inside it. Every waiver
+add carrying a fee then "disagreed" with its own bid by exactly that fee.
+
+`espn.py` no longer writes it, but `data/derived/` belongs to the nightly Action and cannot be
+corrected from anywhere else, so seasons synced before the fix still carry the sentence. The two
+readers drop it while the season is in that window. **Delete this and both call sites once every
+season file has been re-synced** — it matches on prose, which is why it is scoped this narrowly
+and dated here rather than left to be discovered.
+"""

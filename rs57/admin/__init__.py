@@ -276,6 +276,7 @@ def create_app(
             store,
             claims=claims,
             first_nfl_season=derived.first_nfl_seasons(),
+            keeper_deadline=keeper_deadline_fact(current, now=now()),
         )
 
         if problems or screen.blocked:
@@ -295,6 +296,7 @@ def create_app(
             store,
             saved=True,
             first_nfl_season=derived.first_nfl_seasons(),
+            keeper_deadline=keeper_deadline_fact(current, now=now()),
         )
         return render_template("_claim_form.html", screen=saved, source=current, problems=[])
 
