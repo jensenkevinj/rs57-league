@@ -18,43 +18,6 @@
     "filled. That gap is what taxed a prospect $5 in the old spreadsheet."
   ],
   "seasons": {
-    "2026": [
-      {
-        "computed_salary": 33,
-        "espn_player_id": 3918298,
-        "fee_allocated": 5,
-        "manager_id": "t9",
-        "season": 2026,
-        "slot": "K1",
-        "submitted_at": "2026-07-29T23:25:46.202707"
-      },
-      {
-        "computed_salary": 32,
-        "espn_player_id": 4361307,
-        "fee_allocated": 5,
-        "manager_id": "t9",
-        "season": 2026,
-        "slot": "K2",
-        "submitted_at": "2026-07-29T23:25:46.202707"
-      },
-      {
-        "computed_salary": 18,
-        "espn_player_id": 4362238,
-        "fee_allocated": 5,
-        "manager_id": "t9",
-        "season": 2026,
-        "slot": "K3",
-        "submitted_at": "2026-07-29T23:25:46.202707"
-      },
-      {
-        "computed_salary": 5,
-        "espn_player_id": 4696981,
-        "fee_allocated": 0,
-        "manager_id": "t9",
-        "season": 2026,
-        "slot": "PROSPECT",
-        "submitted_at": "2026-07-29T23:25:46.202707"
-      }
-    ]
+    "2026": []
   }
 }
