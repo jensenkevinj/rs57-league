@@ -69,9 +69,21 @@
       "season": 2026
     },
     {
+      "manager_id": "t6",
+      "paid": true,
+      "paid_at": "2026-09-02T17:15:06.725644",
+      "season": 2026
+    },
+    {
       "manager_id": "t7",
       "paid": true,
       "paid_at": "2026-08-31T18:00:50.767594",
+      "season": 2026
+    },
+    {
+      "manager_id": "t8",
+      "paid": true,
+      "paid_at": "2026-09-02T17:15:06.101568",
       "season": 2026
     },
     {
