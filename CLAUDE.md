@@ -24,6 +24,12 @@ acceptance check that was tempting to wave through, and each one was hiding a re
   `player-origins.json` — so a broken box score cannot blank a season of salaries, and a
   core-API outage cannot touch either. `player-origins.json` is merge-only on top of that:
   a failed run adds nobody and removes nobody.
+  - **`data/derived/` was hand-corrected once, deliberately: 2026-09-02.** The 17:16 nightly
+    copied in 27 entered keeper prices before `hold_entered_bases` existed, and a merge-only
+    guard freezes wrong numbers in place rather than repairing them. The clean bases were
+    restored from commit `50d06a6` — the last sync taken before the prices went in — and every
+    one checked against `recorded claim − fee − tax`, which is an independent source. **A hand
+    edit in `data/derived/` without a note like this beside it is a bug.**
 - `python -m rs57.validate` reads data/ and reports. It is never a writer. CI runs it.
 - ESPN reads need no credentials — public league, historical seasons included.
   **2019 is the oldest season served**; 2018 answers 401 and earlier 404.
@@ -140,6 +146,18 @@ for $5 in 2025 → $10 in 2026. ESPN reports his current base as $5.
 
 `check_base_continuity()` audits this: a kept player's base must equal last season's computed
 salary unless an override explains it.
+
+**Between the keeper deadline and the auction, ESPN's field is not ESPN's.** The commissioner
+types the season's keeper prices into ESPN in that window — base + allocated fee + $5 tax, added
+together — and the field hands them straight back. A sync that copies them in charges every kept
+player his own fee and tax twice, and the ratchet then carries the doubling forward for good.
+`sync.hold_entered_bases` is the guard: in that window the nightly keeps the salaries already on
+disk and overwrites nothing, reporting how many it held. **Everything else in the file still
+syncs** — rosters, dates, acquisitions. One field stops being ESPN's to give, not the season.
+Because of it, every reader may trust `base_salary` unconditionally; nothing downstream needs to
+know what week it is. It was briefly the other way round — `site.py` subtracted the tax in that
+window for a few hours on 2026-09-02 — and a decoding rule in the readers is how you end up with
+four copies of the same calendar test and a $5 error in whichever one you missed.
 
 **Which ESPN field is the base depends on whether that season has drafted** — `keeperValue`
 before the auction, `keeperValueFuture` after, decided by `draftDetail.drafted`. Getting this

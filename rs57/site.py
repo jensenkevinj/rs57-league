@@ -206,10 +206,6 @@ class KeeperSeason:
     qualifying_deadline: datetime | None = None
     """That season's trade deadline, printed above the grid. ``None`` when it is not on disk,
     in which case the page says so rather than showing a date it does not have."""
-    charges_in_base: bool = False
-    """Whether the salaries below already carry their fee and $5 tax — the window between the
-    keeper deadline and the auction. Printed above the grid, because otherwise an empty Tax
-    column beside a taxed player is a number the page is quietly not showing."""
     rows: tuple[KeeperLine, ...] = ()
     """Every rostered player in the league, flat, **dearest first**.
 
@@ -885,11 +881,12 @@ def build_keeper_season(
     how many keepers a manager declares and the split is the manager's own choice, so there is no
     per-player fee to publish for a player nobody has claimed.
 
-    **Except between the keeper deadline and the auction, when the price IS the base.** In that
-    window ESPN's ``keeperValue`` has stopped meaning "carried in from last season" and holds
-    the price the commissioner has entered for each keeper, fee and tax already inside it — so
-    the tax goes on top of a number that already carries it, and the page publishes every kept
-    player $5 dear. See ``charges_in_base`` below.
+    The tax goes on top of the base unconditionally, in every window. It briefly did not: for
+    a few hours on 2026-09-02 this page subtracted it between the keeper deadline and the
+    auction, because the sync was copying in the keeper prices the commissioner had entered and
+    those already carried it. ``sync.hold_entered_bases`` stops that at the writer now, so the
+    base here is a carried-in price whatever the calendar says — and skipping the tax against a
+    clean base would drop $5 that is genuinely owed.
 
     A **declared keeper** is one the admin tool has recorded a ``KeeperClaim`` for. He carries the
     fee his manager allocated and the salary recorded at declaration — the figure that manager was
@@ -993,11 +990,7 @@ def build_keeper_season(
             )
             continue
         base = effective_base_salary(entry, overrides)
-        price = (
-            base
-            if charges_in_base
-            else keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
-        )
+        price = keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
         claim = declared.get((entry.manager_id, entry.espn_player_id))
         began = origins.get(entry.espn_player_id)
         lines.setdefault(entry.manager_id, []).append(
@@ -1063,7 +1056,6 @@ def build_keeper_season(
         decision_season=decision_season,
         qualifying_season=qualifying_season,
         qualifying_deadline=deadline,
-        charges_in_base=charges_in_base,
         # Dearest first, then by name so equal salaries have a stable order rather than one
         # that depends on which franchise happened to be read first.
         rows=tuple(

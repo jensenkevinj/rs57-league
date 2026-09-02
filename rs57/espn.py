@@ -522,6 +522,17 @@ class SyncedSeason:
     state of every season for most of the year and it clears itself at the auction. Rendering
     it as "nobody has checked this" is how the flags that DO need checking stop being read.
     """
+    prices_entered: bool = False
+    """True while ESPN's salary field holds the keeper prices the commissioner has entered
+    rather than the value carried in from last season — the window between the keeper deadline
+    and the auction.
+
+    Decided once, here, and read by ``sync.py`` to decide whether it may write those salaries
+    to disk. One decision rather than two that can drift apart.
+    """
+    bases_held: int = 0
+    """Salaries this run left as they were on disk rather than overwriting — see
+    ``sync.hold_entered_bases``. Zero outside the keeper window."""
     waiver_bases_verified: int = 0
     """Waiver adds whose base was confirmed against the FAAB actually bid."""
     waiver_base_mismatches: tuple[int, ...] = ()
@@ -743,6 +754,7 @@ def build_season(
         keeper_deadline=keeper_deadline,
         warnings=tuple(warnings),
         phase=tuple(phase),
+        prices_entered=entered,
         waiver_bases_verified=verified_waivers,
         waiver_base_mismatches=tuple(sorted(mismatched_waivers)),
     )

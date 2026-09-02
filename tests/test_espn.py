@@ -21,6 +21,7 @@ import ast
 import inspect
 import json
 import textwrap
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
@@ -46,7 +47,7 @@ from rs57.espn import (
 )
 from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS, charges_in_base
 from rs57.models import dump_json, json_dumps
-from rs57.sync import season_document
+from rs57.sync import hold_entered_bases, season_document
 
 DATA = Path(__file__).parent / "data"
 
@@ -601,6 +602,82 @@ def _prune_every_roster(doc: dict, keep: int) -> None:
     for roster in doc["rosters"].values():
         entries = roster["teams"][0]["roster"]["entries"]
         roster["teams"][0]["roster"]["entries"] = entries[:keep]
+
+
+def _written(tmp_path, season):
+    """Write a season the way the sync does, so the next run has something to read back."""
+    dump_json(season_document(season), tmp_path / f"{season.season}.json")
+    return tmp_path
+
+
+def _repriced(season, delta):
+    """The same season as ESPN would report it after the keeper prices went in."""
+    return replace(
+        season,
+        roster=tuple(
+            e.model_copy(update={"base_salary": e.base_salary + delta}) for e in season.roster
+        ),
+    )
+
+
+def test_a_base_already_on_disk_is_held_while_the_prices_are_entered(tmp_path, season_2026):
+    """The bug this exists for, in one sentence: on 2026-09-02 the 14:25 sync matched 08-31 on
+    all 38 bases and the 17:16 sync — taken after the keeper prices were typed into ESPN —
+    moved 27 of them by exactly a fee or a fee plus tax.
+
+    ESPN's field is the commissioner's to write in that window, so what it hands back is not a
+    carried-in price and must not be copied over one.
+    """
+    clean = replace(season_2026, prices_entered=True)
+    _written(tmp_path, clean)
+
+    held, count = hold_entered_bases(_repriced(clean, +5), tmp_path)
+
+    assert count == len(clean.roster), "every base should have been held"
+    bases = {e.espn_player_id: e.base_salary for e in held.roster}
+    assert all(bases[e.espn_player_id] == e.base_salary for e in clean.roster)
+
+
+def test_a_base_is_overwritten_in_every_other_window(tmp_path, season_2026):
+    """The other half, and the one that matters more.
+
+    "Never update a salary" would also make the symptom go away, and would quietly freeze every
+    price in the league from the first sync onward — a far worse bug than the one it fixes,
+    and a silent one.
+    """
+    clean = replace(season_2026, prices_entered=False)
+    _written(tmp_path, clean)
+
+    held, count = hold_entered_bases(_repriced(clean, +5), tmp_path)
+
+    assert count == 0
+    bases = {e.espn_player_id: e.base_salary for e in held.roster}
+    assert all(bases[e.espn_player_id] == e.base_salary + 5 for e in clean.roster)
+
+
+def test_a_player_new_in_the_window_takes_espns_base(tmp_path, season_2026):
+    """There is nothing on disk to preserve for somebody who has only just arrived, and
+    refusing him a price would be worse than reading one that may carry a charge."""
+    clean = replace(season_2026, prices_entered=True)
+    # A newcomer priced at $0 would let this pass against a base invented from nothing.
+    newcomer = next(e for e in clean.roster if e.base_salary > 0)
+    absent = tuple(e for e in clean.roster if e.espn_player_id != newcomer.espn_player_id)
+    _written(tmp_path, replace(clean, roster=absent))
+
+    held, count = hold_entered_bases(clean, tmp_path)
+
+    assert count == 0, "an unchanged base is not a held one"
+    assert {e.espn_player_id: e.base_salary for e in held.roster}[
+        newcomer.espn_player_id
+    ] == newcomer.base_salary > 0
+
+
+def test_holding_bases_needs_no_file_to_read(tmp_path, season_2026):
+    """The first sync of a season lands in this window if the deadline is already past. There is
+    no previous file then, and there is nothing to hold — it must not fail."""
+    held, count = hold_entered_bases(replace(season_2026, prices_entered=True), tmp_path)
+    assert count == 0
+    assert held.roster == season_2026.roster
 
 
 def test_a_pruned_keeper_window_is_not_degraded(doc_2026):

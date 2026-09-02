@@ -38,22 +38,6 @@
     {% endif %}
   </p>
 
-  {# Why the Tax column is empty on players who plainly owe one. Between the keeper deadline
-     and the auction ESPN holds the price the commissioner entered for each keeper, fee and tax
-     already inside it, so there is nothing to add on top. Said plainly rather than left to be
-     inferred from a column of dashes — and NOT as an "unverified" flag, because this is a
-     known state with a known cause, not something nobody has checked.
-
-     The sentence is one flex item, not four: `.deadline` is an inline-flex row, so a bare
-     <strong> mid-sentence becomes its own column and the words lay out in the wrong order. #}
-  {% if current.charges_in_base %}
-    <p class="deadline">
-      <span class="deadline-i" aria-hidden="true">i</span>
-      <span>Keepers are set and the auction has not run — these prices
-        <strong>already include</strong> the keeper fee and the $5 tax.</span>
-    </p>
-  {% endif %}
-
   {# Hidden until the script runs. Controls that cannot filter anything are worse than none. #}
   <div class="controls" id="controls" hidden>
     <input type="search" id="q" placeholder="Filter by player name"
@@ -133,9 +117,8 @@
             </td>
             <td class="num" data-v="{{ line.base }}">${{ line.base }}</td>
             <td class="num" data-v="{{ line.tax }}">
-              {# Keyed on the tax itself, not on `kept_prior_year`. Between the keeper deadline
-                 and the auction ESPN's figure already carries the tax, so a taxed player owes
-                 nothing on top and this cell would otherwise print a bare "$0". #}
+              {# Keyed on the tax itself rather than on `kept_prior_year`: a player who owes
+                 nothing on top reads as a dash instead of a computed "$0". #}
               {% if line.tax %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
             </td>
             <td class="num money" data-v="{{ line.price }}">${{ line.price }}</td>

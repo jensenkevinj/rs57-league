@@ -550,26 +550,29 @@ def with_deadline(derived: Path, *, deadline: str | None = DEADLINE, drafted: bo
     return derived
 
 
-def test_the_tax_is_not_added_once_espn_holds_the_entered_keeper_prices(derived: Path):
-    """Deadline passed, auction not run: ESPN's figure IS the salary. Do not add to it."""
-    lines, season = priced(with_deadline(derived), now=AFTER)
+def test_the_tax_is_added_between_the_deadline_and_the_auction_too(derived: Path):
+    """The window this page briefly subtracted the tax in, for a few hours on 2026-09-02.
+
+    It did that because the sync was copying in the keeper prices the commissioner had entered,
+    which already carry the fee and the tax. ``sync.hold_entered_bases`` stops that at the
+    writer, so the base reaching this page is a carried-in price in every window — and taking
+    the tax off a clean base drops $5 somebody genuinely owes.
+    """
+    lines, _ = priced(with_deadline(derived), now=AFTER)
 
     nacua = lines["Puka Nacua"]
     assert nacua.kept_prior_year is True, "the fixture's taxed player must stay taxed"
-    assert nacua.price == nacua.base == 5, "the $5 tax is already inside ESPN's figure"
-    assert nacua.tax == 0
+    assert nacua.price == nacua.base + KEEPER_TAX == 10
+    assert nacua.tax == KEEPER_TAX
 
-    # An untaxed player is unaffected either way — the guard must not reprice him.
+    # An untaxed player is unaffected, in this window as in any other.
     assert lines["James Cook III"].price == 42
-
-    assert season.charges_in_base is True
 
 
 def test_the_tax_still_applies_before_the_keeper_deadline(derived: Path):
     """The ordinary case, and the one the window must not swallow: managers still deciding."""
-    lines, season = priced(with_deadline(derived), now=BEFORE)
+    lines, _ = priced(with_deadline(derived), now=BEFORE)
     assert lines["Puka Nacua"].price == 5 + KEEPER_TAX
-    assert season.charges_in_base is False
 
 
 def test_the_tax_still_applies_once_the_season_has_drafted(derived: Path):
@@ -623,31 +626,28 @@ def test_a_stored_waiver_mismatch_is_not_published_in_the_entered_prices_window(
 
 
 def test_the_tax_column_reads_as_a_dash_rather_than_zero_dollars(tmp_path: Path, derived: Path):
-    """A taxed player owing nothing this week must not render "$0" — that reads as a figure
-    somebody computed, when the truth is the charge is sitting inside the base beside it.
+    """A player who owes no tax must not render "$0" — that reads as a figure somebody
+    computed, when the truth is that no charge applies to him at all.
 
     Rendered through ``build_site``, on the real ``utc_now`` clock rather than an injected one,
-    so this also pins the default wiring the four tests above bypass. The deadline is long past
-    for any wall clock that will ever run this.
+    so this also pins the default wiring the tests above bypass.
+    """
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in grid_rows(page) if r[0].startswith("James Cook III"))
+    assert "$0" not in row, "an absent tax must not read as a computed zero"
+    assert "—" in row
+
+    taxed = next(r for r in grid_rows(page) if r[0].startswith("Puka Nacua"))
+    assert "$5" in taxed, "and a player who does owe it sees the figure"
+
+
+def test_the_page_never_says_the_charges_are_inside_the_base(tmp_path: Path, derived: Path):
+    """A caption saying so was on this page for a few hours on 2026-09-02, while the sync was
+    copying entered keeper prices in. The base is held at the writer now, so the sentence would
+    be false in every window — and it is the kind of false that reads as reassurance.
     """
     with_deadline(derived, deadline="2020-01-01T00:00:00")
-    page = render(tmp_path, derived)["keepers.html"]
-    row = next(r for r in grid_rows(page) if r[0].startswith("Puka Nacua"))
-    assert "$0" not in row, "an empty tax must not read as a computed zero"
-    assert "—" in row
-    assert "$5" in row, "the base is still $5, and the salary column repeats it"
-
-    # The dashes have to be explained on the page itself. A REVIEW note cannot do it:
-    # keepers.html renders errors only, deliberately — see
-    # test_a_sync_warning_stays_off_the_public_page — so a note here would reach nobody.
-    assert "keeper fee and the $5 tax" in text(page)
-    assert "unverified" not in text(page).lower(), "this is a known state, not an unchecked one"
-
-
-def test_the_included_fee_caption_is_absent_the_rest_of_the_year(tmp_path: Path, derived: Path):
-    """The mirror of the test above. A caption that never comes down is wallpaper."""
-    page = render(tmp_path, derived)["keepers.html"]
-    assert "keeper fee and the $5 tax" not in text(page)
+    assert "keeper fee and the $5 tax" not in text(render(tmp_path, derived)["keepers.html"])
 
 
 def test_no_template_does_arithmetic_on_money():
