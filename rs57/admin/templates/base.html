@@ -223,12 +223,10 @@
      and with it on the spinner the badge came to rest against the team name instead. */
   .tc-head .spin { margin-left: 0; }
   .tc-status { margin-left: auto; }
-  /* Hover is for the reason, so say that a reason exists. Without it a badge with a tooltip
-     and one without are indistinguishable until you happen to mouse over the right one. */
-  .tc-status .tc-why {
-    display: inline-block; margin-left: 0.2rem; opacity: 0.65; font-weight: 700;
-  }
-  .tc-status[title] { cursor: help; }
+  /* Only a badge with something to explain carries a title, so the help cursor IS the
+     affordance. A "?" glyph was tried and read as part of the word — "Valid?" asks a question
+     the badge is supposed to be answering. */
+  .tc-status[title], .tc-actions .tag-inline[title] { cursor: help; }
   .team-card .tc-table th { background: transparent; padding: 0.4rem 0.3rem; }
   .team-card .tc-table td { padding: 0.3rem 0.3rem; border-bottom: 1px solid var(--line); }
   /* No rule under the total row — the card's own edge already closes the table. The generic

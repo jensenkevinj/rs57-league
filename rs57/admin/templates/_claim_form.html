@@ -58,11 +58,9 @@
                  {%- elif st.kind == 'ok' %} ok
                  {%- elif st.kind == 'error' %} bad
                  {%- else %} flat{% endif %}"
-          {% if problems %}title="{% for problem in problems %}CANNOT READ THE FORM: {{ problem }}&#10;{% endfor %}"
+          {% if problems %}title="{% for problem in problems %}{{ problem }}&#10;&#10;{% endfor %}"
           {%- elif st.has_detail %}title="{% for line in st.detail %}{{ line }}&#10;&#10;{% endfor %}"{% endif %}>
-      {%- if problems %}Cannot read the form
-      {%- else %}{{ st.label }}{% endif %}
-      {%- if not problems and st.has_detail %} <span class="tc-why">?</span>{% endif %}
+      {%- if problems %}Invalid{% else %}{{ st.label }}{% endif %}
     </span>
   </div>
 
@@ -194,6 +192,16 @@
         Recorded {{ (screen.submitted_at | et).strftime('%Y-%m-%d %H:%M') }} ET
       {% else %}
         Not recorded yet
+      {% endif %}
+      {# **Not on the Valid/Invalid badge, and not gone either.** A REVIEW does not make a card
+         invalid, so it has no place in that verdict — but an unverified item rendering as
+         nothing is the failure this project guards against hardest, so the count sits here in
+         the open and the reasons are on its own tooltip. #}
+      {% if screen.review_count %}
+        <span class="tag-inline"
+              title="{% for line in screen.unverified_reasons %}{{ line }}&#10;&#10;{% endfor %}">
+          {{ screen.review_count }} unverified
+        </span>
       {% endif %}
     </span>
   </div>

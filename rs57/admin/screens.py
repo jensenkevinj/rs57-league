@@ -666,88 +666,77 @@ class TeamScreen:
 
     @property
     def status(self) -> CardStatus:
-        """One verdict for the whole card: colour, wording, and the reasons behind it.
+        """The card's one-word verdict: ``Valid``, ``Invalid``, or nothing checked yet.
 
-        **The selection/fee split survives the merge into one badge — in the wording.** It was
-        two badges because the offseason asks the two questions a day apart, and a combined
-        verdict called a card broken on deadline night when the keepers were settled and only
-        the fees were outstanding. That case is still not an error here: unallocated fees on a
-        legal selection read "fees not entered", in grey. What turns the badge red is a fee
-        spread somebody actually typed and got wrong, or an illegal selection — and the label
-        always says which half, so a bad fee never implies a bad selection.
+        **Errors only.** A REVIEW does not make a card invalid — it never blocked a claim and
+        calling it invalid would be false — so unverified items are not in this badge at all.
+        They are on the card's status line, in ``unverified_reasons``, which is where "Not
+        recorded yet" already lives. Nothing is dropped; the badge is just no longer the place
+        that carries it.
 
-        **"Not recorded" is carried alongside severity, not instead of it.** A card can be
-        unverified AND unsaved; the earlier pair could show one while hiding the other.
+        **The tooltip is populated only when it is Invalid**, because that is the only state
+        with anything to explain. A valid card's badge has no title attribute, so the cursor
+        does not change and there is nothing to hover for.
 
-        **A REVIEW is never silent.** Its explanation moves to the tooltip, but the count stays
-        in the badge text — an unverified item that renders as nothing until someone happens to
-        hover is the failure this project is built around. Hover hides the reason, never the
-        existence of one.
+        Whether the card has been *recorded* is a different question and is not in here either.
+        The status line answers it, and a card that is valid but unsaved says both — "Valid"
+        above, "Not recorded yet" below.
+
+        **There is deliberately no branch for the unrun fee check.** Above the keeper maximum
+        the tier is undefined and the engine raises no ``FEE_TOTAL_MISMATCH`` at all, which
+        would be silence reading as success — but that state cannot exist on its own: more than
+        ``MAX_KEEPERS`` keepers always raises ``TOO_MANY_KEEPERS``, so the card is already
+        Invalid and already says why. A second check for it was written here, could not be made
+        to fail under mutation, and was removed: an unreachable guard is worse than none,
+        because it reads like protection.
         """
         names = {row.espn_player_id: row.name for row in self.rows}
-        detail: list[str] = []
-        for issue in self.verdict_issues:
-            who = names.get(issue.espn_player_id)
-            severity = "ERROR" if issue.severity is Severity.ERROR else UNCHECKED
-            subject = f"{who} — " if who else ""
-            detail.append(f"{severity} · {issue.code}: {subject}{issue.message}")
-        for note in self.notes:
-            tag = {"error": "ERROR", "review": UNCHECKED}.get(note.kind, "FOR INFORMATION")
-            detail.append(f"{tag}: {note.message}")
-        reasons = tuple(detail)
-
-        selection_errors = [
-            i for i in self.selection_issues if i.severity is Severity.ERROR
+        errors = [i for i in self.verdict_issues if i.severity is Severity.ERROR]
+        detail = [
+            f"{issue.code}: "
+            f"{names[issue.espn_player_id] + ' — ' if names.get(issue.espn_player_id) else ''}"
+            f"{issue.message}"
+            for issue in errors
         ]
-        fee_errors = [i for i in self.fee_issues if i.severity is Severity.ERROR]
-        # **Counted team by team, shown in full.** A league-wide fact — an unrecorded
-        # consolation winner, a sync warning about the season — belongs in the tooltip of every
-        # card it touches, because that is where the number it affects is being read. It must
-        # NOT be counted on all twelve: twelve identical flags is how a real one stops being
-        # read, and the badge read "3 unverified" on every franchise before this line existed.
-        pending = len([i for i in self.verdict_issues if i.severity is Severity.REVIEW])
-        pending += len(
-            [n for n in self.notes if n.kind in ("review", "error") and n.team_specific]
-        )
-        # Nothing typed yet against a tier that expects something. That is the normal state of
-        # every card on deadline night, not a mistake anybody has made.
-        fees_untouched = self.total_fees == 0 and bool(self.fee_expected)
+        detail += [f"{note.message}" for note in self.notes if note.kind == "error"]
 
-        parts: list[str] = []
-        kind = "ok"
-        if selection_errors:
-            kind = "error"
-            parts.append(f"{len(selection_errors)} selection error(s)")
-        if fee_errors:
-            if fees_untouched:
-                parts.append("fees not entered")
-            else:
-                kind = "error"
-                parts.append(f"{len(fee_errors)} fee error(s)")
-        elif self.declared and self.fee_verdict == "skipped":
-            # Stated even when the selection is already red. Above the keeper maximum the tier
-            # is undefined and the engine raises no fee finding at all, so an unmentioned fee
-            # half reads as a fee half that passed — the check did not run, and the card has to
-            # say which of those it is regardless of what else is wrong with it.
-            parts.append("fees not checked")
-            if kind != "error":
-                kind = "review"
-        if pending:
-            parts.append(f"{pending} unverified")
-        if kind != "error" and parts:
-            kind = "review" if pending else "none"
-
-        # Whether anything is on file is its own fact and is stated first, never displaced by
-        # a finding. A card can be empty AND carry an unverified note, and an earlier pass
-        # printed only the note — so a card nobody had touched read the same as a saved one.
+        if detail:
+            return CardStatus("error", "Invalid", tuple(detail))
         if not self.declared:
-            parts.insert(0, "Not recorded" if self.selection_proposed else "Nothing declared")
-            if kind == "ok":
-                kind = "none"
-        elif not parts:
-            parts.append("Legal")
+            return CardStatus("none", "Not checked", ())
+        return CardStatus("ok", "Valid", ())
 
-        return CardStatus(kind, " · ".join(parts), reasons)
+    @property
+    def unverified_reasons(self) -> tuple[str, ...]:
+        """Everything nobody has checked, for the status line's own tag.
+
+        Kept off the Valid/Invalid badge because an unverified item is neither — but kept, and
+        counted, because an unverified thing rendering as nothing is what this project guards
+        against hardest.
+
+        League-wide facts are included here and excluded from ``review_count``: the note
+        belongs on every card whose numbers it affects, and the tally belongs to the franchise.
+        Twelve identical counts is how a real flag stops being read.
+        """
+        names = {row.espn_player_id: row.name for row in self.rows}
+        out = [
+            f"{UNCHECKED} · {issue.code}: "
+            f"{names[issue.espn_player_id] + ' — ' if names.get(issue.espn_player_id) else ''}"
+            f"{issue.message}"
+            for issue in self.verdict_issues
+            if issue.severity is Severity.REVIEW
+        ]
+        out += [
+            f"{UNCHECKED}: {note.message}"
+            for note in self.notes
+            if note.kind == "review"
+        ]
+        out += [
+            f"FOR INFORMATION: {note.message}"
+            for note in self.notes
+            if note.kind == "info"
+        ]
+        return tuple(out)
 
     @property
     def display_total_salary(self) -> int:

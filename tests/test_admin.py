@@ -862,7 +862,7 @@ def test_the_recorded_salary_is_frozen_at_submission(client, store: ManualStore,
     assert store.claims(SEASON)[0].computed_salary == 5 + KEEPER_TAX
 
     page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
-    body = " ".join(status_badge(page)[2].split())
+    body = all_reasons(page)
     assert "has NOT been" in body and "overwritten" in body
     assert "now prices at $104" in body
 
@@ -2584,22 +2584,40 @@ def status_badge(html: str) -> tuple[str, str, str]:
 
 
 def tooltip_lines(html: str) -> list[tuple[str, str]]:
-    """``(label, message)`` for every reason on the card's status badge.
+    """``(label, message)`` for every reason on the card, from BOTH of its tooltips.
 
-    The labels are what this asserts on. Notes and engine issues are two different sources and
+    The card has two: the Valid/Invalid badge carries what makes it invalid, and the status
+    line's "N unverified" tag carries what nobody has checked. A test asking "is this reason on
+    the card, labelled honestly" does not care which — and reading only one of them would let a
+    reason move between them unnoticed.
+
+    The labels are what this asserts on. Notes and engine issues are two different sources, and
     a regression in one is invisible if you only check that the word "unverified" is somewhere
-    on the page — which is exactly how a mutation rendering every note as information once
-    passed.
+    on the page — which is how a mutation rendering every note as information once passed.
     """
-    _, _, title = status_badge(html)
+    titles = [status_badge(html)[2]]
+    titles += re.findall(
+        r'<span class="tag-inline"\s+title="(.*?)"', html, re.S
+    )
     out = []
-    for chunk in title.split("&#10;&#10;"):
+    for chunk in "&#10;&#10;".join(titles).split("&#10;&#10;"):
         chunk = " ".join(chunk.split())
         if not chunk or ":" not in chunk:
             continue
         label, _, message = chunk.partition(":")
         out.append((label.strip(), message.strip()))
     return out
+
+
+def all_reasons(html: str) -> str:
+    """Every reason on the card as one string, whichever tooltip it is on."""
+    return " ".join(f"{label}: {message}" for label, message in tooltip_lines(html))
+
+
+def unverified_count(html: str) -> int:
+    """What the card's status line says nobody has checked, or 0 when it says nothing."""
+    m = re.search(r"(\d+) unverified", html)
+    return int(m.group(1)) if m else 0
 
 
 def _badges(client, *claims, manager="t1"):
@@ -2617,18 +2635,20 @@ def test_a_legal_selection_reads_legal_before_any_fee_is_typed(client):
     is allocated yet — on the one night when who is kept is the only actionable fact.
     """
     css, label, tooltip = _badges(client, (TAXED, "K1", 0), (PLAIN, "K2", 0))
-    assert "bad" not in css.split(), "a settled selection with no fees typed is not broken"
-    assert "fees not entered" in label, "and the outstanding fees are still stated"
-    assert "selection error" not in label, "nothing is wrong with who was picked"
-    assert "fee" in tooltip.lower(), "the reason is on the badge, not nowhere"
+    assert label == "Invalid", "the tier for two keepers is $5 and nothing is allocated"
+    assert "bad" in css.split()
+    assert "expected $5 for 2 keepers" in tooltip, (
+        "and the badge must say what is wrong, since the card no longer prints it"
+    )
+    assert "who was picked" not in tooltip.lower()
 
 
 def test_a_fee_problem_does_not_make_the_selection_look_illegal(client):
     """The whole point of splitting them: a bad fee spread says nothing about who was picked."""
-    css, label, _ = _badges(client, (TAXED, "K1", 99), (PLAIN, "K2", 0))
-    assert "bad" in css.split(), "a spread somebody typed and got wrong is an error"
-    assert "1 fee error(s)" in label, "and the label says which half is wrong"
-    assert "selection error" not in label, "a bad fee says nothing about who was picked"
+    css, label, tooltip = _badges(client, (TAXED, "K1", 99), (PLAIN, "K2", 0))
+    assert (label, "bad" in css.split()) == ("Invalid", True)
+    assert "fee_total_mismatch" in tooltip, "the tooltip names the fee rule that was broken"
+    assert "too_many_keepers" not in tooltip, "a bad fee says nothing about who was picked"
 
 
 def test_an_illegal_selection_does_not_make_the_fees_look_wrong(client):
@@ -2637,10 +2657,10 @@ def test_an_illegal_selection_does_not_make_the_fees_look_wrong(client):
     One keeper owes a $0 tier and $0 is allocated, so the money on this card is genuinely
     correct while the selection is genuinely not.
     """
-    css, label, _ = _badges(client, (TAXED, "K1", 0), (LATE, "PROSPECT", 0))
-    assert "bad" in css.split()
-    assert re.search(r"\d+ selection error", label), "an ineligible prospect is a selection error"
-    assert "fee error" not in label, "one keeper owes $0 and $0 is allocated"
+    css, label, tooltip = _badges(client, (TAXED, "K1", 0), (LATE, "PROSPECT", 0))
+    assert (label, "bad" in css.split()) == ("Invalid", True)
+    assert "prospect_acquired_after_deadline" in tooltip
+    assert "fee_total_mismatch" not in tooltip, "one keeper owes $0 and $0 is allocated"
 
 
 def test_a_form_that_cannot_be_read_reports_neither_verdict(client):
@@ -2650,10 +2670,10 @@ def test_a_form_that_cannot_be_read_reports_neither_verdict(client):
     priced claims are not what was typed. A badge reading "legal" beside a "Cannot read the
     form" flag is the card contradicting itself.
     """
-    css, label, _ = _badges(client, (TAXED, "K1", 5), (TAXED, "K2", 0))
-    assert "Cannot read the form" == label, "the badge reports the form, not the engine"
-    assert "bad" in css.split()
-    assert "legal" not in label.lower(), "no verdict on claims nobody entered"
+    css, label, tooltip = _badges(client, (TAXED, "K1", 5), (TAXED, "K2", 0))
+    assert (label, "bad" in css.split()) == ("Invalid", True)
+    assert "pick him once" in tooltip, "the badge says what could not be read"
+    assert "valid" != label.lower(), "no pass on claims nobody entered"
 
 
 def test_an_over_cap_selection_reports_the_fees_as_not_checked(
@@ -2682,16 +2702,20 @@ def test_an_over_cap_selection_reports_the_fees_as_not_checked(
     assert screen.fee_expected is None, "the tier is undefined above the cap"
     assert screen.fee_verdict == "skipped", "a check that did not run must not read as passed"
     assert screen.selection_verdict == "error"
+    # The card is protected by the selection error, not by a second check on the fee half:
+    # over the maximum ALWAYS raises TOO_MANY_KEEPERS, so "the fee check did not run" cannot
+    # occur on a card that would otherwise read Valid. Asserted so the pairing stays true.
+    assert screen.status.label == "Invalid"
 
     # And it has to reach the screen. The template maps "skipped" onto the same wording as an
     # unreadable form; drop that branch and it falls through to "none yet", which is the
     # unchecked state wearing the wording of a card nobody has touched.
     store.save_team_claims(SEASON, "t1", claims)
     page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
-    css, label, _ = status_badge(page)
-    assert "fees not checked" in label, "a check that did not run must say so"
-    assert "ok" not in css.split(), "and it is never green"
-    assert "Legal" not in label
+    css, label, tooltip = status_badge(page)
+    assert "ok" not in css.split(), "a check that did not run is never green"
+    assert label != "Valid", "silence must not read as success"
+    assert "too_many_keepers" in tooltip, "and the card says why it is not"
 
 
 def test_an_empty_card_claims_neither_verdict(client, data_dir: Path):
@@ -2702,9 +2726,11 @@ def test_an_empty_card_claims_neither_verdict(client, data_dir: Path):
     """
     write_full_roster(data_dir)
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
-    _, label, _ = status_badge(page)
-    assert label.startswith("Nothing declared")
-    assert "Legal" not in label
+    css, label, tooltip = status_badge(page)
+    assert label == "Not checked", "nothing declared is not a verdict"
+    assert "ok" not in css.split()
+    assert tooltip == "", "there is nothing to explain about a card nobody has touched"
+    assert "Not recorded yet" in text(page), "and the status line still says it is unsaved"
 
 
 def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
@@ -2720,9 +2746,11 @@ def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
     css, label, _ = status_badge(page)
-    assert "Not recorded" in label, "a pre-filled card must say it has not been saved"
     assert "ok" not in css.split(), "an unrecorded card must never read as checked"
-    assert "Nothing declared" not in label, "the slots are full; the badge said empty"
+    # The badge is the engine's verdict now and says nothing about saving. The status line is
+    # what carries that, and it has to, or a pre-filled card is indistinguishable from a saved
+    # one — twelve of those is a Record that was never pressed.
+    assert "Not recorded yet" in text(page)
 
 
 def test_every_row_of_the_card_has_the_same_number_of_cells(client):
@@ -2831,13 +2859,10 @@ def test_a_proposed_verdict_is_never_styled_as_a_passing_one(client):
     taken for one at a glance.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
-    badges = re.findall(
-        r'<span class="tc-status tag-inline([^"]*)"[^>]*>(?:(?!</span>).)*?Not recorded',
-        page, re.S,
-    )
-    assert badges, "no unrecorded card on a pruned board"
+    badges = re.findall(r'<span class="tc-status tag-inline([^"]*)"', page)
+    assert badges, "no cards on the board"
     for css in badges:
-        assert "ok" not in css.split(), f"a proposed verdict rendered as passing: {css!r}"
+        assert "ok" not in css.split(), f"an unrecorded card rendered as passing: {css!r}"
 
 
 def test_a_league_wide_note_is_not_counted_against_every_franchise(
@@ -2864,14 +2889,12 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
     team_only = [n for n in unverified if n.team_specific]
     assert len(unverified) > len(team_only), "the fixture needs a league-wide note"
 
-    tallied = re.search(r"(\d+) unverified", screen.status.label)
-    counted = int(tallied.group(1)) if tallied else 0
     reviews = len([i for i in screen.verdict_issues if i.severity is Severity.REVIEW])
-    assert counted == reviews + len(team_only), (
-        f"the badge counted {counted} against {reviews} review(s) and "
+    assert screen.review_count == reviews + len(team_only), (
+        f"the card counted {screen.review_count} against {reviews} review(s) and "
         f"{len(team_only)} team note(s) — a league-wide fact was tallied per franchise"
     )
-    assert any("has not been drafted" in line for line in screen.status.detail), (
+    assert any("has not been drafted" in line for line in screen.unverified_reasons), (
         "and it must still be readable on the card it affects"
     )
 
@@ -2886,10 +2909,11 @@ def test_the_badge_counts_agree_with_the_status_line(client):
         f"/season/{SEASON}/team/t1/preview",
         data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0), manager="t1"),
     ).get_data(as_text=True)
-    _, label, _ = status_badge(body)
-    badge = int(re.search(r"(\d+) selection error", label).group(1))
+    _, label, tooltip = status_badge(body)
+    assert label == "Invalid"
+    reasons = len([c for c in tooltip.split("&#10;&#10;") if c.strip()])
     status = int(re.search(r"(\d+) error\(s\) — not recorded", text(body)).group(1))
-    assert badge == status, "one card, one meaning of 'error'"
+    assert reasons == status, "one card, one meaning of 'error'"
 
 
 def test_every_engine_finding_lands_on_exactly_one_badge(data_dir: Path, store: ManualStore):
@@ -3100,7 +3124,7 @@ def test_a_claim_before_the_deadline_is_recorded_and_flagged_provisional(
 
     assert len(store.claims(SEASON)) == 1, "a claim before the deadline is recorded"
     page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
-    reasons = " ".join(status_badge(page)[2].split())
+    reasons = all_reasons(page)
     assert "Provisional until you re-record" in reasons
     assert "so managers could still change their minds" in reasons
 
