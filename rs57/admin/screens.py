@@ -531,6 +531,35 @@ class PlayerRow:
         return bool(self.slot)
 
 
+UNCHECKED = "UNVERIFIED — nobody has checked this"
+"""How a REVIEW is labelled wherever it is shown.
+
+The long form, deliberately. It was the wording on the flags this badge replaced, and it is
+the sentence that stops a reader skimming past an item as though somebody had looked at it."""
+
+
+@dataclass(frozen=True)
+class CardStatus:
+    """The one badge a card carries, and everything behind it.
+
+    Replaces two badges and two stacks of flags under the table. The card is scanned twelve at
+    a time, and the question being asked of it at a glance is one question: is this franchise
+    finished, broken, or waiting on me.
+
+    ``kind`` is ``ok`` / ``error`` / ``review`` / ``none`` and drives the colour. ``detail``
+    is every issue and every note, in full — nothing is dropped on the way into the tooltip,
+    only moved.
+    """
+
+    kind: str
+    label: str
+    detail: tuple[str, ...]
+
+    @property
+    def has_detail(self) -> bool:
+        return bool(self.detail)
+
+
 @dataclass(frozen=True)
 class SlotRow:
     """One line of the card: a slot, who is in it, and what he costs THERE.
@@ -634,6 +663,91 @@ class TeamScreen:
     @property
     def fee_error_count(self) -> int:
         return len([i for i in self.fee_issues if i.severity is Severity.ERROR])
+
+    @property
+    def status(self) -> CardStatus:
+        """One verdict for the whole card: colour, wording, and the reasons behind it.
+
+        **The selection/fee split survives the merge into one badge — in the wording.** It was
+        two badges because the offseason asks the two questions a day apart, and a combined
+        verdict called a card broken on deadline night when the keepers were settled and only
+        the fees were outstanding. That case is still not an error here: unallocated fees on a
+        legal selection read "fees not entered", in grey. What turns the badge red is a fee
+        spread somebody actually typed and got wrong, or an illegal selection — and the label
+        always says which half, so a bad fee never implies a bad selection.
+
+        **"Not recorded" is carried alongside severity, not instead of it.** A card can be
+        unverified AND unsaved; the earlier pair could show one while hiding the other.
+
+        **A REVIEW is never silent.** Its explanation moves to the tooltip, but the count stays
+        in the badge text — an unverified item that renders as nothing until someone happens to
+        hover is the failure this project is built around. Hover hides the reason, never the
+        existence of one.
+        """
+        names = {row.espn_player_id: row.name for row in self.rows}
+        detail: list[str] = []
+        for issue in self.verdict_issues:
+            who = names.get(issue.espn_player_id)
+            severity = "ERROR" if issue.severity is Severity.ERROR else UNCHECKED
+            subject = f"{who} — " if who else ""
+            detail.append(f"{severity} · {issue.code}: {subject}{issue.message}")
+        for note in self.notes:
+            tag = {"error": "ERROR", "review": UNCHECKED}.get(note.kind, "FOR INFORMATION")
+            detail.append(f"{tag}: {note.message}")
+        reasons = tuple(detail)
+
+        selection_errors = [
+            i for i in self.selection_issues if i.severity is Severity.ERROR
+        ]
+        fee_errors = [i for i in self.fee_issues if i.severity is Severity.ERROR]
+        # **Counted team by team, shown in full.** A league-wide fact — an unrecorded
+        # consolation winner, a sync warning about the season — belongs in the tooltip of every
+        # card it touches, because that is where the number it affects is being read. It must
+        # NOT be counted on all twelve: twelve identical flags is how a real one stops being
+        # read, and the badge read "3 unverified" on every franchise before this line existed.
+        pending = len([i for i in self.verdict_issues if i.severity is Severity.REVIEW])
+        pending += len(
+            [n for n in self.notes if n.kind in ("review", "error") and n.team_specific]
+        )
+        # Nothing typed yet against a tier that expects something. That is the normal state of
+        # every card on deadline night, not a mistake anybody has made.
+        fees_untouched = self.total_fees == 0 and bool(self.fee_expected)
+
+        parts: list[str] = []
+        kind = "ok"
+        if selection_errors:
+            kind = "error"
+            parts.append(f"{len(selection_errors)} selection error(s)")
+        if fee_errors:
+            if fees_untouched:
+                parts.append("fees not entered")
+            else:
+                kind = "error"
+                parts.append(f"{len(fee_errors)} fee error(s)")
+        elif self.declared and self.fee_verdict == "skipped":
+            # Stated even when the selection is already red. Above the keeper maximum the tier
+            # is undefined and the engine raises no fee finding at all, so an unmentioned fee
+            # half reads as a fee half that passed — the check did not run, and the card has to
+            # say which of those it is regardless of what else is wrong with it.
+            parts.append("fees not checked")
+            if kind != "error":
+                kind = "review"
+        if pending:
+            parts.append(f"{pending} unverified")
+        if kind != "error" and parts:
+            kind = "review" if pending else "none"
+
+        # Whether anything is on file is its own fact and is stated first, never displaced by
+        # a finding. A card can be empty AND carry an unverified note, and an earlier pass
+        # printed only the note — so a card nobody had touched read the same as a saved one.
+        if not self.declared:
+            parts.insert(0, "Not recorded" if self.selection_proposed else "Nothing declared")
+            if kind == "ok":
+                kind = "none"
+        elif not parts:
+            parts.append("Legal")
+
+        return CardStatus(kind, " · ".join(parts), reasons)
 
     @property
     def display_total_salary(self) -> int:

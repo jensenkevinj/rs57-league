@@ -35,6 +35,7 @@ from rs57.admin.reconcile import (
     verify,
 )
 from rs57.admin.screens import (
+    UNCHECKED,
     SLOT_CHOICES,
     KeeperDeadline,
     build_season_screen,
@@ -456,10 +457,24 @@ def test_a_review_never_renders_as_checked(client):
         f"/season/{SEASON}/team/t1",
         data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0)),
     ).get_data(as_text=True)
-    body = text(page).lower()
+    reasons = tooltip_lines(page)
+    body = " ".join(f"{label} {message}" for label, message in reasons).lower()
     assert "prospect rule 1" in body, "the rookie rule cannot be checked and must say so"
     assert "unverified" in body
-    assert "nobody has checked this" in body
+    assert "nobody has checked this" in body, (
+        "the emphatic wording is what stops a reader skimming past an unchecked item"
+    )
+    # **Both paths, named separately.** Engine issues and screen notes are labelled by two
+    # different lines of code, and asserting the phrase appears *somewhere* lets either regress
+    # behind the other — mutation is what showed that, so each is now pinned by something only
+    # it produces: an issue carries its IssueCode, a note never does.
+    issues = [label for label, _ in reasons if "prospect_rookie_unverified" in label]
+    assert issues, "the fixture must raise an unverifiable prospect for this to prove anything"
+    assert all("nobody has checked this" in label for label in issues), (
+        f"an engine REVIEW is labelled {issues} — it must not read as merely informational"
+    )
+    notes = [label for label, _ in reasons if label == UNCHECKED]
+    assert notes, "a screen note must carry the same wording as an engine review"
 
 
 def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path):
@@ -484,10 +499,12 @@ def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path)
     page = app.test_client().get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
 
     warned = [
-        (label, message) for label, message in tagged_flags(page) if "has not been drafted" in message
+        (label, message)
+        for label, message in tooltip_lines(page)
+        if "has not been drafted" in message
     ]
     assert warned, "the sync's warning is not on the commissioner's screen at all"
-    assert all("Unverified" in label for label in (label for label, _ in warned)), (
+    assert all("UNVERIFIED" in label for label, _ in warned), (
         f"the sync warning is labelled {[label for label, _ in warned]} — it has not been checked"
     )
 
@@ -515,15 +532,15 @@ def test_an_unverified_note_is_labelled_where_it_appears(client):
         data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0)),
     ).get_data(as_text=True)
 
-    flags = tagged_flags(page)
+    flags = tooltip_lines(page)
     rule_one = [label for label, message in flags if "Prospect rule 1" in message]
-    assert rule_one, "the un-checkable prospect rule is not on the page at all"
-    assert all("Unverified" in label for label in rule_one), (
+    assert rule_one, "the un-checkable prospect rule is not on the badge at all"
+    assert all("UNVERIFIED" in label for label in rule_one), (
         f"an unverified note is labelled {rule_one} — it must not read as information"
     )
 
     waiver = [label for label, message in flags if "priced IN FULL" in message]
-    assert waiver and all("Unverified" in label for label in waiver)
+    assert waiver and all("UNVERIFIED" in label for label in waiver)
 
 
 def test_a_review_does_not_block_the_save(client, store: ManualStore):
@@ -845,7 +862,7 @@ def test_the_recorded_salary_is_frozen_at_submission(client, store: ManualStore,
     assert store.claims(SEASON)[0].computed_salary == 5 + KEEPER_TAX
 
     page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
-    body = text(page)
+    body = " ".join(status_badge(page)[2].split())
     assert "has NOT been" in body and "overwritten" in body
     assert "now prices at $104" in body
 
@@ -2547,12 +2564,50 @@ def test_a_future_deadline_disables_nothing(client, data_dir: Path):
 # ---------------------------------------------------------------------------
 
 
+_STATUS = re.compile(r'<span class="tc-status tag-inline([^"]*)"([^>]*)>(.*?)</span>', re.S)
+
+
+def status_badge(html: str) -> tuple[str, str, str]:
+    """``(css, label, tooltip)`` of a card's one status badge.
+
+    The reasons live in a ``title`` attribute now, which ``text()`` strips — so a test that
+    wants them has to read the markup. That is the point of returning all three together: the
+    colour, what it says, and what it says on hover cannot be asserted from different places
+    and drift apart.
+    """
+    m = _STATUS.search(html)
+    assert m, "the card has no status badge"
+    css, attrs, inner = m.groups()
+    title = re.search(r'title="(.*?)"', attrs, re.S)
+    label = re.sub(r"<[^>]+>", "", inner)
+    return css.strip(), " ".join(label.split()), (title.group(1) if title else "")
+
+
+def tooltip_lines(html: str) -> list[tuple[str, str]]:
+    """``(label, message)`` for every reason on the card's status badge.
+
+    The labels are what this asserts on. Notes and engine issues are two different sources and
+    a regression in one is invisible if you only check that the word "unverified" is somewhere
+    on the page — which is exactly how a mutation rendering every note as information once
+    passed.
+    """
+    _, _, title = status_badge(html)
+    out = []
+    for chunk in title.split("&#10;&#10;"):
+        chunk = " ".join(chunk.split())
+        if not chunk or ":" not in chunk:
+            continue
+        label, _, message = chunk.partition(":")
+        out.append((label.strip(), message.strip()))
+    return out
+
+
 def _badges(client, *claims, manager="t1"):
-    """Price a card through the preview route and return its rendered badge text."""
+    """Price a card through the preview route and return its status badge."""
     body = client.post(
         f"/season/{SEASON}/team/{manager}/preview", data=form(*claims, manager=manager)
     ).get_data(as_text=True)
-    return text(body)
+    return status_badge(body)
 
 
 def test_a_legal_selection_reads_legal_before_any_fee_is_typed(client):
@@ -2561,16 +2616,19 @@ def test_a_legal_selection_reads_legal_before_any_fee_is_typed(client):
     One combined verdict called this card broken — the tier for two keepers is $5 and nothing
     is allocated yet — on the one night when who is kept is the only actionable fact.
     """
-    flat = _badges(client, (TAXED, "K1", 0), (PLAIN, "K2", 0))
-    assert "Selection: legal" in flat, "two rostered keepers is a legal selection"
-    assert "Fees: 1 error(s)" in flat, "and the fee tier is separately, visibly, unmet"
+    css, label, tooltip = _badges(client, (TAXED, "K1", 0), (PLAIN, "K2", 0))
+    assert "bad" not in css.split(), "a settled selection with no fees typed is not broken"
+    assert "fees not entered" in label, "and the outstanding fees are still stated"
+    assert "selection error" not in label, "nothing is wrong with who was picked"
+    assert "fee" in tooltip.lower(), "the reason is on the badge, not nowhere"
 
 
 def test_a_fee_problem_does_not_make_the_selection_look_illegal(client):
     """The whole point of splitting them: a bad fee spread says nothing about who was picked."""
-    flat = _badges(client, (TAXED, "K1", 99), (PLAIN, "K2", 0))
-    assert "Selection: legal" in flat
-    assert "Fees: 1 error(s)" in flat
+    css, label, _ = _badges(client, (TAXED, "K1", 99), (PLAIN, "K2", 0))
+    assert "bad" in css.split(), "a spread somebody typed and got wrong is an error"
+    assert "1 fee error(s)" in label, "and the label says which half is wrong"
+    assert "selection error" not in label, "a bad fee says nothing about who was picked"
 
 
 def test_an_illegal_selection_does_not_make_the_fees_look_wrong(client):
@@ -2579,9 +2637,10 @@ def test_an_illegal_selection_does_not_make_the_fees_look_wrong(client):
     One keeper owes a $0 tier and $0 is allocated, so the money on this card is genuinely
     correct while the selection is genuinely not.
     """
-    flat = _badges(client, (TAXED, "K1", 0), (LATE, "PROSPECT", 0))
-    assert re.search(r"Selection: \d+ error", flat), "an ineligible prospect is a selection error"
-    assert "Fees: legal" in flat, "and the money side of this card is correct"
+    css, label, _ = _badges(client, (TAXED, "K1", 0), (LATE, "PROSPECT", 0))
+    assert "bad" in css.split()
+    assert re.search(r"\d+ selection error", label), "an ineligible prospect is a selection error"
+    assert "fee error" not in label, "one keeper owes $0 and $0 is allocated"
 
 
 def test_a_form_that_cannot_be_read_reports_neither_verdict(client):
@@ -2591,10 +2650,10 @@ def test_a_form_that_cannot_be_read_reports_neither_verdict(client):
     priced claims are not what was typed. A badge reading "legal" beside a "Cannot read the
     form" flag is the card contradicting itself.
     """
-    flat = _badges(client, (TAXED, "K1", 5), (TAXED, "K2", 0))
-    assert "Cannot read the form" in flat
-    assert "Selection: not checked" in flat and "Fees: not checked" in flat
-    assert "legal" not in flat
+    css, label, _ = _badges(client, (TAXED, "K1", 5), (TAXED, "K2", 0))
+    assert "Cannot read the form" == label, "the badge reports the form, not the engine"
+    assert "bad" in css.split()
+    assert "legal" not in label.lower(), "no verdict on claims nobody entered"
 
 
 def test_an_over_cap_selection_reports_the_fees_as_not_checked(
@@ -2628,9 +2687,11 @@ def test_an_over_cap_selection_reports_the_fees_as_not_checked(
     # unreadable form; drop that branch and it falls through to "none yet", which is the
     # unchecked state wearing the wording of a card nobody has touched.
     store.save_team_claims(SEASON, "t1", claims)
-    page = text(client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True))
-    assert "Fees: not checked" in page
-    assert "Fees: none yet" not in page and "Fees: legal" not in page
+    page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    css, label, _ = status_badge(page)
+    assert "fees not checked" in label, "a check that did not run must say so"
+    assert "ok" not in css.split(), "and it is never green"
+    assert "Legal" not in label
 
 
 def test_an_empty_card_claims_neither_verdict(client, data_dir: Path):
@@ -2640,10 +2701,10 @@ def test_an_empty_card_claims_neither_verdict(client, data_dir: Path):
     one carries ESPN's own answer and is judged on it — see the test below.
     """
     write_full_roster(data_dir)
-    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
-    assert "Selection: nothing declared" in page
-    assert "Fees: none yet" in page
-    assert "Selection: legal" not in page
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    _, label, _ = status_badge(page)
+    assert label.startswith("Nothing declared")
+    assert "Legal" not in label
 
 
 def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
@@ -2657,12 +2718,11 @@ def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
     The fee half deliberately does NOT follow. Nobody has typed a fee yet, so a pre-filled card
     would otherwise open with a red shortfall for money the workflow collects afterwards.
     """
-    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))  # fixture is 4 deep
-    assert "Selection: from ESPN" in page
-    assert "not recorded" in page
-    assert "Selection: legal" not in page, "an unrecorded card must never read as checked"
-    assert "Selection: nothing declared" not in page, "the slots are full; the badge said empty"
-    assert "Fees: none yet" in page, "fees are entered after the selection, not proposed"
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
+    css, label, _ = status_badge(page)
+    assert "Not recorded" in label, "a pre-filled card must say it has not been saved"
+    assert "ok" not in css.split(), "an unrecorded card must never read as checked"
+    assert "Nothing declared" not in label, "the slots are full; the badge said empty"
 
 
 def test_every_row_of_the_card_has_the_same_number_of_cells(client):
@@ -2771,10 +2831,49 @@ def test_a_proposed_verdict_is_never_styled_as_a_passing_one(client):
     taken for one at a glance.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
-    badges = re.findall(r'<span class="(tag-inline[^"]*)"[^>]*>\s*Selection: from ESPN', page)
-    assert badges, "no proposed Selection badge on a pruned card"
+    badges = re.findall(
+        r'<span class="tc-status tag-inline([^"]*)"[^>]*>(?:(?!</span>).)*?Not recorded',
+        page, re.S,
+    )
+    assert badges, "no unrecorded card on a pruned board"
     for css in badges:
         assert "ok" not in css.split(), f"a proposed verdict rendered as passing: {css!r}"
+
+
+def test_a_league_wide_note_is_not_counted_against_every_franchise(
+    data_dir: Path, store: ManualStore
+):
+    """It belongs in each card's tooltip and in nobody's tally.
+
+    A sync warning is one fact about the season. Counted per card it made all twelve badges
+    read the same number, which is exactly how a real flag stops being read — and is what the
+    count did on its first pass here.
+
+    The note still reaches the card, because a card is where the number it affects is read.
+    Only the tally is per franchise.
+    """
+    doc = keeper_doc()
+    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
+    (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store
+    )
+    unverified = [n for n in screen.notes if n.kind in ("review", "error")]
+    team_only = [n for n in unverified if n.team_specific]
+    assert len(unverified) > len(team_only), "the fixture needs a league-wide note"
+
+    tallied = re.search(r"(\d+) unverified", screen.status.label)
+    counted = int(tallied.group(1)) if tallied else 0
+    reviews = len([i for i in screen.verdict_issues if i.severity is Severity.REVIEW])
+    assert counted == reviews + len(team_only), (
+        f"the badge counted {counted} against {reviews} review(s) and "
+        f"{len(team_only)} team note(s) — a league-wide fact was tallied per franchise"
+    )
+    assert any("has not been drafted" in line for line in screen.status.detail), (
+        "and it must still be readable on the card it affects"
+    )
 
 
 def test_the_badge_counts_agree_with_the_status_line(client):
@@ -2783,9 +2882,13 @@ def test_the_badge_counts_agree_with_the_status_line(client):
     The badge first printed every selection issue, REVIEWs included, so a card read "Selection:
     2 error(s)" directly above "1 error(s) — not recorded".
     """
-    flat = _badges(client, (TAXED, "K1", 0), (LATE, "PROSPECT", 0))
-    badge = int(re.search(r"Selection: (\d+) error", flat).group(1))
-    status = int(re.search(r"(\d+) error\(s\) — not recorded", flat).group(1))
+    body = client.post(
+        f"/season/{SEASON}/team/t1/preview",
+        data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0), manager="t1"),
+    ).get_data(as_text=True)
+    _, label, _ = status_badge(body)
+    badge = int(re.search(r"(\d+) selection error", label).group(1))
+    status = int(re.search(r"(\d+) error\(s\) — not recorded", text(body)).group(1))
     assert badge == status, "one card, one meaning of 'error'"
 
 
@@ -2996,9 +3099,10 @@ def test_a_claim_before_the_deadline_is_recorded_and_flagged_provisional(
     ).get_data(as_text=True)
 
     assert len(store.claims(SEASON)) == 1, "a claim before the deadline is recorded"
-    page = text(client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True))
-    assert "Provisional until you re-record" in page
-    assert "so managers could still change their minds" in page
+    page = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    reasons = " ".join(status_badge(page)[2].split())
+    assert "Provisional until you re-record" in reasons
+    assert "so managers could still change their minds" in reasons
 
 
 def test_a_claim_after_the_deadline_is_not_called_provisional(

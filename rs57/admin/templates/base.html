@@ -218,7 +218,17 @@
   .tc-name { font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; }
   .tc-name a { color: var(--ink); text-decoration: none; }
   .tc-name a:hover { color: var(--accent); }
-  .tc-head .spin { margin-left: auto; }
+  /* The badge takes the free space, so it sits hard right whatever the franchise is called.
+     `.spin` must NOT also claim it: the first `auto` margin in a flex row absorbs everything,
+     and with it on the spinner the badge came to rest against the team name instead. */
+  .tc-head .spin { margin-left: 0; }
+  .tc-status { margin-left: auto; }
+  /* Hover is for the reason, so say that a reason exists. Without it a badge with a tooltip
+     and one without are indistinguishable until you happen to mouse over the right one. */
+  .tc-status .tc-why {
+    display: inline-block; margin-left: 0.2rem; opacity: 0.65; font-weight: 700;
+  }
+  .tc-status[title] { cursor: help; }
   .team-card .tc-table th { background: transparent; padding: 0.4rem 0.3rem; }
   .team-card .tc-table td { padding: 0.3rem 0.3rem; border-bottom: 1px solid var(--line); }
   /* No rule under the total row — the card's own edge already closes the table. The generic

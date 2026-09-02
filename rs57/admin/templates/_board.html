@@ -38,7 +38,7 @@
 
   <div class="team-grid">
     {% for team in screen.teams %}
-      {% with screen = team, problems = [], detailed = false %}
+      {% with screen = team, problems = [] %}
         {% include "_claim_form.html" %}
       {% endwith %}
     {% endfor %}

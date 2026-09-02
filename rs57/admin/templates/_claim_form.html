@@ -16,14 +16,13 @@
 {% set players = {} %}
 {% for row in screen.rows %}{% set _ = players.update({row.espn_player_id: row.name}) %}{% endfor %}
 {% set form_id = 'claim-form-' ~ screen.manager_id %}
-{# The grid renders twelve cards and passes detailed=false, so it stays scannable. Everything
-   else — the team page, and the fragment htmx swaps back after an edit — defaults to True.
+{# There is no `detailed` switch any more. It chose between printing the notes under the
+   table and leaving them off, and the notes now live in the status badge's tooltip in every
+   view — so there is nothing left for it to pick between.
 
-   That default is the important half. A card that dropped its notes would drop REVIEW items
-   with them, and an unverified thing rendering as nothing is the one failure this project
-   keeps guarding against. So the card you are actually working on always shows them; only the
-   eleven you are not looking at stay quiet. #}
-{% set detailed = detailed if detailed is defined else True %}
+   What it was guarding still holds and is guarded elsewhere: an unverified item must never
+   render as nothing. `CardStatus` keeps the COUNT in the badge text for exactly that reason.
+   Hover hides the explanation; it never hides that there is one. #}
 
 {# A div, not a form: the board wraps all twelve in one form so a single button can record the
    league. Live pricing still posts this card alone — hx-include="closest .team-card" — so a
@@ -42,51 +41,28 @@
     </span>
     {% if screen.fees_waived %}<span class="tag-inline ok">fees waived</span>{% endif %}
     <span class="spin">…</span>
-  </div>
+    {# **One badge, and it is the whole verdict.** The engine's issues and the card's notes are
+       in its tooltip rather than stacked under the table — twelve cards of flags could not be
+       scanned, which is what the board is for.
 
-  {# **Two verdicts, not one.** The offseason asks the two questions a day apart: the keeper
-     deadline settles who is kept, and the fee breakdowns arrive after it. One combined badge
-     made a card with a perfectly legal set of keepers and no fees typed yet read as broken on
-     the night when the selection is the only thing anybody can act on.
+       The COUNT stays in the badge text even though the reason moves to hover. An unverified
+       item that renders as nothing until someone happens to mouse over it is exactly the
+       silence this project keeps guarding against; what hover hides is the explanation, never
+       the fact that there is one.
 
-     Both come straight off `keeper_rules` — `selection_issues` and `fee_issues` partition the
-     engine's own findings, so neither badge can disagree with the errors listed below it.
-
-     "not checked" is a real state and is never green. Over the keeper maximum the fee tier is
-     undefined, so the engine raises no fee finding at all — an empty list there means the
-     check did not run, and a green badge would be silence reading as success. #}
-  {# When the form itself could not be read, the claims that reached the engine are not what
-     was typed — so neither verdict is about the card in front of you. Both stand down rather
-     than reporting on a set of claims nobody entered. The "Cannot read the form" flag above
-     says which field. #}
-  <div class="tc-verdicts">
-    {# **A proposed verdict is never green.** After the prune a pre-filled card looks finished,
-       so a green badge would read exactly like a recorded one — twelve of those and the
-       commissioner presses Record believing the work is already saved. It carries its own
-       "from ESPN" prefix and stays neutral, whatever the engine made of it. #}
-    {% set sv = 'unreadable' if problems else screen.selection_verdict %}
-    {% set proposed = screen.selection_proposed and not problems %}
-    <span class="tag-inline{% if proposed %} flat{% elif sv == 'ok' %} ok{% elif sv == 'error' %} bad{% elif sv == 'none' %} flat{% endif %}"
-          title="{% if proposed %}Filled from ESPN's kept players. Nothing is recorded until you press Record.&#10;{% endif %}{% for issue in screen.selection_issues %}{{ issue.message }}&#10;{% endfor %}">
-      Selection:
-      {%- if proposed %} from ESPN,
-        {%- if sv == 'ok' %} legal — not recorded
-        {%- elif sv == 'error' %} {{ screen.selection_error_count }} error(s)
-        {%- else %} unverified{% endif %}
-      {%- elif sv == 'ok' %} legal
-      {%- elif sv == 'error' %} {{ screen.selection_error_count }} error(s)
-      {%- elif sv == 'review' %} unverified
-      {%- elif sv == 'unreadable' %} not checked
-      {%- else %} nothing declared{% endif %}
-    </span>
-    {% set fv = 'unreadable' if problems else screen.fee_verdict %}
-    <span class="tag-inline{% if fv == 'ok' %} ok{% elif fv == 'error' %} bad{% elif fv == 'none' %} flat{% endif %}"
-          title="{% for issue in screen.fee_issues %}{{ issue.message }}&#10;{% endfor %}">
-      Fees:
-      {%- if fv == 'ok' %} legal
-      {%- elif fv == 'error' %} {{ screen.fee_error_count }} error(s)
-      {%- elif fv == 'skipped' or fv == 'unreadable' %} not checked
-      {%- else %} none yet{% endif %}
+       When the form could not be read, the card is not showing what was typed, so the badge
+       reports that instead of the engine's opinion of claims nobody entered. #}
+    {% set st = screen.status %}
+    <span class="tc-status tag-inline
+                 {%- if problems %} bad
+                 {%- elif st.kind == 'ok' %} ok
+                 {%- elif st.kind == 'error' %} bad
+                 {%- else %} flat{% endif %}"
+          {% if problems %}title="{% for problem in problems %}CANNOT READ THE FORM: {{ problem }}&#10;{% endfor %}"
+          {%- elif st.has_detail %}title="{% for line in st.detail %}{{ line }}&#10;&#10;{% endfor %}"{% endif %}>
+      {%- if problems %}Cannot read the form
+      {%- else %}{{ st.label }}{% endif %}
+      {%- if not problems and st.has_detail %} <span class="tc-why">?</span>{% endif %}
     </span>
   </div>
 
@@ -198,8 +174,10 @@
     </tfoot>
   </table>
 
-  {{ show.issues(screen.issues, players) }}
-  {% if detailed %}{{ show.notes(screen.notes) }}{% endif %}
+  {# The issues and notes used to stack under here as flags. They are the status badge's
+     tooltip now — in both views, deliberately. The board is swapped card-by-card through the
+     same fragment, so a stack that appeared only on the team page would appear on the board
+     too the moment a fee was typed into it, and the two would disagree about the same card. #}
 
   {# No per-card button. Recording twelve franchises is one action taken once, and a button per
      card is twelve chances to forget one. The board's single Record writes team by team, so a
@@ -216,9 +194,6 @@
         Recorded {{ (screen.submitted_at | et).strftime('%Y-%m-%d %H:%M') }} ET
       {% else %}
         Not recorded yet
-      {% endif %}
-      {% if screen.review_count %}
-        <span class="tag-inline">{{ screen.review_count }} unverified</span>
       {% endif %}
     </span>
   </div>

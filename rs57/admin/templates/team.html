@@ -24,8 +24,8 @@
   </p>
 </div>
 
-{# The same card the board renders, on its own with full notes. The board passes
-   detailed=false; here it defaults to true, so nothing unverified is folded away. #}
+{# The same card the board renders, on its own. Every issue and note is on the status badge
+   in the card's top right — one card or twelve, the reasons are in one place. #}
 {% with problems = problems | default([]) %}
   {% include "_claim_form.html" %}
 {% endwith %}
