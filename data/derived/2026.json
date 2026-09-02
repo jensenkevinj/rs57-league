@@ -292,17 +292,14 @@
     }
   ],
   "review": {
-    "waiver_base_mismatches": [
-      3915511,
-      3929645,
-      4431452
-    ],
-    "waiver_bases_verified": 3,
-    "warnings": [
+    "phase": [
       "every roster is 4 players or fewer, so ESPN has pruned the league to its keepers: this is the window between the keeper deadline and the auction, and the season holds only kept players. Re-sync after the auction.",
-      "3 waiver adds disagree with the FAAB actually bid; under the ratchet a wrong waiver base carries forward every season after",
+      "the waiver-base check did not run: between the keeper deadline and the auction ESPN holds the keeper prices entered for this season, not the price each player was acquired for, so there is nothing to compare a FAAB bid against. It resumes once the auction has run",
       "2026 has not been drafted, so base_salary is keeperValue (last season's salary carried forward). Re-sync after the auction."
-    ]
+    ],
+    "waiver_base_mismatches": [],
+    "waiver_bases_verified": 0,
+    "warnings": []
   },
   "roster": [
     {
