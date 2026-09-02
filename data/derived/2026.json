@@ -292,17 +292,22 @@
     }
   ],
   "review": {
-    "waiver_base_mismatches": [],
-    "waiver_bases_verified": 6,
+    "waiver_base_mismatches": [
+      3915511,
+      3929645,
+      4431452
+    ],
+    "waiver_bases_verified": 3,
     "warnings": [
       "every roster is 4 players or fewer, so ESPN has pruned the league to its keepers: this is the window between the keeper deadline and the auction, and the season holds only kept players. Re-sync after the auction.",
+      "3 waiver adds disagree with the FAAB actually bid; under the ratchet a wrong waiver base carries forward every season after",
       "2026 has not been drafted, so base_salary is keeperValue (last season's salary carried forward). Re-sync after the auction."
     ]
   },
   "roster": [
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 20,
+      "base_salary": 25,
       "espn_player_id": 4429615,
       "kept_prior_year": false,
       "manager_id": "t1",
@@ -311,7 +316,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 7,
+      "base_salary": 12,
       "espn_player_id": 4596448,
       "kept_prior_year": true,
       "manager_id": "t1",
@@ -329,7 +334,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 32,
+      "base_salary": 37,
       "espn_player_id": 4242335,
       "kept_prior_year": true,
       "manager_id": "t10",
@@ -338,7 +343,7 @@
     },
     {
       "acquired_at": "2025-09-11T19:55:03.455000",
-      "base_salary": 0,
+      "base_salary": 5,
       "espn_player_id": 4431452,
       "kept_prior_year": false,
       "manager_id": "t10",
@@ -356,7 +361,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 1,
+      "base_salary": 16,
       "espn_player_id": 4248528,
       "kept_prior_year": false,
       "manager_id": "t11",
@@ -374,7 +379,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 30,
+      "base_salary": 35,
       "espn_player_id": 4374302,
       "kept_prior_year": true,
       "manager_id": "t11",
@@ -392,7 +397,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 25,
+      "base_salary": 35,
       "espn_player_id": 4047646,
       "kept_prior_year": true,
       "manager_id": "t12",
@@ -401,7 +406,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 23,
+      "base_salary": 28,
       "espn_player_id": 4429160,
       "kept_prior_year": true,
       "manager_id": "t12",
@@ -419,7 +424,7 @@
     },
     {
       "acquired_at": "2025-11-12T08:06:27.660000",
-      "base_salary": 0,
+      "base_salary": 15,
       "espn_player_id": 3915511,
       "kept_prior_year": false,
       "manager_id": "t2",
@@ -428,7 +433,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 12,
+      "base_salary": 17,
       "espn_player_id": 4258173,
       "kept_prior_year": true,
       "manager_id": "t2",
@@ -437,7 +442,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 5,
+      "base_salary": 10,
       "espn_player_id": 4426515,
       "kept_prior_year": true,
       "manager_id": "t2",
@@ -455,7 +460,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 30,
+      "base_salary": 35,
       "espn_player_id": 4262921,
       "kept_prior_year": true,
       "manager_id": "t3",
@@ -473,7 +478,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.581000",
-      "base_salary": 19,
+      "base_salary": 24,
       "espn_player_id": 4430878,
       "kept_prior_year": true,
       "manager_id": "t3",
@@ -491,7 +496,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 42,
+      "base_salary": 52,
       "espn_player_id": 4379399,
       "kept_prior_year": true,
       "manager_id": "t4",
@@ -500,7 +505,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 20,
+      "base_salary": 25,
       "espn_player_id": 4428331,
       "kept_prior_year": true,
       "manager_id": "t4",
@@ -518,7 +523,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 1,
+      "base_salary": 16,
       "espn_player_id": 3046439,
       "kept_prior_year": false,
       "manager_id": "t5",
@@ -527,7 +532,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 40,
+      "base_salary": 45,
       "espn_player_id": 4362628,
       "kept_prior_year": true,
       "manager_id": "t5",
@@ -536,7 +541,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 28,
+      "base_salary": 33,
       "espn_player_id": 4595348,
       "kept_prior_year": true,
       "manager_id": "t5",
@@ -554,7 +559,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 39,
+      "base_salary": 49,
       "espn_player_id": 4241389,
       "kept_prior_year": true,
       "manager_id": "t6",
@@ -563,7 +568,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 24,
+      "base_salary": 34,
       "espn_player_id": 4426502,
       "kept_prior_year": true,
       "manager_id": "t6",
@@ -572,7 +577,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 27,
+      "base_salary": 32,
       "espn_player_id": 4567048,
       "kept_prior_year": false,
       "manager_id": "t6",
@@ -581,7 +586,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 18,
+      "base_salary": 23,
       "espn_player_id": 4432665,
       "kept_prior_year": true,
       "manager_id": "t7",
@@ -590,7 +595,7 @@
     },
     {
       "acquired_at": "2025-09-11T01:11:50.082000",
-      "base_salary": 0,
+      "base_salary": 10,
       "espn_player_id": 3929645,
       "kept_prior_year": false,
       "manager_id": "t8",
@@ -599,7 +604,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 45,
+      "base_salary": 50,
       "espn_player_id": 4429795,
       "kept_prior_year": true,
       "manager_id": "t8",
@@ -608,7 +613,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 25,
+      "base_salary": 30,
       "espn_player_id": 4569618,
       "kept_prior_year": false,
       "manager_id": "t8",
@@ -617,7 +622,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 2,
+      "base_salary": 7,
       "espn_player_id": 4239996,
       "kept_prior_year": false,
       "manager_id": "t9",
@@ -626,7 +631,7 @@
     },
     {
       "acquired_at": "2025-09-02T02:46:22.582000",
-      "base_salary": 8,
+      "base_salary": 13,
       "espn_player_id": 4362238,
       "kept_prior_year": true,
       "manager_id": "t9",
