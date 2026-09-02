@@ -36,7 +36,7 @@ class DerivedSeason:
     admin field to override it — the nightly sync is the only writer."""
     keeper_deadline: datetime | None
     """ESPN's own ``draftSettings.keeperDeadlineDate``. Not hand-entered anywhere in this tool —
-    ``keeper_gate`` reads it straight off this object."""
+    ``keeper_deadline_fact`` reads it straight off this object."""
     franchises: tuple[FranchiseName, ...]
     players: tuple[Player, ...]
     roster: tuple[RosterEntry, ...]

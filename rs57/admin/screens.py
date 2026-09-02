@@ -69,6 +69,23 @@ DEFAULT_OVERRIDE_REASON = "Draft-cash trade"
 SLOT_LABELS = {"K1": "K1", "K2": "K2", "K3": "K3", "PROSPECT": "P"}
 """Short labels for the card, which is narrow. Display only — the stored slot is unchanged."""
 
+FEE_ISSUE_CODES = frozenset({
+    IssueCode.FEE_TOTAL_MISMATCH,
+    IssueCode.NEGATIVE_FEE,
+    IssueCode.FEE_ON_PROSPECT,
+})
+"""The engine findings that are about **money**, not about who was picked.
+
+The card answers two questions separately because the offseason asks them a day apart: the
+keeper deadline settles *who is kept*, and the fee breakdowns arrive afterwards (commissioner,
+2026-09-01). A single verdict made a card with a perfectly legal set of keepers and no fees
+typed yet look broken on deadline night, which is when the selection is the only thing anybody
+can act on.
+
+Listed as the fee side and **not** as the selection side, so ``TeamScreen.selection_issues`` can
+be the complement: a code nobody classifies still surfaces rather than falling through both.
+"""
+
 ROSTER_IS_KEEPERS_ONLY = MAX_KEEPERS + MAX_PROSPECTS
 """At or under this many rostered players, ESPN has pruned the team to its keepers.
 
@@ -302,23 +319,122 @@ def unlinked_override_issues(
 
 
 @dataclass(frozen=True)
-class KeeperGate:
-    """Whether claims may be edited right now, and why.
+class CashScreen:
+    """One season's draft cash, audited against the whole ledger.
+
+    **The engine runs over every season; only the display is filtered.** That split is the
+    whole reason this object exists. ``trade_groups`` is union-find over trades that share a
+    salary edit and ``check_cash_trades`` audits *a franchise's net across a group*, so handing
+    it one season's trades computes ``expected`` over half a group and reports an imbalance that
+    is not there. ``CASH_TRADE_LEG_WRONG_DRAFT`` exists precisely because a leg's season can
+    differ from its trade's draft year, so a group spanning two seasons is a real state, not a
+    hypothetical. Filtering the inputs would also manufacture ``OVERRIDE_NOT_ON_A_TRADE`` for
+    every leg pointing at a trade the filter removed.
+
+    Consequence, stated on screen rather than hidden: a trade from another draft year appears
+    here when it nets with one of this season's. Showing half a netted pair would rest the
+    verdict on a row you cannot see.
+    """
+
+    season: int
+    trades: tuple[TradeRow, ...]
+    overrides: tuple[OverrideRow, ...]
+    unlinked: tuple[ValidationIssue, ...]
+    """Live legs on no trade at all — **league-wide**, and labelled that way on screen."""
+    league_net: int | None
+    """Every live override in the file, summed. The season-scoped ``SeasonScreen.override_net``
+    cannot see a leg misfiled into another year, so on its own it reads clean for exactly the
+    mistake ``CASH_TRADE_LEG_WRONG_DRAFT`` was written to catch. This is what replaces the
+    cross-season ledger the Draft cash tab used to be."""
+    hidden_years: tuple[int, ...]
+    """Draft years holding rows this page is not showing. A ledger that looks complete and is
+    not is the failure this repo keeps guarding against — silence reads exactly like success."""
+
+    @property
+    def borrowed(self) -> tuple[str, ...]:
+        """Trade ids shown from another draft year, because they net with one of this season's."""
+        return tuple(row.trade.id for row in self.trades if row.trade.draft_year != self.season)
+
+
+def cash_screen(
+    season: int,
+    trades: list[CashTrade],
+    overrides: list[SalaryOverride],
+    seasons: Mapping[int, DerivedSeason | None],
+    roster: Sequence[RosterEntry],
+) -> CashScreen:
+    """Build one season's slice of the ledger. See ``CashScreen`` for why it is a slice."""
+    rows = trade_rows(trades, overrides, seasons, roster)
+
+    seed = {trade.id for trade in trades if trade.draft_year == season}
+    # ``netted_with`` already carries the whole group, so one pass closes the set.
+    visible_ids = seed | {
+        sibling for row in rows if row.trade.id in seed for sibling in row.netted_with
+    }
+    visible = tuple(row for row in rows if row.trade.id in visible_ids)
+
+    # A leg misfiled into another year stays visible on the page its trade lives on. Without
+    # that, CASH_TRADE_LEG_WRONG_DRAFT names a row nobody can reach to fix.
+    override_view = tuple(
+        override_row(override, seasons.get(override.season))
+        for override in sorted(overrides, key=lambda o: (o.season, o.espn_player_id))
+        if override.season == season or (set(override.trade_ids) & visible_ids)
+    )
+
+    # Every live leg in the file, not just this season's. A reverted one has been put back in
+    # ESPN and moves nothing. ``None`` anywhere means no total: a sum resting on a guessed zero
+    # is worse than saying it cannot be computed.
+    live = [
+        override_row(override, seasons.get(override.season)).delta
+        for override in overrides
+        if not override.reverted
+    ]
+    league_net = None if any(delta is None for delta in live) else sum(live)
+
+    shown_trades = {row.trade.id for row in visible}
+    shown_overrides = {(row.override.season, row.override.espn_player_id) for row in override_view}
+    hidden = {t.draft_year for t in trades if t.id not in shown_trades}
+    hidden |= {
+        o.season for o in overrides if (o.season, o.espn_player_id) not in shown_overrides
+    }
+
+    return CashScreen(
+        season=season,
+        trades=visible,
+        overrides=override_view,
+        unlinked=unlinked_override_issues(overrides, trades, roster),
+        league_net=league_net,
+        hidden_years=tuple(sorted(hidden)),
+    )
+
+
+
+@dataclass(frozen=True)
+class KeeperDeadline:
+    """Where the season stands relative to the keeper deadline. **Display only.**
+
+    It used to be a lock: before the deadline the console refused to save, on the reasoning that
+    no salary is entered that early so a lock costs nothing (commissioner, 2026-08-04). That
+    premise turned out to be wrong — ESPN publishes keeper selections to nobody but an
+    authenticated league member, so **manual entry is the only way the selections get in**, and
+    the commissioner needs to enter and check them *before* the deadline, not after
+    (commissioner, 2026-09-01). A lock across the one window the work happens in was blocking
+    the tool's only input path.
+
+    What the lock was actually protecting — a claim recorded while a manager could still change
+    his mind — is not dropped. ``build_team_screen`` reports it, per claim, as REVIEW: the risk
+    is made *visible* rather than *prevented*. That is a weaker guarantee and a wider net. The
+    lock never said a word about the four claims recorded 2026-07-29, six days before the lock
+    itself existed; the note does.
 
     **Three states, not two.** ``deadline`` is ``None`` for two entirely different reasons —
-    ESPN has not set one yet, or that season has not synced. A future deadline and an unrecorded
-    deadline both used to collapse into ``deadline_passed = False``, so gating on that single
-    flag would freeze a freshly synced season solid, with nothing on screen saying why. The
-    deadline comes from ESPN's own ``draftSettings.keeperDeadlineDate``, read off the derived
-    season the nightly sync already wrote (commissioner, 2026-08-26) — nowhere in this tool can
-    set or override it, so a missing one cannot be the thing that locks the console.
+    ESPN has not set one yet, or that season has not synced. Those are not the same as a
+    deadline still in the future, and the three stay distinct here because the screen says
+    something different about each. The deadline comes from ESPN's own
+    ``draftSettings.keeperDeadlineDate``, read off the derived season the nightly sync wrote
+    (commissioner, 2026-08-26); nothing in this tool can set it.
 
-    ``state`` is ``"locked"``, ``"open"`` or ``"unrecorded"``. Only ``"locked"`` refuses a write.
-
-    This object is presentation *and* an answer, but it is never the guard. The ``save`` route
-    computes its own gate from the store and the clock rather than trusting whatever a screen
-    was handed — a ``disabled`` attribute is a courtesy to the browser, and a tab left open
-    from before the deadline still posts.
+    ``state`` is ``"upcoming"``, ``"passed"`` or ``"unrecorded"``. **No state refuses a write.**
     """
 
     deadline: datetime | None
@@ -327,8 +443,8 @@ class KeeperGate:
     state: str
 
     @property
-    def editable(self) -> bool:
-        return self.state != "locked"
+    def passed(self) -> bool:
+        return self.state == "passed"
 
     @property
     def local_deadline(self) -> datetime | None:
@@ -341,38 +457,37 @@ class KeeperGate:
 
     @property
     def message(self) -> str:
-        if self.state == "locked":
+        if self.state == "upcoming":
             return (
-                f"Claims are locked until the keeper deadline "
-                f"({self.local_deadline:%Y-%m-%d %H:%M} ET). Salaries are entered after it "
-                f"passes, so "
-                f"nothing is recorded while managers can still change their minds. Prices "
-                f"below are live — you can look, you just cannot record."
+                f"The keeper deadline ({self.local_deadline:%Y-%m-%d %H:%M} ET) has not passed "
+                f"yet. Managers can still change their minds, so anything recorded now is "
+                f"provisional and every claim entered before it says so until you re-record it."
             )
         if self.state == "unrecorded":
             return (
                 "ESPN has no keeper deadline set for this season yet "
-                "(draftSettings.keeperDeadlineDate), so nothing is locked. It will start "
-                "holding claims automatically once ESPN sets one and the season re-syncs."
+                "(draftSettings.keeperDeadlineDate), so there is nothing to record claims "
+                "against. It appears here once ESPN sets one and the season re-syncs."
             )
         return (
-            f"The keeper deadline ({self.local_deadline:%Y-%m-%d %H:%M} ET) has passed. The "
-            f"console is open and stays open — nothing re-locks."
+            f"The keeper deadline ({self.local_deadline:%Y-%m-%d %H:%M} ET) has passed. "
+            f"Selections are final."
         )
 
 
-def keeper_gate(current: DerivedSeason, *, now: datetime) -> KeeperGate:
-    """Read the gate off ESPN's own deadline. The one place the three states are decided.
+def keeper_deadline_fact(current: DerivedSeason, *, now: datetime) -> KeeperDeadline:
+    """Read the deadline's state off ESPN's own date. The one place the three are decided.
 
     ``now`` must be **naive UTC** — ``models.utc_now``, which is what the app injects.
     ``deadline`` is naive UTC off ESPN, so a local-time clock here compares two different
-    timezones and keeps the console shut for the length of the offset after the deadline has
-    actually passed.
+    timezones and misreports the state for the length of the offset. That used to keep the
+    console shut for five hours after the deadline had actually passed; it is now only a
+    mislabelled tag, but the comparison is still between two UTC values for the same reason.
     """
     deadline = current.keeper_deadline
     if deadline is None:
-        return KeeperGate(deadline=None, state="unrecorded")
-    return KeeperGate(deadline=deadline, state="open" if deadline < now else "locked")
+        return KeeperDeadline(deadline=None, state="unrecorded")
+    return KeeperDeadline(deadline=deadline, state="passed" if deadline < now else "upcoming")
 
 
 @dataclass(frozen=True)
@@ -409,8 +524,6 @@ class TeamScreen:
     """One team's claim screen: priced rows, every issue, and what was not checked."""
 
     season: int
-    prior_season: int
-    """Passed in rather than computed in a template — years are arithmetic too."""
     manager_id: str
     name: str
     rows: tuple[PlayerRow, ...]
@@ -428,9 +541,9 @@ class TeamScreen:
     waiver_recorded: bool
     submitted_at: datetime | None
     saved: bool = False
-    gate: KeeperGate | None = None
-    """``None`` renders as editable. Safe as a default because the ``save`` route computes its
-    own gate and never reads this one — a screen cannot talk a route into a write."""
+    keeper_deadline: KeeperDeadline | None = None
+    """Where the season stands relative to ESPN's keeper deadline. **Display only** — no route
+    reads it and none may: it stopped being a gate on 2026-09-01. See ``KeeperDeadline``."""
 
     @property
     def errors(self) -> tuple[ValidationIssue, ...]:
@@ -443,6 +556,65 @@ class TeamScreen:
     @property
     def unverified(self) -> tuple[Note, ...]:
         return tuple(note for note in self.notes if note.kind in ("review", "error"))
+
+    @property
+    def fee_issues(self) -> tuple[ValidationIssue, ...]:
+        return tuple(i for i in self.issues if i.code in FEE_ISSUE_CODES)
+
+    @property
+    def selection_issues(self) -> tuple[ValidationIssue, ...]:
+        """Everything that is not a fee issue — **the default side of the partition.**
+
+        Defined as the complement rather than as its own list on purpose. A new ``IssueCode``
+        nobody remembered to classify lands here and is visible, instead of falling out of both
+        badges and leaving a card that reads legal on both counts while the engine is objecting.
+        """
+        return tuple(i for i in self.issues if i.code not in FEE_ISSUE_CODES)
+
+    @property
+    def selection_error_count(self) -> int:
+        """ERRORs only. The badge used to print ``len(selection_issues)``, which counts REVIEWs
+        too — so a card showed "2 error(s)" beside a status line reading "1 error(s)", from two
+        different definitions of the same word."""
+        return len([i for i in self.selection_issues if i.severity is Severity.ERROR])
+
+    @property
+    def fee_error_count(self) -> int:
+        return len([i for i in self.fee_issues if i.severity is Severity.ERROR])
+
+    @property
+    def selection_verdict(self) -> str:
+        """``"none"``, ``"error"``, ``"review"`` or ``"ok"`` — is this a legal set of keepers?
+
+        The first of the two questions the card answers, and on deadline night the only one that
+        matters: who is kept is settled tonight, the fees are entered afterwards
+        (commissioner, 2026-09-01).
+        """
+        if not self.declared:
+            return "none"
+        if any(i.severity is Severity.ERROR for i in self.selection_issues):
+            return "error"
+        if self.selection_issues:
+            return "review"
+        return "ok"
+
+    @property
+    def fee_verdict(self) -> str:
+        """``"none"``, ``"skipped"``, ``"error"`` or ``"ok"`` — do the fees follow the rules?
+
+        ``"skipped"`` is the one that has to exist. Over the keeper maximum the tier is
+        **undefined** — ``fee_total_for`` has no answer for four keepers — so ``keeper_rules``
+        does not raise ``FEE_TOTAL_MISMATCH`` at all. An empty issue list there means the check
+        never ran, and rendering that as a green "fees legal" is exactly the failure this
+        repo is built around: silence reading as success.
+        """
+        if not self.declared:
+            return "none"
+        if self.fee_expected is None:
+            return "skipped"
+        if self.fee_issues:
+            return "error"
+        return "ok"
 
     @property
     def fee_gap(self) -> int:
@@ -520,16 +692,6 @@ class TeamScreen:
         return tuple(out)
 
     @property
-    def prospect_unknown(self) -> bool:
-        """A pruned roster deeper than the keeper limit must hold a prospect, and ESPN won't say.
-
-        Three keepers is the maximum, so a team ESPN pruned to four has exactly one prospect
-        among them — a fact forced by the rules. *Which* one is not derivable from anything
-        ESPN publishes, so it is left for the commissioner rather than guessed.
-        """
-        return self.keepers_only and len(self.rows) > MAX_KEEPERS and not self.prospect_count
-
-    @property
     def pickable(self) -> tuple[PlayerRow, ...]:
         """Everyone on the roster, dearest first — the options behind each slot picker.
 
@@ -565,20 +727,16 @@ class SeasonScreen:
     """Every team at once — the report the commissioner reads before releasing anything."""
 
     season: int
-    prior_season: int
     teams: tuple[TeamScreen, ...]
     """Full screens, not summaries. This page *is* the entry form for all twelve franchises, so
     it needs every priced row — and a summary object alongside them would be a second place for
     the same numbers to live."""
     notes: tuple[Note, ...]
-    league_salary: int
-    league_fees: int
-    declared_count: int
-    blocked_count: int
-    gate: KeeperGate
-    waiver_manager_id: str | None
-    waiver_name: str | None
+    keeper_deadline: KeeperDeadline
     waiver_recorded: bool
+    """Whether ``season - 1`` has a consolation winner on file. Drives the note below; the
+    winner's id and name are deliberately not carried — a franchise's own "fees waived" tag is
+    read on that franchise's card, where the number it affects is."""
     overrides: tuple[OverrideRow, ...]
     """This season's draft-cash trades, recorded in the same sitting as the fees."""
     override_net: int | None
@@ -672,7 +830,7 @@ def build_team_screen(
     claims: list[KeeperClaim] | None = None,
     saved: bool = False,
     first_nfl_season: Mapping[int, int] | None = None,
-    gate: KeeperGate | None = None,
+    keeper_deadline: KeeperDeadline | None = None,
 ) -> TeamScreen:
     """Price and validate one team.
 
@@ -815,6 +973,36 @@ def build_team_screen(
         season, active, deadline, season - 1, origins, {p.espn_player_id: p.name for p in players.values()}
     )
 
+    # **This is what replaces the deadline lock.** Until 2026-09-01 the console simply refused
+    # to record before the deadline, so a claim entered while a manager could still change his
+    # mind could not exist. It can now, because manual entry is the only way selections reach
+    # this tool and the deadline is exactly when that entry happens — so the risk is reported
+    # instead of prevented.
+    #
+    # Wider than the lock ever was, and that is the point: the lock said nothing about the four
+    # claims stamped 2026-07-29, six days before the lock itself was written. This does.
+    # It clears itself the moment the card is re-recorded after the deadline.
+    keeper_deadline = current.keeper_deadline
+    if keeper_deadline is not None:
+        provisional = sorted(
+            {
+                claim.submitted_at
+                for claim in stored
+                if claim.submitted_at is not None and claim.submitted_at < keeper_deadline
+            }
+        )
+        if provisional:
+            when = to_league_time(provisional[0])
+            notes.append(
+                Note(
+                    "review",
+                    f"Recorded {when:%Y-%m-%d %H:%M} ET, before this season's keeper deadline "
+                    f"({to_league_time(keeper_deadline):%Y-%m-%d %H:%M} ET) — so managers could "
+                    f"still change their minds after it was entered. Provisional until you "
+                    f"re-record this card, which clears this note.",
+                )
+            )
+
     for claim in stored:
         keeper = priced.get(claim.espn_player_id)
         if claim.computed_salary is None or keeper is None:
@@ -859,7 +1047,6 @@ def build_team_screen(
 
     return TeamScreen(
         season=season,
-        prior_season=season - 1,
         manager_id=manager_id,
         name=current.name_of(manager_id),
         rows=tuple(rows),
@@ -876,7 +1063,7 @@ def build_team_screen(
         waiver_recorded=waiver_recorded,
         submitted_at=max(submitted) if submitted else None,
         saved=saved,
-        gate=gate,
+        keeper_deadline=keeper_deadline,
     )
 
 
@@ -899,7 +1086,7 @@ def build_season_screen(
     disagreeing about whether a rule ran is worse than either answer.
     """
     waived_manager, waiver_recorded = store.fees_waived_for(season)
-    gate = keeper_gate(current, now=now)
+    deadline_fact = keeper_deadline_fact(current, now=now)
 
     summaries = [
         build_team_screen(
@@ -909,7 +1096,7 @@ def build_season_screen(
             prior,
             store,
             first_nfl_season=first_nfl_season,
-            gate=gate,
+            keeper_deadline=deadline_fact,
         )
         for manager_id in current.manager_ids
     ]
@@ -934,10 +1121,10 @@ def build_season_screen(
             )
         )
 
-    if gate.state == "unrecorded":
+    if deadline_fact.state == "unrecorded":
         # Still REVIEW: an unrecorded deadline is a real gap in the season's record, and it has
         # to be counted as unverified. It is just not a reason to lock the tool that records it.
-        notes.append(Note("review", gate.message))
+        notes.append(Note("review", deadline_fact.message))
     # Locked and open get no note. Locked is the page's operating state and the template says so
     # once, at the top, where it is acted on; open is what the deadline line already reads. The
     # old note here warned that the deadline had passed, which is now simply what a season does —
@@ -953,16 +1140,9 @@ def build_season_screen(
 
     return SeasonScreen(
         season=season,
-        prior_season=season - 1,
         teams=tuple(summaries),
         notes=tuple(notes),
-        league_salary=sum(s.total_salary for s in summaries),
-        league_fees=sum(s.total_fees for s in summaries),
-        declared_count=sum(1 for s in summaries if s.declared),
-        blocked_count=sum(1 for s in summaries if s.blocked),
-        gate=gate,
-        waiver_manager_id=waived_manager,
-        waiver_name=current.name_of(waived_manager) if waived_manager else None,
+        keeper_deadline=deadline_fact,
         waiver_recorded=waiver_recorded,
         overrides=override_view,
         override_net=override_net,

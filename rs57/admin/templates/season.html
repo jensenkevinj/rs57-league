@@ -16,15 +16,19 @@
 <div class="page-meta">
   <div>
     Keeper deadline:
-    {% if screen.gate.deadline %}
-      {{ screen.gate.local_deadline.strftime('%Y-%m-%d %H:%M') }} ET
-      {% if screen.gate.state == 'locked' %}
-        <span class="tag-inline">locked until then</span>
+    {% if screen.keeper_deadline.deadline %}
+      {{ screen.keeper_deadline.local_deadline.strftime('%Y-%m-%d %H:%M') }} ET
+      {% if screen.keeper_deadline.passed %}
+        <span class="tag-inline ok">passed</span>
       {% else %}
-        <span class="tag-inline ok">passed — open</span>
+        <span class="tag-inline">not yet — selections can still change</span>
       {% endif %}
     {% else %}
-      not recorded — <a href="{{ url_for('settings', year=screen.season) }}">record it</a>
+      {# NOT "record it". Nothing in this tool can: the deadline is ESPN's
+         draftSettings.keeperDeadlineDate, rendered read-only on Season settings
+         (commissioner, 2026-08-26). Sending somebody to a form that cannot accept it is
+         worse than saying where it actually comes from. #}
+      not set by ESPN, or {{ screen.season }} has not synced since it was
     {% endif %}
   </div>
   <div>
@@ -43,6 +47,22 @@
 
 <div id="verify-result"></div>
 
+{% if seasons_available | length > 1 %}
+  <p class="small muted">
+    Season:
+    {% for yr in seasons_available | reverse %}
+      {% if yr == screen.season %}
+        <strong>{{ yr }}</strong>
+      {% else %}
+        <a href="{{ url_for('season', year=yr) }}">{{ yr }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if screen.season != current_season %}
+      <span class="tag-inline">not the current season</span>
+    {% endif %}
+  </p>
+{% endif %}
+
 {# No lock banner. The deadline line above already carries a "locked until then" tag, every
    control on every card is disabled and every button says so — a paragraph repeating it is the
    fourth telling of one fact. #}
@@ -54,36 +74,28 @@
 
 <details class="fold">
   <summary>
-    Draft-cash overrides
-    {% if screen.overrides %}
-      <span class="tag-inline">{{ screen.overrides | length }} recorded</span>
+    Draft cash
+    {% if cash.overrides or cash.trades %}
+      <span class="tag-inline">{{ cash.overrides | length }} edit(s), {{ cash.trades | length }} trade(s)</span>
       {% if screen.override_net is none %}
         <span class="tag-inline">net unknown</span>
       {% elif screen.override_net %}
-        <span class="tag-inline bad">nets ${{ screen.override_net }}, not $0</span>
+        <span class="tag-inline bad">{{ screen.season }} nets ${{ screen.override_net }}, not $0</span>
+      {% endif %}
+      {% if cash.league_net %}
+        <span class="tag-inline bad">every season nets ${{ cash.league_net }}</span>
       {% endif %}
     {% endif %}
   </summary>
+  {# Folded shut by default. The page is for entering keepers and checking they are legal;
+     this is the same sitting's other job, not what the page is for. #}
   <div class="fold-body">
     <p class="small">
       Managers trade draft cash and ESPN has no native support, so a few salaries get hand-edited
       on the two teams involved and changed back before the next draft. The override records the
-      <strong>true</strong> value while ESPN holds the distorted one. The
-      <a href="{{ url_for('trades') }}">draft cash tab</a> is the ledger across every season —
-      only it can show both legs of a trade cancelling.
+      <strong>true</strong> value while ESPN holds the distorted one.
     </p>
-
-    {% if screen.overrides %}
-      {% with rows = screen.overrides, show_season = false, return_year = screen.season %}
-        {% include "_override_table.html" %}
-      {% endwith %}
-    {% else %}
-      <p class="muted small">Nothing recorded for {{ screen.season }}.</p>
-    {% endif %}
-
-    {% with scope = 'season', year = screen.season, return_year = screen.season %}
-      {% include "_override_form.html" %}
-    {% endwith %}
+    {% include "_cash.html" %}
   </div>
 </details>
 
