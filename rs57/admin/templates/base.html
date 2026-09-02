@@ -112,6 +112,10 @@
      twelve across, a badge that wraps to the next line only on the long franchise names makes
      the grid impossible to scan down. */
   .tc-verdicts { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.5rem; }
+  /* These two carry sentences — "from ESPN, legal — not recorded" — where the other
+     `tag-inline` uses are one or two words. `nowrap` on a sentence is a ~20rem unbreakable
+     box, which is what set the card's minimum width and broke the grid. */
+  .tc-verdicts .tag-inline { white-space: normal; }
   .tag-inline.flat { color: var(--muted); background: var(--bg); border-color: var(--line); }
   /* The unsaved-changes count in the nav. Nothing recorded in this tool reaches the league
      until it is committed, and before this the only way to find out was to go looking. */
@@ -191,13 +195,20 @@
   }
 
   /* The keeper board: a card per franchise, four slots each, edited in place. */
+  /* 23rem, not 19: the card grew Base and Tax columns and a picker that stays after the
+     prune. At 19rem the table could not reach its own minimum and the cards blew out of their
+     tracks. */
   .team-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr));
     gap: 0.9rem; margin: 1.2rem 0 1.6rem; align-items: start;
   }
   .team-card {
     border: 1px solid var(--line); border-radius: 10px; background: #fff;
     padding: 0.85rem 0.95rem 0.7rem;
+    /* A grid item's min-width is `auto` — its min-content — so ONE unbreakable thing inside
+       (a nowrap badge, a table that will not compress) stops the card fitting its track and
+       pushes it out over its neighbour. Nothing in a card is wide enough to be worth that. */
+    min-width: 0;
   }
   .team-card.blocked { border-color: var(--bad-line); background: var(--bad-bg); }
   .tc-head {
@@ -208,18 +219,28 @@
   .tc-name a { color: var(--ink); text-decoration: none; }
   .tc-name a:hover { color: var(--accent); }
   .tc-head .spin { margin-left: auto; }
-  .team-card table.tc-table { margin: 0; font-size: 0.9rem; background: transparent; }
   .team-card .tc-table th { background: transparent; padding: 0.4rem 0.3rem; }
   .team-card .tc-table td { padding: 0.3rem 0.3rem; border-bottom: 1px solid var(--line); }
   /* No rule under the total row — the card's own edge already closes the table. The generic
      `tfoot td` clears this, but `.team-card .tc-table td` above is more specific and puts it
      back, so it has to be cleared here. */
   .team-card .tc-table tfoot td { padding-top: 0.45rem; border-bottom: none; }
-  .team-card .tc-table select { width: 100%; }
-  .team-card .tc-table input[type="number"] { width: 3.2rem; padding: 0.2rem 0.3rem; }
+  /* **Fixed, so the columns stop depending on their contents.** A `select`'s minimum width is
+     its widest option, and `width: 100%` does not reduce it — so an auto table holding one
+     asked for 620px inside a 340px card and every column was squeezed to fit. Fixed layout
+     takes the widths below as given and lets the long option ellipsize instead. */
+  .team-card table.tc-table {
+    margin: 0; font-size: 0.9rem; background: transparent;
+    table-layout: fixed; width: 100%;
+  }
+  .team-card .tc-table select { width: 100%; min-width: 0; }
+  .team-card .tc-table input[type="number"] { width: 100%; padding: 0.2rem 0.25rem; }
   .team-card .tc-table td.tc-slot-col, .team-card .tc-table th.tc-slot-col {
     width: 1.5rem; padding-right: 0; padding-left: 0;
   }
+  /* The player column takes what is left; these four are sized for "$100". */
+  .team-card .tc-table th.tc-money-col { width: 2.9rem; }
+  .team-card .tc-table th.tc-fee-col { width: 3.4rem; }
   .tc-player { font-weight: 600; }
   .tc-pos {
     color: var(--muted); font-size: 0.78rem; margin-left: 0.3rem; white-space: nowrap;

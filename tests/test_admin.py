@@ -2650,6 +2650,62 @@ def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
     assert "Fees: none yet" in page, "fees are entered after the selection, not proposed"
 
 
+def test_every_row_of_the_card_has_the_same_number_of_cells(client):
+    """Header, body and footer must agree, or the totals sit under the wrong columns.
+
+    The card went from four columns to six. The footer is written by hand rather than
+    generated, so it is the one that silently falls out of step — and a Total printed under
+    "Fee" is a wrong number rather than a broken-looking one.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    table = page.split('id="claim-form-t1"')[1].split("</table>")[0]
+    header = table.split("<thead>")[1].split("</thead>")[0].count("<th")
+    footer = table.split("<tfoot>")[1].count("<td")
+    bodies = [
+        row.count("<td")
+        for row in table.split("<tbody>")[1].split("</tbody>")[0].split("<tr")[1:]
+    ]
+    assert header == 6, f"expected slot, player, base, tax, fee, total; got {header}"
+    assert footer == header, f"footer has {footer} cells against {header} headers"
+    assert bodies and set(bodies) == {header}, f"body rows have {set(bodies)} cells"
+
+
+def test_the_card_can_shrink_into_its_grid_track(client):
+    """Three CSS declarations, each of which caused a real blow-out when it was missing.
+
+    This pins the declarations; it cannot measure layout, and says so rather than implying the
+    rendering was checked. What it prevents is the quiet deletion of a rule whose purpose is
+    not obvious from reading it:
+
+    * a grid item's min-width is its min-content, so one unbreakable child pushes the card out
+      over its neighbour;
+    * a `select`'s minimum width is its widest option and `width: 100%` does not reduce it, so
+      an auto-layout table holding one demanded 620px inside a 340px card;
+    * the two verdict badges carry sentences now, and `nowrap` on a sentence is an unbreakable
+      box about 20rem wide.
+    """
+    css = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    def block(selector: str) -> str:
+        """The declarations inside one rule, so an unrelated rule cannot satisfy the check.
+
+        Both of these first passed against `table.trades { table-layout: fixed }` and a
+        `min-width: 0` on the cash-trade form — vacuous, and mutation is what caught it.
+        """
+        assert selector in css, f"no rule for {selector}"
+        return css.split(selector, 1)[1].split("}", 1)[0]
+
+    assert "min-width: 0" in block(".team-card {"), (
+        "a grid item that cannot shrink pushes itself out over its neighbour"
+    )
+    assert "table-layout: fixed" in block(".team-card table.tc-table {"), (
+        "an auto table sizes to its widest option and will not fit the card"
+    )
+    assert "white-space: normal" in block(".tc-verdicts .tag-inline {"), (
+        "the verdict badges carry sentences; nowrap makes them an unbreakable 20rem"
+    )
+
+
 def test_the_tax_column_is_priced_per_slot_not_per_player(data_dir: Path, store: ManualStore):
     """A taxed player owes nothing in the prospect slot, and the column has to say so.
 
