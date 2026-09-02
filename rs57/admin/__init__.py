@@ -827,7 +827,7 @@ def create_app(
             draft_picks=len(picks),
             error=error or pick_error if error else None,
         )
-        return render_template("_verify.html", result=result, year=year, source=current)
+        return render_template("_verify.html", result=result, year=year)
 
     # -- the commit button ------------------------------------------------------
 

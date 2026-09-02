@@ -20,11 +20,8 @@
   {% else %}
     {% if result.clean %}
       <div class="flag ok">
-        <span class="tag">ESPN agrees</span>
-        <div>
-          All {{ result.checked | length }} recorded claim(s) carry the salary this tool
-          computed.
-        </div>
+        <span class="tag">Verified</span>
+        <div>{{ result.checked | length }} records verified</div>
       </div>
     {% endif %}
 
@@ -97,7 +94,7 @@
     {% macro rows_table(rows, caption) %}
       <div class="scroll">
         <table>
-          <caption>{{ caption }}</caption>
+          {% if caption %}<caption>{{ caption }}</caption>{% endif %}
           <thead>
             <tr>
               <th>Team</th>
@@ -155,9 +152,9 @@
          and the easiest to mistake the absence of for a clean run, so the count is on the
          summary whether it is open or shut. #}
       <details class="fold">
-        <summary>{{ result.checked | length }} row(s) agree with ESPN</summary>
+        <summary>See all {{ result.checked | length }} verified records</summary>
         <div class="fold-body">
-          {{ rows_table(result.checked, caption='These carry exactly the salary this tool computed. Nothing to do.') }}
+          {{ rows_table(result.checked, caption='') }}
         </div>
       </details>
     {% endif %}
@@ -165,18 +162,5 @@
     {% if not result.rows %}
       <p class="muted small">Nothing recorded for {{ year }} yet, so there was nothing to check.</p>
     {% endif %}
-
-    <p class="small muted">
-      Read from ESPN's <code>{{ source.base_salary_field }}</code>, the same field
-      <code>data/derived/{{ year }}.json</code> was built from. Rosters came back
-      {% if result.regime == 'keepers' %}
-        pruned to the kept players.
-      {% elif result.regime == 'full' %}
-        at full depth.
-      {% else %}
-        in an unreadable shape.
-      {% endif %}
-      Nothing was written.
-    </p>
   {% endif %}
 </div>

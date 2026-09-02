@@ -2270,7 +2270,7 @@ def test_the_espn_check_shows_conflicts_and_folds_the_agreements(client, store, 
     above = body[:body.index("<details")]
 
     assert "mismatch" in above, "a row ESPN disagrees about must be read without opening anything"
-    assert "1 row(s) agree with ESPN" in fold, "and the agreements are counted on the summary"
+    assert "See all 1 verified records" in fold, "and the agreements are counted on the summary"
     assert body.count("<details") == 1
 
 
