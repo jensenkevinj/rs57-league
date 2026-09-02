@@ -165,6 +165,25 @@ def effective_base_salary(
     return max(applicable, key=lambda override: override.created_at).actual_salary
 
 
+def charges_in_base(drafted: bool, keeper_deadline: datetime | None, now: datetime) -> bool:
+    """Whether ESPN's keeper field currently holds the ENTERED price, not the carried-in one.
+
+    ``keeperValue`` means "what this player carried in from last season" for most of the year.
+    Between the keeper deadline and the auction it does not: the commissioner has typed this
+    season's keeper prices into ESPN by then, so the field holds base + allocated fee + $5 tax.
+    Anything that adds a charge on top of it in that window charges the same money twice, and
+    anything that compares it against an acquisition price compares two different facts.
+
+    **Three states, not two.** A season ESPN has set no deadline for cannot place itself in this
+    window and reads the way it does the rest of the year — a missing fact is not a past one.
+
+    This reads the deadline; it does not enforce it. Nothing gates on the result except which of
+    two meanings the field currently carries. ``now`` must be naive UTC, like the stored
+    deadline, so both sides of the comparison are the same clock.
+    """
+    return not drafted and keeper_deadline is not None and keeper_deadline < now
+
+
 def keeper_salary(
     base_salary: int,
     fee_allocated: int,

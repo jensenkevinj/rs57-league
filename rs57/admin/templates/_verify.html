@@ -20,11 +20,8 @@
   {% else %}
     {% if result.clean %}
       <div class="flag ok">
-        <span class="tag">ESPN agrees</span>
-        <div>
-          All {{ result.checked | length }} recorded claim(s) carry the salary this tool
-          computed.
-        </div>
+        <span class="tag">Verified</span>
+        <div>{{ result.checked | length }} records verified</div>
       </div>
     {% endif %}
 
@@ -92,13 +89,12 @@
       </div>
     {% endif %}
 
-    {% if result.rows %}
+    {# One table, rendered twice: the rows that differ, and the rows that do not folded away.
+       Two copies of this markup would drift, and the second copy is the one nobody reads. #}
+    {% macro rows_table(rows, caption) %}
       <div class="scroll">
         <table>
-          <caption>
-            Compared against each claim's recorded <code>computed_salary</code> — what the
-            manager was told they owed — never against a fresh recomputation.
-          </caption>
+          {% if caption %}<caption>{{ caption }}</caption>{% endif %}
           <thead>
             <tr>
               <th>Team</th>
@@ -111,7 +107,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for row in result.rows %}
+            {% for row in rows %}
               <tr>
                 <td class="small">{{ row.manager_id }}</td>
                 <td>{{ row.name }}</td>
@@ -145,21 +141,26 @@
           </tbody>
         </table>
       </div>
-    {% else %}
-      <p class="muted small">Nothing recorded for {{ year }} yet, so there was nothing to check.</p>
+    {% endmacro %}
+
+    {% if result.conflicts %}
+      {{ rows_table(result.conflicts, caption='Compared against each claim\'s recorded computed_salary — what the manager was told they owed — never against a fresh recomputation.') }}
     {% endif %}
 
-    <p class="small muted">
-      Read from ESPN's <code>{{ source.base_salary_field }}</code>, the same field
-      <code>data/derived/{{ year }}.json</code> was built from. Rosters came back
-      {% if result.regime == 'keepers' %}
-        pruned to the kept players.
-      {% elif result.regime == 'full' %}
-        at full depth.
-      {% else %}
-        in an unreadable shape.
-      {% endif %}
-      Nothing was written.
-    </p>
+    {% if result.checked %}
+      {# Folded, not dropped. A row that agrees is the least interesting thing on this screen
+         and the easiest to mistake the absence of for a clean run, so the count is on the
+         summary whether it is open or shut. #}
+      <details class="fold">
+        <summary>See all {{ result.checked | length }} verified records</summary>
+        <div class="fold-body">
+          {{ rows_table(result.checked, caption='') }}
+        </div>
+      </details>
+    {% endif %}
+
+    {% if not result.rows %}
+      <p class="muted small">Nothing recorded for {{ year }} yet, so there was nothing to check.</p>
+    {% endif %}
   {% endif %}
 </div>

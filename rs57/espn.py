@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS
+from rs57.keeper_rules import MAX_KEEPERS, MAX_PROSPECTS, charges_in_base
 from rs57.models import (
     AcquisitionSource,
     FranchiseName,
@@ -49,6 +49,7 @@ from rs57.models import (
     Position,
     RosterEntry,
     WeeklyScore,
+    utc_now,
 )
 
 HOST = "https://lm-api-reads.fantasy.espn.com"
@@ -510,6 +511,28 @@ class SyncedSeason:
     """ESPN's ``draftSettings.keeperDeadlineDate``. Gates the admin console the same way
     ``trade_deadline`` gates the prospect check — never hand-entered, never overridden."""
     warnings: tuple[str, ...] = ()
+    """Things that could not be checked, or were checked and disagreed. Every one names
+    something a person can do about it, and every one is REVIEW wherever it is read."""
+    phase: tuple[str, ...] = ()
+    """What state the season is *in* — pruned rosters, an auction not yet run, a check whose
+    premise the calendar has suspended.
+
+    Kept apart from ``warnings`` because they are not the same kind of fact and must not wear
+    the same label. Nobody needs to check that a season has not drafted yet: it is the known
+    state of every season for most of the year and it clears itself at the auction. Rendering
+    it as "nobody has checked this" is how the flags that DO need checking stop being read.
+    """
+    prices_entered: bool = False
+    """True while ESPN's salary field holds the keeper prices the commissioner has entered
+    rather than the value carried in from last season — the window between the keeper deadline
+    and the auction.
+
+    Decided once, here, and read by ``sync.py`` to decide whether it may write those salaries
+    to disk. One decision rather than two that can drift apart.
+    """
+    bases_held: int = 0
+    """Salaries this run left as they were on disk rather than overwriting — see
+    ``sync.hold_entered_bases``. Zero outside the keeper window."""
     waiver_bases_verified: int = 0
     """Waiver adds whose base was confirmed against the FAAB actually bid."""
     waiver_base_mismatches: tuple[int, ...] = ()
@@ -534,6 +557,7 @@ def build_season(
     prior_prospect_ids: Iterable[int] | None = None,
     faab_bids: Mapping[int, int] | None = None,
     managers: Mapping[int, str] | None = None,
+    now: datetime | None = None,
 ) -> SyncedSeason:
     """Read one season from ESPN and map it onto models.
 
@@ -552,6 +576,13 @@ def build_season(
     Drafted players get this for free — ``check_base_continuity`` and the auction record cover
     them — but a waiver base has no other witness, so without it those players are carried as
     unverified rather than assumed correct.
+
+    **That cross-check has a window.** It compares the base ESPN reports against the price the
+    player was acquired for, which only means something while ESPN's field still holds an
+    acquisition price. Between the keeper deadline and the auction it does not — it holds the
+    keeper prices the commissioner has entered, fee and tax inside them — so every waiver add
+    carrying a fee "disagrees" with its own FAAB bid by exactly that fee. The check is skipped
+    there and says so; ``now`` is only for testing that window.
 
     Raises ``EspnError`` rather than returning a thin season. A sync that quietly succeeds
     with an empty roster would blank a year of salaries.
@@ -576,11 +607,16 @@ def build_season(
     draft_settings = settings.get("draftSettings") or {}
     draft_date = _epoch_ms(draft_settings.get("date"))
     keeper_deadline = _epoch_ms(draft_settings.get("keeperDeadlineDate"))
+    # Decided once, before the roster loop: while ESPN holds the entered keeper prices the
+    # FAAB cross-check is comparing a keeper price against an acquisition price, and reports
+    # every waiver add carrying a fee as a disagreement with itself.
+    entered = charges_in_base(drafted, keeper_deadline, now or utc_now())
 
     franchises: list[FranchiseName] = []
     players: dict[int, Player] = {}
     roster: list[RosterEntry] = []
     warnings: list[str] = []
+    phase: list[str] = []
     verified_waivers = 0
     mismatched_waivers: list[int] = []
     roster_sizes: dict[int, int] = {}
@@ -639,7 +675,7 @@ def build_season(
             # above is already his new waiver value and the tax is gone with it.
             kept_prior = player_id in prior_keepers and source is not AcquisitionSource.WAIVER
 
-            if source is AcquisitionSource.WAIVER and faab_bids is not None:
+            if source is AcquisitionSource.WAIVER and faab_bids is not None and not entered:
                 bid = faab_bids.get(player_id)
                 if bid is None or bid != base:
                     mismatched_waivers.append(player_id)
@@ -662,7 +698,7 @@ def build_season(
     # raising here still refuses the season rather than half-writing one.
     regime = check_roster_sizes(roster_sizes)
     if regime == "keepers":
-        warnings.append(
+        phase.append(
             f"every roster is {KEEPERS_ONLY_ROSTER_SIZE} players or fewer, so ESPN has pruned "
             f"the league to its keepers: this is the window between the keeper deadline and "
             f"the auction, and the season holds only kept players. Re-sync after the auction."
@@ -681,18 +717,27 @@ def build_season(
             f"be a prospect owing no $5 tax. Pass prior_prospect_ids from last season's "
             f"keeper claims"
         )
-    if faab_bids is None:
+    if faab_bids is None and not entered:
         warnings.append(
             "waiver bases were not checked against the FAAB record — pass faab_bids so a "
             "waiver add's salary has a witness"
         )
-    if mismatched_waivers:
+    if entered:
+        # SKIPPED, never silence — but a phase note, not a warning. The check has not passed
+        # here, it has not run, and the reason is a known state with a known end: the auction.
+        phase.append(
+            "the waiver-base check did not run: between the keeper deadline and the auction "
+            "ESPN holds the keeper prices entered for this season, not the price each player "
+            "was acquired for, so there is nothing to compare a FAAB bid against. It resumes "
+            "once the auction has run"
+        )
+    elif mismatched_waivers:
         warnings.append(
             f"{len(mismatched_waivers)} waiver adds disagree with the FAAB actually bid; "
             f"under the ratchet a wrong waiver base carries forward every season after"
         )
     if not drafted:
-        warnings.append(
+        phase.append(
             f"{client.year} has not been drafted, so base_salary is keeperValue (last "
             f"season's salary carried forward). Re-sync after the auction."
         )
@@ -708,6 +753,8 @@ def build_season(
         draft_date=draft_date,
         keeper_deadline=keeper_deadline,
         warnings=tuple(warnings),
+        phase=tuple(phase),
+        prices_entered=entered,
         waiver_bases_verified=verified_waivers,
         waiver_base_mismatches=tuple(sorted(mismatched_waivers)),
     )

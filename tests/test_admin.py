@@ -29,6 +29,8 @@ from rs57.admin.gitops import Git, GitError
 from rs57 import admin
 from rs57.admin.reconcile import (
     EspnKeeperPick,
+    ReconcileRow,
+    Verification,
     keeper_picks,
     reconcile,
     roster_salaries,
@@ -498,6 +500,16 @@ def test_a_review_never_renders_as_checked(client):
     assert notes, "a screen note must carry the same wording as an engine review"
 
 
+def tagged_flags(html: str) -> list[tuple[str, str]]:
+    """Every rendered flag as ``(label, message)``, so a test can check what a note is called."""
+    return [
+        (re.sub(r"\s+", " ", tag).strip(), re.sub(r"\s+", " ", text(body)).strip())
+        for tag, body in re.findall(
+            r'<span class="tag">(.*?)</span>\s*<div>(.*?)</div>', html, re.S
+        )
+    ]
+
+
 def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path):
     """The nightly's own warnings surface here, because they surface nowhere else.
 
@@ -505,9 +517,13 @@ def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path)
     ``test_site.test_a_sync_warning_stays_off_the_public_page``. This screen is now the only
     place a ``review.warnings`` entry is ever read by a human, so it must arrive labelled as
     unchecked rather than folded in beside the prices as though somebody had looked at it.
+
+    On the **season report**, once. It used to print on all twelve cards (commissioner,
+    2026-09-02): a sync warning changes no number on any one of them and cannot be acted on
+    from one, and twelve copies buried the findings that could.
     """
     doc = keeper_doc()
-    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
+    doc["review"]["warnings"] = ["prospect keeps were not supplied for 2025"]
     (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
 
     app = create_app(
@@ -517,27 +533,22 @@ def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path)
         push=False,
         clock=lambda: NOW,
     )
-    page = app.test_client().get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    client = app.test_client()
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "prospect keeps were not supplied" not in client.get(
+        f"/season/{SEASON}/team/t1"
+    ).get_data(as_text=True), "a sync warning has no business on one franchise's card"
 
     warned = [
         (label, message)
-        for label, message in tooltip_lines(page)
-        if "has not been drafted" in message
+        for label, message in tagged_flags(page)
+        if "prospect keeps were not supplied" in message
     ]
     assert warned, "the sync's warning is not on the commissioner's screen at all"
-    assert all("UNVERIFIED" in label for label, _ in warned), (
+    assert len(warned) == 1, f"printed {len(warned)} times — once is the point"
+    assert all("Unverified" in label for label, _ in warned), (
         f"the sync warning is labelled {[label for label, _ in warned]} — it has not been checked"
     )
-
-
-def tagged_flags(html: str) -> list[tuple[str, str]]:
-    """Every rendered flag as ``(label, message)``, so a test can check what a note is called."""
-    return [
-        (re.sub(r"\s+", " ", tag).strip(), re.sub(r"\s+", " ", text(body)).strip())
-        for tag, body in re.findall(
-            r'<span class="tag">(.*?)</span>\s*<div>(.*?)</div>', html, re.S
-        )
-    ]
 
 
 def test_an_unverified_note_is_labelled_where_it_appears(client):
@@ -2211,6 +2222,211 @@ def test_verify_writes_nothing(client, data_dir: Path, monkeypatch):
     assert before == after, "verify touched a file"
 
 
+def test_conflicts_is_every_row_that_is_not_an_agreement(client):
+    """Defined as the complement of `checked`, so a state added later lands where it is read.
+
+    `not_yet_entered` is in it deliberately. ESPN has not been *told* the number rather than
+    disagreeing about it, but the row still differs, and it is the list of players still to
+    type in — the one thing the screen is for in the weeks before the auction.
+    """
+    agrees = ReconcileRow(manager_id="t1", name="A", espn_player_id=1,
+                          recorded_salary=10, espn_value=10, slot="K1", claimed=True)
+    mismatch = ReconcileRow(manager_id="t1", name="B", espn_player_id=2,
+                            recorded_salary=10, espn_value=99, slot="K2", claimed=True)
+    pending = ReconcileRow(manager_id="t2", name="C", espn_player_id=3, recorded_salary=15,
+                           espn_value=10, slot="K1", claimed=True, base_at_sync=10)
+    unpriced = ReconcileRow(manager_id="t2", name="D", espn_player_id=4,
+                            recorded_salary=None, espn_value=10, slot="K2", claimed=True)
+
+    assert (agrees.state, mismatch.state, pending.state, unpriced.state) == (
+        "agrees", "mismatch", "not_yet_entered", "unpriced"
+    ), "the fixture must cover an agreement and three ways of differing"
+
+    run = Verification(
+        season=SEASON, rows=(agrees, mismatch, pending, unpriced),
+        regime="keepers", unrecorded_checked=True, draft_picks_seen=0,
+    )
+    assert run.conflicts == (mismatch, pending, unpriced)
+    assert run.checked == (agrees,)
+    # The whole point: nothing falls between the two halves and out of sight.
+    assert len(run.conflicts) + len(run.checked) == len(run.rows)
+
+
+def test_the_espn_check_shows_conflicts_and_folds_the_agreements(client, store, data_dir, monkeypatch):
+    """Rows that differ are read; rows that agree are the least interesting thing on the screen.
+
+    Folded, never dropped — the count is on the summary whether it is open or shut. A run that
+    silently showed fewer rows than it checked would be this repo's own failure mode.
+    """
+    store.save_team_claims(SEASON, "t1", [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=PLAIN, slot="K1",
+                    fee_allocated=0, computed_salary=42, submitted_at=NOW),
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED, slot="K2",
+                    fee_allocated=0, computed_salary=17, submitted_at=NOW),
+    ])
+    monkeypatch.setattr(
+        admin, "fetch_roster_salaries",
+        lambda season, field, ids: (
+            [EspnKeeperPick(espn_team_id=1, espn_player_id=PLAIN, bid=42),   # agrees
+             EspnKeeperPick(espn_team_id=1, espn_player_id=TAXED, bid=99)],  # mismatch
+            _sizes(3), None,
+        ),
+    )
+    monkeypatch.setattr(admin, "fetch_keeper_picks", lambda season: ([], None))
+
+    body = client.post(f"/season/{SEASON}/verify").get_data(as_text=True)
+    fold = body[body.index("<details"):]
+    above = body[:body.index("<details")]
+
+    assert "mismatch" in above, "a row ESPN disagrees about must be read without opening anything"
+    assert "See all 1 verified records" in fold, "and the agreements are counted on the summary"
+    assert body.count("<details") == 1
+
+
+def _set_waiver_mismatch(data_dir: Path, player_id: int, season: int = SEASON) -> None:
+    """Put a stored mismatch in the derived file, the way a sync before the fix left one."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["waiver_base_mismatches"] = [player_id]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def _set_sync_phase(data_dir: Path, note: str, season: int = SEASON) -> None:
+    """A phase note in the derived file, as the sync writes them since the split."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["phase"] = [note]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def _set_sync_warning(data_dir: Path, warning: str, season: int = SEASON) -> None:
+    """A sync warning stored in the derived file, as a run before the window gate left one."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["warnings"] = [warning]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def test_no_sync_note_of_either_kind_reaches_a_franchise_card(client, data_dir: Path):
+    """A card carries what is true of that franchise. Nothing else (commissioner, 2026-09-02).
+
+    Both kinds, because the split is not what fixed this — twelve copies of "2026 has not been
+    drafted" buried three real salary findings on the same card whichever label they wore.
+    """
+    _set_sync_warning(data_dir, "prospect keeps were not supplied for 2025")
+    _set_sync_phase(data_dir, "2026 has not been drafted, so base_salary is keeperValue")
+
+    card = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    assert "prospect keeps were not supplied" not in card
+    assert "has not been drafted" not in card
+
+    board = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert board.count("prospect keeps were not supplied") == 1, "once, on the report"
+    assert board.count("has not been drafted") == 1
+
+
+def test_a_phase_note_is_never_labelled_unverified(client, data_dir: Path):
+    """"This season has not drafted yet" is the known state of every season for most of the
+    year and clears itself at the auction. Nobody has to go and check it.
+
+    The rule it must not break: a REVIEW never renders as though it had passed. This is the
+    other side — something that was never a check must not render as though it were one, or the
+    label stops meaning anything on the findings that are.
+    """
+    _set_sync_warning(data_dir, "prospect keeps were not supplied for 2025")
+    _set_sync_phase(data_dir, "2026 has not been drafted, so base_salary is keeperValue")
+    flags = tagged_flags(client.get(f"/season/{SEASON}").get_data(as_text=True))
+
+    phase = [label for label, msg in flags if "has not been drafted" in msg]
+    warned = [label for label, msg in flags if "prospect keeps were not supplied" in msg]
+    assert phase and warned, f"the fixture must render both kinds: {flags}"
+    assert all("For information" in label for label in phase), phase
+    assert all("Unverified" in label for label in warned), warned
+
+
+def test_a_stored_waiver_mismatch_is_ignored_once_espn_holds_entered_prices(
+    client, data_dir: Path
+):
+    """`data/derived/` belongs to the nightly Action, so a file synced before the fix still
+    carries the finding. Reading it in that window reports three real keepers as errors.
+
+    Both halves are asserted. Suppressing it outright would throw away a check that catches the
+    quiet kind of error — a wrong waiver base the ratchet carries forward every season after.
+    """
+    set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))  # passed, and 2026 has not drafted
+    _set_waiver_mismatch(data_dir, LATE)
+    _set_sync_warning(data_dir, "3 waiver adds disagree with the FAAB actually bid")
+
+    in_window = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "disagree about the waiver price" not in in_window
+    # Both forms, or the card names nobody while still claiming three disagreements.
+    assert "disagree with the FAAB" not in in_window, "the stale sentence goes with the list"
+
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))  # deadline still ahead
+    still_checked = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "disagree about the waiver price" in still_checked, "the check must survive the fix"
+    assert "disagree with the FAAB" in still_checked
+
+
+def test_the_card_states_whether_it_recorded_without_stamping_when(client, store: ManualStore):
+    """The minute a card was saved is not something anyone reads off this screen
+    (commissioner, 2026-09-02). Whether anything is on file still is — it is the one thing the
+    status badge does not answer.
+
+    `submitted_at` keeps being recorded either way: it is what decides whether a claim entered
+    before the keeper deadline reads as provisional.
+    """
+    before = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
+    assert "Not recorded yet" in before
+
+    client.post(f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0)))
+    after = text(client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True))
+
+    assert "Recorded" in after, "whether it saved is still the line's job"
+    assert store.claims(SEASON)[0].submitted_at is not None, "and the stamp is still recorded"
+    assert not re.search(r"Recorded \d{4}-\d{2}-\d{2}", after), "but it is not printed"
+
+
+def test_the_player_picker_does_not_mark_rookies(client, data_dir: Path):
+    """Dropped 2026-09-02 (commissioner).
+
+    It was only ever a hint while choosing — a rookie may legally be kept in K1/K2/K3, so the
+    mark never determined anything. What it hinted at is still checked: an ineligible prospect
+    is a REVIEW on the card either way, which
+    ``test_an_ineligible_prospect_is_reported_but_not_blocked`` and its neighbours hold. The
+    hint went; the finding did not.
+    """
+    # Without this the test cannot fail: nobody in the base fixture has a draft class, so no
+    # option would carry the mark whether the template printed it or not.
+    (data_dir / "derived" / "player-origins.json").write_text(
+        json.dumps({"players": [{"espn_player_id": LATE, "first_nfl_season": SEASON - 1,
+                                 "source": "draft_year"}], "unresolved": []}),
+        encoding="utf-8",
+    )
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    options = re.findall(r'<option value="\d+"[^>]*>(.*?)</option>', page, re.S)
+    assert options, "the fixture must render a player picker"
+    assert not any("rookie" in option for option in options), "the picker marks rookies again"
+
+
+def test_the_espn_check_opens_in_a_dialog_over_the_board(client):
+    """It answers one question and is done. Thirty rows above the cards pushed the screen's own
+    job down the page every time it ran.
+
+    The target has to be INSIDE the dialog, or the result lands on the page again and the modal
+    stays empty.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    dialog = re.search(r'<dialog id="verify-modal"[^>]*>(.*?)</dialog>', page, re.S)
+    assert dialog, "no dialog for the ESPN check"
+    assert 'id="verify-result"' in dialog.group(1), "the result would land outside the modal"
+
+    button = re.search(r'<button[^>]*hx-post="/season/\d+/verify"[^>]*>', page)
+    assert button and 'hx-target="#verify-result"' in button.group(0)
+
+
 def test_verify_is_never_a_get(client):
     """An unreachable ESPN must not take down the page the offseason is entered on."""
     assert client.get(f"/season/{SEASON}/verify").status_code == 405
@@ -2255,15 +2471,71 @@ def test_the_report_counts_a_league_wide_flag_once(data_dir: Path, store: Manual
     )
 
 
-def test_an_open_board_has_exactly_one_record_button(client, data_dir: Path):
+def test_an_open_board_has_exactly_one_save_button(client, data_dir: Path):
     """One action, taken once. Twelve buttons is twelve chances to forget a franchise.
 
     Also the other half of the lock test — removing the button unconditionally would pass that
-    one on its own.
+    one on its own. The button sits above the board and reaches it by id, so `form="board"` is
+    what identifies it now that the label no longer names the season.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # no deadline = open
-    assert page.count("Record all") == 1
+    assert page.count('form="board"') == 1
     assert re.search(r'<form[^>]*hx-post="/season/\d+/record"', page)
+
+
+def test_the_save_button_posts_the_board_from_outside_it(client):
+    """The button sits above the board and the board is a form, so it reaches it by id.
+
+    Native form association — the same thing the trade and override tables do with their own
+    rows. Drop the `form=` and the button becomes inert: it submits nothing, silently, and the
+    only way to record twelve franchises is gone.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    button = re.search(r'<button[^>]*form="board"[^>]*>', page)
+    assert button, "no button reaches the board form"
+    assert 'type="submit"' in button.group(0)
+
+    form = re.search(r'<form[^>]*id="board"[^>]*>', page, re.S)
+    assert form, "no form for it to reach"
+    assert f'/season/{SEASON}/record' in form.group(0), "and it must post the record endpoint"
+
+    assert button.start() < form.start(), "the button is above the board, not inside it"
+
+
+def test_the_boards_spinner_has_somewhere_to_show(client):
+    """`.htmx-request .spin` is a DESCENDANT rule and the form is what makes the request.
+
+    The spinner used to sit inside that form and matched for free. It sits beside the button
+    now, outside it, so the form has to name it — without `hx-indicator` the spinner is dead
+    markup and a record gives no sign it is running.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    form = re.search(r'<form[^>]*id="board"[^>]*>', page, re.S)
+    indicated = re.search(r'hx-indicator="#([\w-]+)"', form.group(0))
+    assert indicated, "the board form names no indicator"
+
+    target = indicated.group(1)
+    opened = page.find(f'id="{target}"')
+    assert opened != -1, f"#{target} is not on the page"
+    # To the first close tag: the indicator wraps the spinner and nothing else.
+    assert 'class="spin"' in page[opened:page.index("</span>", opened)], (
+        f"#{target} contains no spinner to reveal"
+    )
+
+
+def test_the_board_does_not_print_the_keeper_deadline(client, data_dir: Path):
+    """It moved to Season settings (commissioner, 2026-09-02), and it moved — it did not vanish.
+
+    Both halves matter. A board still printing it means the top of the screen never got
+    cleared; a settings page that stopped means the console prints ESPN's deadline nowhere at
+    all, and the date would be gone from the tool rather than relocated in it.
+    """
+    set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
+
+    assert "2026-12-01" not in client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "2026-12-01" in client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
 
 def test_no_card_renders_an_empty_row(client, data_dir: Path):
@@ -2629,15 +2901,19 @@ def test_a_future_deadline_disables_nothing(client, data_dir: Path):
     ESPN publishes keeper selections to nobody but an authenticated league member, so manual
     entry is the only way they reach this tool — and the window that entry happens in is
     exactly the window the lock used to close. Both halves are asserted here: the date is still
-    on the page, and not one control on it is dead.
+    displayed somewhere, and not one control on the board is dead.
+
+    "Somewhere" is Season settings since 2026-09-02 — the board's own deadline line went when
+    the actions moved to the top of it. The board's half of the rule is that nothing gates.
     """
     set_keeper_deadline(data_dir, datetime(2026, 12, 1, 12, 0))
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    settings = client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
-    assert "2026-12-01" in page, "the deadline is still displayed — it just does not gate"
-    assert "not yet" in page, "and the page says it has not passed"
+    assert "2026-12-01" in settings, "the deadline is still displayed — it just does not gate"
+    assert "2026-12-01" not in page, "and no longer on the board, where nothing acts on it"
     assert "Claims are locked until the keeper deadline" not in page
-    assert page.count("Record all") == 1, "one board, one live button"
+    assert page.count('form="board"') == 1, "one board, one live button"
     assert not re.findall(r'name="t\d+__(?:fee|player)_[A-Z0-9]+"[^>]*\sdisabled', page, re.S), (
         "no fee box and no picker may be disabled before the deadline — that was the lock"
     )
@@ -2962,11 +3238,12 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
 
     The note still reaches the card, because a card is where the number it affects is read.
     Only the tally is per franchise.
-    """
-    doc = keeper_doc()
-    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
-    (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
 
+    The fixture is the unrecorded consolation winner, which is the kind this still describes: it
+    prices every team on the board with fees in full, so it changes a number on each card. Sync
+    warnings used to be the example here and no longer reach a card at all — they change no
+    number on one and cannot be acted on from one.
+    """
     derived = Derived(derived_dir=data_dir / "derived")
     screen = build_team_screen(
         SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store
@@ -2980,7 +3257,7 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
         f"the card counted {screen.review_count} against {reviews} review(s) and "
         f"{len(team_only)} team note(s) — a league-wide fact was tallied per franchise"
     )
-    assert any("has not been drafted" in line for line in screen.unverified_reasons), (
+    assert any("no settings row" in line for line in screen.unverified_reasons), (
         "and it must still be readable on the card it affects"
     )
 
@@ -2989,26 +3266,32 @@ def test_a_click_on_the_badge_cannot_record_the_league(client):
     """The board wraps all twelve cards in ONE form, and a bare <button> submits it.
 
     So an unmarked button anywhere inside a card is a click that records twelve franchises —
-    from an element whose whole job is to show a reason. Exactly one button on this page is
-    allowed to submit, and it is the one that says so.
+    from an element whose whole job is to show a reason.
+
+    Since the Save button moved above the board it reaches the form by id, which makes the rule
+    stricter than it was: **no** unscoped submitter may exist anywhere on the page, and the one
+    button allowed to record names the form it records.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)
     # Prose first: the stylesheet's own comments say the word "<button>", and scanning them
     # reported an untyped button that does not exist.
     markup = re.sub(r"<(style|script)\b.*?</\1>", "", page, flags=re.S)
     buttons = re.findall(r"<button([^>]*)>", markup)
-    assert len(buttons) > 1, "the fixture must render both a badge and the Record button"
+    assert len(buttons) > 1, "the fixture must render both a badge and the Save button"
 
-    # A `form=` attribute points the button at a different form, so it cannot submit the board
-    # whatever its type. What is dangerous is an unscoped button that is not type="button".
+    # A `form=` attribute scopes the button to a named form, so it cannot submit whatever
+    # happens to enclose it. What is dangerous is an unscoped button that is not type="button".
     submitters = [
         b for b in buttons if 'type="button"' not in b and "form=" not in b
     ]
-    assert len(submitters) == 1, (
-        f"{len(submitters)} buttons can submit the board; only Record may. Offenders: "
-        f"{[b.strip()[:60] for b in submitters]}"
+    assert submitters == [], (
+        f"{len(submitters)} unscoped button(s) can submit whatever form encloses them. "
+        f"Offenders: {[b.strip()[:60] for b in submitters]}"
     )
-    assert 'type="submit"' in submitters[0], "and it must say so rather than rely on a default"
+
+    records = [b for b in buttons if 'form="board"' in b]
+    assert len(records) == 1, "exactly one button records the league"
+    assert 'type="submit"' in records[0], "and it must say so rather than rely on a default"
 
 
 def test_the_reason_panel_is_wired_up(client):
@@ -3234,10 +3517,12 @@ def test_the_deadline_is_shown_and_never_enforced(client, store: ManualStore, da
     that no salary is entered that early, so a lock cost nothing. The premise was wrong: ESPN
     hands the selections to nobody, so manual entry before the deadline is the only input path
     there is. Both sides of the deadline save now, and neither ever re-locks.
+
+    "Shown" is Season settings — the board stopped printing the date on 2026-09-02. "Never
+    enforced" is the board, and is the half with teeth.
     """
     set_keeper_deadline(data_dir, datetime(2026, 1, 1, 12, 0))
-    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
-    assert "passed" in text(page)
+    assert "2026-01-01" in client.get(f"/season/{SEASON}/settings").get_data(as_text=True)
 
     saved = client.post(
         f"/season/{SEASON}/team/t1", data=form((TAXED, "K1", 0))
@@ -3361,22 +3646,14 @@ def test_the_default_clock_is_utc_and_not_the_machines_local_time(tmp_path: Path
     assert app.config["CLOCK"] is utc_now
 
 
-def test_the_gate_prints_the_deadline_on_the_league_clock(client, data_dir: Path):
-    """ESPN's real 2026 keeper deadline: 11pm ET on 9/1, which is 03:00 UTC on 9/2.
-
-    Stored UTC and printed UTC, the console named the wrong day for it — the same failure the
-    public home page had. The banner is what a commissioner reads to know whether the thing is
-    open, so it has to say the time the managers were given.
-    """
-    set_keeper_deadline(data_dir, datetime(2026, 9, 2, 3, 0))
-    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
-
-    assert "2026-09-01 23:00" in page, "the deadline on the league's clock"
-    assert "2026-09-02 03:00" not in page, "the stored UTC form is a day late"
-
-
 def test_the_settings_page_prints_espns_dates_on_the_league_clock(client, data_dir: Path):
-    """Both read-only ESPN facts, at their real 2026 values — the draft 9pm ET on 9/3."""
+    """Both read-only ESPN facts, at their real 2026 values — the draft 9pm ET on 9/3.
+
+    **The only place the console prints the keeper deadline**, and so the only guard left on
+    printing it in the league's own timezone. The keeper board carried the same assertion until
+    2026-09-02; stored UTC and printed UTC, it named the wrong day — ESPN's 2026 deadline is
+    11pm ET on 9/1, which is 03:00 UTC on 9/2, and the whole console read a day late.
+    """
     path = data_dir / "derived" / f"{SEASON}.json"
     doc = json.loads(path.read_text(encoding="utf-8"))
     doc["source"]["draft_date"] = "2026-09-04T01:00:00"
@@ -3574,15 +3851,22 @@ def test_deleting_an_override_returns_to_the_season_it_was_deleted_from(
     assert landed.headers["Location"].endswith(f"/season/{SEASON}")
 
 
-def test_the_board_names_the_season_it_would_record(client):
-    """The picker makes a prior season a routine destination, and Record clears empties.
+def test_the_save_button_is_told_apart_by_the_header_above_it(client):
+    """The picker makes a prior season a routine destination, and Save clears empties.
 
-    "Record all 12 franchises" on a page you did not mean to be on is one click from wiping a
-    settled year. Nothing gates it — the year is on the button instead.
+    A Save on a page you did not mean to be on is one click from wiping a settled year. The
+    button used to name its own season — "Record all 12 franchises for 2025" — and no longer
+    does (commissioner, 2026-09-02). **This is a weaker guarantee than the one it replaces**,
+    and it is asserted here rather than assumed: the header picker names the year directly
+    above the button, and a prior season also carries the amber tag beside it.
     """
     page = client.get(f"/season/{PRIOR}").get_data(as_text=True)
-    assert f"franchises for {PRIOR}" in page
+    assert f'value="/season/{PRIOR}"' in page and "selected" in page, "the picker names the year"
     assert "not the current season" in text(page)
+    assert 'form="board"' in page, "and the button it warns about is on the same screen"
+
+    # Nothing on the button itself distinguishes the two seasons, which is the cost.
+    assert page.count('form="board"') == 1
 
 
 def test_recording_a_trade_writes_it_with_its_direction(client, store: ManualStore):

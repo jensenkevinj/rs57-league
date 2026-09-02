@@ -84,6 +84,33 @@
     color: var(--muted);
   }
   .page-meta a { color: var(--accent); }
+  /* The board's two actions, in the corner above what they act on. */
+  .page-actions {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 0.8rem; margin: 0.85rem 0 0;
+  }
+  .page-actions > span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  /* The ESPN check, over the board rather than on top of it. `max-height` plus `overflow` and
+     not a fixed height: the run that finds nothing is three lines and should not open a
+     full-screen panel to say so. */
+  dialog.modal {
+    /* Sized to what is in it, not to the viewport. A clean run is three lines and used to get
+       the same 62rem box as a 27-row table, which on a laptop is mostly empty. `fit-content`
+       between a floor and a ceiling: narrow when it has little to say, as wide as the table
+       needs up to the ceiling, and the table scrolls inside `.scroll` beyond that. */
+    width: fit-content;
+    min-width: min(26rem, 92vw);
+    max-width: min(52rem, 92vw);
+    max-height: 85vh; overflow: auto;
+    padding: 1.1rem 1.3rem; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel); color: var(--ink);
+  }
+  dialog.modal::backdrop { background: rgba(20, 24, 30, 0.45); }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-bottom: 0.7rem;
+  }
+  .modal-head strong { font-size: 1.05rem; }
   table {
     border-collapse: collapse; width: 100%; margin: 0.7rem 0 1.3rem; font-size: 0.94rem;
     background: var(--bg);
@@ -117,7 +144,7 @@
   /* The two verdicts under a card's name. Their own row rather than trailing the name: at
      twelve across, a badge that wraps to the next line only on the long franchise names makes
      the grid impossible to scan down. */
-  .tc-verdicts { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.5rem; }
+  .tc-verdicts { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin: 0 0 var(--sp-2); }
   /* These two carry sentences — "from ESPN, legal — not recorded" — where the other
      `tag-inline` uses are one or two words. `nowrap` on a sentence is a ~20rem unbreakable
      box, which is what set the card's minimum width and broke the grid. */
@@ -208,9 +235,13 @@
     display: grid; grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr));
     gap: 0.9rem; margin: 1.2rem 0 1.6rem; align-items: start;
   }
+  /* One spacing scale for everything inside a card, on a 4px grid. This grew eleven
+     hand-picked values — 0.85/0.95/0.7 padding, 0.55 here, 0.45 there — which is how a card
+     ends up looking almost-aligned from every direction at once. */
   .team-card {
+    --sp-1: 0.25rem; --sp-2: 0.5rem; --sp-3: 0.75rem; --sp-4: 1rem;
     border: 1px solid var(--line); border-radius: 10px; background: #fff;
-    padding: 0.85rem 0.95rem 0.7rem;
+    padding: var(--sp-3) var(--sp-4);
     /* A grid item's min-width is `auto` — its min-content — so ONE unbreakable thing inside
        (a nowrap badge, a table that will not compress) stops the card fitting its track and
        pushes it out over its neighbour. Nothing in a card is wide enough to be worth that. */
@@ -218,8 +249,8 @@
   }
   .team-card.blocked { border-color: var(--bad-line); background: var(--bad-bg); }
   .tc-head {
-    display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
-    padding-bottom: 0.55rem; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+    padding-bottom: var(--sp-2); border-bottom: 1px solid var(--line);
   }
   .tc-name { font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; }
   .tc-name a { color: var(--ink); text-decoration: none; }
@@ -256,12 +287,18 @@
   /* The status line sits at the card's bottom edge, so its panel opens upward instead of off
      the end of the card. */
   .tc-actions .tc-reasons { top: auto; bottom: calc(100% + 0.3rem); }
-  .team-card .tc-table th { background: transparent; padding: 0.4rem 0.3rem; }
-  .team-card .tc-table td { padding: 0.3rem 0.3rem; border-bottom: 1px solid var(--line); }
+  .team-card .tc-table th { background: transparent; padding: var(--sp-2) 0.3rem var(--sp-1); }
+  /* `middle`, not the table default of `baseline`. A row pairs a select against plain text and
+     a number, and on baselines the slot label and the totals sat a pixel or two above the
+     control they belong to — the sort of thing that reads as sloppy without being nameable. */
+  .team-card .tc-table td {
+    padding: var(--sp-1) 0.3rem; border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
   /* No rule under the total row — the card's own edge already closes the table. The generic
      `tfoot td` clears this, but `.team-card .tc-table td` above is more specific and puts it
      back, so it has to be cleared here. */
-  .team-card .tc-table tfoot td { padding-top: 0.45rem; border-bottom: none; }
+  .team-card .tc-table tfoot td { padding-top: var(--sp-2); border-bottom: none; }
   /* **Fixed, so the columns stop depending on their contents.** A `select`'s minimum width is
      its widest option, and `width: 100%` does not reduce it — so an auto table holding one
      asked for 620px inside a 340px card and every column was squeezed to fit. Fixed layout
@@ -272,8 +309,12 @@
   }
   .team-card .tc-table select { width: 100%; min-width: 0; }
   .team-card .tc-table input[type="number"] { width: 100%; padding: 0.2rem 0.25rem; }
+  /* The slot label had NO horizontal padding at either end, so it sat hard against the card's
+     content edge with the select's border a hair to its right — the one thing in the card
+     touching a wall. It gets the scale's smallest step on the left and a full step of gutter
+     before the player picker; the column widens to carry the larger type below. */
   .team-card .tc-table td.tc-slot-col, .team-card .tc-table th.tc-slot-col {
-    width: 1.5rem; padding-right: 0; padding-left: 0;
+    width: 1.9rem; padding-left: var(--sp-1); padding-right: var(--sp-2);
   }
   /* The player column takes what is left; these four are sized for "$100". */
   .team-card .tc-table th.tc-money-col { width: 2.9rem; }
@@ -282,23 +323,20 @@
   .tc-pos {
     color: var(--muted); font-size: 0.78rem; margin-left: 0.3rem; white-space: nowrap;
   }
+  /* 0.58rem is 9.3px, which is below the size any of this is readable at — and it was muted
+     grey on white on top of that. Still the quietest thing in the row, but now legible. */
   .tc-slot {
-    display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em;
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
     color: var(--muted);
   }
   .team-card .tc-table th { white-space: nowrap; font-size: 0.65rem; }
-  .team-card .flag { padding: 0.5rem 0.6rem; margin: 0.5rem 0; font-size: 0.85rem; }
+  .team-card .flag {
+    padding: var(--sp-2) var(--sp-3); margin: var(--sp-2) 0; font-size: 0.85rem;
+  }
   .tc-actions {
-    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem;
-    font-size: 0.82rem;
+    display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+    margin-top: var(--sp-3); font-size: 0.82rem;
   }
-  .board-actions {
-    display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
-    margin: 0 0 1.6rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line);
-    border-radius: 8px; background: var(--panel);
-  }
-  .board-actions .small { flex: 1 1 20rem; }
-
   /* Everything that belongs on the tab but is not what the tab is for. */
   /* The cash-trade table: every row is live, and the last row is the insert form.
 
@@ -430,6 +468,33 @@
       var picker = event.target.closest("select.season-pick");
       if (picker && picker.value) window.location.assign(picker.value);
     });
+
+    /* The ESPN check opens its dialog only once htmx has put something in it — an empty modal
+       on the way in would be a panel that says nothing, and a failed request must leave the
+       board exactly as it was. `showModal` and not the `open` attribute: only the former
+       brings the backdrop, the focus trap and Escape. */
+    document.addEventListener("htmx:afterSwap", function (event) {
+      var dialog = document.getElementById("verify-modal");
+      if (!dialog) return;
+      /* Matched on the id and NOT on `dialog.contains(target)`: the swap is `outerHTML`, so by
+         the time this fires the element in `detail.target` has been replaced and detached, and
+         asking whether the dialog still contains it always answers no. Where that id lives is
+         the template's business, and a test holds it inside the dialog. */
+      var swapped = event.detail && event.detail.target;
+      if (!swapped || swapped.id !== "verify-result") return;
+      if (!dialog.open) dialog.showModal();
+    });
+
+    document.addEventListener("click", function (event) {
+      /* A click that lands on the DIALOG itself is a click on its backdrop — anything inside
+         hits a child. */
+      if (event.target.tagName === "DIALOG") return event.target.close();
+      var closer = event.target.closest("button.modal-close");
+      if (closer) {
+        var open = closer.closest("dialog");
+        if (open) open.close();
+      }
+    });
   })();
 </script>
 </head>
@@ -453,7 +518,7 @@
            class="{% if page == 'money' %}on{% endif %}">Money</a>
       {% endif %}
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">
-        Save{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
+        Commit{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
       </a>
       {% if picker_year %}
         {# The one place the working year is stated, which is why the tabs above no longer

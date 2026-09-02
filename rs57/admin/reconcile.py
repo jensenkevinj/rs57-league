@@ -301,6 +301,21 @@ class Verification:
         return tuple(row for row in self.rows if row.state == "agrees")
 
     @property
+    def conflicts(self) -> tuple[ReconcileRow, ...]:
+        """Every row where this tool and ESPN do not hold the same number, in row order.
+
+        The complement of ``checked``, and deliberately defined that way rather than as a list
+        of the interesting states: a state added later lands here by default, where somebody
+        reads it, instead of falling silently into the collapsed half.
+
+        ``not_yet_entered`` counts. It is not a *disagreement* — ESPN simply has not been told
+        the number yet — but it is a difference, and it is the list of players still to type in.
+        Filing it with the agreements would collapse the whole to-do list out of sight in the
+        weeks it matters most.
+        """
+        return tuple(row for row in self.rows if row.state != "agrees")
+
+    @property
     def clean(self) -> bool:
         """Every row compared, every comparison passed, and ESPN was actually reachable.
 

@@ -276,6 +276,7 @@ def create_app(
             store,
             claims=claims,
             first_nfl_season=derived.first_nfl_seasons(),
+            keeper_deadline=keeper_deadline_fact(current, now=now()),
         )
 
         if problems or screen.blocked:
@@ -295,6 +296,7 @@ def create_app(
             store,
             saved=True,
             first_nfl_season=derived.first_nfl_seasons(),
+            keeper_deadline=keeper_deadline_fact(current, now=now()),
         )
         return render_template("_claim_form.html", screen=saved, source=current, problems=[])
 
@@ -827,7 +829,7 @@ def create_app(
             draft_picks=len(picks),
             error=error or pick_error if error else None,
         )
-        return render_template("_verify.html", result=result, year=year, source=current)
+        return render_template("_verify.html", result=result, year=year)
 
     # -- the commit button ------------------------------------------------------
 

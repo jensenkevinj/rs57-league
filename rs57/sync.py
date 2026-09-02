@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -101,8 +102,54 @@ def season_document(season: SyncedSeason) -> dict[str, Any]:
             "waiver_bases_verified": season.waiver_bases_verified,
             "waiver_base_mismatches": list(season.waiver_base_mismatches),
             "warnings": list(season.warnings),
+            # What state the season is in, kept apart from what needs looking at. A reader that
+            # cannot tell them apart labels "this season has not drafted yet" as unverified.
+            "phase": list(season.phase),
         },
     }
+
+
+def hold_entered_bases(season: SyncedSeason, out_dir: Path) -> tuple[SyncedSeason, int]:
+    """Keep the salaries already on disk while ESPN's field is not ESPN's to give.
+
+    **The one field this sync will not overwrite, and only in one window.** For most of the
+    year ESPN's keeper figure is the price a player carried in from last season, which is what
+    every salary in this league is computed from. Between the keeper deadline and the auction
+    it is not: the commissioner types the final keeper prices into ESPN in that window, base
+    and allocated fee and $5 tax already added together, and the field hands those straight
+    back. A sync that copies them in makes every kept player cost his own fee and tax twice.
+
+    That is not hypothetical. On 2026-09-02 the 14:25 sync — after the deadline, after ESPN
+    pruned the rosters to keepers — matched the 08-31 bases on all 38 players. The 17:16 sync,
+    taken after the prices went in, moved 27 of them by exactly a fee or a fee plus tax.
+
+    Matched on ``espn_player_id`` alone: a carried-in price follows the player across a trade,
+    the same way the tax does, so it is his number rather than his franchise's.
+
+    A player with no salary on disk takes ESPN's. There is nothing to preserve for somebody who
+    has only just arrived, and refusing him a price would be worse than reading a stale one.
+
+    Returns the season and how many salaries were held, because a merge nobody is told about is
+    indistinguishable from no merge at all.
+    """
+    if not season.prices_entered:
+        return season, 0
+    path = out_dir / f"{season.season}.json"
+    if not path.exists():
+        return season, 0
+    on_disk = {
+        row.get("espn_player_id"): row.get("base_salary")
+        for row in (json.loads(path.read_text(encoding="utf-8")).get("roster") or [])
+    }
+    held = 0
+    roster = []
+    for entry in season.roster:
+        recorded = on_disk.get(entry.espn_player_id)
+        if recorded is not None and recorded != entry.base_salary:
+            held += 1
+            entry = entry.model_copy(update={"base_salary": recorded})
+        roster.append(entry)
+    return replace(season, roster=tuple(roster)), held
 
 
 def sync_season(year: int, *, out_dir: Path = DERIVED, write: bool = True) -> SyncedSeason:
@@ -112,6 +159,10 @@ def sync_season(year: int, *, out_dir: Path = DERIVED, write: bool = True) -> Sy
     auction as a keeper is taxed this season unless he has been dropped since. Deriving it
     this way retires the old script's hand-maintained list of *names*, which is what
     under-charged James Cook by $5 once ESPN started returning ``James Cook III``.
+
+    Salaries are held rather than overwritten between the keeper deadline and the auction —
+    see ``hold_entered_bases``. Everything else in the file syncs normally in that window: one
+    field stops being ESPN's to give, not the season.
     """
     client = EspnClient.from_env(year)
     try:
@@ -136,6 +187,11 @@ def sync_season(year: int, *, out_dir: Path = DERIVED, write: bool = True) -> Sy
         prior_prospect_ids=prior_prospect_ids(year - 1),
         faab_bids=faab,
     )
+
+    # Before the write, and before the report: a dry run that skipped the merge would print a
+    # count of nothing and call it a preview.
+    season, held = hold_entered_bases(season, out_dir)
+    season = replace(season, bases_held=held)
 
     if write:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -167,6 +223,13 @@ def main(argv: list[str] | None = None) -> int:
         f"  waiver bases verified against FAAB: {season.waiver_bases_verified}"
         f" ({len(season.waiver_base_mismatches)} mismatched)"
     )
+    if season.bases_held:
+        print(
+            f"  HELD:   {season.bases_held} salaries left as they were on disk — ESPN currently "
+            f"holds the entered keeper prices, not the values carried in from last season"
+        )
+    for note in season.phase:
+        print(f"  phase:  {note}")
     for warning in season.warnings:
         print(f"  REVIEW: {warning}")
     if args.dry_run:

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set page = 'commit' %}
-{% block title %}Save data/manual/{% endblock %}
+{% block title %}Commit data/manual/{% endblock %}
 
 {% block content %}
-<h1>Save</h1>
+<h1>Commit</h1>
 <p class="page-intro">
-  Nothing recorded in this tool reaches the league until it is saved — the site is rebuilt from
+  Nothing recorded in this tool reaches the league until it is committed — the site is rebuilt from
   what is in the repo. This is exactly what will land.
 </p>
 
@@ -85,7 +85,7 @@
     </div>
   {% endif %}
 
-  <h2>Save</h2>
+  <h2>Commit</h2>
   <form method="post" action="{{ url_for('do_commit') }}">
     <div class="field">
       <label for="summary">What changed</label>
@@ -94,7 +94,7 @@
     </div>
     <div class="actions">
       <button type="submit">
-        {% if push %}Save and publish{% else %}Save locally{% endif %}
+        {% if push %}Commit and publish{% else %}Commit locally{% endif %}
       </button>
       <span class="small muted">
         {% if push %}
