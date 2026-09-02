@@ -222,11 +222,34 @@
      `.spin` must NOT also claim it: the first `auto` margin in a flex row absorbs everything,
      and with it on the spinner the badge came to rest against the team name instead. */
   .tc-head .spin { margin-left: 0; }
-  .tc-status { margin-left: auto; }
-  /* Only a badge with something to explain carries a title, so the help cursor IS the
-     affordance. A "?" glyph was tried and read as part of the word — "Valid?" asks a question
-     the badge is supposed to be answering. */
-  .tc-status[title], .tc-actions .tag-inline[title] { cursor: help; }
+  /* The auto margin belongs to the WRAPPER, not the badge inside it. On the button it does
+     nothing — it is the only child of an inline-flex box — so the badge came to rest against
+     the team name, and its panel then opened off the left edge of the window. */
+  .tc-status-wrap { margin-left: auto; }
+  /* A badge with reasons is a <button>; one without is a <span>. So the pointer cursor is the
+     whole affordance — there is nothing to click on a card that has nothing to say, and no
+     glyph is needed to advertise it. A "?" was tried and read as part of the word: "Valid?"
+     asks the question the badge exists to answer. */
+  .tc-status-wrap { position: relative; display: inline-flex; }
+  .tc-actions .tc-status-wrap { margin-left: 0; }
+  button.tc-status {
+    font: inherit; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer;
+  }
+  button.tc-status:hover { filter: brightness(0.97); }
+  .tc-reasons {
+    position: absolute; top: calc(100% + 0.3rem); right: 0; z-index: 30;
+    width: max-content; max-width: min(22rem, 80vw);
+    background: #fff; border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.5rem 0.7rem; box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+    font-size: 0.8rem; font-weight: 400; letter-spacing: 0; text-transform: none;
+    color: var(--ink); text-align: left; white-space: normal;
+  }
+  .tc-reasons ul { margin: 0; padding-left: 1rem; }
+  .tc-reasons li + li { margin-top: 0.4rem; }
+  /* The status line sits at the card's bottom edge, so its panel opens upward instead of off
+     the end of the card. */
+  .tc-actions .tc-reasons { top: auto; bottom: calc(100% + 0.3rem); }
   .team-card .tc-table th { background: transparent; padding: 0.4rem 0.3rem; }
   .team-card .tc-table td { padding: 0.3rem 0.3rem; border-bottom: 1px solid var(--line); }
   /* No rule under the total row — the card's own edge already closes the table. The generic
@@ -366,6 +389,36 @@
   .fold-body { padding: 0.2rem 0 1rem; }
   footer { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 0.9rem; }
 </style>
+<script>
+  /* Reason panels. **Delegated from the document**, not bound per badge: htmx swaps a whole
+     card out on every keystroke, and a listener attached to the button inside it would be
+     thrown away with the element it was attached to. */
+  (function () {
+    function closeAll(except) {
+      document.querySelectorAll(".tc-reasons:not([hidden])").forEach(function (panel) {
+        if (panel === except) return;
+        panel.hidden = true;
+        var btn = panel.previousElementSibling;
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      });
+    }
+    document.addEventListener("click", function (event) {
+      // A click inside an open panel is somebody selecting the text to copy it.
+      if (event.target.closest(".tc-reasons")) return;
+      var btn = event.target.closest("button.tc-status");
+      if (!btn) return closeAll(null);
+      var panel = btn.nextElementSibling;
+      if (!panel || !panel.classList.contains("tc-reasons")) return;
+      var opening = panel.hidden;
+      closeAll(panel);
+      panel.hidden = !opening;
+      btn.setAttribute("aria-expanded", String(opening));
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeAll(null);
+    });
+  })();
+</script>
 </head>
 <body>
 <header class="top">

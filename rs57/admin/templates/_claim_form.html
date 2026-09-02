@@ -41,26 +41,35 @@
     </span>
     {% if screen.fees_waived %}<span class="tag-inline ok">fees waived</span>{% endif %}
     <span class="spin">…</span>
-    {# **One badge, and it is the whole verdict.** The engine's issues and the card's notes are
-       in its tooltip rather than stacked under the table — twelve cards of flags could not be
-       scanned, which is what the board is for.
-
-       The COUNT stays in the badge text even though the reason moves to hover. An unverified
-       item that renders as nothing until someone happens to mouse over it is exactly the
-       silence this project keeps guarding against; what hover hides is the explanation, never
-       the fact that there is one.
+    {# **One badge, and it is the whole verdict.** The engine's errors are behind it rather
+       than stacked under the table — twelve cards of flags could not be scanned, which is what
+       the board is for.
 
        When the form could not be read, the card is not showing what was typed, so the badge
        reports that instead of the engine's opinion of claims nobody entered. #}
+    {# **A button, not a `title`.** A native tooltip appears only on hover, only after a delay,
+       and never on click — which is the first thing anybody tries on a red badge. This opens
+       on click and on Enter, and it is a real element so the reasons can be read, selected and
+       copied.
+
+       `type="button"` is load-bearing: the board wraps all twelve cards in ONE form, and a
+       bare <button> defaults to submit — a click here would record the league. #}
     {% set st = screen.status %}
-    <span class="tc-status tag-inline
-                 {%- if problems %} bad
-                 {%- elif st.kind == 'ok' %} ok
-                 {%- elif st.kind == 'error' %} bad
-                 {%- else %} flat{% endif %}"
-          {% if problems %}title="{% for problem in problems %}{{ problem }}&#10;&#10;{% endfor %}"
-          {%- elif st.has_detail %}title="{% for line in st.detail %}{{ line }}&#10;&#10;{% endfor %}"{% endif %}>
-      {%- if problems %}Invalid{% else %}{{ st.label }}{% endif %}
+    {% set reasons = problems if problems else st.detail %}
+    <span class="tc-status-wrap">
+      <{% if reasons %}button type="button" aria-expanded="false"{% else %}span{% endif %}
+         class="tc-status tag-inline
+                {%- if problems %} bad
+                {%- elif st.kind == 'ok' %} ok
+                {%- elif st.kind == 'error' %} bad
+                {%- else %} flat{% endif %}">
+        {%- if problems %}Invalid{% else %}{{ st.label }}{% endif -%}
+      </{% if reasons %}button{% else %}span{% endif %}>
+      {% if reasons %}
+        <div class="tc-reasons" hidden>
+          <ul>{% for line in reasons %}<li>{{ line }}</li>{% endfor %}</ul>
+        </div>
+      {% endif %}
     </span>
   </div>
 
@@ -186,9 +195,10 @@
      so every card has one of the three things below to say. #}
   <div class="tc-actions">
     <span class="small muted">
-      {% if screen.blocked %}
-        <span class="tag-inline bad">{{ screen.error_count }} error(s) — not recorded</span>
-      {% elif screen.submitted_at %}
+      {# The error count used to be repeated here in red. The badge above says Invalid and
+         lists the reasons on click, so this row is left with the one thing the badge does not
+         answer: whether anything is on file. #}
+      {% if screen.submitted_at %}
         Recorded {{ (screen.submitted_at | et).strftime('%Y-%m-%d %H:%M') }} ET
       {% else %}
         Not recorded yet
@@ -198,9 +208,13 @@
          nothing is the failure this project guards against hardest, so the count sits here in
          the open and the reasons are on its own tooltip. #}
       {% if screen.review_count %}
-        <span class="tag-inline"
-              title="{% for line in screen.unverified_reasons %}{{ line }}&#10;&#10;{% endfor %}">
-          {{ screen.review_count }} unverified
+        <span class="tc-status-wrap">
+          <button type="button" class="tc-status tag-inline" aria-expanded="false">
+            {{ screen.review_count }} unverified
+          </button>
+          <div class="tc-reasons" hidden>
+            <ul>{% for line in screen.unverified_reasons %}<li>{{ line }}</li>{% endfor %}</ul>
+          </div>
         </span>
       {% endif %}
     </span>

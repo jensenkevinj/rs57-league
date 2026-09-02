@@ -368,13 +368,33 @@ def test_no_admin_template_does_arithmetic_on_money():
             )
 
 
+# Money words and number parsing. A script touching any of these is doing arithmetic the
+# engine is supposed to own; a script toggling a panel touches none of them.
+PRICING = re.compile(
+    r"\b(salar|fee|tax|price|total|base|keeper|prospect|Number\(|parseInt|parseFloat|toFixed)",
+    re.I,
+)
+
+
 def test_no_javascript_computes_a_salary():
-    """htmx posts the form and swaps the answer. Nothing in the browser prices anything."""
+    """htmx posts the form and swaps the answer. Nothing in the browser prices anything.
+
+    This used to forbid inline script outright, which was a proxy for the real rule and stopped
+    being usable when the status badge needed a click handler — a native ``title`` shows only
+    on hover, after a delay, and ignores the click everybody tries first.
+
+    So it now forbids what the rule is actually about: the vocabulary of pricing, and every way
+    of turning text into a number. A panel toggle uses none of it, and a script that quietly
+    started recomputing a salary would have to.
+    """
     for template in sorted(TEMPLATES.glob("*.html")):
         source = template.read_text(encoding="utf-8")
-        # The one <script> tag is the vendored htmx bundle.
         for script in re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", source, re.S):
-            assert not script.strip(), f"{template.name} carries inline JavaScript"
+            hit = PRICING.search(script)
+            assert not hit, (
+                f"{template.name} has inline JavaScript mentioning {hit.group(0)!r} — "
+                f"the browser must never price anything"
+            )
 
 
 def test_the_screen_salary_is_the_engine_salary(data_dir: Path, store: ManualStore):
@@ -420,7 +440,8 @@ def test_a_fee_mismatch_blocks_the_save_and_writes_nothing(client, store: Manual
     assert "fees total $0, expected $5" in page
     assert store.claims(SEASON) == [], "a blocked claim must not be recorded"
     assert not (store.manual / CLAIMS).exists()
-    assert "not recorded" in text(page), "the card has to say it did not record and why"
+    assert "Not recorded yet" in text(page), "the card has to say it did not record"
+    assert "fee_total_mismatch" in status_badge(page)[2], "and the badge has to say why"
 
 
 def test_a_negative_fee_is_a_rule_violation_not_a_form_error(client, store: ManualStore):
@@ -2564,45 +2585,47 @@ def test_a_future_deadline_disables_nothing(client, data_dir: Path):
 # ---------------------------------------------------------------------------
 
 
-_STATUS = re.compile(r'<span class="tc-status tag-inline([^"]*)"([^>]*)>(.*?)</span>', re.S)
+_STATUS = re.compile(
+    r'<span class="tc-status-wrap">\s*<(button|span)[^>]*?class="tc-status tag-inline([^"]*)"[^>]*>'
+    r'(.*?)</\1>\s*(?:<div class="tc-reasons"[^>]*>(.*?)</div>)?',
+    re.S,
+)
 
 
 def status_badge(html: str) -> tuple[str, str, str]:
-    """``(css, label, tooltip)`` of a card's one status badge.
+    """``(css, label, reasons)`` of a card's one status badge.
 
-    The reasons live in a ``title`` attribute now, which ``text()`` strips — so a test that
-    wants them has to read the markup. That is the point of returning all three together: the
-    colour, what it says, and what it says on hover cannot be asserted from different places
-    and drift apart.
+    The reasons are in a panel the badge opens, not in a ``title`` — a native tooltip only
+    appears on hover, after a delay, and ignores a click, which is the first thing anybody
+    tries on a red badge. So a test that wants them has to read the panel.
+
+    All three come back together on purpose: the colour, the word, and what it says when
+    opened cannot be asserted from different places and drift apart.
     """
     m = _STATUS.search(html)
     assert m, "the card has no status badge"
-    css, attrs, inner = m.groups()
-    title = re.search(r'title="(.*?)"', attrs, re.S)
-    label = re.sub(r"<[^>]+>", "", inner)
-    return css.strip(), " ".join(label.split()), (title.group(1) if title else "")
+    _tag, css, inner, panel = m.groups()
+    label = " ".join(re.sub(r"<[^>]+>", " ", inner).split())
+    reasons = " ".join(re.sub(r"<[^>]+>", " ", panel or "").split())
+    return css.strip(), label, reasons
 
 
 def tooltip_lines(html: str) -> list[tuple[str, str]]:
-    """``(label, message)`` for every reason on the card, from BOTH of its tooltips.
+    """``(label, message)`` for every reason on the card, from BOTH of its panels.
 
     The card has two: the Valid/Invalid badge carries what makes it invalid, and the status
-    line's "N unverified" tag carries what nobody has checked. A test asking "is this reason on
-    the card, labelled honestly" does not care which — and reading only one of them would let a
+    line's "N unverified" badge carries what nobody has checked. A test asking "is this reason
+    on the card, labelled honestly" does not care which — and reading only one would let a
     reason move between them unnoticed.
 
     The labels are what this asserts on. Notes and engine issues are two different sources, and
     a regression in one is invisible if you only check that the word "unverified" is somewhere
     on the page — which is how a mutation rendering every note as information once passed.
     """
-    titles = [status_badge(html)[2]]
-    titles += re.findall(
-        r'<span class="tag-inline"\s+title="(.*?)"', html, re.S
-    )
     out = []
-    for chunk in "&#10;&#10;".join(titles).split("&#10;&#10;"):
-        chunk = " ".join(chunk.split())
-        if not chunk or ":" not in chunk:
+    for item in re.findall(r"<li>(.*?)</li>", html, re.S):
+        chunk = " ".join(re.sub(r"<[^>]+>", " ", item).split())
+        if ":" not in chunk:
             continue
         label, _, message = chunk.partition(":")
         out.append((label.strip(), message.strip()))
@@ -2610,7 +2633,7 @@ def tooltip_lines(html: str) -> list[tuple[str, str]]:
 
 
 def all_reasons(html: str) -> str:
-    """Every reason on the card as one string, whichever tooltip it is on."""
+    """Every reason on the card as one string, whichever panel it is in."""
     return " ".join(f"{label}: {message}" for label, message in tooltip_lines(html))
 
 
@@ -2859,7 +2882,7 @@ def test_a_proposed_verdict_is_never_styled_as_a_passing_one(client):
     taken for one at a glance.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
-    badges = re.findall(r'<span class="tc-status tag-inline([^"]*)"', page)
+    badges = re.findall(r'class="tc-status tag-inline([^"]*)"', page)
     assert badges, "no cards on the board"
     for css in badges:
         assert "ok" not in css.split(), f"an unrecorded card rendered as passing: {css!r}"
@@ -2899,21 +2922,73 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
     )
 
 
-def test_the_badge_counts_agree_with_the_status_line(client):
-    """Two places on one card say "N error(s)". They have to mean the same word.
+def test_a_click_on_the_badge_cannot_record_the_league(client):
+    """The board wraps all twelve cards in ONE form, and a bare <button> submits it.
 
-    The badge first printed every selection issue, REVIEWs included, so a card read "Selection:
-    2 error(s)" directly above "1 error(s) — not recorded".
+    So an unmarked button anywhere inside a card is a click that records twelve franchises —
+    from an element whose whole job is to show a reason. Exactly one button on this page is
+    allowed to submit, and it is the one that says so.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    # Prose first: the stylesheet's own comments say the word "<button>", and scanning them
+    # reported an untyped button that does not exist.
+    markup = re.sub(r"<(style|script)\b.*?</\1>", "", page, flags=re.S)
+    buttons = re.findall(r"<button([^>]*)>", markup)
+    assert len(buttons) > 1, "the fixture must render both a badge and the Record button"
+
+    # A `form=` attribute points the button at a different form, so it cannot submit the board
+    # whatever its type. What is dangerous is an unscoped button that is not type="button".
+    submitters = [
+        b for b in buttons if 'type="button"' not in b and "form=" not in b
+    ]
+    assert len(submitters) == 1, (
+        f"{len(submitters)} buttons can submit the board; only Record may. Offenders: "
+        f"{[b.strip()[:60] for b in submitters]}"
+    )
+    assert 'type="submit"' in submitters[0], "and it must say so rather than rely on a default"
+
+
+def test_the_reason_panel_is_wired_up(client):
+    """The toggle finds the panel as the badge's NEXT SIBLING. Markup and script must agree.
+
+    Only the structure is asserted here — a pytest cannot click anything, and pretending
+    otherwise would be worse than saying so. What it catches is the panel being moved, wrapped
+    or reordered, which breaks the toggle silently while every other test still passes.
+    """
+    # A card carrying BOTH disclosures — the Invalid badge and the unverified badge — because
+    # asserting that *a* panel is correctly placed let a mutation move the other one and pass.
+    body = client.post(
+        f"/season/{SEASON}/team/t1/preview",
+        data=form((TAXED, "K1", 99), (PLAIN, "K2", 0), manager="t1"),
+    ).get_data(as_text=True)
+
+    openers = body.count('aria-expanded="false"')
+    assert openers >= 2, "this test needs both of the card's disclosures to be present"
+    paired = len(re.findall(r"</button>\s*<div class=\"tc-reasons\"", body))
+    assert paired == openers, (
+        f"{openers} disclosure button(s) but {paired} correctly-placed panel(s) — the toggle "
+        f"finds a panel as its button's NEXT SIBLING and cannot find one that moved"
+    )
+    assert body.count('class="tc-reasons" hidden') == openers, "panels must start closed"
+
+
+def test_the_verdict_is_stated_once(client):
+    """One card, one place that says it is invalid.
+
+    The status line used to repeat the error count in red under the table, so a card carried
+    the same verdict twice — the badge, and a second tag saying "1 error(s) — not recorded".
+    The line is left with the one thing the badge does not answer: whether anything is on file.
     """
     body = client.post(
         f"/season/{SEASON}/team/t1/preview",
         data=form((TAXED, "K1", 0), (LATE, "PROSPECT", 0), manager="t1"),
     ).get_data(as_text=True)
-    _, label, tooltip = status_badge(body)
-    assert label == "Invalid"
-    reasons = len([c for c in tooltip.split("&#10;&#10;") if c.strip()])
-    status = int(re.search(r"(\d+) error\(s\) — not recorded", text(body)).group(1))
-    assert reasons == status, "one card, one meaning of 'error'"
+    _, label, reasons = status_badge(body)
+    assert label == "Invalid" and reasons, "the badge states the verdict and its reasons"
+
+    line = text(body)
+    assert "error(s) — not recorded" not in line, "the verdict must not be repeated below"
+    assert "Not recorded yet" in line, "but whether it saved is still the line's job"
 
 
 def test_every_engine_finding_lands_on_exactly_one_badge(data_dir: Path, store: ManualStore):
