@@ -72,6 +72,7 @@ from rs57.models import (
     UnluckyAward,
     WeeklyHigh,
     to_league_time,
+    utc_now,
 )
 from rs57.history import HistoryStore
 from rs57.origins import load_first_season_bounds, load_player_origins
@@ -203,6 +204,10 @@ class KeeperSeason:
     qualifying_deadline: datetime | None = None
     """That season's trade deadline, printed above the grid. ``None`` when it is not on disk,
     in which case the page says so rather than showing a date it does not have."""
+    charges_in_base: bool = False
+    """Whether the salaries below already carry their fee and $5 tax — the window between the
+    keeper deadline and the auction. Printed above the grid, because otherwise an empty Tax
+    column beside a taxed player is a number the page is quietly not showing."""
     rows: tuple[KeeperLine, ...] = ()
     """Every rostered player in the league, flat, **dearest first**.
 
@@ -757,13 +762,18 @@ class PredraftInfo:
     draft_doodle_url: str | None
 
 
+def _source_time(source: Mapping[str, Any], key: str) -> datetime | None:
+    """One ISO datetime out of an already-loaded ``source`` block, or ``None`` if unset."""
+    raw = source.get(key)
+    return datetime.fromisoformat(raw) if raw else None
+
+
 def _source_datetime(derived_dir: Path, season: int, key: str) -> datetime | None:
     """One ISO datetime out of ``{season}.json``'s ``source`` block, or ``None`` if unset."""
     path = derived_dir / f"{season}.json"
     if not path.exists():
         return None
-    raw = (_load(path).get("source") or {}).get(key)
-    return datetime.fromisoformat(raw) if raw else None
+    return _source_time(_load(path).get("source") or {}, key)
 
 
 def _trade_deadline(derived_dir: Path, season: int) -> datetime | None:
@@ -832,6 +842,7 @@ def build_keeper_season(
     first_nfl_season: Mapping[int, int] | None = None,
     first_season_bounds: Mapping[int, int] | None = None,
     prior_prospect_ids: Collection[int] = (),
+    now: datetime | None = None,
 ) -> KeeperSeason:
     """What every rostered player would cost to keep, who has been declared, and who is eligible.
 
@@ -872,6 +883,12 @@ def build_keeper_season(
     how many keepers a manager declares and the split is the manager's own choice, so there is no
     per-player fee to publish for a player nobody has claimed.
 
+    **Except between the keeper deadline and the auction, when the price IS the base.** In that
+    window ESPN's ``keeperValue`` has stopped meaning "carried in from last season" and holds
+    the price the commissioner has entered for each keeper, fee and tax already inside it — so
+    the tax goes on top of a number that already carries it, and the page publishes every kept
+    player $5 dear. See ``charges_in_base`` below.
+
     A **declared keeper** is one the admin tool has recorded a ``KeeperClaim`` for. He carries the
     fee his manager allocated and the salary recorded at declaration — the figure that manager was
     actually told they owed. That salary is read off the claim rather than recomputed here, so this
@@ -908,6 +925,25 @@ def build_keeper_season(
     drafted = bool(source.get("drafted"))
     decision_season = season + 1 if drafted else season
     qualifying_season = decision_season - 1
+
+    # Between the keeper deadline and the auction, ESPN's `keeperValue` is the price the
+    # commissioner has entered for each keeper — allocated fee and $5 tax already inside it —
+    # and NOT the value carried in from last season, which is what it holds the rest of the
+    # year. Adding the tax on top of it charges the same $5 twice.
+    #
+    # This reads the deadline, it does not enforce it: nothing here gates an input or refuses
+    # a claim. It decides which of two meanings ESPN's field currently carries. `utc_now` is
+    # the only clock allowed to meet a stored deadline, and `keeper_deadline` is naive UTC off
+    # ESPN, so both sides of the comparison are UTC.
+    #
+    # An unrecorded deadline is a distinct state from a past one: a season ESPN has set no
+    # deadline for cannot place itself in this window, so the tax applies as usual.
+    keeper_deadline = _source_time(source, "keeper_deadline")
+    charges_in_base = (
+        not drafted
+        and keeper_deadline is not None
+        and keeper_deadline < (now if now is not None else utc_now())
+    )
     origins = first_nfl_season or {}
     bounds = first_season_bounds or {}
 
@@ -943,7 +979,11 @@ def build_keeper_season(
             )
             continue
         base = effective_base_salary(entry, overrides)
-        price = keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
+        price = (
+            base
+            if charges_in_base
+            else keeper_salary(base, 0, entry.kept_prior_year, KeeperSlot.K1)
+        )
         claim = declared.get((entry.manager_id, entry.espn_player_id))
         began = origins.get(entry.espn_player_id)
         lines.setdefault(entry.manager_id, []).append(
@@ -1009,6 +1049,7 @@ def build_keeper_season(
         decision_season=decision_season,
         qualifying_season=qualifying_season,
         qualifying_deadline=deadline,
+        charges_in_base=charges_in_base,
         # Dearest first, then by name so equal salaries have a stable order rather than one
         # that depends on which franchise happened to be read first.
         rows=tuple(

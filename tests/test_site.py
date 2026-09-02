@@ -513,6 +513,107 @@ def test_the_fee_is_not_baked_into_a_published_price(tmp_path: Path, derived: Pa
             assert line.tax in (0, KEEPER_TAX)
 
 
+# ---------------------------------------------------------------------------
+# The window between the keeper deadline and the auction.
+#
+# In it, ESPN's `keeperValue` stops meaning "carried in from last season" and holds the price
+# the commissioner has entered for each keeper, allocated fee and $5 tax already inside it.
+# Adding the tax on top charges the same $5 twice, which is what published every kept player
+# $5 dear on 2026 draft eve. All four states are pinned, because the bug is not "the tax is
+# wrong" — it is "the tax is wrong in exactly one of four states".
+# ---------------------------------------------------------------------------
+
+DEADLINE = "2026-09-02T03:00:00"
+AFTER = datetime(2026, 9, 2, 18, 0)
+BEFORE = datetime(2026, 9, 1, 18, 0)
+
+
+def priced(derived: Path, **kwargs):
+    """``{player name: KeeperLine}`` for the current season."""
+    season = build_keeper_season(derived, SEASON, **kwargs)
+    return (
+        {line.player_name: line for team in season.teams for line in team.lines},
+        season,
+    )
+
+
+def with_deadline(derived: Path, *, deadline: str | None = DEADLINE, drafted: bool = False):
+    """Rewrite the current season's ``source`` block in place."""
+    path = derived / f"{SEASON}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["source"]["drafted"] = drafted
+    if deadline is None:
+        doc["source"].pop("keeper_deadline", None)
+    else:
+        doc["source"]["keeper_deadline"] = deadline
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    return derived
+
+
+def test_the_tax_is_not_added_once_espn_holds_the_entered_keeper_prices(derived: Path):
+    """Deadline passed, auction not run: ESPN's figure IS the salary. Do not add to it."""
+    lines, season = priced(with_deadline(derived), now=AFTER)
+
+    nacua = lines["Puka Nacua"]
+    assert nacua.kept_prior_year is True, "the fixture's taxed player must stay taxed"
+    assert nacua.price == nacua.base == 5, "the $5 tax is already inside ESPN's figure"
+    assert nacua.tax == 0
+
+    # An untaxed player is unaffected either way — the guard must not reprice him.
+    assert lines["James Cook III"].price == 42
+
+    assert season.charges_in_base is True
+
+
+def test_the_tax_still_applies_before_the_keeper_deadline(derived: Path):
+    """The ordinary case, and the one the window must not swallow: managers still deciding."""
+    lines, season = priced(with_deadline(derived), now=BEFORE)
+    assert lines["Puka Nacua"].price == 5 + KEEPER_TAX
+    assert season.charges_in_base is False
+
+
+def test_the_tax_still_applies_once_the_season_has_drafted(derived: Path):
+    """After the auction `keeperValue` is overwritten by `keeperValueFuture`, which carries
+    forward clean — so the tax goes back on top even though the deadline is long past."""
+    lines, _ = priced(with_deadline(derived, drafted=True), now=AFTER)
+    assert lines["Puka Nacua"].price == 5 + KEEPER_TAX
+
+
+def test_an_unrecorded_keeper_deadline_leaves_the_tax_alone(derived: Path):
+    """A missing fact is not a past one. A season ESPN has set no deadline for cannot place
+    itself in the window, so it prices the way it does the rest of the year."""
+    lines, _ = priced(with_deadline(derived, deadline=None), now=AFTER)
+    assert lines["Puka Nacua"].price == 5 + KEEPER_TAX
+
+
+def test_the_tax_column_reads_as_a_dash_rather_than_zero_dollars(tmp_path: Path, derived: Path):
+    """A taxed player owing nothing this week must not render "$0" — that reads as a figure
+    somebody computed, when the truth is the charge is sitting inside the base beside it.
+
+    Rendered through ``build_site``, on the real ``utc_now`` clock rather than an injected one,
+    so this also pins the default wiring the four tests above bypass. The deadline is long past
+    for any wall clock that will ever run this.
+    """
+    with_deadline(derived, deadline="2020-01-01T00:00:00")
+    page = render(tmp_path, derived)["keepers.html"]
+    row = next(r for r in grid_rows(page) if r[0].startswith("Puka Nacua"))
+    assert "$0" not in row, "an empty tax must not read as a computed zero"
+    assert "—" in row
+    assert "$5" in row, "the base is still $5, and the salary column repeats it"
+
+    # The dashes have to be explained on the page itself. A REVIEW note cannot do it:
+    # keepers.html renders errors only, deliberately — see
+    # test_a_sync_warning_stays_off_the_public_page — so a note here would reach nobody.
+    assert "keeper fee and the $5 tax" in text(page)
+    assert "unverified" not in text(page).lower(), "this is a known state, not an unchecked one"
+
+
+def test_the_included_fee_caption_is_absent_the_rest_of_the_year(tmp_path: Path, derived: Path):
+    """The mirror of the test above. A caption that never comes down is wallpaper."""
+    page = render(tmp_path, derived)["keepers.html"]
+    assert "keeper fee and the $5 tax" not in text(page)
+
+
 def test_no_template_does_arithmetic_on_money():
     """A Jinja expression computing a salary is a second, untested copy of the rules."""
     for template in sorted(TEMPLATES.glob("*.html")):
