@@ -94,7 +94,14 @@
      not a fixed height: the run that finds nothing is three lines and should not open a
      full-screen panel to say so. */
   dialog.modal {
-    width: min(62rem, 92vw); max-height: 85vh; overflow: auto;
+    /* Sized to what is in it, not to the viewport. A clean run is three lines and used to get
+       the same 62rem box as a 27-row table, which on a laptop is mostly empty. `fit-content`
+       between a floor and a ceiling: narrow when it has little to say, as wide as the table
+       needs up to the ceiling, and the table scrolls inside `.scroll` beyond that. */
+    width: fit-content;
+    min-width: min(26rem, 92vw);
+    max-width: min(52rem, 92vw);
+    max-height: 85vh; overflow: auto;
     padding: 1.1rem 1.3rem; border: 1px solid var(--line); border-radius: 10px;
     background: var(--panel); color: var(--ink);
   }
