@@ -60,11 +60,20 @@
      than reporting on a set of claims nobody entered. The "Cannot read the form" flag above
      says which field. #}
   <div class="tc-verdicts">
+    {# **A proposed verdict is never green.** After the prune a pre-filled card looks finished,
+       so a green badge would read exactly like a recorded one — twelve of those and the
+       commissioner presses Record believing the work is already saved. It carries its own
+       "from ESPN" prefix and stays neutral, whatever the engine made of it. #}
     {% set sv = 'unreadable' if problems else screen.selection_verdict %}
-    <span class="tag-inline{% if sv == 'ok' %} ok{% elif sv == 'error' %} bad{% elif sv == 'none' %} flat{% endif %}"
-          title="{% for issue in screen.selection_issues %}{{ issue.message }}&#10;{% endfor %}">
+    {% set proposed = screen.selection_proposed and not problems %}
+    <span class="tag-inline{% if proposed %} flat{% elif sv == 'ok' %} ok{% elif sv == 'error' %} bad{% elif sv == 'none' %} flat{% endif %}"
+          title="{% if proposed %}Filled from ESPN's kept players. Nothing is recorded until you press Record.&#10;{% endif %}{% for issue in screen.selection_issues %}{{ issue.message }}&#10;{% endfor %}">
       Selection:
-      {%- if sv == 'ok' %} legal
+      {%- if proposed %} from ESPN,
+        {%- if sv == 'ok' %} legal — not recorded
+        {%- elif sv == 'error' %} {{ screen.selection_error_count }} error(s)
+        {%- else %} unverified{% endif %}
+      {%- elif sv == 'ok' %} legal
       {%- elif sv == 'error' %} {{ screen.selection_error_count }} error(s)
       {%- elif sv == 'review' %} unverified
       {%- elif sv == 'unreadable' %} not checked
@@ -100,35 +109,51 @@
       <tr>
         <th class="tc-slot-col"></th>
         <th>Player, team pos</th>
+        <th class="num">Base</th>
+        <th class="num">Tax</th>
         <th class="num">Fee</th>
-        <th class="num">$</th>
+        <th class="num">Total</th>
       </tr>
     </thead>
     <tbody>
-      {% for slot, label, row in screen.slots %}
+      {% for line in screen.slots %}
+        {% set slot, row = line.slot, line.row %}
         <tr class="{% if row %}claimed{% endif %}">
-          <td class="tc-slot-col"><span class="tc-slot">{{ label }}</span></td>
+          <td class="tc-slot-col"><span class="tc-slot">{{ line.label }}</span></td>
           <td>
-            {% if screen.keepers_only and row %}
-              {# ESPN has pruned to the kept players, so there is nothing to pick. The id still
-                 posts, so the form shape is unchanged and one parser reads both cases. #}
-              <input type="hidden" name="{{ p }}player_{{ slot }}" value="{{ row.espn_player_id }}">
-              <span class="tc-player">{{ row.name }}</span>
-              <span class="tc-pos">{{ row.position }} {{ row.nfl_team }}</span>
-            {% elif screen.keepers_only %}
-              <input type="hidden" name="{{ p }}player_{{ slot }}" value="">
-              <span class="muted">—</span>
-            {% else %}
-              <select name="{{ p }}player_{{ slot }}" aria-label="{{ slot }} for {{ screen.name }}">
-                <option value="">Not selected</option>
-                {% for option in screen.pickable %}
-                  <option value="{{ option.espn_player_id }}"
-                          {% if row and row.espn_player_id == option.espn_player_id %}selected{% endif %}>
-                    {{ option.name }} · {{ option.position }} {{ option.nfl_team }} · ${{ option.candidate_price }}
-                  </option>
-                {% endfor %}
-              </select>
-            {% endif %}
+            {# **A picker in every slot, in both regimes.** This was briefly a hidden input once
+               ESPN had pruned, on the reasoning that a list of exactly the kept players asks a
+               question with one answer. That is true of *who* is kept and false of the thing
+               the card actually decides: ESPN does not record which keep is the prospect, and
+               a hidden input left no way to say. `screen.pickable` is the roster, so after the
+               prune these options ARE just the kept players — the narrowing happens in the
+               data, and one control serves both regimes.
+
+               `rookie` marks who the rule would admit, which is what makes a team with two
+               eligible players resolvable by eye. It is a suggestion, not a determination: a
+               rookie may legally be kept in K1/K2/K3. #}
+            <select name="{{ p }}player_{{ slot }}" aria-label="{{ slot }} for {{ screen.name }}">
+              <option value="">Not selected</option>
+              {% for option in screen.pickable %}
+                <option value="{{ option.espn_player_id }}"
+                        {% if row and row.espn_player_id == option.espn_player_id %}selected{% endif %}>
+                  {{ option.name }} · {{ option.position }} {{ option.nfl_team }} · ${{ option.candidate_price }}
+                  {%- if option.prospect_eligible %} · rookie{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </td>
+          {# Base is the player's true figure — ``effective_base_salary``, so a live draft-cash
+             override is already undone here and ``overridden`` marks it. Tax is priced for THIS
+             slot, which is why it comes off ``line`` and not off ``row``: the same player owes
+             $5 in K2 and nothing in PROSPECT. #}
+          <td class="num money">
+            {% if row %}${{ row.base }}{% if row.overridden %}<span class="tag-inline" title="ESPN says ${{ row.espn_base }}; a draft-cash override is live">adj</span>{% endif %}
+            {%- else %}<span class="muted">—</span>{% endif %}
+          </td>
+          <td class="num money">
+            {% if row %}{% if line.tax %}${{ line.tax }}{% else %}<span class="muted">$0</span>{% endif %}
+            {%- else %}<span class="muted">—</span>{% endif %}
           </td>
           <td class="num">
             <input type="number" step="1" name="{{ p }}fee_{{ slot }}"
@@ -136,7 +161,7 @@
                    aria-label="Fee for {{ slot }} on {{ screen.name }}">
           </td>
           <td class="num money">
-            {% if row and row.salary is not none %}${{ row.salary }}{% else %}<span class="muted">—</span>{% endif %}
+            {% if line.total is not none %}${{ line.total }}{% else %}<span class="muted">—</span>{% endif %}
           </td>
         </tr>
       {% endfor %}
@@ -149,6 +174,8 @@
         <td class="tc-slot-col"></td>
         {# "fees waived" is already on the card head, where you scan. Not twice. #}
         <td>Total</td>
+        <td class="num"></td>
+        <td class="num"></td>
         <td class="num">
           ${{ screen.total_fees }}
           {% if screen.fee_state == 'short' %}
@@ -159,7 +186,7 @@
             <span class="tag-inline">over the limit</span>
           {% endif %}
         </td>
-        <td class="num money">${{ screen.total_salary }}</td>
+        <td class="num money">${{ screen.display_total_salary }}</td>
       </tr>
     </tfoot>
   </table>

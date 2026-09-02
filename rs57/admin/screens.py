@@ -31,7 +31,7 @@ renders as unverified.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from rs57.admin.derived import DerivedSeason
@@ -513,10 +513,45 @@ class PlayerRow:
     overridden: bool
     espn_base: int
     """ESPN's own figure, which differs from ``base`` only when an override is live."""
+    prospect_eligible: bool | None
+    """Whether the rookie rule would admit him as a prospect. ``None`` means unknown.
+
+    Three states, not two, and the third is the point. ``True``/``False`` come from ESPN's
+    draft class — ``season - first_nfl_season <= 1``, the same arithmetic ``_prospect_notes``
+    and the engine use. ``None`` is a player ESPN carries no draft class or debut year for, or
+    a season the rookie rule does not govern at all.
+
+    An unknown must never collapse into ``False``: it would make a genuinely open question
+    look settled, and the prospect fill below reads this to decide whether the slot has one
+    answer. A D/ST is ``False`` rather than ``None`` — the question does not apply to a
+    negative id, which is settled, not unknown."""
 
     @property
     def claimed(self) -> bool:
         return bool(self.slot)
+
+
+@dataclass(frozen=True)
+class SlotRow:
+    """One line of the card: a slot, who is in it, and what he costs THERE.
+
+    **Priced per slot, not per player**, which is the whole reason this type exists. The same
+    man is worth different money in K2 and in PROSPECT — a prospect pays no tax and carries no
+    fee — so neither figure can be read off ``PlayerRow``. ``PlayerRow.tax`` is deliberately
+    "what he would cost as a keeper": the right number for the picker, and the wrong one for
+    this table. Reading it here would print a $5 tax against every prospect on the board.
+
+    ``total`` is the engine's own figure, never assembled here or in the template — the
+    recorded claim's when there is one, the proposal's when the card is only pre-filled.
+    ``None`` means the engine did not price this row, which is a real state: an illegal card
+    has slots the engine refuses to cost.
+    """
+
+    slot: str
+    label: str
+    row: PlayerRow | None
+    tax: int
+    total: int | None
 
 
 @dataclass(frozen=True)
@@ -540,6 +575,24 @@ class TeamScreen:
     fees_waived: bool
     waiver_recorded: bool
     submitted_at: datetime | None
+    proposed_salaries: Mapping[int, int] = field(default_factory=dict)
+    """Player id to the salary the engine gives him in the pre-filled arrangement.
+
+    Empty once anything is recorded — the record is priced by ``rows`` then. Without this the
+    total column reads ``—`` down a card that is showing a complete set of keepers, which is
+    the one column the commissioner is checking."""
+    proposed_issues: tuple[ValidationIssue, ...] | None = None
+    """The engine's verdict on the slots ESPN filled in, for a card nobody has recorded.
+
+    ``None`` means there is no proposal to speak for — nothing is pre-filled, or the card
+    already carries a record and the record is what the badges report on.
+
+    Deliberately NOT folded into ``issues``. ``issues`` is what the engine found in the
+    **recorded** claims and is what ``errors``, ``blocked`` and the issue list under the card
+    all rest on; a proposal nobody submitted must not block a Record, appear as a finding
+    against this franchise, or count toward the unverified badge. It answers exactly one
+    question — would this card be legal if you recorded it as it stands — and only the
+    Selection badge asks it."""
     saved: bool = False
     keeper_deadline: KeeperDeadline | None = None
     """Where the season stands relative to ESPN's keeper deadline. **Display only** — no route
@@ -569,7 +622,7 @@ class TeamScreen:
         nobody remembered to classify lands here and is visible, instead of falling out of both
         badges and leaving a card that reads legal on both counts while the engine is objecting.
         """
-        return tuple(i for i in self.issues if i.code not in FEE_ISSUE_CODES)
+        return tuple(i for i in self.verdict_issues if i.code not in FEE_ISSUE_CODES)
 
     @property
     def selection_error_count(self) -> int:
@@ -583,18 +636,59 @@ class TeamScreen:
         return len([i for i in self.fee_issues if i.severity is Severity.ERROR])
 
     @property
+    def display_total_salary(self) -> int:
+        """The footer figure, and it must agree with the Total column above it.
+
+        ``total_salary`` prices the **record**, so on a pre-filled card it is $0 while every row
+        above shows real money — a card whose own total contradicts its own rows, in the one
+        column the commissioner is reading. Once anything is recorded the two are the same
+        number by construction.
+
+        The fee figures deliberately do NOT follow. Nobody has typed a fee yet, and a footer
+        reading "$5 short" against a card nobody has touched reports a shortfall in money the
+        workflow does not collect until after the selection is settled.
+        """
+        if self.selection_proposed:
+            return sum(self.proposed_salaries.values())
+        return self.total_salary
+
+    @property
+    def selection_proposed(self) -> bool:
+        """Is the Selection badge speaking for ESPN's prefill rather than for a record?
+
+        The template must render this differently from a recorded verdict and never green.
+        After the prune a pre-filled card *looks* finished, so a green badge would make it
+        indistinguishable from a saved one — and the commissioner would work down twelve green
+        cards, press Record, and find nothing had been written.
+        """
+        return not self.declared and self.proposed_issues is not None
+
+    @property
+    def verdict_issues(self) -> tuple[ValidationIssue, ...]:
+        """The findings the badges speak for: the record's, or the proposal's when there is no
+        record. One accessor so a badge cannot report on a different set than its tooltip."""
+        return self.proposed_issues or () if self.selection_proposed else self.issues
+
+    @property
     def selection_verdict(self) -> str:
         """``"none"``, ``"error"``, ``"review"`` or ``"ok"`` — is this a legal set of keepers?
 
         The first of the two questions the card answers, and on deadline night the only one that
         matters: who is kept is settled tonight, the fees are entered afterwards
         (commissioner, 2026-09-01).
+
+        **"none" now means genuinely nothing to say**, not merely "nothing saved yet". A card
+        ESPN has pre-filled is judged on that prefill and reports ok/error/review with
+        ``selection_proposed`` set, because a grey "nothing declared" over four filled slots
+        told the commissioner the opposite of what the card was showing him.
         """
-        if not self.declared:
+        issues = self.verdict_issues
+        if not self.declared and not self.selection_proposed:
             return "none"
-        if any(i.severity is Severity.ERROR for i in self.selection_issues):
+        selection = tuple(i for i in issues if i.code not in FEE_ISSUE_CODES)
+        if any(i.severity is Severity.ERROR for i in selection):
             return "error"
-        if self.selection_issues:
+        if selection:
             return "review"
         return "ok"
 
@@ -664,10 +758,15 @@ class TeamScreen:
         themselves is asking a question that has one answer. The fill is a *default on screen*,
         not a record — nothing reaches ``claims.json`` until the card is submitted.
 
-        K1/K2/K3 are interchangeable, so the fill runs dearest first. Only the keeper/prospect
-        split is load-bearing anywhere (``is_keeper_slot``, ``prior_prospect_ids``), and **ESPN
-        cannot say which keep is the prospect** — so the prospect slot is never filled by
-        guessing. It stays empty and ``prospect_unknown`` says so.
+        K1/K2/K3 are interchangeable, so the fill runs dearest first. The keeper/prospect split
+        is the load-bearing one (``is_keeper_slot``, ``prior_prospect_ids``), and **ESPN cannot
+        say which keep is the prospect** — but the rookie rule often can, so ``obvious_prospect``
+        fills that slot on the teams where only one kept player could legally hold it. Where
+        more than one could, it stays empty and the note says which players are in the running.
+
+        **Every slot stays a picker regardless** — see the template. The fill is a default on
+        screen, not a record, and a rookie is *allowed* to be kept in a keeper slot, so an
+        eligible player is a suggestion about the prospect rather than a determination.
 
         A slot claimed twice keeps the first. That is a rule violation the engine reports as an
         issue and the card shows as an error tag; the card is not the place to adjudicate it.
@@ -677,19 +776,63 @@ class TeamScreen:
             if row.claimed and row.slot not in claimed:
                 claimed[row.slot] = row
 
-        fill: list[PlayerRow] = []
-        if self.keepers_only and not claimed:
-            fill = [row for row in self.pickable][:MAX_KEEPERS]
+        fill = _prefilled_slots(self.rows) if not claimed else {}
 
-        filled = iter(fill)
-        out: list[tuple[str, str, PlayerRow | None]] = []
+        out: list[SlotRow] = []
         for slot in SLOT_CHOICES:
             name = str(slot)
-            row = claimed.get(name)
-            if row is None and is_keeper_slot(slot):
-                row = next(filled, None)
-            out.append((name, SLOT_LABELS[name], row))
+            row = claimed.get(name) or fill.get(name)
+            out.append(
+                SlotRow(
+                    slot=name,
+                    label=SLOT_LABELS[name],
+                    row=row,
+                    tax=_slot_tax(slot, row),
+                    total=self._slot_total(row),
+                )
+            )
         return tuple(out)
+
+    def _slot_total(self, row: PlayerRow | None) -> int | None:
+        """What the engine charged for this row: the record's price, or the proposal's.
+
+        Never assembled from base, tax and fee here. ``keeper_rules`` is the only thing in this
+        project that prices a keeper, and a second adder on the screen is how the card and the
+        engine come to disagree about the same player.
+        """
+        if row is None:
+            return None
+        if row.salary is not None:
+            return row.salary
+        return self.proposed_salaries.get(row.espn_player_id)
+
+    @property
+    def obvious_prospect(self) -> PlayerRow | None:
+        """The one kept player who could hold the prospect slot, or ``None`` when it is a choice.
+
+        Only ever a *default*. A rookie may legally be kept in a normal keeper slot, so this
+        answers "who is the only one who could be the prospect", never "who is the prospect".
+
+        Two things make it stand down, and both mean the same thing — the answer is not
+        forced:
+
+        * **More than one eligible player**, which is the case the commissioner has to settle
+          by hand.
+        * **Any unknown on the roster.** A player ESPN carries no draft class for could be
+          eligible too, so "exactly one eligible" is not established while one is unresolved.
+          Filling anyway would present a guess as the settled answer, which is the failure this
+          codebase keeps guarding against.
+
+        Before the prune this returns ``None`` outright: the roster is still everybody, so
+        "the only eligible player" would be a fact about the whole squad rather than about
+        the keepers, and it would fill the slot with somebody nobody kept.
+        """
+        if not self.keepers_only:
+            return None
+        eligible, unresolved = _prospect_candidates(self.rows)
+        if unresolved or len(eligible) != 1:
+            return None
+        return eligible[0]
 
     @property
     def pickable(self) -> tuple[PlayerRow, ...]:
@@ -743,6 +886,87 @@ class SeasonScreen:
     """Live overrides summed. Should be zero — a cash trade moves money between two teams, and
     ``check_override_balance`` reports it when it does not. ``None`` when any live row has no
     ESPN base to compare against, because a total resting on a guess is worse than no total."""
+
+
+def _slot_tax(slot: KeeperSlot, row: PlayerRow | None) -> int:
+    """The $5 tax as it applies IN THIS SLOT — the rule, not the player's attribute.
+
+    ``keeper_salary`` waives it for a prospect regardless of what is passed in, so a taxed
+    player moved into the prospect slot owes nothing. ``PlayerRow.tax`` cannot express that:
+    it is computed once, as a K1, for the picker's candidate price.
+    """
+    if row is None or slot is KeeperSlot.PROSPECT or not row.kept_prior_year:
+        return 0
+    return KEEPER_TAX
+
+
+def _prefilled_slots(rows: Sequence[PlayerRow]) -> dict[str, PlayerRow]:
+    """ESPN's own answer arranged into slots, or ``{}`` when it has none to give.
+
+    **The one place the arrangement is decided.** Both the card and the pre-validated Selection
+    badge read it, so the badge cannot report on a different set of keepers than the one on
+    screen — which is the way a green badge over a wrong card would happen.
+
+    Empty unless ESPN has pruned to the kept players; before that the roster is everybody and
+    there is nothing to arrange. The prospect goes in only when ``_prospect_candidates`` leaves
+    one answer, and comes out of the keeper run first so a four-keep team does not claim him
+    twice.
+    """
+    if not 0 < len(rows) <= ROSTER_IS_KEEPERS_ONLY:
+        return {}
+    eligible, unresolved = _prospect_candidates(rows)
+    prospect = eligible[0] if not unresolved and len(eligible) == 1 else None
+    keepers = [
+        row
+        for row in sorted(rows, key=lambda r: (-r.candidate_price, r.name))
+        if prospect is None or row.espn_player_id != prospect.espn_player_id
+    ][:MAX_KEEPERS]
+
+    out: dict[str, PlayerRow] = {}
+    for slot, row in zip([s for s in SLOT_CHOICES if is_keeper_slot(s)], keepers):
+        out[str(slot)] = row
+    if prospect is not None:
+        out[str(KeeperSlot.PROSPECT)] = prospect
+    return out
+
+
+def _prospect_candidates(
+    rows: Sequence[PlayerRow],
+) -> tuple[list[PlayerRow], list[PlayerRow]]:
+    """``(eligible, unresolved)`` among these rows, by the rookie rule.
+
+    One computation behind both the prospect fill and the note that explains it. They were
+    briefly separate and could disagree — a card can say the slot was left open for you to
+    settle while the slot above it is filled in, and the reader believes the slot.
+    """
+    return (
+        [row for row in rows if row.prospect_eligible],
+        [row for row in rows if row.prospect_eligible is None],
+    )
+
+
+def _prospect_eligible(
+    season: int, espn_player_id: int, first_nfl_season: Mapping[int, int] | None
+) -> bool | None:
+    """Would the rookie rule admit this player as a prospect? ``None`` when unknowable.
+
+    The arithmetic is ``keeper_rules``' own: ``elapsed = season - first_nfl_season`` and ``> 1``
+    is the violation, so a genuine rookie gives exactly 1 and anything at or under that is
+    eligible. Stated here as ``<= 1`` rather than ``== 1`` so a player whose recorded first
+    season is the keeper season itself does not read as ineligible on a technicality.
+
+    **A D/ST is False, never None.** Negative id, 404 by construction — the question does not
+    apply, which is a settled answer rather than a missing one. Folding it into the unknowns
+    would make every roster carrying a defense look ambiguous.
+    """
+    if espn_player_id < 0:
+        return False
+    if first_nfl_season is None:
+        return None
+    began = first_nfl_season.get(espn_player_id)
+    if began is None:
+        return None
+    return season - began <= 1
 
 
 def _prospect_notes(
@@ -904,10 +1128,49 @@ def build_team_screen(
                 salary=keeper.salary if keeper else None,
                 overridden=base != entry.base_salary,
                 espn_base=entry.base_salary,
+                prospect_eligible=_prospect_eligible(season, entry.espn_player_id, origins),
             )
         )
 
     rows.sort(key=lambda row: (not row.claimed, row.slot, -row.candidate_price, row.name))
+
+    # **Would this card be legal if you recorded it as it stands?** Only asked of a card with
+    # nothing on file: once anything is recorded, the record is what the badges report on.
+    #
+    # Run through the same engine and the same arguments as the real claims, so a proposal that
+    # reads legal here is legal when it is recorded. The fees are $0 because nobody has typed
+    # them yet — which is why only the *selection* half of the verdict reads this. The fee
+    # badge stays on the record, or every pre-filled card would open with a red fee shortfall
+    # for money the workflow does not collect until afterwards.
+    proposed_issues: tuple[ValidationIssue, ...] | None = None
+    proposed_salaries: dict[int, int] = {}
+    prefill = _prefilled_slots(tuple(rows)) if not active else {}
+    if prefill:
+        proposal = [
+            KeeperClaim(
+                season=season,
+                manager_id=manager_id,
+                espn_player_id=row.espn_player_id,
+                slot=KeeperSlot(slot),
+                fee_allocated=0,
+                submitted_at=None,
+            )
+            for slot, row in prefill.items()
+        ]
+        proposal_result = compute_team_keepers(
+            proposal,
+            roster,
+            overrides,
+            manager_id=manager_id,
+            fees_waived=fees_waived,
+            first_nfl_season=origins,
+            trade_deadline=deadline,
+            prior_prospect_ids=prospect_ids,
+        )
+        proposed_issues = proposal_result.issues
+        proposed_salaries = {
+            keeper.espn_player_id: keeper.salary for keeper in proposal_result.keepers
+        }
 
     keepers = [claim for claim in active if is_keeper_slot(claim.slot)]
     prospects = [claim for claim in active if claim.slot is KeeperSlot.PROSPECT]
@@ -934,17 +1197,69 @@ def build_team_screen(
                 f"still owed in full — only the fee on top is waived.",
             )
         )
-    if len(rows) > MAX_KEEPERS and 0 < len(rows) <= ROSTER_IS_KEEPERS_ONLY and not prospects:
-        notes.append(
-            Note(
-                "review",
-                f"ESPN has pruned this roster to {len(rows)} kept players, and {MAX_KEEPERS} is "
-                f"the keeper maximum — so exactly one of them is the prospect. ESPN does not "
-                f"record which, so the slots above are filled from the roster and the prospect "
-                f"is left empty. Set it before recording: a keeper charged as a prospect skips "
-                f"the ${KEEPER_TAX} tax, and a prospect charged as a keeper pays it.",
-            )
+    # Who the prospect is, on a pruned roster with nothing recorded yet. ESPN never says, so
+    # the rookie rule is the only thing that can narrow it, and what it can prove varies by
+    # team. Each outcome gets its own note: a filled slot the commissioner should confirm, or
+    # an open one naming exactly who is in the running.
+    #
+    # The cost of getting it wrong is the same in every branch and is stated in every branch —
+    # the keeper/prospect split moves both the $5 tax and the fee tier, and it is the one thing
+    # on this card ESPN cannot check afterwards.
+    if 0 < len(rows) <= ROSTER_IS_KEEPERS_ONLY and not active:
+        eligible, unresolved = _prospect_candidates(rows)
+        forced = len(rows) > MAX_KEEPERS
+        stakes = (
+            f"a keeper charged as a prospect skips the ${KEEPER_TAX} tax, and a prospect "
+            f"charged as a keeper pays it — and the keeper count sets the fee tier"
         )
+        if unresolved:
+            notes.append(
+                Note(
+                    "review",
+                    f"The prospect slot is NOT filled: ESPN carries no draft class for "
+                    f"{', '.join(row.name for row in unresolved)}, so it cannot be shown that "
+                    f"only one kept player is rookie-eligible. Set the slot by hand — {stakes}.",
+                )
+            )
+        elif len(eligible) == 1 and forced:
+            notes.append(
+                Note(
+                    "info",
+                    f"ESPN kept {len(rows)} players and {MAX_KEEPERS} is the keeper maximum, so "
+                    f"one of them must be the prospect — and {eligible[0].name} is the only one "
+                    f"the rookie rule admits. The slot is filled with him. Change it if the "
+                    f"manager said otherwise.",
+                )
+            )
+        elif len(eligible) == 1:
+            notes.append(
+                Note(
+                    "review",
+                    f"The prospect slot is pre-filled with {eligible[0].name}, the only kept "
+                    f"player the rookie rule admits — but with {len(rows)} kept and "
+                    f"{MAX_KEEPERS} keepers allowed, this team need not be using the slot at "
+                    f"all. Confirm against what the manager sent: {stakes}.",
+                )
+            )
+        elif eligible:
+            notes.append(
+                Note(
+                    "review",
+                    f"The prospect slot is NOT filled: "
+                    f"{', '.join(row.name for row in eligible)} are all rookie-eligible, so the "
+                    f"rookie rule cannot say which is the prospect. Set it by hand — {stakes}.",
+                )
+            )
+        elif forced:
+            notes.append(
+                Note(
+                    "review",
+                    f"ESPN kept {len(rows)} players and {MAX_KEEPERS} is the keeper maximum, so "
+                    f"one must be the prospect — but the rookie rule admits none of them. "
+                    f"Either a keep is not what ESPN reports, or a prospect claim here will be "
+                    f"flagged ineligible. Resolve before recording.",
+                )
+            )
     # The prefill in ``TeamScreen.slots`` runs only on a card with nothing recorded, so a
     # franchise entered *before* ESPN pruned keeps whatever was typed then and never learns
     # that ESPN went on to disagree. The engine catches half of that already — a claim naming
@@ -1059,6 +1374,8 @@ def build_team_screen(
         keeper_count=len(keepers),
         prospect_count=len(prospects),
         blocked=result.blocked,
+        proposed_salaries=proposed_salaries,
+        proposed_issues=proposed_issues,
         fees_waived=fees_waived,
         waiver_recorded=waiver_recorded,
         submitted_at=max(submitted) if submitted else None,

@@ -2236,39 +2236,97 @@ def test_a_full_roster_still_needs_a_picker(client, data_dir: Path):
     assert f"${5 + KEEPER_TAX}" in page, "each option shows what that player would cost"
 
 
-def test_a_pruned_roster_drops_the_picker(client, data_dir: Path, store: ManualStore):
-    """Once ESPN prunes to the kept players there is nothing left to choose.
+def test_a_pruned_roster_keeps_the_picker(client, data_dir: Path, store: ManualStore):
+    """The picker survives the prune, because the prune does not answer the card's question.
 
-    Read off the roster's depth, not a setting somebody flips — so the picker disappears on its
-    own the day rosters prune, and comes back if they do not.
+    It was briefly a hidden input here, on the reasoning that a list of exactly the kept
+    players has one answer. That is true of *who* is kept and false of which one is the
+    prospect — and with no control there, the split could not be entered at all.
+
+    What the prune changes is the option list, not the control: ``pickable`` is the roster, so
+    a pruned roster narrows the options on its own.
     """
     page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
-    # Named on the keeper pickers rather than on "<select" anywhere, because the page carries
-    # unrelated selects now — the override form's "leg of" trade picker is on this page too.
-    # The guard is that no *slot* can be chosen; it is asserted against the same name the
-    # full-roster test above asserts is present, so the two cannot drift apart.
-    assert '<select name="t1__player_' not in page, "nothing to pick from a pruned roster"
-    assert '<input type="hidden" name="t1__player_K1"' in page
+    assert '<select name="t1__player_PROSPECT"' in page, (
+        "with no picker on the prospect slot, the keeper/prospect split cannot be entered"
+    )
+    assert '<select name="t1__player_K1"' in page
+    assert '<input type="hidden" name="t1__player_' not in page
     assert "Puka Nacua" in page, "the kept players are still named"
 
 
-def test_a_pruned_roster_fills_the_keeper_slots_but_never_the_prospect(data_dir: Path, store: ManualStore):
-    """ESPN says who was kept. It cannot say which keep is the prospect, so that stays empty.
+def test_a_pruned_picker_offers_only_the_kept_players(data_dir: Path, store: ManualStore):
+    """The options narrow because the roster did, not because the template filtered anything.
 
-    Three keepers is the maximum, so a team pruned to four holds exactly one prospect — forced
-    by the rules. *Which* one is not derivable from anything ESPN publishes.
+    Asserted on the screen rather than the page so it is the data being checked. A pruned
+    roster IS the kept players, so anyone offered here was kept.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
+    assert screen.keepers_only
+    rostered = {row.espn_player_id for row in screen.rows}
+    assert {row.espn_player_id for row in screen.pickable} == rostered
+
+
+def test_a_pruned_roster_fills_the_prospect_when_only_one_is_eligible(data_dir: Path, store: ManualStore):
+    """One rookie among the keeps settles the slot, so the commissioner is not asked."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(
+        SEASON,
+        "t1",
+        derived.load(SEASON),
+        derived.load(PRIOR),
+        store,
+        # Everyone has a draft class, so nothing is unresolved; only LATE is a rookie.
+        first_nfl_season={TAXED: 2019, PLAIN: 2020, EX_PROSPECT: 2023, LATE: SEASON - 1},
+    )
+    filled = {line.slot: (line.row.name if line.row else None) for line in screen.slots}
+    assert filled["PROSPECT"] == "Ricky Pearsall"
+    assert "Ricky Pearsall" not in [filled[s] for s in ("K1", "K2", "K3")], (
+        "the prospect must come out of the keeper run, or he is claimed twice"
+    )
+    assert len([v for v in filled.values() if v]) == 4, "all four keeps are placed"
+
+
+def test_a_pruned_roster_leaves_the_prospect_open_when_two_are_eligible(data_dir: Path, store: ManualStore):
+    """Two rookies is exactly the case the commissioner has to settle by hand."""
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(
+        SEASON,
+        "t1",
+        derived.load(SEASON),
+        derived.load(PRIOR),
+        store,
+        first_nfl_season={TAXED: 2019, PLAIN: 2020, EX_PROSPECT: SEASON - 1, LATE: SEASON - 1},
+    )
+    filled = {line.slot: (line.row.name if line.row else None) for line in screen.slots}
+    assert filled["PROSPECT"] is None, "a guessed prospect is a guessed $5 tax"
+    assert any(
+        "are all rookie-eligible" in note.message for note in screen.unverified
+    ), "an open prospect slot must name who is in the running, labelled unverified"
+
+
+def test_an_unresolved_draft_class_stops_the_prospect_fill(data_dir: Path, store: ManualStore):
+    """One unknown is enough to stop it: he could be the second eligible player.
+
+    "Exactly one is eligible" is not established while anybody's draft class is missing, and a
+    fill here would present a guess as the settled answer.
     """
     derived = Derived(derived_dir=data_dir / "derived")
     screen = build_team_screen(
-        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store
+        SEASON,
+        "t1",
+        derived.load(SEASON),
+        derived.load(PRIOR),
+        store,
+        # LATE is the lone rookie; EX_PROSPECT has no draft class at all.
+        first_nfl_season={TAXED: 2019, PLAIN: 2020, LATE: SEASON - 1},
     )
-    assert screen.keepers_only
-    filled = {slot: (row.name if row else None) for slot, _, row in screen.slots}
-    assert filled["PROSPECT"] is None, "a guessed prospect is a guessed $5 tax"
-    assert len([v for v in filled.values() if v]) == MAX_KEEPERS
+    filled = {line.slot: (line.row.name if line.row else None) for line in screen.slots}
+    assert filled["PROSPECT"] is None
     assert any(
-        "exactly one of them is the prospect" in note.message for note in screen.unverified
-    ), "an empty prospect slot on a pruned roster must say why, labelled unverified"
+        "carries no draft class" in note.message for note in screen.unverified
+    ), "a fill blocked by missing data must say so, labelled unverified"
 
 
 def test_a_card_with_a_record_is_never_prefilled_around(data_dir: Path, store: ManualStore):
@@ -2286,7 +2344,7 @@ def test_a_card_with_a_record_is_never_prefilled_around(data_dir: Path, store: M
     )
     screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
 
-    shown = [row.name for _, _, row in screen.slots if row]
+    shown = [line.row.name for line in screen.slots if line.row]
     assert shown == ["Tyjae Spears"], f"the card invented {shown[1:]}"
 
 
@@ -2372,7 +2430,7 @@ def test_the_prefill_is_a_default_on_screen_not_a_record(data_dir: Path, store: 
     """Nothing reaches claims.json until the card is submitted."""
     derived = Derived(derived_dir=data_dir / "derived")
     screen = build_team_screen(SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store)
-    assert any(row for _, _, row in screen.slots)
+    assert any(line.row for line in screen.slots)
     assert screen.keeper_count == 0 and screen.total_salary == 0
     assert store.claims(SEASON) == []
 
@@ -2560,12 +2618,92 @@ def test_an_over_cap_selection_reports_the_fees_as_not_checked(
     assert "Fees: none yet" not in page and "Fees: legal" not in page
 
 
-def test_an_empty_card_claims_neither_verdict(client):
-    """Nothing declared is not the same as checked and legal."""
+def test_an_empty_card_claims_neither_verdict(client, data_dir: Path):
+    """Nothing declared is not the same as checked and legal.
+
+    Asserted on a *full* roster, which is the only card with genuinely nothing to say. A pruned
+    one carries ESPN's own answer and is judged on it — see the test below.
+    """
+    write_full_roster(data_dir)
     page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))
     assert "Selection: nothing declared" in page
     assert "Fees: none yet" in page
     assert "Selection: legal" not in page
+
+
+def test_a_prefilled_card_is_judged_but_never_reads_as_recorded(client):
+    """The pre-filled card gets a real verdict, and still cannot be mistaken for a saved one.
+
+    Both halves matter and they pull against each other. A grey "nothing declared" over four
+    filled slots told the commissioner the opposite of what the card showed him — but a plain
+    green "legal" is worse, because after the prune a pre-filled card looks finished, and
+    twelve green badges is a Record that was never pressed.
+
+    The fee half deliberately does NOT follow. Nobody has typed a fee yet, so a pre-filled card
+    would otherwise open with a red shortfall for money the workflow collects afterwards.
+    """
+    page = text(client.get(f"/season/{SEASON}").get_data(as_text=True))  # fixture is 4 deep
+    assert "Selection: from ESPN" in page
+    assert "not recorded" in page
+    assert "Selection: legal" not in page, "an unrecorded card must never read as checked"
+    assert "Selection: nothing declared" not in page, "the slots are full; the badge said empty"
+    assert "Fees: none yet" in page, "fees are entered after the selection, not proposed"
+
+
+def test_the_tax_column_is_priced_per_slot_not_per_player(data_dir: Path, store: ManualStore):
+    """A taxed player owes nothing in the prospect slot, and the column has to say so.
+
+    ``PlayerRow.tax`` is computed once, as a K1, for the picker's candidate price — so reading
+    it straight into this column prints a $5 tax against a prospect who owes none. The engine
+    already waives it in ``keeper_salary``; the risk is the screen disagreeing with the engine.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    now = datetime(2026, 9, 2, 12, 0)
+    claims = [
+        KeeperClaim(season=SEASON, manager_id="t1", espn_player_id=TAXED,
+                    slot=KeeperSlot.PROSPECT, fee_allocated=0, submitted_at=now),
+    ]
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store, claims=claims
+    )
+    line = next(x for x in screen.slots if x.slot == "PROSPECT")
+    assert line.row is not None and line.row.espn_player_id == TAXED
+    assert line.row.kept_prior_year, "the fixture player must carry the tax to prove anything"
+    assert line.row.tax == KEEPER_TAX, "the player-level figure is the keeper price"
+    assert line.tax == 0, "no tax is owed in the prospect slot"
+    assert line.total == line.row.base, "a prospect is kept at his acquisition value"
+
+
+def test_the_card_total_agrees_with_the_column_above_it(data_dir: Path, store: ManualStore):
+    """A footer that contradicts its own rows is worse than no footer.
+
+    ``total_salary`` prices the record, which is $0 on a pre-filled card while every row above
+    shows real money. Asserted on a pruned roster, which is the case that has a proposal.
+    """
+    derived = Derived(derived_dir=data_dir / "derived")
+    screen = build_team_screen(
+        SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store,
+        first_nfl_season={TAXED: 2019, PLAIN: 2020, EX_PROSPECT: 2023, LATE: SEASON - 1},
+    )
+    assert screen.selection_proposed, "this test is about the pre-filled card"
+    column = sum(line.total for line in screen.slots if line.total is not None)
+    assert column > 0, "a pre-filled card must price its rows, or there is nothing to check"
+    assert screen.display_total_salary == column
+
+
+def test_a_proposed_verdict_is_never_styled_as_a_passing_one(client):
+    """Asserted on the CSS class, not the words.
+
+    The wording test above passes perfectly well against a badge rendered green — verified by
+    mutation, which is how this gap was found rather than assumed shut. Green is the style of a
+    card that has been recorded and checked, and the whole risk here is a pre-filled card being
+    taken for one at a glance.
+    """
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
+    badges = re.findall(r'<span class="(tag-inline[^"]*)"[^>]*>\s*Selection: from ESPN', page)
+    assert badges, "no proposed Selection badge on a pruned card"
+    for css in badges:
+        assert "ok" not in css.split(), f"a proposed verdict rendered as passing: {css!r}"
 
 
 def test_the_badge_counts_agree_with_the_status_line(client):
