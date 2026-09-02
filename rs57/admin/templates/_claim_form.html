@@ -91,7 +91,10 @@
     <thead>
       <tr>
         <th class="tc-slot-col"></th>
-        <th>Player, team pos</th>
+        {# "Player", not "Player, team pos": every other header here is one word, and the cell
+           below already reads "Zay Flowers · WR BAL" — the header was restating its own
+           contents in the one column that has no width to spare. #}
+        <th>Player</th>
         <th class="num tc-money-col">Base</th>
         <th class="num tc-money-col">Tax</th>
         <th class="num tc-fee-col">Fee</th>
@@ -112,9 +115,11 @@
                prune these options ARE just the kept players — the narrowing happens in the
                data, and one control serves both regimes.
 
-               `rookie` marks who the rule would admit, which is what makes a team with two
-               eligible players resolvable by eye. It is a suggestion, not a determination: a
-               rookie may legally be kept in K1/K2/K3. #}
+               The option label used to carry a `rookie` mark on whoever the rule would admit
+               (commissioner, 2026-09-02: dropped). It was only ever a suggestion — a rookie may
+               legally be kept in K1/K2/K3 — and the rule itself is still checked: an ineligible
+               prospect is a REVIEW on the card's status badge either way. What is gone is the
+               hint while you pick, not the finding after. #}
             <select name="{{ p }}player_{{ slot }}" aria-label="{{ slot }} for {{ screen.name }}">
               <option value="">Not selected</option>
               {% for option in screen.pickable %}
@@ -128,7 +133,6 @@
                      room it needs. #}
                   {{ option.name }} · {{ option.position }} {{ option.nfl_team }}
                   {%- if not screen.keepers_only %} · ${{ option.candidate_price }}{% endif %}
-                  {%- if option.prospect_eligible %} · rookie{% endif %}
                 </option>
               {% endfor %}
             </select>

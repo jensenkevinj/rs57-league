@@ -2274,6 +2274,29 @@ def test_the_espn_check_shows_conflicts_and_folds_the_agreements(client, store, 
     assert body.count("<details") == 1
 
 
+def test_the_player_picker_does_not_mark_rookies(client, data_dir: Path):
+    """Dropped 2026-09-02 (commissioner).
+
+    It was only ever a hint while choosing — a rookie may legally be kept in K1/K2/K3, so the
+    mark never determined anything. What it hinted at is still checked: an ineligible prospect
+    is a REVIEW on the card either way, which
+    ``test_an_ineligible_prospect_is_reported_but_not_blocked`` and its neighbours hold. The
+    hint went; the finding did not.
+    """
+    # Without this the test cannot fail: nobody in the base fixture has a draft class, so no
+    # option would carry the mark whether the template printed it or not.
+    (data_dir / "derived" / "player-origins.json").write_text(
+        json.dumps({"players": [{"espn_player_id": LATE, "first_nfl_season": SEASON - 1,
+                                 "source": "draft_year"}], "unresolved": []}),
+        encoding="utf-8",
+    )
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+
+    options = re.findall(r'<option value="\d+"[^>]*>(.*?)</option>', page, re.S)
+    assert options, "the fixture must render a player picker"
+    assert not any("rookie" in option for option in options), "the picker marks rookies again"
+
+
 def test_the_espn_check_opens_in_a_dialog_over_the_board(client):
     """It answers one question and is done. Thirty rows above the cards pushed the screen's own
     job down the page every time it ran.
