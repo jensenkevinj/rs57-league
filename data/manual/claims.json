@@ -26,7 +26,7 @@
         "manager_id": "t1",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.260909"
+        "submitted_at": "2026-09-02T17:08:10.275725"
       },
       {
         "computed_salary": 12,
@@ -35,7 +35,7 @@
         "manager_id": "t1",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.260909"
+        "submitted_at": "2026-09-02T17:08:10.275725"
       },
       {
         "computed_salary": 0,
@@ -44,7 +44,7 @@
         "manager_id": "t1",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.260909"
+        "submitted_at": "2026-09-02T17:08:10.275725"
       },
       {
         "computed_salary": 37,
@@ -53,7 +53,7 @@
         "manager_id": "t10",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.331748"
+        "submitted_at": "2026-09-02T17:08:10.345499"
       },
       {
         "computed_salary": 5,
@@ -62,7 +62,7 @@
         "manager_id": "t10",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.331748"
+        "submitted_at": "2026-09-02T17:08:10.345499"
       },
       {
         "computed_salary": 27,
@@ -71,7 +71,43 @@
         "manager_id": "t10",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.331748"
+        "submitted_at": "2026-09-02T17:08:10.345499"
+      },
+      {
+        "computed_salary": 35,
+        "espn_player_id": 4374302,
+        "fee_allocated": 0,
+        "manager_id": "t11",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T17:08:10.349799"
+      },
+      {
+        "computed_salary": 7,
+        "espn_player_id": 4361579,
+        "fee_allocated": 0,
+        "manager_id": "t11",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T17:08:10.349799"
+      },
+      {
+        "computed_salary": 16,
+        "espn_player_id": 4248528,
+        "fee_allocated": 15,
+        "manager_id": "t11",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T17:08:10.349799"
+      },
+      {
+        "computed_salary": 8,
+        "espn_player_id": 4685702,
+        "fee_allocated": 0,
+        "manager_id": "t11",
+        "season": 2026,
+        "slot": "PROSPECT",
+        "submitted_at": "2026-09-02T17:08:10.349799"
       },
       {
         "computed_salary": 35,
@@ -80,7 +116,7 @@
         "manager_id": "t12",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.339475"
+        "submitted_at": "2026-09-02T17:08:10.353959"
       },
       {
         "computed_salary": 28,
@@ -89,7 +125,7 @@
         "manager_id": "t12",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.339475"
+        "submitted_at": "2026-09-02T17:08:10.353959"
       },
       {
         "computed_salary": 5,
@@ -98,7 +134,7 @@
         "manager_id": "t12",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.339475"
+        "submitted_at": "2026-09-02T17:08:10.353959"
       },
       {
         "computed_salary": 17,
@@ -107,7 +143,7 @@
         "manager_id": "t2",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.285361"
+        "submitted_at": "2026-09-02T17:08:10.294160"
       },
       {
         "computed_salary": 10,
@@ -116,7 +152,7 @@
         "manager_id": "t2",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.285361"
+        "submitted_at": "2026-09-02T17:08:10.294160"
       },
       {
         "computed_salary": 15,
@@ -125,7 +161,7 @@
         "manager_id": "t2",
         "season": 2026,
         "slot": "K3",
-        "submitted_at": "2026-09-02T16:46:45.285361"
+        "submitted_at": "2026-09-02T17:08:10.294160"
       },
       {
         "computed_salary": 0,
@@ -134,7 +170,7 @@
         "manager_id": "t2",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.285361"
+        "submitted_at": "2026-09-02T17:08:10.294160"
       },
       {
         "computed_salary": 35,
@@ -143,7 +179,7 @@
         "manager_id": "t3",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.294315"
+        "submitted_at": "2026-09-02T17:08:10.304591"
       },
       {
         "computed_salary": 24,
@@ -152,7 +188,7 @@
         "manager_id": "t3",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.294315"
+        "submitted_at": "2026-09-02T17:08:10.304591"
       },
       {
         "computed_salary": 16,
@@ -161,7 +197,7 @@
         "manager_id": "t3",
         "season": 2026,
         "slot": "K3",
-        "submitted_at": "2026-09-02T16:46:45.294315"
+        "submitted_at": "2026-09-02T17:08:10.304591"
       },
       {
         "computed_salary": 7,
@@ -170,7 +206,7 @@
         "manager_id": "t3",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.294315"
+        "submitted_at": "2026-09-02T17:08:10.304591"
       },
       {
         "computed_salary": 52,
@@ -179,7 +215,7 @@
         "manager_id": "t4",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.301458"
+        "submitted_at": "2026-09-02T17:08:10.312885"
       },
       {
         "computed_salary": 25,
@@ -188,7 +224,7 @@
         "manager_id": "t4",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.301458"
+        "submitted_at": "2026-09-02T17:08:10.312885"
       },
       {
         "computed_salary": 20,
@@ -197,7 +233,7 @@
         "manager_id": "t4",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.301458"
+        "submitted_at": "2026-09-02T17:08:10.312885"
       },
       {
         "computed_salary": 45,
@@ -206,7 +242,7 @@
         "manager_id": "t5",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.307552"
+        "submitted_at": "2026-09-02T17:08:10.319753"
       },
       {
         "computed_salary": 33,
@@ -215,7 +251,7 @@
         "manager_id": "t5",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.307552"
+        "submitted_at": "2026-09-02T17:08:10.319753"
       },
       {
         "computed_salary": 16,
@@ -224,7 +260,7 @@
         "manager_id": "t5",
         "season": 2026,
         "slot": "K3",
-        "submitted_at": "2026-09-02T16:46:45.307552"
+        "submitted_at": "2026-09-02T17:08:10.319753"
       },
       {
         "computed_salary": 44,
@@ -233,7 +269,34 @@
         "manager_id": "t5",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.307552"
+        "submitted_at": "2026-09-02T17:08:10.319753"
+      },
+      {
+        "computed_salary": 49,
+        "espn_player_id": 4241389,
+        "fee_allocated": 5,
+        "manager_id": "t6",
+        "season": 2026,
+        "slot": "K1",
+        "submitted_at": "2026-09-02T17:08:10.325695"
+      },
+      {
+        "computed_salary": 34,
+        "espn_player_id": 4426502,
+        "fee_allocated": 5,
+        "manager_id": "t6",
+        "season": 2026,
+        "slot": "K2",
+        "submitted_at": "2026-09-02T17:08:10.325695"
+      },
+      {
+        "computed_salary": 32,
+        "espn_player_id": 4567048,
+        "fee_allocated": 5,
+        "manager_id": "t6",
+        "season": 2026,
+        "slot": "K3",
+        "submitted_at": "2026-09-02T17:08:10.325695"
       },
       {
         "computed_salary": 23,
@@ -242,7 +305,7 @@
         "manager_id": "t7",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.318076"
+        "submitted_at": "2026-09-02T17:08:10.331163"
       },
       {
         "computed_salary": 50,
@@ -251,7 +314,7 @@
         "manager_id": "t8",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.322990"
+        "submitted_at": "2026-09-02T17:08:10.336336"
       },
       {
         "computed_salary": 30,
@@ -260,7 +323,7 @@
         "manager_id": "t8",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.322990"
+        "submitted_at": "2026-09-02T17:08:10.336336"
       },
       {
         "computed_salary": 10,
@@ -269,7 +332,7 @@
         "manager_id": "t8",
         "season": 2026,
         "slot": "K3",
-        "submitted_at": "2026-09-02T16:46:45.322990"
+        "submitted_at": "2026-09-02T17:08:10.336336"
       },
       {
         "computed_salary": 13,
@@ -278,7 +341,7 @@
         "manager_id": "t9",
         "season": 2026,
         "slot": "K1",
-        "submitted_at": "2026-09-02T16:46:45.327529"
+        "submitted_at": "2026-09-02T17:08:10.341086"
       },
       {
         "computed_salary": 7,
@@ -287,7 +350,7 @@
         "manager_id": "t9",
         "season": 2026,
         "slot": "K2",
-        "submitted_at": "2026-09-02T16:46:45.327529"
+        "submitted_at": "2026-09-02T17:08:10.341086"
       },
       {
         "computed_salary": 5,
@@ -296,7 +359,7 @@
         "manager_id": "t9",
         "season": 2026,
         "slot": "PROSPECT",
-        "submitted_at": "2026-09-02T16:46:45.327529"
+        "submitted_at": "2026-09-02T17:08:10.341086"
       }
     ]
   }
