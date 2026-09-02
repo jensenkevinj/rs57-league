@@ -47,21 +47,9 @@
 
 <div id="verify-result"></div>
 
-{% if seasons_available | length > 1 %}
-  <p class="small muted">
-    Season:
-    {% for yr in seasons_available | reverse %}
-      {% if yr == screen.season %}
-        <strong>{{ yr }}</strong>
-      {% else %}
-        <a href="{{ url_for('season', year=yr) }}">{{ yr }}</a>
-      {% endif %}
-    {% endfor %}
-    {% if screen.season != current_season %}
-      <span class="tag-inline">not the current season</span>
-    {% endif %}
-  </p>
-{% endif %}
+{# The season is chosen in the header, on every tab, and the "not the current season" warning
+   moved there with it — it belongs beside the control that caused it, and on Money and Season
+   settings too, not only here. #}
 
 {# No lock banner. The deadline line above already carries a "locked until then" tag, every
    control on every card is disabled and every button says so — a paragraph repeating it is the

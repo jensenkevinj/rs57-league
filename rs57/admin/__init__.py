@@ -135,6 +135,20 @@ def create_app(
             "slot_choices": SLOT_CHOICES,
             "seasons_available": derived.seasons(),
             "current_season": current,
+            # The header's season control, and the tabs beside it. Both read the year off the
+            # *request* rather than off `current_season`: the tabs used to be hard-wired to
+            # the current season, so opening Money from a 2025 page silently moved you to
+            # 2026. Taken from `view_args` rather than threaded through twenty render calls —
+            # every year-taking route names its parameter `year`, so this is exact.
+            "picker_year": (request.view_args or {}).get("year") or current,
+            # Switching season keeps the tab you are on. `team` maps to the keeper board
+            # because a manager_id does not carry across years, and everything else (the
+            # commit page, the empty page, htmx partials) has no year to begin with.
+            "picker_endpoint": (
+                request.endpoint
+                if request.endpoint in ("season", "settings", "money")
+                else "season"
+            ),
             # The badge in the nav. Without it the only way to learn that something is
             # unsaved is to go looking on the Commit tab, and a change recorded but never
             # committed reaches nobody. Failure-tolerant on purpose: a git problem must not
