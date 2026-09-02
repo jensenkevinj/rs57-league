@@ -500,6 +500,16 @@ def test_a_review_never_renders_as_checked(client):
     assert notes, "a screen note must carry the same wording as an engine review"
 
 
+def tagged_flags(html: str) -> list[tuple[str, str]]:
+    """Every rendered flag as ``(label, message)``, so a test can check what a note is called."""
+    return [
+        (re.sub(r"\s+", " ", tag).strip(), re.sub(r"\s+", " ", text(body)).strip())
+        for tag, body in re.findall(
+            r'<span class="tag">(.*?)</span>\s*<div>(.*?)</div>', html, re.S
+        )
+    ]
+
+
 def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path):
     """The nightly's own warnings surface here, because they surface nowhere else.
 
@@ -507,9 +517,13 @@ def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path)
     ``test_site.test_a_sync_warning_stays_off_the_public_page``. This screen is now the only
     place a ``review.warnings`` entry is ever read by a human, so it must arrive labelled as
     unchecked rather than folded in beside the prices as though somebody had looked at it.
+
+    On the **season report**, once. It used to print on all twelve cards (commissioner,
+    2026-09-02): a sync warning changes no number on any one of them and cannot be acted on
+    from one, and twelve copies buried the findings that could.
     """
     doc = keeper_doc()
-    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
+    doc["review"]["warnings"] = ["prospect keeps were not supplied for 2025"]
     (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
 
     app = create_app(
@@ -519,27 +533,22 @@ def test_a_sync_warning_reaches_the_commissioner(data_dir: Path, tmp_path: Path)
         push=False,
         clock=lambda: NOW,
     )
-    page = app.test_client().get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    client = app.test_client()
+    page = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "prospect keeps were not supplied" not in client.get(
+        f"/season/{SEASON}/team/t1"
+    ).get_data(as_text=True), "a sync warning has no business on one franchise's card"
 
     warned = [
         (label, message)
-        for label, message in tooltip_lines(page)
-        if "has not been drafted" in message
+        for label, message in tagged_flags(page)
+        if "prospect keeps were not supplied" in message
     ]
     assert warned, "the sync's warning is not on the commissioner's screen at all"
-    assert all("UNVERIFIED" in label for label, _ in warned), (
+    assert len(warned) == 1, f"printed {len(warned)} times — once is the point"
+    assert all("Unverified" in label for label, _ in warned), (
         f"the sync warning is labelled {[label for label, _ in warned]} — it has not been checked"
     )
-
-
-def tagged_flags(html: str) -> list[tuple[str, str]]:
-    """Every rendered flag as ``(label, message)``, so a test can check what a note is called."""
-    return [
-        (re.sub(r"\s+", " ", tag).strip(), re.sub(r"\s+", " ", text(body)).strip())
-        for tag, body in re.findall(
-            r'<span class="tag">(.*?)</span>\s*<div>(.*?)</div>', html, re.S
-        )
-    ]
 
 
 def test_an_unverified_note_is_labelled_where_it_appears(client):
@@ -2282,12 +2291,57 @@ def _set_waiver_mismatch(data_dir: Path, player_id: int, season: int = SEASON) -
     path.write_text(json.dumps(doc), encoding="utf-8")
 
 
+def _set_sync_phase(data_dir: Path, note: str, season: int = SEASON) -> None:
+    """A phase note in the derived file, as the sync writes them since the split."""
+    path = data_dir / "derived" / f"{season}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["review"]["phase"] = [note]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
 def _set_sync_warning(data_dir: Path, warning: str, season: int = SEASON) -> None:
     """A sync warning stored in the derived file, as a run before the window gate left one."""
     path = data_dir / "derived" / f"{season}.json"
     doc = json.loads(path.read_text(encoding="utf-8"))
     doc["review"]["warnings"] = [warning]
     path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def test_no_sync_note_of_either_kind_reaches_a_franchise_card(client, data_dir: Path):
+    """A card carries what is true of that franchise. Nothing else (commissioner, 2026-09-02).
+
+    Both kinds, because the split is not what fixed this — twelve copies of "2026 has not been
+    drafted" buried three real salary findings on the same card whichever label they wore.
+    """
+    _set_sync_warning(data_dir, "prospect keeps were not supplied for 2025")
+    _set_sync_phase(data_dir, "2026 has not been drafted, so base_salary is keeperValue")
+
+    card = client.get(f"/season/{SEASON}/team/t1").get_data(as_text=True)
+    assert "prospect keeps were not supplied" not in card
+    assert "has not been drafted" not in card
+
+    board = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert board.count("prospect keeps were not supplied") == 1, "once, on the report"
+    assert board.count("has not been drafted") == 1
+
+
+def test_a_phase_note_is_never_labelled_unverified(client, data_dir: Path):
+    """"This season has not drafted yet" is the known state of every season for most of the
+    year and clears itself at the auction. Nobody has to go and check it.
+
+    The rule it must not break: a REVIEW never renders as though it had passed. This is the
+    other side — something that was never a check must not render as though it were one, or the
+    label stops meaning anything on the findings that are.
+    """
+    _set_sync_warning(data_dir, "prospect keeps were not supplied for 2025")
+    _set_sync_phase(data_dir, "2026 has not been drafted, so base_salary is keeperValue")
+    flags = tagged_flags(client.get(f"/season/{SEASON}").get_data(as_text=True))
+
+    phase = [label for label, msg in flags if "has not been drafted" in msg]
+    warned = [label for label, msg in flags if "prospect keeps were not supplied" in msg]
+    assert phase and warned, f"the fixture must render both kinds: {flags}"
+    assert all("For information" in label for label in phase), phase
+    assert all("Unverified" in label for label in warned), warned
 
 
 def test_a_stored_waiver_mismatch_is_ignored_once_espn_holds_entered_prices(
@@ -3184,11 +3238,12 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
 
     The note still reaches the card, because a card is where the number it affects is read.
     Only the tally is per franchise.
-    """
-    doc = keeper_doc()
-    doc["review"]["warnings"] = ["2026 has not been drafted, so base_salary is keeperValue"]
-    (data_dir / "derived" / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
 
+    The fixture is the unrecorded consolation winner, which is the kind this still describes: it
+    prices every team on the board with fees in full, so it changes a number on each card. Sync
+    warnings used to be the example here and no longer reach a card at all — they change no
+    number on one and cannot be acted on from one.
+    """
     derived = Derived(derived_dir=data_dir / "derived")
     screen = build_team_screen(
         SEASON, "t1", derived.load(SEASON), derived.load(PRIOR), store
@@ -3202,7 +3257,7 @@ def test_a_league_wide_note_is_not_counted_against_every_franchise(
         f"the card counted {screen.review_count} against {reviews} review(s) and "
         f"{len(team_only)} team note(s) — a league-wide fact was tallied per franchise"
     )
-    assert any("has not been drafted" in line for line in screen.unverified_reasons), (
+    assert any("no settings row" in line for line in screen.unverified_reasons), (
         "and it must still be readable on the card it affects"
     )
 

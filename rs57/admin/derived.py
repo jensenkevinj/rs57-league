@@ -41,6 +41,9 @@ class DerivedSeason:
     players: tuple[Player, ...]
     roster: tuple[RosterEntry, ...]
     warnings: tuple[str, ...] = ()
+    """Sync findings that need somebody's eyes. REVIEW."""
+    phase: tuple[str, ...] = ()
+    """Sync notes describing the state the season is in. Information, never REVIEW."""
     waiver_base_mismatches: tuple[int, ...] = ()
 
     @property
@@ -129,6 +132,7 @@ class Derived:
             players=tuple(Player(**row) for row in doc.get("players") or []),
             roster=tuple(RosterEntry(**row) for row in doc.get("roster") or []),
             warnings=tuple(review.get("warnings") or []),
+            phase=tuple(review.get("phase") or []),
             waiver_base_mismatches=tuple(review.get("waiver_base_mismatches") or []),
         )
         self._cache[season] = (mtime, loaded)

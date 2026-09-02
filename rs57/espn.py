@@ -511,6 +511,17 @@ class SyncedSeason:
     """ESPN's ``draftSettings.keeperDeadlineDate``. Gates the admin console the same way
     ``trade_deadline`` gates the prospect check — never hand-entered, never overridden."""
     warnings: tuple[str, ...] = ()
+    """Things that could not be checked, or were checked and disagreed. Every one names
+    something a person can do about it, and every one is REVIEW wherever it is read."""
+    phase: tuple[str, ...] = ()
+    """What state the season is *in* — pruned rosters, an auction not yet run, a check whose
+    premise the calendar has suspended.
+
+    Kept apart from ``warnings`` because they are not the same kind of fact and must not wear
+    the same label. Nobody needs to check that a season has not drafted yet: it is the known
+    state of every season for most of the year and it clears itself at the auction. Rendering
+    it as "nobody has checked this" is how the flags that DO need checking stop being read.
+    """
     waiver_bases_verified: int = 0
     """Waiver adds whose base was confirmed against the FAAB actually bid."""
     waiver_base_mismatches: tuple[int, ...] = ()
@@ -594,6 +605,7 @@ def build_season(
     players: dict[int, Player] = {}
     roster: list[RosterEntry] = []
     warnings: list[str] = []
+    phase: list[str] = []
     verified_waivers = 0
     mismatched_waivers: list[int] = []
     roster_sizes: dict[int, int] = {}
@@ -675,7 +687,7 @@ def build_season(
     # raising here still refuses the season rather than half-writing one.
     regime = check_roster_sizes(roster_sizes)
     if regime == "keepers":
-        warnings.append(
+        phase.append(
             f"every roster is {KEEPERS_ONLY_ROSTER_SIZE} players or fewer, so ESPN has pruned "
             f"the league to its keepers: this is the window between the keeper deadline and "
             f"the auction, and the season holds only kept players. Re-sync after the auction."
@@ -700,9 +712,9 @@ def build_season(
             "waiver add's salary has a witness"
         )
     if entered:
-        # SKIPPED, never silence. The check has not passed here — it has not run, and the
-        # reason is a known state with a known end: the auction.
-        warnings.append(
+        # SKIPPED, never silence — but a phase note, not a warning. The check has not passed
+        # here, it has not run, and the reason is a known state with a known end: the auction.
+        phase.append(
             "the waiver-base check did not run: between the keeper deadline and the auction "
             "ESPN holds the keeper prices entered for this season, not the price each player "
             "was acquired for, so there is nothing to compare a FAAB bid against. It resumes "
@@ -714,7 +726,7 @@ def build_season(
             f"under the ratchet a wrong waiver base carries forward every season after"
         )
     if not drafted:
-        warnings.append(
+        phase.append(
             f"{client.year} has not been drafted, so base_salary is keeperValue (last "
             f"season's salary carried forward). Re-sync after the auction."
         )
@@ -730,6 +742,7 @@ def build_season(
         draft_date=draft_date,
         keeper_deadline=keeper_deadline,
         warnings=tuple(warnings),
+        phase=tuple(phase),
         waiver_bases_verified=verified_waivers,
         waiver_base_mismatches=tuple(sorted(mismatched_waivers)),
     )

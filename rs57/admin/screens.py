@@ -104,9 +104,15 @@ class Note:
     never as though they had passed.
 
     ``team_specific`` is False for a fact about the whole league — an unrecorded consolation
-    winner, a sync warning about the season. Those belong on a team's own screen, because that is
-    where the number they affect is being read, but the league report counts them once at the
-    bottom rather than per team: twelve identical flags is how a real one stops being read.
+    winner, say. Those belong on a team's own screen, because that is where the number they
+    affect is being read, but the league report counts them once at the bottom rather than per
+    team: twelve identical flags is how a real one stops being read.
+
+    **Sync notes are not among them and never reach a card** (commissioner, 2026-09-02). "This
+    season has not drafted yet" changes no number on any card, cannot be acted on from one, and
+    printed twelve times it buried the findings that can. They render once, on the season
+    report, and the ones describing the season's state render as information rather than as
+    something nobody has checked.
     """
 
     kind: str
@@ -1461,10 +1467,6 @@ def build_team_screen(
     entered_prices = (
         not current.drafted and keeper_deadline is not None and keeper_deadline.passed
     )
-    for warning in current.warnings:
-        if entered_prices and STALE_WAIVER_WARNING in warning:
-            continue
-        notes.append(Note("review", f"{season} sync: {warning}", team_specific=False))
     mismatched = [
         row.name for row in rows if row.espn_player_id in current.waiver_base_mismatches
     ]
@@ -1541,6 +1543,18 @@ def build_season_screen(
     # where that team is, and a list naming eleven franchises directly above eleven cards each
     # saying the same thing is one fact told twice.
     notes: list[Note] = []
+
+    # The sync's own findings, read once here rather than on every card. Two kinds, and the
+    # difference is the whole reason they moved: a warning names something to do, a phase note
+    # describes the state of the season and clears itself at the auction.
+    entered_prices = not current.drafted and deadline_fact.passed
+    for warning in current.warnings:
+        # Transitional: a season synced before the split still carries its phase lines here.
+        if entered_prices and STALE_WAIVER_WARNING in warning:
+            continue
+        notes.append(Note("review", f"{season} sync: {warning}", team_specific=False))
+    for note in current.phase:
+        notes.append(Note("info", f"{season} sync: {note}", team_specific=False))
     override_view = tuple(
         override_row(o, current)
         for o in sorted(store.overrides(season), key=lambda o: o.espn_player_id)

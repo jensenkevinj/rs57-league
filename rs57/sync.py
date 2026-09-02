@@ -101,6 +101,9 @@ def season_document(season: SyncedSeason) -> dict[str, Any]:
             "waiver_bases_verified": season.waiver_bases_verified,
             "waiver_base_mismatches": list(season.waiver_base_mismatches),
             "warnings": list(season.warnings),
+            # What state the season is in, kept apart from what needs looking at. A reader that
+            # cannot tell them apart labels "this season has not drafted yet" as unverified.
+            "phase": list(season.phase),
         },
     }
 
@@ -167,6 +170,8 @@ def main(argv: list[str] | None = None) -> int:
         f"  waiver bases verified against FAAB: {season.waiver_bases_verified}"
         f" ({len(season.waiver_base_mismatches)} mismatched)"
     )
+    for note in season.phase:
+        print(f"  phase:  {note}")
     for warning in season.warnings:
         print(f"  REVIEW: {warning}")
     if args.dry_run:

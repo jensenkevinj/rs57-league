@@ -936,6 +936,10 @@ def build_keeper_season(
         if charges_in_base and STALE_WAIVER_WARNING in warning:
             continue
         notes.append(Note("review", warning, where=f"{season} keepers"))
+    # `review.phase` is deliberately NOT published. Site notes are "unverified" by definition
+    # — the class says so and there is no third kind — and a season that has not drafted yet is
+    # not something nobody has checked. The page already states the phase where it matters:
+    # `charges_in_base` puts a caption above the grid saying the charges are inside the base.
     # Nothing to report in that window: the field the check compared is not an acquisition
     # price there, so a waiver add carrying a fee differs from its own FAAB bid by design.
     mismatches = [] if charges_in_base else (review.get("waiver_base_mismatches") or [])

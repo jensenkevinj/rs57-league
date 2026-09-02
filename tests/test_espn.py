@@ -486,8 +486,10 @@ def test_the_waiver_check_does_not_run_once_espn_holds_the_entered_prices(
     assert season.waiver_base_mismatches == (), "a check that cannot run reports nothing"
     assert broken not in season.waiver_base_mismatches
     assert season.waiver_bases_verified == 0
-    # SKIPPED, never silence: it has not passed, it has not run, and the reason is on the page.
-    assert any("did not run" in w for w in season.warnings), season.warnings
+    # SKIPPED, never silence — and a phase note, not a warning. Nobody has to go and check
+    # that the calendar has suspended a check; it resumes on its own at the auction.
+    assert any("did not run" in n for n in season.phase), season.phase
+    assert not any("did not run" in w for w in season.warnings), "not something to action"
     assert not any("disagree with the FAAB" in w for w in season.warnings)
 
 
@@ -610,10 +612,13 @@ def test_a_pruned_keeper_window_is_not_degraded(doc_2026):
     _prune_every_roster(doc_2026, KEEPERS_ONLY_ROSTER_SIZE)
     season = build_season(ReplayClient(2026, doc_2026))
     assert len(season.roster) == LEAGUE_SIZE * KEEPERS_ONLY_ROSTER_SIZE
-    assert any("pruned the league to its keepers" in w for w in season.warnings), (
+    assert any("pruned the league to its keepers" in n for n in season.phase), (
         "a season holding only keepers must say so — read as a full roster it is a "
         "league that dropped three quarters of its players"
     )
+    # It has to say so, but not as something nobody has checked: it is the ordinary state of
+    # the weeks before an auction and it ends with the auction.
+    assert not any("pruned the league" in w for w in season.warnings)
 
 
 def test_a_league_wide_wipe_is_degraded_not_a_keeper_window(doc_2026):
