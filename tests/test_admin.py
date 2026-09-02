@@ -2255,6 +2255,21 @@ def test_a_pruned_roster_keeps_the_picker(client, data_dir: Path, store: ManualS
     assert "Puka Nacua" in page, "the kept players are still named"
 
 
+def test_the_picker_names_a_price_only_while_the_columns_cannot(client, data_dir: Path):
+    """The label carries the cost exactly when nothing else on the row does.
+
+    A full roster prices nothing in Base/Total until a player is picked, so the label is the
+    only figure there is while choosing. A pruned one prices every kept player in its own
+    columns, and repeating it costs the name the width it needs to be readable.
+    """
+    pruned = client.get(f"/season/{SEASON}").get_data(as_text=True)  # fixture is 4 deep
+    assert "Puka Nacua · WR LAR</option>" in pruned.replace("\n", "").replace("  ", "")
+
+    write_full_roster(data_dir)
+    full = client.get(f"/season/{SEASON}").get_data(as_text=True)
+    assert "· $10" in full, "a full roster prices nothing else, so the label must"
+
+
 def test_a_pruned_picker_offers_only_the_kept_players(data_dir: Path, store: ManualStore):
     """The options narrow because the roster did, not because the template filtered anything.
 

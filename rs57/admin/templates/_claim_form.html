@@ -137,7 +137,14 @@
               {% for option in screen.pickable %}
                 <option value="{{ option.espn_player_id }}"
                         {% if row and row.espn_player_id == option.espn_player_id %}selected{% endif %}>
-                  {{ option.name }} · {{ option.position }} {{ option.nfl_team }} · ${{ option.candidate_price }}
+                  {# The price is here only while it is nowhere else. Before the prune the
+                     Base and Total columns read "—" for every unpicked row, so the label is
+                     the one place a candidate's cost appears and you are choosing from a full
+                     roster. After it, those columns carry the price for all three or four kept
+                     players, and repeating it in the label buys nothing and costs the name the
+                     room it needs. #}
+                  {{ option.name }} · {{ option.position }} {{ option.nfl_team }}
+                  {%- if not screen.keepers_only %} · ${{ option.candidate_price }}{% endif %}
                   {%- if option.prospect_eligible %} · rookie{% endif %}
                 </option>
               {% endfor %}
