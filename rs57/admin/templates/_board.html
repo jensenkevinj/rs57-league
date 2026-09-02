@@ -35,30 +35,25 @@
 
   {# Nothing recorded and nothing skipped means nothing was declared. The cards already say
      "Not recorded yet" each; an alert repeating it adds no fact. #}
-  {% if not attempted %}
-    <div class="flag bad">
-      <span class="tag">Locked</span>
-      <div>{{ screen.gate.message }}</div>
-    </div>
-  {% endif %}
 
   <div class="team-grid">
     {% for team in screen.teams %}
-      {% with screen = team, problems = [], lock_banner = false, detailed = false %}
+      {% with screen = team, problems = [], detailed = false %}
         {% include "_claim_form.html" %}
       {% endwith %}
     {% endfor %}
   </div>
 
-  {% if screen.gate.editable %}
-    <div class="board-actions">
-      <button type="submit">Record all {{ screen.teams | length }} franchises</button>
-      <span class="spin">recording…</span>
-      <span class="small muted">
+  <div class="board-actions">
+    {# The year is on the button because the season switcher makes a prior season a routine
+       destination, and this button clears any franchise it posts empty. "Record all 12
+       franchises" on a page you did not mean to be on is one click from wiping 2025. #}
+    <button type="submit">Record all {{ screen.teams | length }} franchises for {{ screen.season }}</button>
+    <span class="spin">recording…</span>
+    <span class="small muted">
         Writes <code>data/manual/claims.json</code> on this machine. Nothing is published until
         you <a href="{{ url_for('commit') }}">commit</a>. A franchise with an error is skipped
         and named — the rest still record.
-      </span>
-    </div>
-  {% endif %}
+    </span>
+  </div>
 </form>

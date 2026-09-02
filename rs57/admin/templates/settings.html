@@ -104,11 +104,18 @@
   </div>
 {% endif %}
 
-<h2>The deadline locks until it passes, never after</h2>
+<h2>The deadline is shown, never enforced</h2>
 <p class="small">
-  Claims cannot be saved before the keeper deadline above, so nothing is recorded while managers
-  can still change their minds. Once it passes the console opens and stays open for good — a
-  claim entered late is still visible as a deliberate correction, not something to work around by
-  editing JSON by hand.
+  Claims save on either side of the keeper deadline above. It was a lock briefly, until it
+  turned out that ESPN hands keeper selections to nobody — so typing them in here before the
+  deadline is the only way they ever arrive, and the lock closed the one window the work
+  happens in.
+</p>
+<p class="small">
+  What the lock protected is reported instead. Every claim carries the moment it was recorded,
+  and its salary is frozen at that moment; a card recorded before the deadline says so and
+  stays flagged until you re-record it, and one whose recorded figure no longer prices the same
+  says that too. A manager who changes his mind after you have entered him is visible, not
+  silent.
 </p>
 {% endblock %}

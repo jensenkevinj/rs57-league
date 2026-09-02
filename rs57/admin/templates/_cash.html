@@ -1,0 +1,85 @@
+{# Draft cash for one season, on the page the keeper salaries it distorts are entered on.
+
+   This was its own tab until 2026-09-01. It is here because step 7 of the offseason — hand-
+   editing a few ESPN salaries to express a cash trade — happens in the same sitting as steps
+   4-6, and walking to another tab to record the legs of a trade you just priced is how one of
+   them gets forgotten.
+
+   **The season filter is on the display only.** `cash_screen` runs `check_cash_trades` over
+   every trade and every override in the file, because the audit is a franchise's net across a
+   group of trades that share a salary edit — hand it one season and it computes half a group
+   and reports an imbalance that is not there. Two consequences show up below and are both
+   stated rather than hidden: a trade from another draft year appears when it nets with one of
+   this season's, and the league-wide net is printed next to the season one. #}
+
+{% if cash.league_net is not none and cash.league_net != 0 %}
+  <div class="flag bad">
+    <span class="tag">Every season, not just {{ cash.season }}</span>
+    <div>
+      Live overrides across the whole file net to ${{ cash.league_net }}, not $0. A cash trade
+      moves budget between two franchises, so the legs cancel — a non-zero total means a leg is
+      missing, or one is filed against the wrong draft year. The season figure above cannot see
+      that: a leg misfiled into another year leaves both seasons reading clean.
+    </div>
+  </div>
+{% elif cash.league_net is none %}
+  <div class="flag">
+    <span class="tag">unverified</span>
+    <div>
+      The league-wide override total cannot be computed: at least one live row names a player
+      with no ESPN base to compare against. A total resting on a guessed zero is worse than no
+      total.
+    </div>
+  </div>
+{% endif %}
+
+<h3>Trades</h3>
+{% if cash.borrowed %}
+  <div class="flag">
+    <span class="tag">shown from another draft</span>
+    <div>
+      {{ cash.borrowed | length }} trade(s) below are not {{ cash.season }} trades. They share a
+      salary edit with one that is, so they are audited as one group and the verdict on this
+      page rests on them — showing half a netted pair would rest it on a row you cannot see.
+    </div>
+  </div>
+{% endif %}
+{% with rows = cash.trades %}
+  {% include "_trade_table.html" %}
+{% endwith %}
+
+<h3>Salary overrides</h3>
+<p class="small muted">
+  Each one is a leg — the hand-edited ESPN salary that expresses a trade.
+  <code>actual_salary</code> is the true value and ESPN's figure is the distorted one until the
+  row is reverted. This is not for fixing a wrong ESPN value.
+</p>
+
+{% if cash.unlinked %}
+  {# One summary, not one per row. The table below carries the per-row "attach to…" control,
+     which is where the fixing actually happens. League-wide and labelled that way: an unlinked
+     leg is exactly the row no per-trade audit can reach, so scoping it to a season would hide
+     the ones that most need answering. #}
+  <div class="flag">
+    <span class="tag">unverified</span>
+    <div>
+      {{ cash.unlinked | length }} live override(s) across every season are attached to no cash
+      trade. Those can only be checked by netting the whole league — attach each to its trade
+      below, or flag it unpaired_ok if the counterparty is unrecoverable.
+    </div>
+  </div>
+{% endif %}
+
+{% with rows = cash.overrides, show_season = false, return_year = cash.season %}
+  {% include "_override_table.html" %}
+{% endwith %}
+
+{% if cash.hidden_years %}
+  {# A ledger that looks complete and is not is the failure this repo keeps guarding against.
+     Silence reads exactly like success. #}
+  <p class="small muted">
+    Not shown here: rows recorded against
+    {% for yr in cash.hidden_years %}<a href="{{ url_for('season', year=yr) }}">{{ yr }}</a>{% if not loop.last %}, {% endif %}{% endfor %}.
+    Switch season above to work on them.
+  </p>
+{% endif %}

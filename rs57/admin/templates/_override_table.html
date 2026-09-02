@@ -111,6 +111,11 @@
                            value="{{ row.override.espn_player_id }}">
                     <input type="hidden" name="created_at"
                            value="{{ row.override.created_at.isoformat() }}">
+                    {# The other three forms on this row carry it; this one did not, so a
+                       delete landed somewhere other than the page it was made from. #}
+                    {% if return_year %}
+                      <input type="hidden" name="return_year" value="{{ return_year }}">
+                    {% endif %}
                     <button type="submit">Delete</button>
                   </form>
                 </div>
@@ -120,29 +125,33 @@
         </tr>
       {% endfor %}
 
-      {% if show_season %}
-        {# Same columns, same controls: adding an override and amending one look and work
-           alike. Ledger only — the season page is a read-and-amend view of one year. #}
-        <tr class="insert-row">
-          <td>{{ draft_options('ov-new', year) }}</td>
-          <td>
-            <input type="number" step="1" name="espn_player_id" form="ov-new"
-                   placeholder="ESPN id">
-          </td>
-          <td class="small muted">—</td>
-          <td class="num muted">—</td>
-          <td class="num">
-            <input type="number" step="1" min="0" name="actual_salary" form="ov-new">
-          </td>
-          <td class="small">{{ trade_options('ov-new', []) }}</td>
-          <td class="small">
-            <label class="small muted">
-              <input type="checkbox" name="unpaired_ok" value="1" form="ov-new"> unpaired
-            </label>
-          </td>
-          <td><button type="submit" form="ov-new">Add</button></td>
-        </tr>
-      {% endif %}
+      {# Same columns, same controls: adding an override and amending one look and work
+         alike. Always rendered — this is the only add form there is. #}
+      <tr class="insert-row">
+        {% if show_season %}<td>{{ draft_options('ov-new', year) }}</td>{% else %}
+          <input type="hidden" name="season" value="{{ year }}" form="ov-new">
+        {% endif %}
+        <td>
+          <input type="number" step="1" name="espn_player_id" form="ov-new"
+                 placeholder="ESPN id">
+          {# The one field only the deleted _override_form could type. Without it every new
+             row would carry DEFAULT_OVERRIDE_REASON forever and provenance would have nowhere
+             to go. Free text, escaped everywhere it renders; autoescaping stays on. #}
+          <input type="text" name="reason" form="ov-new" placeholder="reason (optional)">
+        </td>
+        <td class="small muted">—</td>
+        <td class="num muted">—</td>
+        <td class="num">
+          <input type="number" step="1" min="0" name="actual_salary" form="ov-new">
+        </td>
+        <td class="small">{{ trade_options('ov-new', []) }}</td>
+        <td class="small">
+          <label class="small muted">
+            <input type="checkbox" name="unpaired_ok" value="1" form="ov-new"> unpaired
+          </label>
+        </td>
+        <td><button type="submit" form="ov-new">Add</button></td>
+      </tr>
     </tbody>
   </table>
 </div>
@@ -164,6 +173,8 @@
     {% endif %}
   </form>
 {% endfor %}
-{% if show_season %}
-  <form id="ov-new" method="post" action="{{ url_for('add_override') }}"></form>
-{% endif %}
+<form id="ov-new" method="post" action="{{ url_for('add_override') }}">
+  {% if return_year %}
+    <input type="hidden" name="return_year" value="{{ return_year }}">
+  {% endif %}
+</form>

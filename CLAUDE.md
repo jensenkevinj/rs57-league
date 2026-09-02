@@ -90,16 +90,25 @@ and **from 2026 on the admin tool is the record** and its rows are copied across
     `Season.consolation_winner_id` is recorded in `data/manual/seasons.json` — a derived guess
     must never quietly waive a real team's fees. Unrecorded, `fees_waived_for()` prices that
     year's keepers with fees ON and reports the waiver unconfirmed rather than applying it.
-- Keeper deadline: the admin console refuses to save keeper claims before the deadline passes,
-  and nothing ever re-locks afterward (commissioner, 2026-08-04). **The deadline and the draft
+- Keeper deadline: **shown and stamped, never enforced** (commissioner, 2026-09-01). It was a
+  lock for four weeks (commissioner, 2026-08-04) on the reasoning that no salary is entered
+  before the deadline, so a lock costs nothing. That premise was wrong. **ESPN publishes keeper
+  selections to nobody but an authenticated league member** — every draft pick reads
+  `keeper: false` and `mKeeperRosters` carries no marker, so ESPN's own League Keepers page
+  prints `Selection Hidden` — which makes hand entry the tool's only input path, and it happens
+  in exactly the window the lock closed. What the lock protected is now *reported*: a claim
+  whose `submitted_at` precedes the deadline renders as provisional REVIEW until it is
+  re-recorded. Weaker guarantee, wider net — the lock said nothing about the claims stamped
+  2026-07-29, six days before the lock existed. `KeeperDeadline` is display-only and no route
+  may gate on it. **The deadline and the draft
   date are ESPN facts, not admin fields** (commissioner, 2026-08-26) — `DerivedSeason.keeper_deadline`
   and `.draft_date` come straight from `draftSettings.keeperDeadlineDate` / `.date`, synced into
   `data/derived/{year}.json` by the nightly Action the same way `trade_deadline` already was.
   `Season.keeper_deadline` and `Season.draft_date` no longer exist and there is no admin UI to
   set either one: a hand-typed copy is a second record of a number ESPN already holds, and the
   two had already drifted apart once. An unrecorded deadline (ESPN hasn't set one, or the season
-  hasn't synced) leaves the console open rather than locked — a missing fact is not the same as a
-  future one, and collapsing them would freeze a freshly synced season with no way out on screen.
+  hasn't synced) stays a distinct state from a future one — a missing fact is not the same as a
+  future one, and a season with no deadline on file cannot call any claim provisional against it.
 - Prospects: **must be a rookie**, rostered before the trade deadline, kept at
   acquisition value, no fee allocation. **Prospects may be started** — the old
   "never started by any league team" rule is retired, as is the allowance for

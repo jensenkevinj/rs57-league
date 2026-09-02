@@ -1,5 +1,20 @@
 # Admin keeper redesign
 
+> **Partly superseded 2026-09-01.** Two decisions below were reversed by the commissioner on
+> the 2026 keeper deadline, once it became clear that ESPN publishes keeper selections to
+> nobody but an authenticated league member — so step 1 of the workflow table never reaches
+> this tool on its own and hand entry is the only input path.
+>
+> * **The deadline lock is gone.** It closed the exact window the entry happens in. A claim
+>   recorded before the deadline is now reported as provisional rather than refused. See
+>   `KeeperDeadline` in `rs57/admin/screens.py`.
+> * **Draft cash moved onto the keeper page and the Draft cash tab was removed** — the same
+>   consolidation this file argued for in "Overrides on the same page", carried the rest of
+>   the way.
+>
+> Everything else here still stands, including the board's shape, the slot-keyed form, the
+> team-by-team write, and verification reading the roster.
+
 Replaces an earlier draft of this file. That draft described a keeper *selection* tool. This one
 describes a fee-entry and pricing tool, which is what the console is actually for.
 

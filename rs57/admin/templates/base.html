@@ -108,6 +108,10 @@
   }
   .tag-inline.bad { color: var(--bad); background: var(--bad-bg); border-color: var(--bad-line); }
   .tag-inline.ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
+  /* The two verdicts under a card's name. Their own row rather than trailing the name: at
+     twelve across, a badge that wraps to the next line only on the long franchise names makes
+     the grid impossible to scan down. */
+  .tc-verdicts { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.5rem; }
   .tag-inline.flat { color: var(--muted); background: var(--bg); border-color: var(--line); }
   /* The unsaved-changes count in the nav. Nothing recorded in this tool reaches the league
      until it is committed, and before this the only way to find out was to go looking. */
@@ -350,7 +354,6 @@
         <a href="{{ url_for('money', year=current_season) }}"
            class="{% if page == 'money' %}on{% endif %}">Money</a>
       {% endif %}
-      <a href="{{ url_for('trades') }}" class="{% if page == 'trades' %}on{% endif %}">Draft cash</a>
       <a href="{{ url_for('commit') }}" class="{% if page == 'commit' %}on{% endif %}">
         Save{% if unsaved %} <span class="badge">{{ unsaved }}</span>{% endif %}
       </a>
