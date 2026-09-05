@@ -194,6 +194,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 3149687,
+      "first_nfl_season": 2023,
+      "source": "first_stats_season"
+    },
+    {
       "espn_player_id": 3886598,
       "first_nfl_season": 2020,
       "source": "draft_year"
@@ -281,6 +286,11 @@
     {
       "espn_player_id": 4036378,
       "first_nfl_season": 2020,
+      "source": "draft_year"
+    },
+    {
+      "espn_player_id": 4038441,
+      "first_nfl_season": 2019,
       "source": "draft_year"
     },
     {
@@ -442,6 +452,11 @@
       "espn_player_id": 4360569,
       "first_nfl_season": 2022,
       "source": "first_stats_season"
+    },
+    {
+      "espn_player_id": 4360635,
+      "first_nfl_season": 2022,
+      "source": "draft_year"
     },
     {
       "espn_player_id": 4360689,
@@ -679,6 +694,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 4429835,
+      "first_nfl_season": 2024,
+      "source": "first_stats_season"
+    },
+    {
       "espn_player_id": 4429939,
       "first_nfl_season": 2024,
       "source": "draft_year"
@@ -904,6 +924,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 4685247,
+      "first_nfl_season": 2024,
+      "source": "draft_year"
+    },
+    {
       "espn_player_id": 4685278,
       "first_nfl_season": 2025,
       "source": "draft_year"
@@ -962,6 +987,11 @@
       "espn_player_id": 4695883,
       "first_nfl_season": 2024,
       "source": "first_stats_season"
+    },
+    {
+      "espn_player_id": 4696044,
+      "first_nfl_season": 2026,
+      "source": "draft_year"
     },
     {
       "espn_player_id": 4696981,
