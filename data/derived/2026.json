@@ -1023,12 +1023,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4689114,
-      "name": "Jaxson Dart",
-      "nfl_team": "NYG",
-      "position": "QB"
-    },
-    {
       "espn_player_id": 4695883,
       "name": "Jalen Coker",
       "nfl_team": "CAR",
@@ -2666,15 +2660,6 @@
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 30,
       "espn_player_id": 4569618,
-      "kept_prior_year": false,
-      "manager_id": "t8",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 3,
-      "espn_player_id": 4689114,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
