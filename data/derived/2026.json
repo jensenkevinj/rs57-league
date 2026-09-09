@@ -363,6 +363,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4036133,
+      "name": "T.J. Hockenson",
+      "nfl_team": "MIN",
+      "position": "TE"
+    },
+    {
       "espn_player_id": 4036378,
       "name": "Jordan Love",
       "nfl_team": "GB",
@@ -771,12 +777,6 @@
       "position": "TE"
     },
     {
-      "espn_player_id": 4430539,
-      "name": "Brenton Strange",
-      "nfl_team": "JAX",
-      "position": "TE"
-    },
-    {
       "espn_player_id": 4430737,
       "name": "Kyren Williams",
       "nfl_team": "LAR",
@@ -1047,6 +1047,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 4697815,
+      "name": "Rachaad White",
+      "nfl_team": "WSH",
+      "position": "RB"
+    },
+    {
       "espn_player_id": 4701936,
       "name": "Matthew Golden",
       "nfl_team": "GB",
@@ -1158,7 +1164,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 11,
+    "waiver_bases_verified": 13,
     "warnings": []
   },
   "roster": [
@@ -1496,6 +1502,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-09-08T13:47:38.379000",
+      "base_salary": 0,
+      "espn_player_id": 4036133,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 16,
       "espn_player_id": 4248528,
@@ -1533,15 +1548,6 @@
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": 4430539,
-      "kept_prior_year": false,
-      "manager_id": "t11",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 80,
       "espn_player_id": 4430807,
       "kept_prior_year": false,
@@ -1566,6 +1572,15 @@
       "manager_id": "t11",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-09-08T13:47:07.366000",
+      "base_salary": 0,
+      "espn_player_id": 4697815,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
