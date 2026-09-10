@@ -22,7 +22,7 @@
     },
     {
       "manager_id": "t5",
-      "name": "The Infirmary",
+      "name": "Love thy Nabers",
       "season": 2026
     },
     {
@@ -735,6 +735,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 4429086,
+      "name": "Michael Mayer",
+      "nfl_team": "LV",
+      "position": "TE"
+    },
+    {
       "espn_player_id": 4429096,
       "name": "Blake Corum",
       "nfl_team": "LAR",
@@ -1149,12 +1155,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 5081397,
-      "name": "Dylan Sampson",
-      "nfl_team": "CLE",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 5083076,
       "name": "Harold Fannin Jr.",
       "nfl_team": "CLE",
@@ -1164,7 +1164,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 13,
+    "waiver_bases_verified": 14,
     "warnings": []
   },
   "roster": [
@@ -2492,6 +2492,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-09-09T23:45:49.878000",
+      "base_salary": 0,
+      "espn_player_id": 4429086,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 4430834,
@@ -2540,15 +2549,6 @@
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 58,
       "espn_player_id": 4890973,
-      "kept_prior_year": false,
-      "manager_id": "t7",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": 5081397,
       "kept_prior_year": false,
       "manager_id": "t7",
       "season": 2026,
