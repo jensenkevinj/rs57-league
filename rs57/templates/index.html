@@ -4,6 +4,10 @@
    won it, the number that won it, and what it paid. Nothing here is computed: site.build_home
    assembles the board and this template lays it out.
 
+   The board is a template: every prize is always on it, and results fill the rows in. A
+   season with no results is the whole board, empty. Unverified notes on the season's stats are
+   NOT shown here (commissioner, 2026-09-14) — `validate` and CI are where those are read.
+
    Also used, unchanged, for every past season's page (season-{year}.html) — an archived
    season is the same board, just built from that year's data instead of the most recent
    one. `page` distinguishes them ("home" vs "seasons") for the title and the nav highlight.
@@ -57,13 +61,13 @@
       <span class="pill">{{ home.status }}</span>
     {% endif %}
   </div>
-  {{ ui.flags(home.notes) }}
+  {% set blank = "unawarded" if home.final else "—" %}
 
   <div class="podium">
     {% for spot in home.podium %}
       <div class="spot spot-{{ spot.rank }}">
         <div class="spot-place">{{ spot.place }}</div>
-        <div class="spot-team">{{ ui.teams(spot.winners) }}</div>
+        <div class="spot-team">{{ ui.teams(spot.winners, blank) }}</div>
         <div class="spot-meta">{% if spot.detail %}{{ spot.detail }}{% else %}&nbsp;{% endif %}</div>
         {% if spot.recorded %}
           <div class="spot-money">{{ spot.amount | money }}</div>
@@ -95,8 +99,9 @@
                   </span>
                 {% endif %}
                 <span class="thin-name">
-                  {{ ui.teams(row.winners) }}
+                  {{ ui.teams(row.winners, blank) }}
                   {%- if row.split %}<span class="tag-inline" title="A tie — the prize was split evenly">split</span>{% endif %}
+                  {%- if row.leading %}<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span>{% endif %}
                   {%- if row.detail %}<span class="thin-why">{{ row.detail }}</span>{% endif %}
                 </span>
                 <span class="thin-num">{{ row.value }}</span>
@@ -124,14 +129,19 @@
         </h2>
         <div class="survivor-won">
           <div class="spot-place">Winner</div>
-          <div class="spot-team">{{ ui.teams(home.survivor.winners) }}</div>
+          <div class="spot-team">{{ ui.teams(home.survivor.winners, blank) }}</div>
         </div>
         <ol class="prizes">
-          {% for out in home.survivor.eliminations %}
+          {% for line in home.survivor.weeks %}
             <li class="thin">
-              <span class="thin-key">Week {{ out.week }}</span>
-              <span class="thin-name muted">{{ ui.teams(out.teams) }}</span>
-              <span class="thin-num">{{ "%.2f" | format(out.points) }}</span>
+              <span class="thin-key">Week {{ line.week }}</span>
+              {% if line.out %}
+                <span class="thin-name muted">{{ ui.teams(line.out.teams) }}</span>
+                <span class="thin-num">{{ "%.2f" | format(line.out.points) }}</span>
+              {% else %}
+                <span class="thin-name muted">—</span>
+                <span class="thin-num"></span>
+              {% endif %}
             </li>
           {% endfor %}
         </ol>
@@ -139,7 +149,9 @@
     {% endif %}
   </div>
 
-  {% if home.unawarded %}
+  {# Mid-season this would be the whole pot, which says nothing — the money is simply not won
+     yet. It is a fact worth printing only once the season is over. #}
+  {% if home.final and home.unawarded %}
     <dl class="pot">
       <div>
         <dt>Prize money nobody was awarded</dt>

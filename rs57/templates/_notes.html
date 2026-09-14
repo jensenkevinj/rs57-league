@@ -2,7 +2,9 @@
 
    A REVIEW item is something nobody has checked. Showing a result while hiding the flag
    beside it is the failure this project keeps guarding against, so these render with the
-   result rather than on a page of their own.
+   result rather than on a page of their own. The keepers page uses this for its ERRORs. The
+   prize board does not publish its stats notes at all — `validate` and CI carry them
+   (commissioner, 2026-09-14).
 
    The team macros are whitespace-trimmed because they are used inline, mid-sentence. #}
 
@@ -41,10 +43,12 @@
 {%- endif -%}
 {%- endmacro %}
 
-{% macro teams(named_list) -%}
+{# `empty` is what a prize with nobody on it says. On a finished season that is a result —
+   "unawarded" — and on one still being played it is only a row not filled in yet. #}
+{% macro teams(named_list, empty="unawarded") -%}
 {%- for named in named_list -%}
 {{ team(named) }}{% if not loop.last %} &amp; {% endif %}
 {%- else -%}
-<span class="muted">unawarded</span>
+<span class="muted">{{ empty }}</span>
 {%- endfor -%}
 {%- endmacro %}

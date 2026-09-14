@@ -305,10 +305,25 @@ board a week into 2026. Two rules keep that from weakening a finished season:
   Unlucky pay nobody. Their rows keep their money with no winner, so the pot still adds up.
   Weekly highs pay once their week is decided; Survivor pays once one team is left.
 
+**The prize board is a template, the same for every season** (commissioner, 2026-09-14). Every
+prize is always on it: the three placings, Most Points, all four studs, Unlucky, a survivor
+ladder one week per team but one, and a high score for every regular-season week. Results fill
+the rows in. Until the season is final, Most Points, the studs and Unlucky show the current
+leader marked **leading**; an empty row reads "—", and only a *finished* season says
+"unawarded". It used to be built out of the results it held, so 2026's first board had no studs,
+Unlucky or weekly highs at all.
+
+**Stats REVIEW and ERROR notes are not published on the board** (same decision). They were
+yellow banners over the prizes, asking twelve managers to check things none of them can act on.
+They are not dropped: the stats file keeps them, `validate` re-raises every one and CI prints
+them, which is where the commissioner reads them. The keepers page still publishes its ERRORs.
+
 Everything keys on `espn_team_id`. The sheet names winners by first name; **that mapping is
 not in this repo and must not be added.** Report winners as franchise names.
 
-`data/manual/payouts.json` holds amounts for **2024 and 2025 only**. 2023 is deliberately
+`data/manual/payouts.json` holds amounts for **2024, 2025 and 2026**. 2026 was recorded before
+the season as the same figures as 2025 (commissioner, 2026-09-14), so its board shows its money
+from week 1. 2023 is deliberately
 absent — its $9.29 weekly prize is not an integer dollar and widening `Payout.amount` to a
 float would put floats into every salary in the league. 2019-2022 predate the `RS57` sheet
 entirely and have no source. Those seasons derive stats and award nothing, which `validate`

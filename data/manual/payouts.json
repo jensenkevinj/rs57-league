@@ -47,6 +47,16 @@
       "stud": 25,
       "unlucky": 20,
       "weekly_high": 10
+    },
+    "2026": {
+      "champion": 500,
+      "second": 200,
+      "third": 100,
+      "most_points": 100,
+      "survivor": 40,
+      "stud": 25,
+      "unlucky": 20,
+      "weekly_high": 10
     }
   }
 }
