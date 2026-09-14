@@ -63,6 +63,8 @@
   </div>
   {% set blank = "unawarded" if home.final else "—" %}
 
+  {# Empty until the season is final: the bracket decides the placings once, at the end. #}
+  {% if home.podium %}
   <div class="podium">
     {% for spot in home.podium %}
       <div class="spot spot-{{ spot.rank }}">
@@ -75,6 +77,7 @@
       </div>
     {% endfor %}
   </div>
+  {% endif %}
 
   <div class="boards">
     {% for column in home.columns %}
