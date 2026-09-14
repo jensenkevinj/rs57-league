@@ -1,0 +1,34 @@
+{
+  "payouts": [],
+  "positional_studs": [],
+  "review": {
+    "consolation_winner_manager_ids": [],
+    "issues": [
+      {
+        "code": "no_prize_schedule",
+        "manager_id": null,
+        "message": "no prize amounts recorded for 2026 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
+        "position": null,
+        "severity": "review",
+        "week": null
+      }
+    ],
+    "warnings": [
+      "2026 has no completed matchups yet, so no prize can be awarded. 84 scheduled games are still UNDECIDED."
+    ]
+  },
+  "season": 2026,
+  "season_points": [],
+  "source": {
+    "playoff_team_count": 6,
+    "regular_season_weeks": 14,
+    "weeks_with_results": []
+  },
+  "standings": [],
+  "survivor": {
+    "eliminations": [],
+    "winner_manager_ids": []
+  },
+  "unlucky": null,
+  "weekly_high_scores": []
+}
