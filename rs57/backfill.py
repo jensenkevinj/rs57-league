@@ -86,6 +86,7 @@ import argparse
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from collections.abc import Collection, Iterable, Mapping
 from typing import Any
 
 from rs57.espn import (
@@ -95,13 +96,14 @@ from rs57.espn import (
     EspnError,
     _epoch_ms,
     acquisition_source,
-    bid_season_for,
+    base_season_for,
     build_season,
     keeper_pick_ids,
     winning_bids,
 )
 from rs57.admin.store import ManualStore
 from rs57.history import HistoryStore
+from rs57.keeper_rules import kept_for_tax
 from rs57.models import KeeperClaim, KeeperSlot, RosterEntry
 
 FIRST_ESPN_SEASON = 2019
@@ -495,28 +497,73 @@ def graduated_claims(year: int, manual: ManualStore) -> tuple[list[KeeperClaim],
     ]
 
 
+def repriced_to_carried_in(
+    roster: Iterable[RosterEntry],
+    prior_base: Mapping[int, int],
+    prior_keepers: Collection[int],
+    prior_prospects: Collection[int],
+) -> list[RosterEntry]:
+    """The season's roster repriced to what each player carried in — **base and tax together**.
+
+    ``base_salary`` and ``kept_prior_year`` on a ``RosterEntry`` always describe the same
+    season, and this function is the one place in the repo that moves a row from one season to
+    another. Swapping the base alone leaves this season's tax sitting on last season's price,
+    and this list is the ratchet audit's input: ``check_base_continuity`` filters on
+    ``kept_prior_year`` and compares against last season's recorded claims, so a flag from the
+    wrong season audits the wrong rows.
+
+    Players with no carried-in price are dropped rather than guessed — a player who was not on
+    last season's roster carried nothing in, and inventing a number is worse than reporting the
+    absence. See ``_prior_snapshot``.
+    """
+    return [
+        entry.model_copy(
+            update={
+                "base_salary": prior_base[entry.espn_player_id],
+                "kept_prior_year": kept_for_tax(
+                    entry.espn_player_id, prior_keepers, prior_prospects, entry.source
+                ),
+            }
+        )
+        for entry in roster
+        if entry.espn_player_id in prior_base
+    ]
+
+
 def prepare_season(year: int, *, manual: ManualStore | None = None) -> SeasonImport:
     """Read one completed season from ESPN and assemble its frozen document. Writes nothing."""
     client = EspnClient.from_env(year)
     prior = EspnClient.from_env(year - 1)
     check_completed(client)
 
+    # TWO keeper sets, because this module builds rosters priced from two different seasons and
+    # the tax always belongs to the season the base came from. ``season.roster`` is priced at
+    # this season's keeperValueFuture, so it takes this season's keepers; ``carried_in``,
+    # ``declared`` and the claims are all priced at last season's, so they take last season's.
+    # A completed season has always drafted, so base_season_for(year, True) is year itself.
+    try:
+        keepers = keeper_pick_ids(client.fetch_draft_detail())
+    except EspnError:
+        keepers = frozenset()
     try:
         prior_keepers = keeper_pick_ids(prior.fetch_draft_detail())
     except EspnError:
         prior_keepers = frozenset()
+    prospects = prospect_ids_for(year)
     prior_prospects = prospect_ids_for(year - 1)
 
     drafted = bool(client.fetch_draft_detail().get("drafted"))
     try:
-        faab = winning_bids(EspnClient.from_env(bid_season_for(year, drafted)).fetch_transactions())
+        faab = winning_bids(
+            EspnClient.from_env(base_season_for(year, drafted)).fetch_transactions()
+        )
     except EspnError:
         faab = None
 
     season = build_season(
         client,
-        prior_keeper_ids=prior_keepers,
-        prior_prospect_ids=prior_prospects,
+        keeper_ids=keepers,
+        prospect_ids=prospects,
         faab_bids=faab,
     )
 
@@ -530,11 +577,9 @@ def prepare_season(year: int, *, manual: ManualStore | None = None) -> SeasonImp
     except EspnError:
         prior_snapshot = {}
     prior_base = {pid: row["base"] for pid, row in prior_snapshot.items()}
-    carried_in = [
-        entry.model_copy(update={"base_salary": prior_base[entry.espn_player_id]})
-        for entry in season.roster
-        if entry.espn_player_id in prior_base
-    ]
+    carried_in = repriced_to_carried_in(
+        season.roster, prior_base, prior_keepers, prior_prospects or ()
+    )
 
     # The roster each keeper was DECLARED from, reconstructed from ESPN's draft record.
     #
@@ -558,19 +603,26 @@ def prepare_season(year: int, *, manual: ManualStore | None = None) -> SeasonImp
             continue
         player_id, team_id = pick["playerId"], pick["teamId"]
         manager_id = f"t{team_id}"
-        taxed = player_id in prior_keepers and player_id not in (prior_prospects or ())
         snapshot = prior_snapshot.get(player_id)
         own = own_entries.get(player_id)
         if own is not None:
+            # Repriced to what he carried in, so re-flagged to last season's keeper set for the
+            # same reason ``carried_in`` is — and the opposite of ``season.roster``, which is
+            # priced at this season's auction. Copying ``own`` unchanged would leave this
+            # season's tax sitting on last season's price.
             declared.append(
                 own.model_copy(
                     update={
                         "manager_id": manager_id,
                         "base_salary": prior_base.get(player_id, own.base_salary),
+                        "kept_prior_year": kept_for_tax(
+                            player_id, prior_keepers, prior_prospects or (), own.source
+                        ),
                     }
                 )
             )
         elif snapshot is not None and snapshot["acquired_at"] is not None:
+            source = acquisition_source(snapshot["source"])
             declared.append(
                 RosterEntry(
                     season=year,
@@ -578,8 +630,10 @@ def prepare_season(year: int, *, manual: ManualStore | None = None) -> SeasonImp
                     espn_player_id=player_id,
                     acquired_at=snapshot["acquired_at"],
                     base_salary=snapshot["base"],
-                    kept_prior_year=taxed,
-                    source=acquisition_source(snapshot["source"]),
+                    kept_prior_year=kept_for_tax(
+                        player_id, prior_keepers, prior_prospects or (), source
+                    ),
+                    source=source,
                 )
             )
 

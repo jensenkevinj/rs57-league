@@ -63,6 +63,48 @@ programmatic answer the old script's TODO asked for. The switch is **not** "befo
 the season" — it is *which season's payload you are reading*, which the payload itself tells
 you. There is no manual toggle and no date arithmetic.
 
+### The $5 tax rides on the same switch — found 2026-09-13
+
+The tax is charged on top of a *specific* base, so it has to describe the same season the base
+does:
+
+```
+kept_prior_year(Y) = "was a keeper in season base_season_for(Y, drafted)"
+base_season_for(Y, drafted) = Y  if drafted else Y - 1
+```
+
+This is the same asymmetry as the field choice above, for the same reason, and
+`espn.base_season_for` is the one place it is decided — for the keeper set and for the FAAB
+witness alike. It went unnoticed for a whole auction because the sync always reached back a
+year: correct while a season is undrafted, and wrong the moment its auction runs. On the 2026
+board it taxed every 2025 keeper who was **not** kept into 2026 and was bought back at the
+auction — Saquon Barkley, `keeperValueFuture` $62, charged $67 — and untaxed the eleven
+players who genuinely were kept. It fails silently; what gives it away is that a franchise
+ends up with more taxed players than the three it is allowed to keep.
+
+Settled against the league's own record: all **38** recorded 2026 claim prices reconcile as
+`base(2025) + fee + $5 if kept into 2025` once the two draft-cash overrides are applied, and
+`computed_salary − prior_base − fee` across the 2024 and 2025 claims agrees with "kept into
+season Y" **51/51** where the old derivation managed 37/51.
+
+### Keeper flags on draft picks: present, but only after the auction
+
+`mDraftDetail`'s `picks[].keeper` is the authoritative record of who was kept, and it needs no
+cookies — verified as an *exact* match to the league's own recorded claims for 2024 (40 picks),
+2025 (33) and 2026 (38).
+
+**Before that season's auction it is empty.** ESPN publishes keeper selections to nobody but an
+authenticated league member: every pick reads `keeper: false` and the League Keepers page prints
+`Selection Hidden`. `tests/data/espn_2026.json` is a recording of exactly that state — 180
+picks, `drafted: false`, **zero** flagged — which is what makes the hand-entered claims in
+`data/manual/claims.json` the only pre-auction source, and why the pre-auction tax has to come
+from the previous season's flags instead.
+
+One thing the flags cannot tell you: **which of the four was the prospect.**
+`draftSettings.keeperCount` is 4 — three keepers plus a prospect — and ESPN marks all four
+identically. A prospect keep owes no tax, so that has to be subtracted from the league's own
+claim slots; see `sync.prospect_ids_for_season`.
+
 ## Why — the auction record is the ground truth
 
 This is an auction league, so `view=mDraftDetail` records what every drafted player actually

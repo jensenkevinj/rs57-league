@@ -22,6 +22,7 @@ from rs57.keeper_rules import (
     effective_base_salary,
     fee_total_for,
     keeper_salary,
+    kept_for_tax,
     validate_team_claims,
 )
 from rs57.models import AcquisitionSource, KeeperSlot
@@ -94,6 +95,32 @@ def test_drop_clears_the_tax():
 
 def test_never_kept_is_untaxed():
     assert derive_kept_prior_year(None) is False
+
+
+def test_kept_for_tax_agrees_with_derive_kept_prior_year():
+    """Two spellings of one rule, and they must not drift.
+
+    ``derive_kept_prior_year`` takes a recorded claim; ``kept_for_tax`` takes the keeper set
+    off ESPN's draft record, which is what the sync and the backfill have. Same three rules:
+    a keeper slot is taxed, a prospect slot is not, a drop clears it, a trade does not.
+    """
+    taxed = kept_for_tax(1, {1}, set(), AcquisitionSource.DRAFT)
+    assert taxed is derive_kept_prior_year(claim(1, KeeperSlot.K2)) is True
+
+    prospect = kept_for_tax(1, {1}, {1}, AcquisitionSource.DRAFT)
+    assert prospect is derive_kept_prior_year(claim(1, KeeperSlot.PROSPECT)) is False
+
+    dropped = kept_for_tax(1, {1}, set(), AcquisitionSource.WAIVER)
+    assert dropped is derive_kept_prior_year(claim(1, KeeperSlot.K1), dropped_since=True) is False
+
+    never = kept_for_tax(1, set(), set(), AcquisitionSource.DRAFT)
+    assert never is derive_kept_prior_year(None) is False
+
+
+def test_kept_for_tax_keeps_the_tax_across_a_trade():
+    """The asymmetry against a drop, stated in the set-based form too: ``TRADE`` is not
+    ``WAIVER``, so the tax follows the player to his new manager."""
+    assert kept_for_tax(1, {1}, set(), AcquisitionSource.TRADE) is True
 
 
 def test_trade_does_not_clear_the_tax():

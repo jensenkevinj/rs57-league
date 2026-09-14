@@ -21,6 +21,7 @@ import ast
 import inspect
 import json
 import textwrap
+from collections import Counter
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -39,7 +40,7 @@ from rs57.espn import (
     Position,
     acquisition_source,
     base_salary_field,
-    bid_season_for,
+    base_season_for,
     build_season,
     first_nfl_season,
     keeper_pick_ids,
@@ -97,7 +98,7 @@ def faab_2025():
 def season_2026(doc_2025):
     """2026 as the pipeline actually builds it: undrafted, taxed off 2025's keeper picks."""
     return build_season(
-        ReplayClient(2026), prior_keeper_ids=keeper_pick_ids(doc_2025["draft"])
+        ReplayClient(2026), keeper_ids=keeper_pick_ids(doc_2025["draft"])
     )
 
 
@@ -238,7 +239,13 @@ def test_keeper_value_future_is_not_a_projection(doc_2025):
 # --------------------------------------------------------------------------------------
 
 
-def test_kept_prior_year_comes_from_last_seasons_keeper_picks(season_2026, doc_2025):
+def test_before_the_auction_the_tax_comes_from_last_seasons_keeper_picks(
+    season_2026, doc_2025, doc_2026
+):
+    """2026 has not drafted, so its base is ``keeperValue`` — last season's price — and the tax
+    that pairs with it is last season's too. Asserted here rather than left to the fixture's
+    name, so the case cannot drift out from under the test."""
+    assert doc_2026["draft"]["drafted"] is False
     kept = {e.espn_player_id for e in season_2026.roster if e.kept_prior_year}
     picks = keeper_pick_ids(doc_2025["draft"])
     assert kept
@@ -277,12 +284,12 @@ def test_a_drop_clears_the_tax(doc_2025, doc_2026):
     )
     player_id = entry["playerPoolEntry"]["player"]["id"]
 
-    taxed = build_season(ReplayClient(2026, doc_2026), prior_keeper_ids=picks)
+    taxed = build_season(ReplayClient(2026, doc_2026), keeper_ids=picks)
     assert next(e for e in taxed.roster if e.espn_player_id == player_id).kept_prior_year
 
     entry["acquisitionType"] = "ADD"
     entry["playerPoolEntry"]["keeperValue"] = 0  # re-added off waivers, so the base resets too
-    after = build_season(ReplayClient(2026, doc_2026), prior_keeper_ids=picks)
+    after = build_season(ReplayClient(2026, doc_2026), keeper_ids=picks)
     re_added = next(e for e in after.roster if e.espn_player_id == player_id)
     assert re_added.kept_prior_year is False
     assert re_added.base_salary == 0
@@ -304,11 +311,11 @@ def test_a_prospect_keep_is_not_taxed(doc_2025):
     picks = keeper_pick_ids(doc_2025["draft"])
     assert TYJAE_SPEARS in picks, "ESPN does flag the prospect as a keeper"
 
-    taxed = build_season(ReplayClient(2026), prior_keeper_ids=picks)
+    taxed = build_season(ReplayClient(2026), keeper_ids=picks)
     assert next(e for e in taxed.roster if e.espn_player_id == TYJAE_SPEARS).kept_prior_year
 
     fixed = build_season(
-        ReplayClient(2026), prior_keeper_ids=picks, prior_prospect_ids={TYJAE_SPEARS}
+        ReplayClient(2026), keeper_ids=picks, prospect_ids={TYJAE_SPEARS}
     )
     entry = next(e for e in fixed.roster if e.espn_player_id == TYJAE_SPEARS)
     assert entry.kept_prior_year is False
@@ -318,11 +325,11 @@ def test_a_prospect_keep_is_not_taxed(doc_2025):
 def test_unknown_prospects_warn_rather_than_silently_taxing(doc_2025):
     """Never let a REVIEW item pass silently as if it had been checked."""
     picks = keeper_pick_ids(doc_2025["draft"])
-    unknown = build_season(ReplayClient(2026), prior_keeper_ids=picks)
+    unknown = build_season(ReplayClient(2026), keeper_ids=picks)
     assert any("prospect keeps were not supplied" in w for w in unknown.warnings)
 
     known = build_season(
-        ReplayClient(2026), prior_keeper_ids=picks, prior_prospect_ids={TYJAE_SPEARS}
+        ReplayClient(2026), keeper_ids=picks, prospect_ids={TYJAE_SPEARS}
     )
     assert not any("prospect" in w for w in known.warnings)
 
@@ -335,8 +342,8 @@ def test_matches_the_workbook_keeper_column(doc_2025):
     """
     season = build_season(
         ReplayClient(2026),
-        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
-        prior_prospect_ids={TYJAE_SPEARS},
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        prospect_ids={TYJAE_SPEARS},
     )
     names = {p.espn_player_id: p.name for p in season.players}
     taxed = {names[e.espn_player_id] for e in season.roster if e.kept_prior_year}
@@ -353,8 +360,52 @@ def test_matches_the_workbook_keeper_column(doc_2025):
     assert taxed == workbook
 
 
-def test_no_prior_keepers_warns_rather_than_silently_untaxing():
-    season = build_season(ReplayClient(2026), prior_keeper_ids=())
+PROSPECTS_2025 = frozenset({TYJAE_SPEARS, 4685247})
+"""The two PROSPECT slots in 2025 — Tyjae Spears and Braelon Allen — per
+``data/history/2025.json``. Hardcoded rather than read, because these tests do not touch
+``data/``; ``test_sync.py`` covers the reading."""
+
+
+def test_after_the_auction_the_tax_comes_from_this_seasons_keeper_picks(doc_2025):
+    """2025 **has** drafted, so its base is ``keeperValueFuture`` — what its own auction charged
+    — and the keeper set that pairs with it is its own.
+
+    The half that was missing. Every existing test above runs on the undrafted 2026 recording,
+    which is why an off-by-one in the season the keepers come from went a whole auction without
+    failing anything: there was no drafted season under test at all.
+    """
+    assert doc_2025["draft"]["drafted"] is True
+    picks = keeper_pick_ids(doc_2025["draft"])
+    season = build_season(
+        ReplayClient(2025), keeper_ids=picks, prospect_ids=PROSPECTS_2025
+    )
+    taxed = {e.espn_player_id for e in season.roster if e.kept_prior_year}
+    assert taxed
+    assert taxed <= picks - PROSPECTS_2025
+    assert not taxed & PROSPECTS_2025
+
+
+def test_no_franchise_owes_more_taxes_than_it_may_keep(doc_2025):
+    """The assertion that catches this class of bug without knowing which player to look at.
+
+    A franchise may keep ``MAX_KEEPERS`` plus one prospect, and a prospect keep sets no tax, so
+    no franchise can owe more than three. Taxing off the wrong season lifts a team above that
+    — five on one franchise and four on another, on the 2026 board — and the count is checkable
+    without a single player name.
+    """
+    season = build_season(
+        ReplayClient(2025),
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        prospect_ids=PROSPECTS_2025,
+    )
+    per_franchise = Counter(e.manager_id for e in season.roster if e.kept_prior_year)
+    assert per_franchise
+    worst = max(per_franchise.values())
+    assert worst <= MAX_KEEPERS, f"{worst} taxed on one franchise, above {MAX_KEEPERS}"
+
+
+def test_no_keeper_picks_warns_rather_than_silently_untaxing():
+    season = build_season(ReplayClient(2026), keeper_ids=())
     assert not any(e.kept_prior_year for e in season.roster)
     assert any("kept_prior_year is False" in w for w in season.warnings)
 
@@ -408,7 +459,7 @@ def test_waiver_bases_are_verified_against_the_faab_actually_bid(doc_2025, faab_
     included. That is the independent confirmation that the field is money paid.
     """
     season = build_season(
-        ReplayClient(2026), prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]), faab_bids=faab_2025
+        ReplayClient(2026), keeper_ids=keeper_pick_ids(doc_2025["draft"]), faab_bids=faab_2025
     )
     waivers = [e for e in season.roster if e.source is AcquisitionSource.WAIVER]
     assert len(waivers) == 80
@@ -434,7 +485,7 @@ def test_a_waiver_base_that_contradicts_the_faab_record_is_caught(doc_2025, doc_
 
     season = build_season(
         ReplayClient(2026, doc_2026),
-        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
         faab_bids=faab_2025,
     )
     assert entry["playerPoolEntry"]["player"]["id"] in season.waiver_base_mismatches
@@ -479,7 +530,7 @@ def test_the_waiver_check_does_not_run_once_espn_holds_the_entered_prices(
     broken = _break_one_waiver_base(_with_deadline(doc_2026, DEADLINE_MS))
     season = build_season(
         ReplayClient(2026, doc_2026),
-        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
         faab_bids=faab_2025,
         now=datetime(2025, 9, 3),  # after the deadline, and 2026 has not drafted
     )
@@ -499,7 +550,7 @@ def test_the_waiver_check_still_runs_before_the_deadline(doc_2025, doc_2026, faa
     broken = _break_one_waiver_base(_with_deadline(doc_2026, DEADLINE_MS))
     season = build_season(
         ReplayClient(2026, doc_2026),
-        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
         faab_bids=faab_2025,
         now=datetime(2025, 9, 1),  # before the deadline
     )
@@ -520,7 +571,7 @@ def test_the_waiver_check_still_runs_once_the_season_has_drafted(doc_2025, doc_2
 
     season = build_season(
         ReplayClient(2026, doc_2026),
-        prior_keeper_ids=keeper_pick_ids(doc_2025["draft"]),
+        keeper_ids=keeper_pick_ids(doc_2025["draft"]),
         faab_bids=faab_2025,
         now=datetime(2025, 9, 3),  # past the deadline, but the auction has run
     )
@@ -581,8 +632,8 @@ def test_the_latest_add_sets_the_base():
 
 def test_bids_come_from_the_season_that_set_the_bases():
     """Same asymmetry as the field choice, for the same reason."""
-    assert bid_season_for(2026, drafted=False) == 2025
-    assert bid_season_for(2026, drafted=True) == 2026
+    assert base_season_for(2026, drafted=False) == 2025
+    assert base_season_for(2026, drafted=True) == 2026
 
 
 # --------------------------------------------------------------------------------------

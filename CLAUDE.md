@@ -165,6 +165,21 @@ wrong does not fail loudly; it silently reprices the whole league and compounds 
 Settled against the auction record in `docs/espn-field-semantics.md` — read it before touching
 anything that sets `base_salary`.
 
+**And the $5 tax moves with it.** `base_salary` and `kept_prior_year` on a `RosterEntry` always
+describe the *same* season — the tax is charged on top of a specific base, so the keeper set
+that decides it is the keeper set of the season that supplied the base. `espn.base_season_for`
+is the single place that decision is made (`year if drafted else year - 1`), and it answers for
+the keeper set and the FAAB witness alike. **Reprice a row and you must re-flag it**, which is
+what `backfill.repriced_to_carried_in` exists to do; the two rosters in a frozen season are
+priced from two different seasons and carry two different flags on purpose.
+
+The sync reached back a year unconditionally until 2026-09-13 — right before an auction, wrong
+after one, and nothing failed for a whole auction because the only 2026 recording under test is
+undrafted. It taxed every 2025 keeper who went back into the 2026 pool and was bought again
+(Saquon Barkley, $62, charged $67) and untaxed the eleven who were genuinely kept. **What gives
+this class of bug away is a franchise owing more taxes than the three players it may keep** —
+`Fake News` had five — and that is now an assertion rather than something to notice.
+
 **And `keeperValue` stops being the carried-in price once a season drafts.** ESPN overwrites it
 with `keeperValueFuture`, so a *completed* season's payload no longer holds what its keepers
 carried in — that is `keeperValueFuture(Y-1)`, read from the previous season. This is why a
