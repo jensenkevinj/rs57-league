@@ -143,9 +143,11 @@ jobs:
               # It derived before and does not now. That is a regression, not the offseason.
               echo "stats $year: BLOCKED, though it derived on a previous run" | tee -a failures.txt
             else
-              # Expected from now until the season is played: an unplayed season has no scores
-              # in any of its weeks, so every prize is correctly refused. Reported, not red —
-              # a job that fails every night until September teaches everyone to ignore it.
+              # Expected in the offseason, before ESPN opens the season's schedule. A season in
+              # progress does NOT land here: weeks from ESPN's currentMatchupPeriod on are
+              # pending rather than missing, so it derives and exits 0 from the auction onward
+              # (see rs57/stats.py). Reported, not red — a job that fails every night until
+              # September teaches everyone to ignore it.
               echo "stats $year: no completed games yet, nothing to derive" | tee -a notes.txt
             fi
           done

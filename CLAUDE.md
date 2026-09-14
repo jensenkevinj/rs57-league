@@ -294,6 +294,17 @@ Amounts are **per-season, not constants** — they live in `data/manual/payouts.
   is integer dollars, so an indivisible split pays the floor and reports the remainder as
   REVIEW — never a float, never rounded away.
 
+**A season being played derives too, and that's what puts it on the home page.** A week from
+ESPN's `status.currentMatchupPeriod` on is **pending, not missing**; every earlier week is due,
+and a hole there still blocks. Before 2026-09-14 every future week was a `missing_week` ERROR,
+so the nightly discarded the in-progress file every night and the home page showed 2025's final
+board a week into 2026. Two rules keep that from weakening a finished season:
+- **Final ranks override the status.** A season with final ranks is held to every week,
+  whatever `currentMatchupPeriod` says.
+- **Leaders are not winners.** While a season is in progress, Most Points, the studs and
+  Unlucky pay nobody. Their rows keep their money with no winner, so the pot still adds up.
+  Weekly highs pay once their week is decided; Survivor pays once one team is left.
+
 Everything keys on `espn_team_id`. The sheet names winners by first name; **that mapping is
 not in this repo and must not be added.** Report winners as franchise names.
 

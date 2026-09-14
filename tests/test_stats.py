@@ -462,3 +462,92 @@ class TestSeasonStats:
         assert [i.code for i in stats.review_issues] == [
             StatIssueCode.LINEUP_POINTS_MISMATCH
         ]
+
+
+class TestSeasonInProgress:
+    """The nightly derives the season being played, so the home page can follow it.
+
+    A week ESPN has not reached yet is pending, not missing. Until this existed every future
+    week was a ``missing_week`` ERROR, the in-progress file was discarded every night, and the
+    home page showed the previous season until January.
+    """
+
+    TEAMS = ("t1", "t2", "t3", "t4")
+
+    def _through(self, last_week: int, **kwargs):
+        scores, matchups, weeks = [], [], []
+        for week in range(1, last_week + 1):
+            points = {m: 100.0 + index * 10 + week for index, m in enumerate(self.TEAMS)}
+            scores += [score(week, m, p) for m, p in points.items()]
+            matchups += [
+                game(week, "t1", points["t1"], "t2", points["t2"]),
+                game(week, "t3", points["t3"], "t4", points["t4"]),
+            ]
+            weeks += [
+                played(week, "t4", 20.0 + week, position=position, player_id=index)
+                for index, position in enumerate(STUD_POSITIONS)
+            ]
+        kwargs.setdefault("regular_season_weeks", 14)
+        return _season(scores, matchups, weeks, **kwargs)
+
+    def test_weeks_not_yet_due_do_not_block(self):
+        stats = self._through(2, current_matchup_period=3)
+        assert stats.in_progress
+        assert not stats.blocked, [i.message for i in stats.issues if i.severity is Severity.ERROR]
+        assert [high.week for high in stats.weekly_highs] == [1, 2]
+
+    def test_survivor_keeps_running_and_names_no_winner_yet(self):
+        stats = self._through(2, current_matchup_period=3)
+        assert len(stats.survivor_eliminations) == 2
+        assert stats.survivor_winner_ids == ()
+        assert StatIssueCode.SURVIVOR_NO_WINNER not in {i.code for i in stats.issues}
+
+    def test_the_week_after_the_auction_has_nothing_to_report(self):
+        """Today's 2026: drafted, Week 1 live, every game UNDECIDED."""
+        stats = self._through(0, current_matchup_period=1)
+        assert stats.in_progress
+        assert stats.issues == ()
+
+    def test_a_hole_before_the_current_week_still_blocks(self):
+        holed = _season(
+            [score(2, "t1", 100.0), score(2, "t2", 90.0)],
+            [game(2, "t1", 100.0, "t2", 90.0)],
+            [played(2, "t1", 100.0)],
+            regular_season_weeks=14,
+            current_matchup_period=3,
+        )
+        assert holed.blocked
+        assert {i.week for i in holed.issues if i.code is StatIssueCode.MISSING_WEEK} == {1}
+
+    def test_a_finished_season_is_held_to_every_week_whatever_espn_status_says(self):
+        """Final ranks override the status. A truncated matchups read for a finished season
+        must block, not quietly derive as though the season were still being played."""
+        stats = self._through(
+            2, current_matchup_period=3, final_ranks={"t1": 1, "t2": 2, "t3": 3}
+        )
+        assert not stats.in_progress
+        assert stats.blocked
+        assert 3 in {i.week for i in stats.issues if i.code is StatIssueCode.MISSING_WEEK}
+
+    def test_no_status_from_espn_keeps_every_week_due(self):
+        stats = self._through(2)
+        assert not stats.in_progress
+        assert stats.blocked
+
+    def test_only_decided_prizes_have_winners(self):
+        stats = self._through(2, current_matchup_period=3)
+        payouts, issues = award_prizes(stats, schedule(), {})
+        winners = {p.label: p.winner_manager_id for p in payouts}
+        assert winners["Week 1 High Score"] == "t4"
+        assert winners["Week 2 High Score"] == "t4"
+        # A leader in week 2 is owed nothing: these are decided by the whole season.
+        for label in ("Most Points (Season)", "Unlucky", "Survivor", "QB Stud", "Week 3 High Score"):
+            assert winners[label] is None, label
+        assert sum(p.amount for p in payouts) == schedule().total(14)
+        assert StatIssueCode.PRIZE_TOTAL_MISMATCH not in {i.code for i in issues}
+
+    def test_survivor_pays_once_it_is_decided_even_mid_season(self):
+        stats = self._through(3, current_matchup_period=4)
+        assert stats.survivor_winner_ids == ("t4",)
+        payouts, _ = award_prizes(stats, schedule(), {})
+        assert next(p for p in payouts if p.label == "Survivor").winner_manager_id == "t4"
