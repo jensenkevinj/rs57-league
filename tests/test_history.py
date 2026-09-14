@@ -19,6 +19,7 @@ from rs57.backfill import (
     BackfillError,
     build_claims,
     check_completed,
+    repriced_to_carried_in,
 )
 from rs57.history import FrozenSeasonError, HistoryStore, OwnershipError
 from rs57.models import AcquisitionSource, KeeperClaim, KeeperSlot, RosterEntry
@@ -384,3 +385,71 @@ def test_a_roster_round_trips_through_the_models(store: HistoryStore):
     store.write_season(2024, {"roster_carried_in": [entry]})
     doc = json.loads((store.history / "2024.json").read_text(encoding="utf-8"))
     assert RosterEntry(**doc["roster_carried_in"][0]) == entry
+
+
+# --------------------------------------------------------------------------------------
+# Repricing a roster row moves its tax with it
+# --------------------------------------------------------------------------------------
+
+
+def _row(player_id: int, base: int, *, kept: bool, source=AcquisitionSource.DRAFT):
+    return RosterEntry(
+        season=2025,
+        manager_id="t1",
+        espn_player_id=player_id,
+        acquired_at=NOW,
+        base_salary=base,
+        kept_prior_year=kept,
+        source=source,
+    )
+
+
+def test_repricing_to_carried_in_moves_the_tax_with_the_base():
+    """``base_salary`` and ``kept_prior_year`` describe the same season, always.
+
+    Player 10 was kept into 2024 *and* 2025, so he is taxed at both prices. Player 20 was kept
+    into 2025 only — his 2025 base carries a tax, but the $2 he carried *in* does not, because
+    at that price he had not been kept before. Inheriting the flag would charge him $5 a season
+    early, and this list is what ``check_base_continuity`` audits.
+    """
+    roster = [_row(10, 30, kept=True), _row(20, 12, kept=True)]
+    carried = repriced_to_carried_in(
+        roster, {10: 25, 20: 2}, prior_keepers={10}, prior_prospects=set()
+    )
+    by_id = {e.espn_player_id: e for e in carried}
+
+    assert by_id[10].base_salary == 25 and by_id[10].kept_prior_year is True
+    assert by_id[20].base_salary == 2 and by_id[20].kept_prior_year is False
+
+
+def test_repricing_drops_a_player_who_carried_nothing_in():
+    """No carried-in price means he was not on last season's roster. Reported as absent rather
+    than filled in with this season's number, which is the mistake that makes every keeper look
+    like he carried in exactly what he was charged."""
+    carried = repriced_to_carried_in(
+        [_row(10, 30, kept=True), _row(99, 5, kept=False)],
+        {10: 25},
+        prior_keepers={10},
+        prior_prospects=set(),
+    )
+    assert [e.espn_player_id for e in carried] == [10]
+
+
+def test_repricing_does_not_tax_a_prior_prospect_keep():
+    """A prospect keep never sets the tax flag, at either price."""
+    carried = repriced_to_carried_in(
+        [_row(20, 12, kept=True)], {20: 3}, prior_keepers={20}, prior_prospects={20}
+    )
+    assert carried[0].base_salary == 3
+    assert carried[0].kept_prior_year is False
+
+
+def test_repricing_clears_the_tax_for_a_player_back_off_the_wire():
+    """The drop asymmetry survives the reprice: an ADD is the drop's fingerprint."""
+    carried = repriced_to_carried_in(
+        [_row(10, 30, kept=True, source=AcquisitionSource.WAIVER)],
+        {10: 25},
+        prior_keepers={10},
+        prior_prospects=set(),
+    )
+    assert carried[0].kept_prior_year is False

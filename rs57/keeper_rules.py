@@ -24,7 +24,14 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 
-from rs57.models import CashTrade, KeeperClaim, KeeperSlot, RosterEntry, SalaryOverride
+from rs57.models import (
+    AcquisitionSource,
+    CashTrade,
+    KeeperClaim,
+    KeeperSlot,
+    RosterEntry,
+    SalaryOverride,
+)
 
 KEEPER_TAX = 5
 """Charged when the player was kept the previous season. Waived on a drop, NOT on a trade."""
@@ -215,6 +222,40 @@ def fee_total_for(n_keepers: int, fees_waived: bool = False) -> int:
     if n_keepers not in FEE_TIERS:
         raise ValueError(f"no fee tier for {n_keepers} keepers (max {MAX_KEEPERS})")
     return FEE_TIERS[n_keepers]
+
+
+def kept_for_tax(
+    player_id: int,
+    keeper_ids: Collection[int],
+    prospect_ids: Collection[int],
+    source: AcquisitionSource,
+) -> bool:
+    """Whether this roster row owes the $5 tax, given the keeper set for **the base's season**.
+
+    The set-based twin of ``derive_kept_prior_year``, for the writers that work from ESPN's
+    draft record rather than from recorded claims. One predicate, so the rule cannot drift
+    between ``espn.build_season`` and ``backfill.prepare_season`` — which is how it drifted from
+    the pure core in the first place, and how the season it asks about came to be off by one.
+
+    **``keeper_ids`` must be the keepers of the season ``base_salary`` describes**, not of the
+    season the file is named for. Those are the same season only once the auction has run; see
+    ``espn.base_season_for``. Pairing a drafted season's base with last season's keeper set
+    charges the tax to whoever was kept a year earlier, which means every player who went back
+    into the auction pool and was bought again.
+
+    The three rules from ``derive_kept_prior_year`` hold here unchanged:
+
+    * A **prospect** keep does not count, and ESPN's draft flag cannot tell one from a keeper
+      slot, so ``prospect_ids`` has to come from the league's own claims.
+    * A **trade** does not clear it — hence no "was traded" argument.
+    * A **drop** does, and an ``ADD`` is the drop's fingerprint: he was kept, but he is back
+      through the wire, so his base is already the new waiver value and the tax went with it.
+    """
+    return (
+        player_id in keeper_ids
+        and player_id not in prospect_ids
+        and source is not AcquisitionSource.WAIVER
+    )
 
 
 def derive_kept_prior_year(
