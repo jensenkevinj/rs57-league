@@ -295,7 +295,10 @@
 
   /* --- the home page: a prize board ------------------------------------- */
 
-  .page-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; }
+  /* Centered, not baseline: the pill's small text sat on the heading's baseline and its padding
+     and border hung below it, 8px low. Centered, its middle is within half a pixel of the
+     heading's glyphs. */
+  .page-head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
   .page-head h1 { margin-bottom: 0; }
   .pill {
     font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;

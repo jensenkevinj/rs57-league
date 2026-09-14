@@ -295,7 +295,10 @@
 
   /* --- the home page: a prize board ------------------------------------- */
 
-  .page-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; }
+  /* Centered, not baseline: the pill's small text sat on the heading's baseline and its padding
+     and border hung below it, 8px low. Centered, its middle is within half a pixel of the
+     heading's glyphs. */
+  .page-head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
   .page-head h1 { margin-bottom: 0; }
   .pill {
     font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
@@ -483,26 +486,6 @@
       <span class="pill">No results yet</span>
   </div>
 
-  <div class="podium">
-      <div class="spot spot-1">
-        <div class="spot-place">Champion</div>
-        <div class="spot-team"><span class="muted">—</span></div>
-        <div class="spot-meta">&nbsp;</div>
-          <div class="spot-money">$500</div>
-      </div>
-      <div class="spot spot-2">
-        <div class="spot-place">2nd Place</div>
-        <div class="spot-team"><span class="muted">—</span></div>
-        <div class="spot-meta">&nbsp;</div>
-          <div class="spot-money">$200</div>
-      </div>
-      <div class="spot spot-3">
-        <div class="spot-place">3rd Place</div>
-        <div class="spot-team"><span class="muted">—</span></div>
-        <div class="spot-meta">&nbsp;</div>
-          <div class="spot-money">$100</div>
-      </div>
-  </div>
 
   <div class="boards">
       <section class="board-col">
