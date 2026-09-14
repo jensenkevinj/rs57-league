@@ -279,49 +279,38 @@ def test_markdown_does_not_pass_raw_html_through():
 # ---------------------------------------------------------------------------
 
 
-def test_review_issue_renders_as_unverified(tmp_path: Path):
+def test_stats_notes_stay_off_the_public_prize_board(tmp_path: Path):
+    """The board is prizes, not the commissioner's to-do list (commissioner, 2026-09-14).
+
+    A REVIEW or ERROR on a season's stats is read where it can be acted on — ``validate``
+    re-raises every issue in a stats file and CI prints them — so neither the home page nor an
+    archived season page publishes it. It is not dropped on the way: the loaded season still
+    carries every one, which is what keeps it from quietly vanishing.
+    """
     derived = tmp_path / "derived"
     derived.mkdir()
     doc = stats_doc()
     doc["review"]["issues"] = [
-        {
-            "code": "tie_split",
-            "severity": "review",
-            "message": "Week 6 High Score is a 2-way tie",
-            "manager_id": None,
-            "week": 6,
-            "position": None,
-        }
+        {"code": "tie_split", "severity": "review", "message": "Week 6 High Score is a 2-way tie",
+         "manager_id": None, "week": 6, "position": None},
+        {"code": "missing_week", "severity": "error", "message": "no scores recorded for week 3",
+         "manager_id": None, "week": 3, "position": None},
     ]
+    doc["review"]["warnings"] = ["2025 has no completed matchups yet"]
     (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
-    (derived / f"{PRIOR}.json").write_text(
-        json.dumps(keeper_doc(season=PRIOR)), encoding="utf-8"
-    )
+    (derived / f"{PRIOR}.json").write_text(json.dumps(keeper_doc(season=PRIOR)), encoding="utf-8")
 
-    page = render(tmp_path, derived)[f"season-{PRIOR}.html"]
-    assert "Week 6 High Score is a 2-way tie" in page
-    body = text(page).lower()
-    assert "unverified" in body
-    assert "nobody has checked this" in body
+    season = build_stats_season(derived, PRIOR)
+    assert {"review", "error"} <= {note.kind for note in season.notes}
 
-
-def test_error_issue_renders_too_and_is_not_silently_dropped(tmp_path: Path):
-    derived = tmp_path / "derived"
-    derived.mkdir()
-    doc = stats_doc()
-    doc["review"]["issues"] = [
-        {
-            "code": "missing_week",
-            "severity": "error",
-            "message": "no scores recorded for week 3",
-            "manager_id": None,
-            "week": 3,
-            "position": None,
-        }
-    ]
-    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
-    page = render(tmp_path, derived)[f"season-{PRIOR}.html"]
-    assert "no scores recorded for week 3" in page
+    pages = render(tmp_path, derived, drafted=True)
+    for name in (f"season-{PRIOR}.html", "index.html", "seasons.html"):
+        body = text(pages[name]).lower()
+        assert "2-way tie" not in body, name
+        assert "no scores recorded for week 3" not in body, name
+        assert "no completed matchups" not in body, name
+        assert "unverified" not in body and "nobody has checked this" not in body, name
+        assert "have not been checked" not in body, name
 
 
 def test_a_sync_warning_stays_off_the_public_page(tmp_path: Path):
@@ -1240,23 +1229,24 @@ def test_most_points_leads_the_season_awards_and_is_not_a_placing(tmp_path: Path
     assert "weeks 1–14" in points.caption
 
 
-def test_a_prize_a_season_never_awarded_leaves_no_empty_subheading(tmp_path: Path):
-    """A group with nothing in it would render its subheading over nothing at all.
+def test_a_prize_a_season_never_awarded_stays_on_the_board_and_says_so(tmp_path: Path):
+    """The board is a template: a finished season with no Unlucky still has the Unlucky row.
 
-    Not every season has every prize — 2019 through 2022 have no recorded money, and a season
-    can finish with no Unlucky award. The subheading has to go with the rows.
+    Dropping it is how three whole sections vanished from 2026's board before its first game.
+    On a finished season an empty prize is a result, so it reads "unawarded".
     """
     doc = stats_doc()
     doc["unlucky"] = None
     derived = one_stats_season(tmp_path, doc)
 
     home = build_home(build_stats_season(derived, PRIOR))
-    assert all(
-        block.rows for column in home.columns for block in column
-    ), "a heading with no prizes under it"
-    assert "Unlucky" not in _blocks(home)
+    assert all(block.rows for column in home.columns for block in column)
+    unlucky = _block(home, "Unlucky")
+    assert len(unlucky.rows) == 1 and unlucky.rows[0].winners == ()
+    assert not unlucky.rows[0].leading, "a finished season has winners or nobody, never leaders"
 
-    assert "Unlucky" not in text(render(tmp_path, derived, drafted=True)["index.html"])
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
+    assert "Unlucky" in body and "unawarded" in body
 
 
 def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path):
@@ -1266,6 +1256,8 @@ def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path
     it is misreporting are no longer on the page to contradict it.
     """
     doc = stats_doc()
+    # Two regular-season weeks, so the weekly block is exactly the two recorded prizes below.
+    doc["source"]["regular_season_weeks"] = 2
     doc["weekly_high_scores"] = [
         {"season": PRIOR, "week": 1, "manager_ids": ["t1"], "points": 129.62},
         {"season": PRIOR, "week": 2, "manager_ids": ["t2"], "points": 126.00},
@@ -1297,6 +1289,9 @@ def test_a_column_only_says_each_when_its_prizes_really_are_equal(tmp_path: Path
         {"season": PRIOR, "label": "Unlucky", "amount": 20, "winner_manager_id": "t2", "paid": False},
         {"season": PRIOR, "label": "QB Stud", "amount": 25, "winner_manager_id": "t1", "paid": False},
         {"season": PRIOR, "label": "RB Stud", "amount": 30, "winner_manager_id": "t2", "paid": False},
+        # The board always carries all four studs, so the other two are recorded as well.
+        {"season": PRIOR, "label": "WR Stud", "amount": 25, "paid": False},
+        {"season": PRIOR, "label": "TE Stud", "amount": 25, "paid": False},
         {"season": PRIOR, "label": "Survivor", "amount": 40, "winner_manager_id": "t1", "paid": False},
     ]
     derived = one_stats_season(tmp_path, doc)
@@ -1363,24 +1358,170 @@ def test_survivor_is_shown_once_and_paid_once(tmp_path: Path):
         assert f"Week {elimination.week}" in body
 
 
-def test_a_season_with_no_survivor_ladder_keeps_the_prize_in_the_season_awards(
+def test_a_season_with_no_survivor_ladder_still_has_the_survivor_column(
     tmp_path: Path, derived: Path
 ):
-    """With no ladder there is no column to hold the prize, so it stays a row.
+    """The column is the prize whether or not a ladder was derived, so it is always there.
 
-    The fixture has a Survivor winner but no eliminations. Dropping the row here because the
-    column normally takes it would take the prize off the page entirely.
+    The fixture has a Survivor winner but no eliminations. The prize has to be on the page
+    exactly once: in the column, never also as a row in the season awards.
     """
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.survivor is None
+    assert home.survivor is not None
+    assert [w.name for w in home.survivor.winners] == ["Fake News"]
 
     rows = [row for column in home.columns for block in column for row in block.rows]
-    assert len([row for row in rows if row.label == "Survivor"]) == 1
+    assert not [row for row in rows if row.label == "Survivor"]
     assert _money_shown(home) == home.pot
 
     body = text(render(tmp_path, derived, drafted=True)["index.html"])
-    assert "Survivor" in body
-    assert "Winner" not in body
+    assert "Survivor" in body and "Winner" in body
+
+
+def _empty_season_doc(season: int = SEASON, **source) -> dict:
+    """A stats file for a season with nothing decided yet, in the shape the nightly writes."""
+    return {
+        "season": season,
+        "source": {"regular_season_weeks": 14, "weeks_with_results": [], **source},
+        "standings": [],
+        "weekly_high_scores": [],
+        "season_points": [],
+        "positional_studs": [],
+        "survivor": {"eliminations": [], "winner_manager_ids": []},
+        "unlucky": None,
+        "payouts": [],
+        "review": {"consolation_winner_manager_ids": [], "warnings": [], "issues": []},
+    }
+
+
+def _in_progress_payouts(season: int) -> list[dict]:
+    """What ``award_prizes`` writes mid-season: the whole pot, weeks 1-2 won, nothing else."""
+    rows = [{"season": season, "label": label, "amount": amount, "paid": False}
+            for label, amount in (("Champion", 500), ("2nd Place", 200), ("3rd Place", 100),
+                                  ("Most Points (Season)", 100), ("Survivor", 40),
+                                  ("QB Stud", 25), ("RB Stud", 25), ("WR Stud", 25),
+                                  ("TE Stud", 25), ("Unlucky", 20))]
+    rows += [{"season": season, "label": f"Week {week} High Score", "amount": 10, "paid": False,
+              **({"winner_manager_id": "t1"} if week == 1 else {})}
+             | ({"winner_manager_id": "t2"} if week == 2 else {})
+             for week in range(1, 15)]
+    return rows
+
+
+def _twelve_teams(derived: Path) -> None:
+    """Give SEASON's keeper file a full league, so the survivor ladder has its real length."""
+    path = derived / f"{SEASON}.json"
+    doc = json.loads(path.read_text())
+    doc["franchises"] += [
+        {"manager_id": f"t{i}", "season": SEASON, "name": f"Team {i}"} for i in range(3, 13)
+    ]
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+
+def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, derived: Path):
+    """Drafted, no game final: every prize is on the board, blank, with its money.
+
+    Before this the board was built out of results, so a season without any showed a podium,
+    Most Points and Survivor reading "unawarded", and no studs, Unlucky or weekly highs at all.
+    """
+    doc = _empty_season_doc()
+    doc["payouts"] = [{k: v for k, v in row.items() if k != "winner_manager_id"}
+                      for row in _in_progress_payouts(SEASON)]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+
+    home = build_home(build_stats_season(derived, SEASON))
+    assert [spot.place for spot in home.podium] == ["Champion", "2nd Place", "3rd Place"]
+    assert len(_block(home, "Most Points").rows) == 1
+    assert [row.short_label for row in _block(home, "Stud").rows] == ["QB", "RB", "WR", "TE"]
+    assert len(_block(home, "Unlucky").rows) == 1
+    assert [row.short_label for row in _block(home, "Weekly top score").rows] == [
+        f"Week {week}" for week in range(1, 15)
+    ]
+    # Twelve franchises, and survivor runs a week for all but one.
+    assert home.survivor is not None
+    assert [line.week for line in home.survivor.weeks] == list(range(1, 12))
+    assert all(line.out is None for line in home.survivor.weeks)
+
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert not any(row.winners for row in rows) and not any(row.leading for row in rows)
+    # 500 + 200 + 100 placings, 100 Most Points, 40 Survivor, 4 x 25 studs, 20 Unlucky, 14 x 10.
+    assert _money_shown(home) == home.pot == 1200
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    # The survivor column: a blank winner and eleven blank weeks, each one a visible dash.
+    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    column = column[: column.index("</section>")]
+    assert text(column).count("—") == 12
+    assert "Week 11" in text(column)
+
+    body = text(page)
+    for heading in ("Champion", "Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
+        assert heading in body, heading
+    assert "unawarded" not in body, "an unplayed prize is not unawarded, it is not decided yet"
+    assert "Prize money nobody was awarded" not in body
+    assert "unawarded" not in text(render(tmp_path, derived, drafted=True)["seasons.html"]).split(
+        str(PRIOR)
+    )[0], "the season index calls a prize still to be played unawarded"
+    assert "$1,200" not in body and "$25 each" in body and "$10 each" in body
+
+
+def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, derived: Path):
+    doc = _empty_season_doc(weeks_with_results=[1, 2])
+    doc["weekly_high_scores"] = [
+        {"season": SEASON, "week": 1, "manager_ids": ["t1"], "points": 140.1},
+        {"season": SEASON, "week": 2, "manager_ids": ["t2"], "points": 150.2},
+    ]
+    doc["season_points"] = [
+        {"season": SEASON, "manager_id": "t2", "points": 280.4},
+        {"season": SEASON, "manager_id": "t1", "points": 270.0},
+    ]
+    doc["positional_studs"] = [
+        {"season": SEASON, "position": "QB", "espn_player_id": 9, "player_name": "Josh Allen",
+         "week": 2, "points": 38.2, "manager_ids": ["t1"]},
+    ]
+    doc["unlucky"] = {"season": SEASON, "week": 2, "manager_ids": ["t1"], "points": 131.5}
+    doc["survivor"]["eliminations"] = [
+        {"season": SEASON, "week": 1, "manager_ids": ["t2"], "points": 80.0},
+        {"season": SEASON, "week": 2, "manager_ids": ["t1"], "points": 90.0},
+    ]
+    doc["payouts"] = _in_progress_payouts(SEASON)
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+
+    home = build_home(build_stats_season(derived, SEASON))
+    assert not home.final
+
+    weekly = _block(home, "Weekly top score").rows
+    assert [bool(row.winners) for row in weekly] == [True, True] + [False] * 12
+    assert not any(row.leading for row in weekly), "a week is won or not played, never led"
+
+    most = _block(home, "Most Points").rows[0]
+    assert most.leading and [w.manager_id for w in most.winners] == ["t2"]
+    qb, rb, *_ = _block(home, "Stud").rows
+    assert qb.leading and [w.manager_id for w in qb.winners] == ["t1"]
+    assert not rb.leading and rb.winners == ()
+    unlucky = _block(home, "Unlucky").rows[0]
+    assert unlucky.leading and unlucky.short_label == "Week 2"
+
+    assert home.survivor is not None and home.survivor.winners == ()
+    ladder = [line.out is not None for line in home.survivor.weeks]
+    assert ladder == [True, True] + [False] * 9, "decided weeks filled, the other nine to come"
+    assert _money_shown(home) == home.pot
+
+    body = text(render(tmp_path, derived, drafted=True)["index.html"])
+    assert body.count("leading") == 3
+    assert "unawarded" not in body
+    assert "Prize money nobody was awarded" not in body
+
+
+def test_a_finished_season_has_no_leaders(tmp_path: Path, derived: Path):
+    """Once the bracket has ranked everyone the board holds results, and nothing leads."""
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.final
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert not any(row.leading for row in rows)
+    assert "leading" not in text(render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"])
 
 
 def test_a_finished_season_says_so(tmp_path: Path, derived: Path):

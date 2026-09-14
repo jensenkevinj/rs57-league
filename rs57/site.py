@@ -78,6 +78,7 @@ from rs57.models import (
 )
 from rs57.history import HistoryStore
 from rs57.origins import load_first_season_bounds, load_player_origins
+from rs57.stats import STUD_POSITIONS
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -292,6 +293,10 @@ class StatsSeason:
     """Whether the playoffs have decided a final rank. A season still being played has none,
     and the home page must not present its prize board as settled."""
     names_known: bool
+    franchise_count: int
+    """How many franchises the season has, which is what sizes the survivor ladder: one week
+    out for every team but the last. Zero when nothing on file says, and then the ladder shows
+    only the eliminations that happened."""
     standings: tuple[StandingLine, ...]
     season_points: tuple[PointsLine, ...]
     weekly_highs: tuple[HighLine, ...]
@@ -356,6 +361,10 @@ class BoardRow:
     value: str = ""
     """The number that won the prize, in the row's last column. Every row on the board ends in
     one, which is what makes them line up."""
+    leading: bool = False
+    """The season is still being played and this is who is ahead, not who won. Only the prizes
+    the whole season decides — Most Points, the studs, Unlucky — ever lead; a week's high score
+    is simply won or not yet played."""
     short_label: str = ""
     """What to call the prize in a narrow column. Empty means ``label`` reads fine as is.
 
@@ -411,6 +420,14 @@ class BoardBlock:
 
 
 @dataclass(frozen=True)
+class SurvivorWeek:
+    """One line of the survivor ladder. ``out`` is ``None`` until that week has been played."""
+
+    week: int
+    out: HighLine | None
+
+
+@dataclass(frozen=True)
 class SurvivorPanel:
     """The survivor ladder, as its own column, the way the league's spreadsheet had it.
 
@@ -425,6 +442,9 @@ class SurvivorPanel:
     amount: int
     recorded: bool
     eliminations: tuple[HighLine, ...]
+    weeks: tuple[SurvivorWeek, ...] = ()
+    """Every week the ladder runs, eliminated or not yet — the template's rows. A week nobody
+    has gone out in yet is an empty line, not a missing one."""
     caption: str = SURVIVOR_RULE
 
 
@@ -1168,6 +1188,7 @@ def build_stats_season(derived_dir: Path, season: int) -> StatsSeason:
         playoff_team_count=int(source.get("playoff_team_count") or 0),
         final=any(row.final_rank for row in standings),
         names_known=bool(names),
+        franchise_count=len(names) or len(standings),
         standings=tuple(
             StandingLine(
                 team=_named(row.manager_id, names),
@@ -1323,26 +1344,42 @@ def build_home(season: StatsSeason | None) -> Home | None:
     Any payout label the stats do not explain still reaches the page, in a trailing section.
     A prize that quietly vanished between the engine and the page is exactly the kind of
     silence this project treats as a bug.
+
+    **The board is a template, the same for every season.** Every prize is always on it — three
+    placings, Most Points, four studs, Unlucky, a survivor ladder one week per team but one, and
+    a high score for every regular-season week — and results fill the rows in. A season with no
+    results is the whole board, empty; it used to be a board with three of its sections missing,
+    because a section was built out of the results it held (commissioner, 2026-09-14).
+
+    Until the season is final, the prizes the whole season decides show who is **leading**.
     """
     if season is None:
         return None
+    final = season.final
 
     groups = {group.label: group for group in season.prizes}
     claimed: set[str] = set()
 
-    def resolve(label: str, fallback: Sequence[Named]) -> tuple[tuple[Named, ...], int, bool]:
-        """Winners, money, and whether any money is on record, for one prize label."""
+    def resolve(
+        label: str, fallback: Sequence[Named], *, leads: bool = False
+    ) -> tuple[tuple[Named, ...], int, bool, bool]:
+        """Winners, money, whether any money is on record, and whether the winners are only
+        leading, for one prize label."""
         claimed.add(label)
         group = groups.get(label)
         if group is None:
-            return tuple(fallback), 0, False
-        # A prize nobody won still has a group and still carries its money, so the winners
-        # come back empty and the amount does not.
-        return (
-            tuple(row.winner for row in group.rows if row.winner),
-            sum(row.amount for row in group.rows),
-            True,
-        )
+            winners, amount, recorded = tuple(fallback), 0, False
+        else:
+            # A prize nobody won still has a group and still carries its money, so the winners
+            # come back empty and the amount does not.
+            winners = tuple(row.winner for row in group.rows if row.winner)
+            amount, recorded = sum(row.amount for row in group.rows), True
+        # Mid-season the payout rows for these prizes name nobody — a leader is owed nothing —
+        # so the leader comes from the stats. A final season keeps an empty prize empty: that
+        # is a real result, and "unawarded" is what it says.
+        if leads and not final:
+            return winners or tuple(fallback), amount, recorded, bool(winners or fallback)
+        return winners, amount, recorded, False
 
     def line(
         label: str,
@@ -1350,8 +1387,9 @@ def build_home(season: StatsSeason | None) -> Home | None:
         detail: str,
         short_label: str = "",
         value: str = "",
+        leads: bool = False,
     ) -> BoardRow:
-        winners, amount, recorded = resolve(label, fallback)
+        winners, amount, recorded, leading = resolve(label, fallback, leads=leads)
         return BoardRow(
             label=label,
             winners=winners,
@@ -1361,6 +1399,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
             detail=detail,
             short_label=short_label,
             value=value,
+            leading=leading,
         )
 
     standing = {row.team.manager_id: row for row in season.standings}
@@ -1369,7 +1408,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
     podium: list[PodiumSpot] = []
     for rank, place in ((1, "Champion"), (2, "2nd Place"), (3, "3rd Place")):
         placed = by_rank.get(rank)
-        winners, amount, recorded = resolve(place, (placed.team,) if placed else ())
+        winners, amount, recorded, _ = resolve(place, (placed.team,) if placed else ())
         # Described from the franchise actually shown as the winner, not from the rank — so a
         # payout and the standings disagreeing shows up as a missing record, not a wrong one.
         described = standing.get(winners[0].manager_id) if len(winners) == 1 else None
@@ -1396,57 +1435,82 @@ def build_home(season: StatsSeason | None) -> Home | None:
         leaders_by_points,
         "",
         value=_points(best) if best is not None else "",
+        leads=True,
     )
 
     survived = len(season.survivor_eliminations)
     # Survivor is shown as its own column, so it is built here but not put in a season-awards
     # group. `line` still resolves the label, which is what keeps it out of "Other prizes".
+    # It never leads: it is decided the week one team is left, and until then nobody has it.
     survivor_row = line(
         "Survivor",
         season.survivor_winners,
         f"last standing after {survived} eliminations" if survived else "last team standing",
     )
-    # No ladder means no column to put it in, so the prize stays with the season awards.
-    # Dropping it would take its money off the page and the pot would not foot.
-    survivor_rows = [] if season.survivor_eliminations else [survivor_row]
-
-    unlucky_rows = (
-        [
-            line(
-                "Unlucky",
-                season.unlucky.teams if season.unlucky else (),
-                "",
-                short_label=f"Week {season.unlucky.week}" if season.unlucky else "",
-                value=_points(season.unlucky.points) if season.unlucky else "",
-            )
-        ]
-        if season.unlucky is not None or "Unlucky" in groups
-        else []
-    )
+    # Unlucky is always on the board. Before anyone has lost there is no week to key it on, so
+    # the key is a dash rather than the prize's own name repeated under its heading.
+    unlucky = season.unlucky
+    unlucky_rows = [
+        line(
+            "Unlucky",
+            unlucky.teams if unlucky else (),
+            "",
+            short_label=f"Week {unlucky.week}" if unlucky else "—",
+            value=_points(unlucky.points) if unlucky else "",
+            leads=True,
+        )
+    ]
 
     # One prize at four positions, so the position alone labels the row — "Stud" is the
-    # group's subheading and does not need repeating four times under it.
-    studs = [
-        line(
-            f"{stud.position} Stud",
-            stud.teams,
-            f"{stud.player_name} · Week {stud.week}",
-            short_label=stud.position,
-            value=_points(stud.points),
+    # group's subheading and does not need repeating four times under it. All four are always
+    # there; a position nobody has started a scorer at yet is an empty row.
+    stud_at = {stud.position: stud for stud in season.studs}
+    studs = []
+    for position in STUD_POSITIONS:
+        stud = stud_at.get(str(position))
+        studs.append(
+            line(
+                f"{position} Stud",
+                stud.teams if stud else (),
+                f"{stud.player_name} · Week {stud.week}" if stud else "",
+                short_label=str(position),
+                value=_points(stud.points) if stud else "",
+                leads=True,
+            )
         )
-        for stud in season.studs
-    ]
 
-    weekly = [
-        line(
-            f"Week {high.week} High Score",
-            high.teams,
-            "",
-            short_label=f"Week {high.week}",
-            value=_points(high.points),
+    # Every regular-season week, played or not. A file that predates `regular_season_weeks`
+    # cannot say how many there are, so it shows the weeks it has rather than guessing.
+    high_in = {high.week: high for high in season.weekly_highs}
+    weekly_weeks = (
+        range(1, season.regular_season_weeks + 1)
+        if season.regular_season_weeks
+        else sorted(high_in)
+    )
+    weekly = []
+    for week in weekly_weeks:
+        high = high_in.get(week)
+        weekly.append(
+            line(
+                f"Week {week} High Score",
+                high.teams if high else (),
+                "",
+                short_label=f"Week {week}",
+                value=_points(high.points) if high else "",
+            )
         )
-        for high in season.weekly_highs
-    ]
+    # A week's high that the regular season's length does not cover still reaches the page.
+    for week in sorted(set(high_in) - set(weekly_weeks)):
+        high = high_in[week]
+        weekly.append(
+            line(
+                f"Week {week} High Score",
+                high.teams,
+                "",
+                short_label=f"Week {week}",
+                value=_points(high.points),
+            )
+        )
 
     leftover = [
         BoardRow(
@@ -1495,12 +1559,6 @@ def build_home(season: StatsSeason | None) -> Home | None:
                         "whole season, not once a week. Regular season only, and a tie is "
                         "not a loss.",
                     ),
-                    BoardBlock(
-                        "Survivor",
-                        tuple(survivor_rows),
-                        caption=SURVIVOR_RULE,
-                        heading_is_the_prize=True,
-                    ),
                 ),
                 (
                     BoardBlock(
@@ -1539,18 +1597,24 @@ def build_home(season: StatsSeason | None) -> Home | None:
             )
         )
 
-    # The same prize the "Survivor" row above carries, retold as its elimination order. It is
-    # built from the ladder alone, so a season whose survivor could not be derived shows no
-    # panel rather than an empty one.
-    survivor_panel = (
-        SurvivorPanel(
-            winners=survivor_row.winners,
-            amount=survivor_row.amount,
-            recorded=survivor_row.recorded,
-            eliminations=season.survivor_eliminations,
-        )
-        if season.survivor_eliminations
-        else None
+    # Survivor is always its own column, and the column is the prize: the money appears here
+    # and nowhere else. One line per week the ladder runs — a team out each week until one is
+    # left — filled in as the weeks are played.
+    out_in = {out.week: out for out in season.survivor_eliminations}
+    # Once it is decided the ladder is exactly the weeks it took, which is shorter than one per
+    # team whenever a tie took two out at once. Until then it runs the full length.
+    if out_in and (final or season.survivor_winners):
+        ladder_weeks = max(out_in)
+    else:
+        ladder_weeks = max(season.franchise_count - 1, max(out_in, default=0), 0)
+    survivor_panel = SurvivorPanel(
+        winners=survivor_row.winners,
+        amount=survivor_row.amount,
+        recorded=survivor_row.recorded,
+        eliminations=season.survivor_eliminations,
+        weeks=tuple(
+            SurvivorWeek(week=week, out=out_in.get(week)) for week in range(1, ladder_weeks + 1)
+        ),
     )
 
     # The season's phase, read off the results themselves. ESPN fills in a final rank only

@@ -28,7 +28,8 @@
                     {% if row.winner %}
                       {{ ui.team(row.winner) }}
                     {% else %}
-                      <span class="muted">unawarded</span>
+                      {# Only a finished season's empty prize is a result; mid-season it is to come. #}
+                      <span class="muted">{% if season.final %}unawarded{% else %}&mdash;{% endif %}</span>
                     {% endif %}
                   </td>
                   <td class="num money">${{ row.amount }}</td>
@@ -46,12 +47,6 @@
       {{ season.standings | length }} franchises ·
       <a href="season-{{ season.season }}.html">full prize board and moneylist &rarr;</a>
     </p>
-    {% if season.notes %}
-      <p class="small muted">
-        {{ season.notes | length }} item(s) on this season have not been checked — they are
-        shown on the season page.
-      </p>
-    {% endif %}
   {% endfor %}
 {% else %}
   <p class="muted">
