@@ -306,9 +306,11 @@ board a week into 2026. Two rules keep that from weakening a finished season:
   Weekly highs pay once their week is decided; Survivor pays once one team is left.
 
 **The prize board is a template, the same for every season** (commissioner, 2026-09-14). Every
-prize is always on it: the three placings, Most Points, all four studs, Unlucky, a survivor
-ladder one week per team but one, and a high score for every regular-season week. Results fill
-the rows in. Until the season is final, Most Points, the studs and Unlucky show the current
+prize is always on it: Most Points, all four studs, Unlucky, a survivor ladder one week per team
+but one, and a high score for every regular-season week. Results fill the rows in. **The
+Champion / 2nd / 3rd podium appears only once the season is final** (same day): the bracket
+decides the placings once, at the end, so mid-season it was three empty cards taking up the top
+of the page. Its payout rows are still resolved, so they never fall into "Other prizes". Until the season is final, Most Points, the studs and Unlucky show the current
 leader marked **leading**; an empty row reads "—", and only a *finished* season says
 "unawarded". It used to be built out of the results it held, so 2026's first board had no studs,
 Unlucky or weekly highs at all.

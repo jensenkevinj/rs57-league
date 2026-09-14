@@ -1431,7 +1431,8 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     _twelve_teams(derived)
 
     home = build_home(build_stats_season(derived, SEASON))
-    assert [spot.place for spot in home.podium] == ["Champion", "2nd Place", "3rd Place"]
+    # The placings are decided once, at the end, so a season being played has no podium.
+    assert home.podium == ()
     assert len(_block(home, "Most Points").rows) == 1
     assert [row.short_label for row in _block(home, "Stud").rows] == ["QB", "RB", "WR", "TE"]
     assert len(_block(home, "Unlucky").rows) == 1
@@ -1446,7 +1447,9 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert not any(row.winners for row in rows) and not any(row.leading for row in rows)
     # 500 + 200 + 100 placings, 100 Most Points, 40 Survivor, 4 x 25 studs, 20 Unlucky, 14 x 10.
-    assert _money_shown(home) == home.pot == 1200
+    # The placings' $800 is the podium's, which is not shown until the season is final.
+    assert home.pot == 1200
+    assert _money_shown(home) == home.pot - 800
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
     # The survivor column: a blank winner and eleven blank weeks, each one a visible dash.
@@ -1456,8 +1459,11 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     assert "Week 11" in text(column)
 
     body = text(page)
-    for heading in ("Champion", "Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
+    for heading in ("Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
         assert heading in body, heading
+    for placing in ("Champion", "2nd Place", "3rd Place", "$500", "$200"):
+        assert placing not in body, placing
+    assert 'class="podium"' not in page
     assert "unawarded" not in body, "an unplayed prize is not unawarded, it is not decided yet"
     assert "Prize money nobody was awarded" not in body
     assert "unawarded" not in text(render(tmp_path, derived, drafted=True)["seasons.html"]).split(
@@ -1507,7 +1513,8 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
     assert home.survivor is not None and home.survivor.winners == ()
     ladder = [line.out is not None for line in home.survivor.weeks]
     assert ladder == [True, True] + [False] * 9, "decided weeks filled, the other nine to come"
-    assert _money_shown(home) == home.pot
+    assert home.podium == ()
+    assert _money_shown(home) == home.pot - 800, "everything but the unshown placings"
 
     body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert body.count("leading") == 3
@@ -1521,7 +1528,11 @@ def test_a_finished_season_has_no_leaders(tmp_path: Path, derived: Path):
     assert home.final
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert not any(row.leading for row in rows)
-    assert "leading" not in text(render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"])
+    page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
+    assert "leading" not in text(page)
+    # And its placings are back: the podium is hidden only while the season is being played.
+    assert [spot.place for spot in home.podium] == ["Champion", "2nd Place", "3rd Place"]
+    assert "Champion" in text(page) and 'class="podium"' in page
 
 
 def test_a_finished_season_says_so(tmp_path: Path, derived: Path):

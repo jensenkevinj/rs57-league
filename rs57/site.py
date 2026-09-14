@@ -1646,7 +1646,11 @@ def build_home(season: StatsSeason | None) -> Home | None:
         status=status,
         final=season.final,
         money_recorded=bool(season.prizes),
-        podium=tuple(podium),
+        # The placings are settled once, by the bracket, at the very end — a season still being
+        # played would show three empty cards every week, so they appear only once it is final
+        # (commissioner, 2026-09-14). They are still resolved above, which is what keeps their
+        # payout rows out of "Other prizes".
+        podium=tuple(podium) if final else (),
         columns=columns,
         survivor=survivor_panel,
         leaders=tuple(leaders),
