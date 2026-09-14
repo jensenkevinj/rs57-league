@@ -27,6 +27,21 @@ settles it:
   only, by commissioner decision (2026-07-28) — the sheet cannot settle the window, because
   1-14 and 1-17 give the same answer in all three recorded seasons.
 
+A season still being played
+---------------------------
+
+The nightly derives the season in progress, so the home page can follow it week by week. A
+week that has not been played yet is **pending**, not missing — and only ESPN can say which is
+which, via ``status.currentMatchupPeriod``. Every week before that one is due and must have
+results; a hole there is still an ERROR. Until 2026-09-14 every future week was a
+``missing_week`` ERROR, which blocked the in-progress file every night and left the previous
+season on the home page until January.
+
+Relaxing needs *both* no final ranks and a current matchup period. A completed season always
+has final ranks, so a truncated matchups response for one still blocks however ESPN's status
+reads. Prizes decided only by the whole season — Most Points, the studs, Unlucky — carry no
+winner until the season is final; a leader in week 3 is not owed anything.
+
 Ties
 ----
 
@@ -129,9 +144,16 @@ def _by_week(scores: Iterable[WeeklyScore]) -> dict[int, dict[str, float]]:
 
 
 def weekly_high_scores(
-    scores: Iterable[WeeklyScore], weeks: Sequence[int]
+    scores: Iterable[WeeklyScore],
+    weeks: Sequence[int],
+    *,
+    pending_from_week: int | None = None,
 ) -> tuple[list[WeeklyHigh], list[StatIssue]]:
-    """Top score in each of ``weeks``. Weeks 1-14 — the playoff weeks pay nothing here."""
+    """Top score in each of ``weeks``. Weeks 1-14 — the playoff weeks pay nothing here.
+
+    ``pending_from_week`` is the first week not yet due in a season still being played. A week
+    from there on with no scores is simply not played yet; a week before it with none is a hole.
+    """
     scores = list(scores)
     table = _by_week(scores)
     season = next((score.season for score in scores), 0)
@@ -139,6 +161,8 @@ def weekly_high_scores(
     issues: list[StatIssue] = []
     for week in weeks:
         if not table.get(week):
+            if pending_from_week is not None and week >= pending_from_week:
+                continue
             issues.append(
                 StatIssue(
                     StatIssueCode.MISSING_WEEK,
@@ -174,7 +198,7 @@ def season_points(scores: Iterable[WeeklyScore], weeks: Sequence[int]) -> list[S
 
 
 def positional_studs(
-    player_weeks: Iterable[PlayerWeek],
+    player_weeks: Iterable[PlayerWeek], *, in_progress: bool = False
 ) -> tuple[list[StudAward], list[StatIssue]]:
     """Best single started week per position, across the whole season.
 
@@ -199,6 +223,9 @@ def positional_studs(
     for position in STUD_POSITIONS:
         tied = best.get(position)
         if not tied:
+            # Nobody at a position having scored is only a fault once the season is over.
+            if in_progress:
+                continue
             issues.append(
                 StatIssue(
                     StatIssueCode.NO_STUD_FOR_POSITION,
@@ -231,7 +258,10 @@ class SurvivorResult:
 
 
 def survivor(
-    scores: Iterable[WeeklyScore], *, max_weeks: int | None = None
+    scores: Iterable[WeeklyScore],
+    *,
+    max_weeks: int | None = None,
+    pending_from_week: int | None = None,
 ) -> tuple[SurvivorResult, list[StatIssue]]:
     """Lowest score among the still-alive goes out each week; last standing wins.
 
@@ -241,10 +271,15 @@ def survivor(
 
     A tie for lowest eliminates **everyone** tied, which can end the run early or wipe out the
     last survivors. Both cases are reported: nothing about a tie is decided quietly here.
+
+    In a season still being played (``pending_from_week`` set) the run stops at the first
+    pending week with nobody named the winner, since more weeks are still to come.
     """
     scores = list(scores)
     table = _by_week(scores)
     season = next((score.season for score in scores), 0)
+    if pending_from_week is not None and not table.get(1) and pending_from_week <= 1:
+        return SurvivorResult((), ()), []
     alive = set(table.get(1, {}))
     limit = max_weeks if max_weeks is not None else len(alive) - 1
 
@@ -254,6 +289,8 @@ def survivor(
         if len(alive) <= 1:
             break
         live = {m: p for m, p in table.get(week, {}).items() if m in alive}
+        if not live and pending_from_week is not None and week >= pending_from_week:
+            return SurvivorResult(tuple(eliminations), ()), issues
         if not live:
             issues.append(
                 StatIssue(
@@ -297,7 +334,7 @@ def survivor(
 
 
 def unlucky(
-    matchups: Iterable[Matchup], weeks: Sequence[int]
+    matchups: Iterable[Matchup], weeks: Sequence[int], *, in_progress: bool = False
 ) -> tuple[UnluckyAward | None, list[StatIssue]]:
     """The highest score that still lost, once for the season.
 
@@ -318,6 +355,8 @@ def unlucky(
         if beaten is not None:
             losses.append((beaten[1], matchup.week, beaten[0]))
 
+    if not losses and in_progress:
+        return None, []
     if not losses:
         return None, [
             StatIssue(
@@ -606,6 +645,9 @@ class SeasonStats:
     unlucky: UnluckyAward | None
     consolation_winner_ids: tuple[str, ...]
     issues: tuple[StatIssue, ...]
+    in_progress: bool = False
+    """Still being played: no final ranks, and ESPN names a week not yet due. See the module
+    docstring for what that relaxes and what it does not."""
 
     @property
     def blocked(self) -> bool:
@@ -627,6 +669,7 @@ def compute_season_stats(
     playoff_seeds: Mapping[str, int] | None = None,
     playoff_team_count: int | None = None,
     espn_points: Mapping[str, float] | None = None,
+    current_matchup_period: int | None = None,
 ) -> SeasonStats:
     """Run every derived stat for one season, in one pass, with all its cross-checks.
 
@@ -638,13 +681,19 @@ def compute_season_stats(
     weeks = list(range(1, regular_season_weeks + 1))
     issues: list[StatIssue] = []
 
-    highs, high_issues = weekly_high_scores(scores, weeks)
+    # ``current_matchup_period`` is ESPN's ``status.currentMatchupPeriod``: the week being
+    # played, so the first one not yet due. Final ranks override it — a finished season is
+    # held to every week, whatever the status says.
+    in_progress = current_matchup_period is not None and not final_ranks
+    pending_from = current_matchup_period if in_progress else None
+
+    highs, high_issues = weekly_high_scores(scores, weeks, pending_from_week=pending_from)
     issues += high_issues
-    studs, stud_issues = positional_studs(player_weeks)
+    studs, stud_issues = positional_studs(player_weeks, in_progress=in_progress)
     issues += stud_issues
-    survived, survivor_issues = survivor(scores)
+    survived, survivor_issues = survivor(scores, pending_from_week=pending_from)
     issues += survivor_issues
-    unlucky_award, unlucky_issues = unlucky(matchups, weeks)
+    unlucky_award, unlucky_issues = unlucky(matchups, weeks, in_progress=in_progress)
     issues += unlucky_issues
     consolation, consolation_issues = consolation_winner(
         matchups, final_ranks, playoff_seeds, playoff_team_count
@@ -680,6 +729,7 @@ def compute_season_stats(
         unlucky=unlucky_award,
         consolation_winner_ids=consolation,
         issues=tuple(issues),
+        in_progress=in_progress,
     )
 
 
@@ -746,8 +796,10 @@ def award_prizes(
         payouts += rows
         issues += found
 
+    # A season still being played has leaders, not winners, for every prize the whole season
+    # decides. Those rows keep their money and name nobody, so the pot still adds up.
     leaders: list[str] = []
-    if stats.season_points:
+    if stats.season_points and not stats.in_progress:
         best = stats.season_points[0].points
         leaders = [row.manager_id for row in stats.season_points if row.points == best]
     rows, found = _award(stats.season, "Most Points (Season)", schedule.most_points, leaders)
@@ -760,14 +812,18 @@ def award_prizes(
     payouts += rows
     issues += found
 
-    for stud in stats.studs:
+    if stats.in_progress:
+        for position in STUD_POSITIONS:
+            payouts += _award(stats.season, f"{position} Stud", schedule.stud, [])[0]
+        payouts += _award(stats.season, "Unlucky", schedule.unlucky, [])[0]
+    for stud in () if stats.in_progress else stats.studs:
         rows, found = _award(
             stats.season, f"{stud.position} Stud", schedule.stud, list(stud.manager_ids)
         )
         payouts += rows
         issues += found
 
-    if stats.unlucky is not None:
+    if stats.unlucky is not None and not stats.in_progress:
         rows, found = _award(
             stats.season, "Unlucky", schedule.unlucky, list(stats.unlucky.manager_ids)
         )
@@ -783,6 +839,13 @@ def award_prizes(
         )
         payouts += rows
         issues += found
+    if stats.in_progress:
+        decided = {high.week for high in stats.weekly_highs}
+        for week in stats.regular_season_weeks:
+            if week not in decided:
+                payouts += _award(
+                    stats.season, f"Week {week} High Score", schedule.weekly_high, []
+                )[0]
 
     expected = schedule.total(len(stats.regular_season_weeks), len(STUD_POSITIONS))
     actual = sum(payout.amount for payout in payouts)

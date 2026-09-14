@@ -825,6 +825,36 @@ def test_home_is_the_most_recent_season_with_results(tmp_path: Path, derived: Pa
     assert f"{SEASON} Preseason" not in text(page), "the drafted fixture must not show the preseason page"
 
 
+def test_home_moves_to_the_season_being_played_once_it_has_a_stats_file(
+    tmp_path: Path, derived: Path
+):
+    """Drafted, Week 1 live, nothing final: the home page is SEASON, not PRIOR's final board.
+
+    The nightly used to discard this file every night — every future week was a missing-week
+    ERROR — and the home page showed the previous season until January.
+    """
+    in_progress = {
+        "season": SEASON,
+        "source": {"regular_season_weeks": 14, "weeks_with_results": []},
+        "standings": [],
+        "weekly_high_scores": [],
+        "season_points": [],
+        "positional_studs": [],
+        "survivor": {"eliminations": [], "winner_manager_ids": []},
+        "unlucky": None,
+        "payouts": [],
+        "review": {"consolation_winner_manager_ids": [], "warnings": [], "issues": []},
+    }
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(in_progress), encoding="utf-8")
+
+    pages = render(tmp_path, derived, drafted=True)
+    home = text(pages["index.html"])
+    assert f"{SEASON} Season" in home
+    assert "No results yet" in home
+    assert f"{PRIOR} Final Results" not in home
+    assert f"{PRIOR} Final Results" in text(pages[f"season-{PRIOR}.html"])
+
+
 def test_the_home_page_is_the_preseason_page_before_the_auction(tmp_path: Path, derived: Path):
     """Before SEASON drafts, home shows the draft's own info, not last season's finished board.
 
@@ -1006,7 +1036,9 @@ def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
 @pytest.mark.parametrize(
     ("weeks", "final", "expected"),
     [
-        ([], False, f"{PRIOR} Preseason"),
+        # A stats file exists only once the season is under way; "Preseason" is the pre-draft
+        # page's word, and a drafted season with no final score yet is not that.
+        ([], False, f"{PRIOR} Season"),
         ([1], False, f"{PRIOR} Week 1"),
         # Week 14 is the last regular-season week, so it is not yet the playoffs.
         (list(range(1, 15)), False, f"{PRIOR} Week 14"),

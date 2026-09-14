@@ -1558,7 +1558,10 @@ def build_home(season: StatsSeason | None) -> Home | None:
     if season.final:
         heading, status = f"{season.season} Final Results", "Final"
     elif not season.weeks_played:
-        heading, status = f"{season.season} Preseason", "No results yet"
+        # Not "Preseason": a stats file only exists once the season is under way, and the
+        # pre-draft page already carries that word. This is the week between the auction and
+        # the first final score.
+        heading, status = f"{season.season} Season", "No results yet"
     else:
         status = f"In progress — through week {season.weeks_played}"
         if not season.regular_season_weeks:

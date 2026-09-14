@@ -48,17 +48,21 @@ class FakeClient:
 
     year = 2025
 
-    def __init__(self, matchups, boxscores=None, teams=None, regular_weeks=14):
+    def __init__(self, matchups, boxscores=None, teams=None, regular_weeks=14, status=None):
         self._matchups = matchups
         self._boxscores = boxscores or {}
         self._teams = teams if teams is not None else [team(i) for i in range(1, 13)]
         self._regular_weeks = regular_weeks
+        self._status = status
 
     def fetch_league(self):
-        return {
+        league = {
             "settings": {"scheduleSettings": {"matchupPeriodCount": self._regular_weeks}},
             "teams": self._teams,
         }
+        if self._status is not None:
+            league["status"] = self._status
+        return league
 
     def fetch_matchups(self):
         return self._matchups
@@ -107,6 +111,20 @@ class TestWhatCountsAsPlayed:
             FakeClient([matchup(15, 9, 0.0, winner="UNDECIDED", tier="WINNERS_BRACKET")])
         )
         assert synced.matchups == ()
+
+    def test_the_week_being_played_is_read_off_the_league_status(self):
+        """It is what separates a week not yet played from one gone missing."""
+        synced = build_scoring_season(
+            FakeClient(
+                [matchup(1, 1, 0.0, 2, 0.0, winner="UNDECIDED")],
+                status={"currentMatchupPeriod": 1, "finalScoringPeriod": 17},
+            )
+        )
+        assert synced.current_matchup_period == 1
+
+    def test_no_status_means_no_current_week(self):
+        synced = build_scoring_season(FakeClient([matchup(1, 1, 100.0, 2, 90.0)]))
+        assert synced.current_matchup_period is None
 
     def test_a_short_regular_season_is_reported(self):
         synced = build_scoring_season(FakeClient([matchup(1, 1, 100.0, 2, 90.0)]))

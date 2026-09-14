@@ -807,3 +807,17 @@ unknown. The single remaining unresolved id league-wide is Zach Ertz, who is ret
 purged him from the core API entirely, and the season-less and older-season paths 404 as well.
 He is on no current roster, and "nothing at all is known about when he started" is the correct
 and honest answer for him.
+
+**A season in progress was blocked every night by weeks nobody had played yet (2026-09-14).**
+The home page showed 2025's final board a week into 2026. `site.build_site` already picks the
+newest stats file and `build_home` already has in-progress headings, but no `2026-stats.json`
+ever landed. `weekly_high_scores` raised `missing_week` ERROR for all fourteen weeks, future ones
+included, and `positional_studs` and `unlucky` raised "nobody all season" ERRORs. The nightly
+reads exit 1 as blocked and deletes the file. Nothing looked red: the workflow logs that case as
+"no completed games yet", which is exactly what the offseason looks like, so it would have gone
+on until January. Every test season was a completed one.
+
+ESPN's `status.currentMatchupPeriod` is what separates a pending week from a missing one. It is
+only trusted with no final ranks on file, so a truncated read of a finished season still blocks.
+Season-long prizes pay nobody until the season is final, so recording 2026 amounts mid-season
+cannot turn a week-3 leader into a debt on the Money tab.

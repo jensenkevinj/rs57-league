@@ -118,6 +118,7 @@ def sync_stats(
         playoff_seeds=scoring.playoff_seeds,
         playoff_team_count=scoring.playoff_team_count,
         espn_points=scoring.espn_points,
+        current_matchup_period=scoring.current_matchup_period,
     )
 
     issues = list(stats.issues)

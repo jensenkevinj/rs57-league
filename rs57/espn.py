@@ -798,6 +798,10 @@ class SyncedScoring:
     espn_points: Mapping[str, float] = field(default_factory=dict)
     """``team.points`` as ESPN reports it — the second witness for the computed standings."""
     warnings: tuple[str, ...] = ()
+    current_matchup_period: int | None = None
+    """``status.currentMatchupPeriod``: the week being played. Every week before it is due. It
+    is what lets a season in progress tell a week not yet played from a week gone missing, and
+    ``None`` when ESPN omits it, which keeps every week due."""
 
 
 def _player_points(player: Mapping[str, Any], week: int) -> float:
@@ -959,6 +963,7 @@ def build_scoring_season(
 
     return SyncedScoring(
         season=client.year,
+        current_matchup_period=(league.get("status") or {}).get("currentMatchupPeriod"),
         regular_season_weeks=regular_weeks,
         playoff_team_count=playoff_team_count,
         scores=tuple(sorted(scores, key=lambda s: (s.week, s.manager_id))),
