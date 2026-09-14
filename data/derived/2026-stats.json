@@ -1,18 +1,178 @@
 {
-  "payouts": [],
+  "payouts": [
+    {
+      "amount": 500,
+      "label": "Champion",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 200,
+      "label": "2nd Place",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 100,
+      "label": "3rd Place",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 100,
+      "label": "Most Points (Season)",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 40,
+      "label": "Survivor",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 25,
+      "label": "QB Stud",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 25,
+      "label": "RB Stud",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 25,
+      "label": "WR Stud",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 25,
+      "label": "TE Stud",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 20,
+      "label": "Unlucky",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 1 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 2 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 3 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 4 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 5 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 6 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 7 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 8 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 9 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 10 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 11 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 12 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 13 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    },
+    {
+      "amount": 10,
+      "label": "Week 14 High Score",
+      "paid": false,
+      "season": 2026,
+      "winner_manager_id": null
+    }
+  ],
   "positional_studs": [],
   "review": {
     "consolation_winner_manager_ids": [],
-    "issues": [
-      {
-        "code": "no_prize_schedule",
-        "manager_id": null,
-        "message": "no prize amounts recorded for 2026 in data/manual/payouts.json, so the stats were derived but nobody was awarded anything",
-        "position": null,
-        "severity": "review",
-        "week": null
-      }
-    ],
+    "issues": [],
     "warnings": [
       "2026 has no completed matchups yet, so no prize can be awarded. 84 scheduled games are still UNDECIDED."
     ]
