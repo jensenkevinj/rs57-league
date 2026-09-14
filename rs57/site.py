@@ -443,8 +443,9 @@ class SurvivorPanel:
     recorded: bool
     eliminations: tuple[HighLine, ...]
     weeks: tuple[SurvivorWeek, ...] = ()
-    """Every week the ladder runs, eliminated or not yet — the template's rows. A week nobody
-    has gone out in yet is an empty line, not a missing one."""
+    """Every week the ladder runs, eliminated or not yet — the template's rows, **latest week
+    first**, so the ladder reads up from Week 1 to the winner. A week nobody has gone out in yet
+    is an empty line, not a missing one."""
     caption: str = SURVIVOR_RULE
 
 
@@ -1612,8 +1613,11 @@ def build_home(season: StatsSeason | None) -> Home | None:
         amount=survivor_row.amount,
         recorded=survivor_row.recorded,
         eliminations=season.survivor_eliminations,
+        # Latest week first. It is a ladder: the winner on top, each week's elimination under the
+        # one after it, Week 1 at the foot — so a season being played builds up from the bottom
+        # into the empty weeks above it (commissioner, 2026-09-14).
         weeks=tuple(
-            SurvivorWeek(week=week, out=out_in.get(week)) for week in range(1, ladder_weeks + 1)
+            SurvivorWeek(week=week, out=out_in.get(week)) for week in range(ladder_weeks, 0, -1)
         ),
     )
 
