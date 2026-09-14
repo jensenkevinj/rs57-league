@@ -1441,7 +1441,8 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     ]
     # Twelve franchises, and survivor runs a week for all but one.
     assert home.survivor is not None
-    assert [line.week for line in home.survivor.weeks] == list(range(1, 12))
+    # A ladder: latest week on top, Week 1 at the foot.
+    assert [line.week for line in home.survivor.weeks] == list(range(11, 0, -1))
     assert all(line.out is None for line in home.survivor.weeks)
 
     rows = [row for column in home.columns for block in column for row in block.rows]
@@ -1456,7 +1457,7 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     column = page[page.index('<h2 class="col-head">\n          Survivor'):]
     column = column[: column.index("</section>")]
     assert text(column).count("—") == 12
-    assert "Week 11" in text(column)
+    assert text(column).index("Week 11") < text(column).index("Week 1 "), "Week 1 is at the foot"
 
     body = text(page)
     for heading in ("Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
@@ -1512,7 +1513,7 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
 
     assert home.survivor is not None and home.survivor.winners == ()
     ladder = [line.out is not None for line in home.survivor.weeks]
-    assert ladder == [True, True] + [False] * 9, "decided weeks filled, the other nine to come"
+    assert ladder == [False] * 9 + [True, True], "built up from the bottom, nine weeks to come"
     assert home.podium == ()
     assert _money_shown(home) == home.pot - 800, "everything but the unshown placings"
 
