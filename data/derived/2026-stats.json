@@ -75,7 +75,7 @@
       "label": "Week 1 High Score",
       "paid": false,
       "season": 2026,
-      "winner_manager_id": null
+      "winner_manager_id": "t3"
     },
     {
       "amount": 10,
@@ -169,26 +169,292 @@
       "winner_manager_id": null
     }
   ],
-  "positional_studs": [],
+  "positional_studs": [
+    {
+      "espn_player_id": 4431611,
+      "manager_ids": [
+        "t12"
+      ],
+      "player_name": "Caleb Williams",
+      "points": 37.26,
+      "position": "QB",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "espn_player_id": 3043078,
+      "manager_ids": [
+        "t2"
+      ],
+      "player_name": "Derrick Henry",
+      "points": 34.8,
+      "position": "RB",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "espn_player_id": 4248528,
+      "manager_ids": [
+        "t11"
+      ],
+      "player_name": "Christian Watson",
+      "points": 29.7,
+      "position": "WR",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "espn_player_id": 4361307,
+      "manager_ids": [
+        "t11"
+      ],
+      "player_name": "Trey McBride",
+      "points": 20.0,
+      "position": "TE",
+      "season": 2026,
+      "week": 1
+    }
+  ],
   "review": {
     "consolation_winner_manager_ids": [],
     "issues": [],
     "warnings": [
-      "2026 has no completed matchups yet, so no prize can be awarded. 84 scheduled games are still UNDECIDED."
+      "only 1 of 14 regular-season weeks have results; the weekly high score prizes for the rest cannot be awarded yet"
     ]
   },
   "season": 2026,
-  "season_points": [],
+  "season_points": [
+    {
+      "manager_id": "t3",
+      "points": 164.9,
+      "season": 2026
+    },
+    {
+      "manager_id": "t11",
+      "points": 151.96,
+      "season": 2026
+    },
+    {
+      "manager_id": "t9",
+      "points": 128.26,
+      "season": 2026
+    },
+    {
+      "manager_id": "t8",
+      "points": 119.56,
+      "season": 2026
+    },
+    {
+      "manager_id": "t2",
+      "points": 117.16,
+      "season": 2026
+    },
+    {
+      "manager_id": "t10",
+      "points": 114.4,
+      "season": 2026
+    },
+    {
+      "manager_id": "t7",
+      "points": 101.22,
+      "season": 2026
+    },
+    {
+      "manager_id": "t6",
+      "points": 92.74,
+      "season": 2026
+    },
+    {
+      "manager_id": "t12",
+      "points": 88.56,
+      "season": 2026
+    },
+    {
+      "manager_id": "t1",
+      "points": 88.44,
+      "season": 2026
+    },
+    {
+      "manager_id": "t4",
+      "points": 61.72,
+      "season": 2026
+    },
+    {
+      "manager_id": "t5",
+      "points": 49.36,
+      "season": 2026
+    }
+  ],
   "source": {
     "playoff_team_count": 6,
     "regular_season_weeks": 14,
-    "weeks_with_results": []
+    "weeks_with_results": [
+      1
+    ]
   },
-  "standings": [],
+  "standings": [
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t3",
+      "playoff_seed": 1,
+      "points_against": 49.36,
+      "points_for": 164.9,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t11",
+      "playoff_seed": 2,
+      "points_against": 114.4,
+      "points_for": 151.96,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t9",
+      "playoff_seed": 3,
+      "points_against": 117.16,
+      "points_for": 128.26,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t8",
+      "playoff_seed": 4,
+      "points_against": 88.44,
+      "points_for": 119.56,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t7",
+      "playoff_seed": 7,
+      "points_against": 61.72,
+      "points_for": 101.22,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 0,
+      "manager_id": "t6",
+      "playoff_seed": 8,
+      "points_against": 88.56,
+      "points_for": 92.74,
+      "season": 2026,
+      "ties": 0,
+      "wins": 1
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t2",
+      "playoff_seed": 5,
+      "points_against": 128.26,
+      "points_for": 117.16,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t10",
+      "playoff_seed": 6,
+      "points_against": 151.96,
+      "points_for": 114.4,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t12",
+      "playoff_seed": 9,
+      "points_against": 92.74,
+      "points_for": 88.56,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t1",
+      "playoff_seed": 10,
+      "points_against": 119.56,
+      "points_for": 88.44,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t4",
+      "playoff_seed": 11,
+      "points_against": 101.22,
+      "points_for": 61.72,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    },
+    {
+      "final_rank": null,
+      "losses": 1,
+      "manager_id": "t5",
+      "playoff_seed": 12,
+      "points_against": 164.9,
+      "points_for": 49.36,
+      "season": 2026,
+      "ties": 0,
+      "wins": 0
+    }
+  ],
   "survivor": {
-    "eliminations": [],
+    "eliminations": [
+      {
+        "manager_ids": [
+          "t5"
+        ],
+        "points": 49.36,
+        "season": 2026,
+        "week": 1
+      }
+    ],
     "winner_manager_ids": []
   },
-  "unlucky": null,
-  "weekly_high_scores": []
+  "unlucky": {
+    "manager_ids": [
+      "t2"
+    ],
+    "points": 117.16,
+    "season": 2026,
+    "week": 1
+  },
+  "weekly_high_scores": [
+    {
+      "manager_ids": [
+        "t3"
+      ],
+      "points": 164.9,
+      "season": 2026,
+      "week": 1
+    }
+  ]
 }
