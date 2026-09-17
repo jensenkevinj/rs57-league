@@ -64,6 +64,11 @@
       "source": "debut_year"
     },
     {
+      "espn_player_id": 2573079,
+      "first_nfl_season": 2016,
+      "source": "draft_year"
+    },
+    {
       "espn_player_id": 2576925,
       "first_nfl_season": 2015,
       "source": "draft_year"
@@ -105,6 +110,11 @@
     },
     {
       "espn_player_id": 3043078,
+      "first_nfl_season": 2016,
+      "source": "draft_year"
+    },
+    {
+      "espn_player_id": 3043116,
       "first_nfl_season": 2016,
       "source": "draft_year"
     },
@@ -1126,6 +1136,11 @@
     {
       "espn_player_id": 5081397,
       "first_nfl_season": 2025,
+      "source": "draft_year"
+    },
+    {
+      "espn_player_id": 5081432,
+      "first_nfl_season": 2026,
       "source": "draft_year"
     },
     {
