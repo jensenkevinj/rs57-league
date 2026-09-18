@@ -99,6 +99,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": -16021,
+      "name": "Eagles D/ST",
+      "nfl_team": "PHI",
+      "position": "DEF"
+    },
+    {
       "espn_player_id": -16017,
       "name": "Patriots D/ST",
       "nfl_team": "NE",
@@ -114,12 +120,6 @@
       "espn_player_id": -16012,
       "name": "Chiefs D/ST",
       "nfl_team": "KC",
-      "position": "DEF"
-    },
-    {
-      "espn_player_id": -16009,
-      "name": "Packers D/ST",
-      "nfl_team": "GB",
       "position": "DEF"
     },
     {
@@ -1176,7 +1176,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 22,
+    "waiver_bases_verified": 23,
     "warnings": []
   },
   "roster": [
@@ -2315,13 +2315,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": -16009,
+      "acquired_at": "2026-09-18T07:12:21.778000",
+      "base_salary": 0,
+      "espn_player_id": -16021,
       "kept_prior_year": false,
       "manager_id": "t6",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
