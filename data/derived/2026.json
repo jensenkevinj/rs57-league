@@ -93,6 +93,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": -16025,
+      "name": "49ers D/ST",
+      "nfl_team": "SF",
+      "position": "DEF"
+    },
+    {
       "espn_player_id": -16023,
       "name": "Steelers D/ST",
       "nfl_team": "PIT",
@@ -126,12 +132,6 @@
       "espn_player_id": -16007,
       "name": "Broncos D/ST",
       "nfl_team": "DEN",
-      "position": "DEF"
-    },
-    {
-      "espn_player_id": -16005,
-      "name": "Browns D/ST",
-      "nfl_team": "CLE",
       "position": "DEF"
     },
     {
@@ -528,6 +528,12 @@
       "espn_player_id": 4360761,
       "name": "Michael Wilson",
       "nfl_team": "ARI",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4360939,
+      "name": "Rashod Bateman",
+      "nfl_team": "BAL",
       "position": "WR"
     },
     {
@@ -1176,7 +1182,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 23,
+    "waiver_bases_verified": 25,
     "warnings": []
   },
   "roster": [
@@ -2585,13 +2591,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": -16005,
+      "acquired_at": "2026-09-20T16:23:34.636000",
+      "base_salary": 0,
+      "espn_player_id": -16025,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.290000",
@@ -2633,6 +2639,15 @@
       "acquired_at": "2026-09-05T12:35:17.446000",
       "base_salary": 0,
       "espn_player_id": 4360635,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2026-09-20T15:09:10.336000",
+      "base_salary": 0,
+      "espn_player_id": 4360939,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
