@@ -69,12 +69,6 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16033,
-      "name": "Ravens D/ST",
-      "nfl_team": "BAL",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16029,
       "name": "Panthers D/ST",
       "nfl_team": "CAR",
@@ -132,6 +126,12 @@
       "espn_player_id": -16009,
       "name": "Packers D/ST",
       "nfl_team": "GB",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16008,
+      "name": "Lions D/ST",
+      "nfl_team": "DET",
       "position": "DEF"
     },
     {
@@ -1188,7 +1188,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 29,
+    "waiver_bases_verified": 30,
     "warnings": []
   },
   "roster": [
@@ -1769,13 +1769,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": -16033,
+      "acquired_at": "2026-09-24T00:44:54.607000",
+      "base_salary": 0,
+      "espn_player_id": -16008,
       "kept_prior_year": false,
       "manager_id": "t2",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
