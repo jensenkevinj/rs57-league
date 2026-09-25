@@ -1157,6 +1157,11 @@
       "espn_player_id": 5083076,
       "first_nfl_season": 2025,
       "source": "draft_year"
+    },
+    {
+      "espn_player_id": 5083315,
+      "first_nfl_season": 2026,
+      "source": "draft_year"
     }
   ],
   "review": {
