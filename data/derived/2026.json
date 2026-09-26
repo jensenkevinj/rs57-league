@@ -135,6 +135,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": -16004,
+      "name": "Bengals D/ST",
+      "nfl_team": "CIN",
+      "position": "DEF"
+    },
+    {
       "espn_player_id": 12483,
       "name": "Matthew Stafford",
       "nfl_team": "LAR",
@@ -480,12 +486,6 @@
       "espn_player_id": 4262921,
       "name": "Justin Jefferson",
       "nfl_team": "MIN",
-      "position": "WR"
-    },
-    {
-      "espn_player_id": 4360078,
-      "name": "Alec Pierce",
-      "nfl_team": "IND",
       "position": "WR"
     },
     {
@@ -1194,7 +1194,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 31,
+    "waiver_bases_verified": 32,
     "warnings": []
   },
   "roster": [
@@ -2756,6 +2756,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-09-25T20:16:21.273000",
+      "base_salary": 0,
+      "espn_player_id": -16004,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 3116365,
@@ -2805,15 +2814,6 @@
       "base_salary": 7,
       "espn_player_id": 4239996,
       "kept_prior_year": true,
-      "manager_id": "t9",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 11,
-      "espn_player_id": 4360078,
-      "kept_prior_year": false,
       "manager_id": "t9",
       "season": 2026,
       "source": "draft"
