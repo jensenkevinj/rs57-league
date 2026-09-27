@@ -489,6 +489,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4360078,
+      "name": "Alec Pierce",
+      "nfl_team": "IND",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 4360248,
       "name": "Kyle Pitts Sr.",
       "nfl_team": "ATL",
@@ -517,12 +523,6 @@
       "name": "Tyler Shough",
       "nfl_team": "NO",
       "position": "QB"
-    },
-    {
-      "espn_player_id": 4360761,
-      "name": "Michael Wilson",
-      "nfl_team": "ARI",
-      "position": "WR"
     },
     {
       "espn_player_id": 4360939,
@@ -1194,7 +1194,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 32,
+    "waiver_bases_verified": 33,
     "warnings": []
   },
   "roster": [
@@ -1406,13 +1406,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 3,
-      "espn_player_id": 4360761,
+      "acquired_at": "2026-09-27T07:21:09.107000",
+      "base_salary": 22,
+      "espn_player_id": 4360078,
       "kept_prior_year": false,
       "manager_id": "t10",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
