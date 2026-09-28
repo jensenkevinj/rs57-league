@@ -7,7 +7,7 @@
     },
     {
       "manager_id": "t2",
-      "name": "100yd Reverse Hurdles",
+      "name": "Burrdwalk and Parker’s Place",
       "season": 2026
     },
     {
@@ -933,6 +933,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 4595342,
+      "name": "Oronde Gadsden",
+      "nfl_team": "LAC",
+      "position": "TE"
+    },
+    {
       "espn_player_id": 4595348,
       "name": "Malik Nabers",
       "nfl_team": "NYG",
@@ -1194,7 +1200,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 33,
+    "waiver_bases_verified": 34,
     "warnings": []
   },
   "roster": [
@@ -2745,6 +2751,15 @@
       "manager_id": "t8",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-09-27T16:03:11.991000",
+      "base_salary": 0,
+      "espn_player_id": 4595342,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
