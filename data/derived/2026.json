@@ -123,12 +123,6 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16004,
-      "name": "Bengals D/ST",
-      "nfl_team": "CIN",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16003,
       "name": "Bears D/ST",
       "nfl_team": "CHI",
@@ -186,12 +180,6 @@
       "espn_player_id": 2976212,
       "name": "Stefon Diggs",
       "nfl_team": "WSH",
-      "position": "WR"
-    },
-    {
-      "espn_player_id": 2991662,
-      "name": "Mack Hollins",
-      "nfl_team": "NE",
       "position": "WR"
     },
     {
@@ -297,6 +285,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 3912547,
+      "name": "Sam Darnold",
+      "nfl_team": "SEA",
+      "position": "QB"
+    },
+    {
       "espn_player_id": 3915416,
       "name": "DJ Moore",
       "nfl_team": "BUF",
@@ -355,12 +349,6 @@
       "name": "Juwan Johnson",
       "nfl_team": "NO",
       "position": "TE"
-    },
-    {
-      "espn_player_id": 4032473,
-      "name": "Rashid Shaheed",
-      "nfl_team": "SEA",
-      "position": "WR"
     },
     {
       "espn_player_id": 4035538,
@@ -981,6 +969,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 4608686,
+      "name": "Kyle Monangai",
+      "nfl_team": "CHI",
+      "position": "RB"
+    },
+    {
       "espn_player_id": 4612826,
       "name": "Ladd McConkey",
       "nfl_team": "LAC",
@@ -1191,6 +1185,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 5081432,
+      "name": "Antonio Williams",
+      "nfl_team": "WSH",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 5083076,
       "name": "Harold Fannin Jr.",
       "nfl_team": "CLE",
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 39,
+    "waiver_bases_verified": 40,
     "warnings": []
   },
   "roster": [
@@ -1553,15 +1553,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.290000",
-      "base_salary": 1,
-      "espn_player_id": 4032473,
-      "kept_prior_year": false,
-      "manager_id": "t11",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 16,
       "espn_player_id": 4248528,
@@ -1643,18 +1634,18 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-09-30T07:47:38.592000",
+      "acquired_at": "2026-10-01T07:17:59.176000",
       "base_salary": 0,
-      "espn_player_id": -16009,
+      "espn_player_id": 5081432,
       "kept_prior_year": false,
-      "manager_id": "t12",
+      "manager_id": "t11",
       "season": 2026,
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-09-30T07:47:38.593000",
+      "acquired_at": "2026-09-30T07:47:38.592000",
       "base_salary": 0,
-      "espn_player_id": 2991662,
+      "espn_player_id": -16009,
       "kept_prior_year": false,
       "manager_id": "t12",
       "season": 2026,
@@ -1754,6 +1745,15 @@
       "acquired_at": "2026-09-30T07:47:38.591000",
       "base_salary": 1,
       "espn_player_id": 4599739,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2026-10-01T07:17:59.167000",
+      "base_salary": 7,
+      "espn_player_id": 4608686,
       "kept_prior_year": false,
       "manager_id": "t12",
       "season": 2026,
@@ -2786,15 +2786,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-25T20:16:21.273000",
-      "base_salary": 0,
-      "espn_player_id": -16004,
-      "kept_prior_year": false,
-      "manager_id": "t9",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 3116365,
@@ -2802,6 +2793,15 @@
       "manager_id": "t9",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-10-01T16:22:08.510000",
+      "base_salary": 0,
+      "espn_player_id": 3912547,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
