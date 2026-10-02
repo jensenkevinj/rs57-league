@@ -855,12 +855,6 @@
       "position": "TE"
     },
     {
-      "espn_player_id": 4432708,
-      "name": "Marvin Harrison Jr.",
-      "nfl_team": "ARI",
-      "position": "WR"
-    },
-    {
       "espn_player_id": 4432710,
       "name": "TreVeyon Henderson",
       "nfl_team": "NE",
@@ -895,6 +889,12 @@
       "name": "Rhamondre Stevenson",
       "nfl_team": "NE",
       "position": "RB"
+    },
+    {
+      "espn_player_id": 4569559,
+      "name": "Devaughn Vele",
+      "nfl_team": "NO",
+      "position": "WR"
     },
     {
       "espn_player_id": 4569587,
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 40,
+    "waiver_bases_verified": 41,
     "warnings": []
   },
   "roster": [
@@ -1724,13 +1724,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 11,
-      "espn_player_id": 4432708,
+      "acquired_at": "2026-10-02T07:04:03.993000",
+      "base_salary": 12,
+      "espn_player_id": 4569559,
       "kept_prior_year": false,
       "manager_id": "t12",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
