@@ -363,12 +363,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4036133,
-      "name": "T.J. Hockenson",
-      "nfl_team": "MIN",
-      "position": "TE"
-    },
-    {
       "espn_player_id": 4036378,
       "name": "Jordan Love",
       "nfl_team": "GB",
@@ -855,6 +849,12 @@
       "position": "TE"
     },
     {
+      "espn_player_id": 4432708,
+      "name": "Marvin Harrison Jr.",
+      "nfl_team": "ARI",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 4432710,
       "name": "TreVeyon Henderson",
       "nfl_team": "NE",
@@ -1247,15 +1247,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-16T07:05:17.305000",
-      "base_salary": 0,
-      "espn_player_id": 4036133,
-      "kept_prior_year": false,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-24T17:57:38.893000",
       "base_salary": 0,
       "espn_player_id": 4429013,
@@ -1290,6 +1281,15 @@
       "manager_id": "t1",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-10-03T07:33:00.762000",
+      "base_salary": 0,
+      "espn_player_id": 4432708,
+      "kept_prior_year": false,
+      "manager_id": "t1",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
