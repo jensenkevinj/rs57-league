@@ -75,15 +75,15 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16026,
-      "name": "Seahawks D/ST",
-      "nfl_team": "SEA",
+      "espn_player_id": -16030,
+      "name": "Jaguars D/ST",
+      "nfl_team": "JAX",
       "position": "DEF"
     },
     {
-      "espn_player_id": -16025,
-      "name": "49ers D/ST",
-      "nfl_team": "SF",
+      "espn_player_id": -16026,
+      "name": "Seahawks D/ST",
+      "nfl_team": "SEA",
       "position": "DEF"
     },
     {
@@ -163,6 +163,12 @@
       "name": "Davante Adams",
       "nfl_team": "LAR",
       "position": "WR"
+    },
+    {
+      "espn_player_id": 2576925,
+      "name": "Darren Waller",
+      "nfl_team": "CAR",
+      "position": "TE"
     },
     {
       "espn_player_id": 2577417,
@@ -651,12 +657,6 @@
       "position": "QB"
     },
     {
-      "espn_player_id": 4426348,
-      "name": "Jayden Daniels",
-      "nfl_team": "WSH",
-      "position": "QB"
-    },
-    {
       "espn_player_id": 4426354,
       "name": "George Pickens",
       "nfl_team": "DAL",
@@ -903,6 +903,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4569603,
+      "name": "Malik Washington",
+      "nfl_team": "MIA",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 4569618,
       "name": "Garrett Wilson",
       "nfl_team": "NYJ",
@@ -1077,12 +1083,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 4697815,
-      "name": "Rachaad White",
-      "nfl_team": "WSH",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4701936,
       "name": "Matthew Golden",
       "nfl_team": "GB",
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 41,
+    "waiver_bases_verified": 42,
     "warnings": []
   },
   "roster": [
@@ -1598,6 +1598,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-10-04T02:19:23.228000",
+      "base_salary": 0,
+      "espn_player_id": 4569603,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 4597500,
@@ -1619,15 +1628,6 @@
       "acquired_at": "2026-09-16T07:05:17.304000",
       "base_salary": 68,
       "espn_player_id": 4695883,
-      "kept_prior_year": false,
-      "manager_id": "t11",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
-      "acquired_at": "2026-09-08T13:47:07.366000",
-      "base_salary": 0,
-      "espn_player_id": 4697815,
       "kept_prior_year": false,
       "manager_id": "t11",
       "season": 2026,
@@ -2633,9 +2633,18 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-20T16:23:34.636000",
+      "acquired_at": "2026-10-04T04:22:33.793000",
       "base_salary": 0,
-      "espn_player_id": -16025,
+      "espn_player_id": -16030,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2026-10-04T04:25:38.316000",
+      "base_salary": 0,
+      "espn_player_id": 2576925,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
@@ -2717,15 +2726,6 @@
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 4373626,
-      "kept_prior_year": false,
-      "manager_id": "t8",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 6,
-      "espn_player_id": 4426348,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
