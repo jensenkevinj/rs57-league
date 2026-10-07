@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{# The page carries no heading: the nav names it and the title bar carries the season, which
-   is the only fact a bare grid cannot show for itself. Everything the commissioner has to
+{# The page opens on its name and one line saying which season the prices are for. It used to
+   carry no heading and opened on the red deadline box, which reads as an error page to
+   somebody arriving from a link. Everything the commissioner has to
    check — the sync's own warnings, the derived consolation waiver — lives in the admin tool,
    which is the thing he actually works in. An ERROR still surfaces here, because an error is
    a row missing from the grid below and nothing else on this page would say so.
 
-   Every roster in the league is one flat table with a Team column, sorted and filtered in the
+   Every roster in the league is one flat table with a Franchise column, sorted and filtered in the
    browser. Nothing is serialised into a script tag: the sort reads the numbers off `data-v`
    attributes Jinja already escaped, so franchise names and player names never leave the DOM
    and never become code. #}
@@ -23,15 +24,28 @@
     writes them.
   </p>
 {% else %}
+  <h1>Keepers</h1>
+  <p class="lede">
+    What every rostered player would cost to keep for {{ current.decision_season }}. Sort by
+    any column, or filter by player, position or franchise.
+  </p>
+
   {{ ui.flags(current.notes | selectattr("kind", "equalto", "error")) }}
 
   {# The deadline the Acquired column is measured against, stated once so a reader is not
      asked to remember it down 188 rows. When it is not on disk the page says that instead of
-     printing nothing, because a missing line reads as "there is no deadline". #}
-  <p class="deadline">
+     printing nothing, because a missing line reads as "there is no deadline".
+
+     How loud it is depends on how close the date is — site.deadline_status decides, and the
+     words change with the colour so the state never rests on the colour alone. It is only
+     ever a notice: nothing on this page or anywhere else is gated on the date. #}
+  <p class="deadline is-{{ current.deadline_state }}">
     <span class="deadline-i" aria-hidden="true">i</span>
-    {% if current.qualifying_deadline %}
-      Keeper Deadline: <strong>{{ current.qualifying_deadline | mdy }}</strong>
+    {% if current.deadline_state == "passed" %}
+      <span>Keeper deadline passed: <strong>{{ current.qualifying_deadline | mdy }}</strong></span>
+    {% elif current.qualifying_deadline %}
+      <span>Keeper deadline: <strong>{{ current.qualifying_deadline | mdy }}</strong>
+      {%- if current.deadline_countdown %} · {{ current.deadline_countdown }}{% endif %}</span>
     {% else %}
       {{ current.qualifying_season }}'s keeper deadline is not on file — no row is marked
       against it
@@ -52,14 +66,15 @@
   <div class="grid-scroll">
     <table class="grid" id="keepers">
       <thead>
-        {# Pos, Team and NFL are folded into the Player cell and their columns are hidden at
-           every width. The cells stay in the table because the dropdowns and the search read
+        {# Pos and NFL are folded into the Player cell and their columns are hidden at every
+           width; Franchise is folded in too, except on a desktop, where it has a column of
+           its own. The cells stay in the table because the dropdowns and the search read
            them, and because a hidden column is still a column the sort can be pointed at.
            Nothing is displayed twice: what is shown here is not shown there. #}
         <tr>
           <th data-sort="text">Player</th>
           <th data-sort="text">Pos</th>
-          <th data-sort="text">Team</th>
+          <th data-sort="text">Franchise</th>
           <th data-sort="text">NFL</th>
           <th data-sort="text">Prospect</th>
           <th data-sort="text">Acquired</th>
@@ -85,20 +100,21 @@
               class="pos">{{ line.position }} · {{ line.nfl_team }}</span>{%
                 if line.prospect_state == "eligible" %}<button type="button" class="pbadge is-eligible"
                   aria-label="Prospect eligible — first NFL season was {{ current.qualifying_season }}"><span
-                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
+                    class="tip-glyph" aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligible —
                     first NFL season was {{ current.qualifying_season }}</span></button>{%
                 elif line.prospect_state == "unknown" %}<button type="button" class="pbadge is-unknown"
                   aria-label="Prospect eligibility unknown — ESPN has no first season for him"><span
-                    aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligibility
+                    class="tip-glyph" aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligibility
                     unknown — ESPN has no first season for him</span></button>{%
                 endif %}{%
                 if line.overridden %}<button type="button" class="wbadge"
                   aria-label="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value."><span
-                    aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
+                    class="tip-glyph" aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
                     Salary. Contact League Commissioner to update ESPN keeper value.</span></button>{%
                 endif %}</span><span
               class="sub"><span class="franchise">{{ line.team_name }}</span><span
-                class="acq-sub{% if line.after_deadline %} late-date{% endif %}"> · {{ line.acquired_at | mdy }}</span></span></td>
+                class="acq-sub dot" aria-hidden="true">·</span><span
+                class="acq-sub{% if line.after_deadline %} late-date{% endif %}">{{ line.acquired_label }} {{ line.acquired_at | mdy }}</span></span></td>
             <td class="muted">{{ line.position }}</td>
             <td class="team-cell">{{ line.team_name }}</td>
             <td class="muted">{{ line.nfl_team }}</td>
@@ -110,8 +126,11 @@
                the same reason money sorts off `data-v` rather than off "$12". Eastern, like the
                date printed beside it: `acquired_at` is naive UTC, so an evening add lands on the
                next calendar day and the key would have named a different date than the cell. #}
+            {# How he arrived, then when. The label is for reading only — the sort key above
+               is the date alone, and nothing filters on the label. #}
             <td class="acq" data-k="{{ (line.acquired_at | et).strftime('%Y-%m-%d') }}">
-              <span{% if line.after_deadline %} class="late-date"
+              <span class="acq-how">{{ line.acquired_label }}</span><span
+                class="dot" aria-hidden="true">·</span><span{% if line.after_deadline %} class="late-date"
                 title="Acquired after the {{ current.qualifying_season }} keeper deadline"{% endif
                 %}>{{ line.acquired_at | mdy }}</span>
             </td>
@@ -268,7 +287,7 @@
   });
 
   fill(byPos, "All positions", POS);
-  fill(byTeam, "All teams", TEAM);
+  fill(byTeam, "All franchises", TEAM);
   q.addEventListener("input", filter);
   byPos.addEventListener("change", filter);
   byTeam.addEventListener("change", filter);

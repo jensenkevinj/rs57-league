@@ -61,8 +61,21 @@
       <span class="pill">{{ home.status }}</span>
     {% endif %}
   </div>
+  {# An archived season's way back, and sideways. The live home page gets neither: it is not
+     one of a series, and site.build_site passes these only to season-{year}.html. A year
+     with no page written has no link — the ends of the run simply stop. #}
+  {% if page == 'seasons' %}
+    <p class="season-nav small">
+      <a href="seasons.html">&larr; All seasons</a>
+      {% if prev_season %}<a href="season-{{ prev_season }}.html" rel="prev">&lsaquo; {{ prev_season }}</a>{% endif %}
+      {% if next_season %}<a href="season-{{ next_season }}.html" rel="next">{{ next_season }} &rsaquo;</a>{% endif %}
+    </p>
+  {% endif %}
   {% set blank = "unawarded" if home.final else "—" %}
 
+  {# One container so a phone can reorder what is in it — see `.board-page` in base.html. The
+     order here is the desktop order and the one a screen reader meets. #}
+  <div class="board-page">
   {# Empty until the season is final: the bracket decides the placings once, at the end. #}
   {% if home.podium %}
   <div class="podium">
@@ -95,17 +108,21 @@
             {% for row in group.rows %}
               {# One row shape everywhere on the board: a key, a name, and the number that won
                  it. A prize whose heading already names it has no key. #}
-              <li class="thin {% if not group.show_labels %}nokey{% endif %}">
+              <li class="thin{% if not group.show_labels %} nokey{% endif %}{% if row.pending %} pending{% endif %}">
                 {% if group.show_labels %}
                   <span class="thin-key">
                     {%- if row.short_label %}{{ row.short_label }}{% else %}{{ row.label }}{% endif -%}
                   </span>
                 {% endif %}
+                {# A week not played yet is its key and nothing else — no dash to read as a
+                   result. Whoever is ahead mid-season is not tagged either: the pill beside
+                   the heading says the season is in progress, once, for the whole board. #}
                 <span class="thin-name">
+                  {%- if not row.pending %}
                   {{ ui.teams(row.winners, blank) }}
                   {%- if row.split %}<span class="tag-inline" title="A tie — the prize was split evenly">split</span>{% endif %}
-                  {%- if row.leading %}<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span>{% endif %}
                   {%- if row.detail %}<span class="thin-why">{{ row.detail }}</span>{% endif %}
+                  {%- endif %}
                 </span>
                 <span class="thin-num">{{ row.value }}</span>
                 {%- if not group.each_recorded %}
@@ -130,12 +147,20 @@
             <span class="col-money">{{ home.survivor.amount | money }}</span>
           {%- endif %}
         </h2>
+        {# Until somebody has won it, the slot says how many are left — the one fact about a
+           ladder in progress that the rows below do not state. #}
         <div class="survivor-won">
-          <div class="spot-place">Winner</div>
-          <div class="spot-team">{{ ui.teams(home.survivor.winners, blank) }}</div>
+          {% if not home.final and not home.survivor.winners and home.survivor.alive is not none %}
+            <div class="spot-place">Still alive</div>
+            <div class="spot-team">{{ home.survivor.alive }} of {{ home.survivor.franchises }}</div>
+          {% else %}
+            <div class="spot-place">Winner</div>
+            <div class="spot-team">{{ ui.teams(home.survivor.winners, blank) }}</div>
+          {% endif %}
         </div>
+        {% if home.survivor.played %}
         <ol class="prizes">
-          {% for line in home.survivor.weeks %}
+          {% for line in home.survivor.played %}
             <li class="thin">
               <span class="thin-key">Week {{ line.week }}</span>
               {% if line.out %}
@@ -148,6 +173,17 @@
             </li>
           {% endfor %}
         </ol>
+        {% endif %}
+        {% if home.survivor.upcoming %}
+        <div class="spot-place upcoming">Upcoming</div>
+        <ol class="prizes">
+          {% for line in home.survivor.upcoming %}
+            <li class="thin pending">
+              <span class="thin-key">Week {{ line.week }}</span>
+            </li>
+          {% endfor %}
+        </ol>
+        {% endif %}
       </section>
     {% endif %}
   </div>
@@ -164,6 +200,7 @@
   {% endif %}
 
   {% if home.leaders %}
+    <section class="moneylist">
     <h2>Moneylist</h2>
     <ol class="leaders">
       {% for line in home.leaders %}
@@ -179,7 +216,9 @@
         </li>
       {% endfor %}
     </ol>
+    </section>
   {% endif %}
+  </div>
 {% else %}
   <h1>RS57</h1>
   <p class="lede">

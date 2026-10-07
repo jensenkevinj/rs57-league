@@ -2,12 +2,70 @@
 
 {% block title %}RS57 — Rules{% endblock %}
 
+{# The contents, from site.rules_outline — the same walk over the rules file that gave the
+   headings their ids, so an entry here cannot point at a heading that has none. Every value
+   is escaped; the id is digits and hyphens by construction. #}
+{% macro contents(outline) %}
+<ol>
+  {% for entry in outline %}
+    <li class="toc-{{ entry.level }}"><a href="#{{ entry.id }}"><span class="toc-n">{{ entry.number }}</span>{{ entry.title }}</a></li>
+  {% endfor %}
+</ol>
+{% endmacro %}
+
 {% block content %}
 <h1>RS57 League Rules</h1>
-<p class="lede">In effect for the 2026 season.</p>
+<p class="lede">In effect for the {{ rules_season }} season.</p>
 
-{# `rules` is markup, produced by site.render_markdown, which HTML-escapes the source before
-   it adds a single tag. No "safe" filter is involved: autoescaping leaves a Markup value
-   alone on its own. #}
-{{ rules }}
+<div class="rules-page">
+  {% if outline %}
+    {# Two renderings of one list: beside the rules on a desktop, folded above them anywhere
+       narrower. The stylesheet takes whichever is not in use out with `display: none`, so a
+       screen reader meets exactly one. Not a `nav` element — base.html styles every `nav` as
+       the site header's row of tabs. #}
+    <div class="rules-toc" role="navigation" aria-label="Contents">
+      <div class="toc-head">Contents</div>
+      {{ contents(outline) }}
+    </div>
+    <details class="rules-toc-fold">
+      <summary>Contents</summary>
+      {{ contents(outline) }}
+    </details>
+  {% endif %}
+
+  {# `rules` is markup, produced by site.render_markdown, which HTML-escapes the source before
+     it adds a single tag. No "safe" filter is involved: autoescaping leaves a Markup value
+     alone on its own. #}
+  <div class="rules-prose">
+  {{ rules }}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if outline %}
+<script>
+/* Marks the section being read in the contents beside it. An enhancement only: the links,
+   the anchors and the sticky column all work without it. */
+(function () {
+  var toc = document.querySelector(".rules-toc");
+  if (!toc || !window.IntersectionObserver) return;
+  var links = {};
+  Array.prototype.forEach.call(toc.querySelectorAll("a"), function (a) {
+    links[a.getAttribute("href").slice(1)] = a;
+  });
+  var watch = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      Object.keys(links).forEach(function (id) { links[id].removeAttribute("aria-current"); });
+      links[entry.target.id].setAttribute("aria-current", "true");
+    });
+  }, { rootMargin: "0px 0px -75% 0px" });
+  Object.keys(links).forEach(function (id) {
+    var heading = document.getElementById(id);
+    if (heading) watch.observe(heading);
+  });
+})();
+</script>
+{% endif %}
 {% endblock %}

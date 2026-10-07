@@ -1,53 +1,74 @@
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
+{# The hall of fame: one table, a season to a row and a prize to a column, so a reader can run
+   down a column and see who has won what. It replaced a table per season, which made eight
+   tables of the same six rows and no way to compare two years without scrolling.
+
+   Every cell is read off the same `Home` the season's own page renders — see
+   site.build_seasons_index — so this page and the one each row links to cannot disagree.
+   Nothing is added up here: the pot arrives as a number and goes through the money filter. #}
 {% block title %}RS57 — Past Seasons{% endblock %}
 
 {% block content %}
 <h1>Seasons</h1>
 <p class="lede">
-  Every season that has been synced. Each page is that year's home page, archived — the same
-  prize board, podium and moneylist, built from that season's results.
+  Every season at a glance. Tap a year for its full prize board and moneylist.
 </p>
 
-{% if seasons %}
-  {% for season in seasons %}
-    <h2><a href="season-{{ season.season }}.html">{{ season.season }}</a></h2>
-    <div class="scroll">
-      <table>
-        <thead>
-          <tr><th>Prize</th><th>Winner</th><th class="num">Amount</th></tr>
-        </thead>
-        <tbody>
-          {% for group in season.prizes %}
-            {% if group.label in ('Champion', '2nd Place', '3rd Place', 'Most Points (Season)', 'Survivor', 'Unlucky') %}
-              {% for row in group.rows %}
-                <tr>
-                  <td>{% if loop.first %}{{ group.label }}{% else %}<span class="muted">{{ group.label }}</span>{% endif %}</td>
-                  <td>
-                    {% if row.winner %}
-                      {{ ui.team(row.winner) }}
-                    {% else %}
-                      {# Only a finished season's empty prize is a result; mid-season it is to come. #}
-                      <span class="muted">{% if season.final %}unawarded{% else %}&mdash;{% endif %}</span>
-                    {% endif %}
-                  </td>
-                  <td class="num money">${{ row.amount }}</td>
-                </tr>
-              {% endfor %}
+{% if season_index.rows %}
+  <div class="scroll">
+    <table class="hall">
+      <thead>
+        <tr>
+          <th class="hall-season">Season</th>
+          <th>Champion</th>
+          <th class="hall-wide">2nd</th>
+          <th class="hall-wide">3rd</th>
+          <th class="hall-wide">Most Points</th>
+          <th class="hall-wide">Survivor</th>
+          <th class="hall-wide">Unlucky</th>
+          <th class="num hall-pot hall-wide">Pot</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in season_index.rows %}
+          <tr>
+            <th scope="row" class="hall-season"><a href="season-{{ row.season }}.html">{{ row.season }}</a></th>
+            {% if row.final %}
+              <td class="hall-champion">
+                {{ ui.teams(row.champion) }}
+                {# A phone keeps Season and Champion and folds the other two placings in
+                   here. Hidden wherever they have columns of their own, so nothing is shown
+                   — or read out — twice. #}
+                <span class="hall-fold">2nd {{ ui.teams(row.second) }} · 3rd {{ ui.teams(row.third) }}</span>
+              </td>
+              <td class="hall-wide">{{ ui.teams(row.second) }}</td>
+              <td class="hall-wide">{{ ui.teams(row.third) }}</td>
+              <td class="hall-wide">{{ ui.teams(row.most_points) }}</td>
+              <td class="hall-wide">{{ ui.teams(row.survivor) }}</td>
+              <td class="hall-wide">{{ ui.teams(row.unlucky) }}</td>
+            {% else %}
+              {# Whoever leads a season still being played has won nothing yet, so this row
+                 names nobody. Its own page shows the board as it stands. #}
+              <td colspan="6" class="muted hall-pending">{{ row.status }}</td>
             {% endif %}
-          {% else %}
-            <tr><td colspan="3" class="muted">No prize amounts are recorded for this season.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <p class="small">
-      Season pot <span class="money">${{ season.pot }}</span> ·
-      {{ season.standings | length }} franchises ·
-      <a href="season-{{ season.season }}.html">full prize board and moneylist &rarr;</a>
-    </p>
-  {% endfor %}
+            <td class="num hall-wide">
+              {% if row.money_recorded %}
+                <span class="money">{{ row.pot | money }}</span>
+              {% else %}
+                {# Not "$0", which would say the league paid nothing. #}
+                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if season_index.money_footnote %}
+    <p class="small muted hall-note" id="no-money">* {{ season_index.money_footnote }}</p>
+  {% endif %}
 {% else %}
   <p class="muted">
     No completed season has been synced yet. The nightly build writes the current season, and

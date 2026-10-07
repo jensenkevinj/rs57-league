@@ -30,7 +30,9 @@ dev = [
 include = ["rs57*"]
 
 [tool.setuptools.package-data]
-rs57 = ["templates/*.html", "admin/templates/*.html", "admin/static/*"]
+# `static/*` is the public site's icons and link-preview card. Left out, an installed copy of
+# the package builds a site with no favicon and a preview with no image, and nothing fails.
+rs57 = ["templates/*.html", "static/*", "admin/templates/*.html", "admin/static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
