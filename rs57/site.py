@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import shutil
 import sys
@@ -57,6 +58,7 @@ from rs57.keeper_rules import (
 )
 from rs57.models import (
     STALE_WAIVER_WARNING,
+    AcquisitionSource,
     Base,
     Dues,
     FranchiseName,
@@ -87,8 +89,57 @@ HISTORY = DATA / "history"
 MANUAL = DATA / "manual"
 RULES_MD = ROOT / "docs" / "rules.md"
 TEMPLATES = Path(__file__).resolve().parent / "templates"
+STATIC = Path(__file__).resolve().parent / "static"
+"""The icons and the link-preview card. Source files, committed here; ``build_site`` copies
+them into the output. Nothing is ever put into ``site/`` by hand — it has one writer."""
 SITE = ROOT / "site"
 PREVIEW = ROOT / ".preview"
+
+RULES_SEASON = 2026
+"""The season ``docs/rules.md`` is in effect for. Stated once, for the rules page's own line
+and for its link preview, so the two cannot name different years."""
+
+OG_CARD = "og-card.png"
+"""The image a chat app shows beside a pasted link. One card for every page."""
+
+
+def site_url_from(env: Mapping[str, str]) -> str | None:
+    """Where the site is published, or ``None`` when nothing says. Pure.
+
+    A link preview needs absolute addresses — a chat app fetching ``og:image`` has no page to
+    resolve a relative one against. But the address is ``https://<account>.github.io/<repo>/``
+    and the account is a person's handle, which this repo does not hold anywhere. So it is
+    read at build time and never written down in the source:
+
+    * ``RS57_SITE_URL``, if set — for a custom domain. Must be ``https``.
+    * otherwise ``GITHUB_REPOSITORY`` (``owner/repo``), which every Actions run already has.
+
+    Neither is set on a laptop, and a preview build then carries no ``og:url`` or ``og:image``
+    at all rather than a made-up address. ``main`` says which happened.
+    """
+    explicit = (env.get("RS57_SITE_URL") or "").strip()
+    if explicit:
+        return explicit.rstrip("/") + "/" if explicit.startswith("https://") else None
+    owner, _, repo = (env.get("GITHUB_REPOSITORY") or "").strip().partition("/")
+    if owner and repo:
+        return f"https://{owner.lower()}.github.io/{repo}/"
+    return None
+
+
+@dataclass(frozen=True)
+class PageMeta:
+    """What a link to one page says about itself when pasted somewhere.
+
+    ``description`` is public the moment a link is shared and is cached by whoever fetched it,
+    for days. Franchise names only: it is built by ``_named_or_none``, which gives nothing back
+    for a franchise whose name is not on file, so a manager id can never be the fallback.
+    """
+
+    title: str
+    description: str
+    url: str | None = None
+    image: str | None = None
+
 
 SURVIVOR_RULE = (
     "Every week the lowest score among the teams still alive is eliminated, and the last team "
@@ -96,6 +147,50 @@ SURVIVOR_RULE = (
 )
 """Stated once. Survivor is shown as a column when it has a ladder and as a block when it does
 not, and the two must not drift apart."""
+
+
+ACQUIRED_LABELS: dict[AcquisitionSource, str] = {
+    AcquisitionSource.DRAFT: "Draft",
+    AcquisitionSource.TRADE: "Trade",
+    AcquisitionSource.WAIVER: "Add",
+    AcquisitionSource.FAAB: "Add",
+}
+"""How a player reached his roster, as the keeper grid prints it beside the date.
+
+"Add" covers a waiver claim and a free-agent pickup alike. ESPN does not separate the two in
+any way this league can rely on — which of ``waiver`` and ``faab`` a row carries says how the
+*base* was priced, not how the player arrived — so the page does not pretend to.
+
+Indexed, never ``.get``: a source with no label must fail the build and the test that walks the
+enum, not print a blank beside a date."""
+
+DEADLINE_SOON_DAYS = 14
+"""How close the keeper deadline has to be before the alert turns amber."""
+
+
+def deadline_status(
+    deadline: datetime | None, now: datetime
+) -> tuple[str, int | None, str]:
+    """Where today stands against a deadline: its state, the days left, and the words for them.
+
+    ``unknown`` | ``upcoming`` | ``soon`` | ``passed``. Display only — nothing gates on this,
+    and it must stay that way: the deadline is shown and stamped, never enforced.
+
+    Two different clocks, on purpose. **Passed is the instant**: both arguments are naive UTC,
+    the same comparison the late-row marking makes, so the alert and the rows it is about
+    cannot disagree. **Days left are calendar days on the league's clock**, so the count agrees
+    with the date printed beside it — a deadline at 5pm Eastern on the 25th is "today" all day
+    on the 25th, not "1 day left" until the evening before in UTC.
+    """
+    if deadline is None:
+        return "unknown", None, ""
+    if now > deadline:
+        return "passed", None, ""
+    days = (to_league_time(deadline).date() - to_league_time(now).date()).days
+    if days > DEADLINE_SOON_DAYS:
+        return "upcoming", days, ""
+    words = "today" if days == 0 else "1 day left" if days == 1 else f"{days} days left"
+    return "soon", days, words
 
 
 class ReviewIssue(Base):
@@ -169,6 +264,9 @@ class KeeperLine:
 
     A **fact**, not a verdict. It is the prospect rule's third test, and the page marks it so a
     manager can see it, but the engine applies it to prospects only — see the template."""
+    acquired_label: str = ""
+    """``Draft``, ``Trade`` or ``Add`` — see ``ACQUIRED_LABELS``. Display only: nothing sorts
+    or filters on it, and the Acquired column still sorts on the date."""
 
 
 @dataclass(frozen=True)
@@ -207,6 +305,17 @@ class KeeperSeason:
     qualifying_deadline: datetime | None = None
     """That season's trade deadline, printed above the grid. ``None`` when it is not on disk,
     in which case the page says so rather than showing a date it does not have."""
+    deadline_state: str = "unknown"
+    """``unknown`` | ``upcoming`` | ``soon`` | ``passed`` — how loud the alert above the grid
+    is. Measured against ``qualifying_deadline``, the date that alert prints, and **not**
+    against ``source.keeper_deadline``, which is a different date with a different job (it
+    places the season in the window where ESPN's base already holds the charges)."""
+    days_left: int | None = None
+    """Calendar days to the deadline on the league's clock, as of the build. ``None`` once it
+    has passed or when it is not on file. The site rebuilds once a day, so this is right as of
+    that morning."""
+    deadline_countdown: str = ""
+    """``9 days left`` | ``1 day left`` | ``today``, and empty outside the ``soon`` state."""
     rows: tuple[KeeperLine, ...] = ()
     """Every rostered player in the league, flat, **dearest first**.
 
@@ -370,6 +479,11 @@ class BoardRow:
 
     **Display only.** ``label`` is what the payout rows are matched on, so it is not free to
     change — "Week 1 High Score" is the key that finds the money in ``payouts.json``."""
+    pending: bool = False
+    """A week that has not been played yet, in a season still being played. The row stays on
+    the board — it is a template, and every prize is always on it — but it recedes, so the
+    weeks that have results are what a reader sees first. Decided here from the weeks played;
+    the template reads the flag and never works out which weeks those are."""
 
 
 @dataclass(frozen=True)
@@ -425,6 +539,8 @@ class SurvivorWeek:
 
     week: int
     out: HighLine | None
+    pending: bool = False
+    """Not played yet, in a ladder nobody has won. Same meaning as ``BoardRow.pending``."""
 
 
 @dataclass(frozen=True)
@@ -442,10 +558,23 @@ class SurvivorPanel:
     amount: int
     recorded: bool
     eliminations: tuple[HighLine, ...]
-    weeks: tuple[SurvivorWeek, ...] = ()
-    """Every week the ladder runs, eliminated or not yet — the template's rows, **latest week
-    first**, so the ladder reads up from Week 1 to the winner. A week nobody has gone out in yet
-    is an empty line, not a missing one."""
+    played: tuple[SurvivorWeek, ...] = ()
+    """The weeks that have been played, **newest first** — what happened last is what a reader
+    came for, so it sits directly under the heading. On a decided ladder this is every week it
+    took. A played week with nobody out is a hole and keeps its dash; it is not ``upcoming``."""
+    upcoming: tuple[SurvivorWeek, ...] = ()
+    """The weeks still to come, **in week order**, under their own label below the played ones.
+    Empty once the ladder is decided, which is what leaves a finished season's column as it was.
+
+    The two replace a single latest-first ``weeks`` (commissioner, 2026-10-06). That put eleven
+    empty rows above the first result in week 1, and the results are the point of the column."""
+    alive: int | None = None
+    """How many franchises are still in it: the season's franchises minus the **teams** that
+    have gone out. Teams, not weeks — a tie takes two out in one week, and counting weeks would
+    leave one of them alive. ``None`` when the season does not say how many franchises it has."""
+    franchises: int = 0
+    """How many started, for "8 of 12". Carried so the template prints two numbers it was
+    handed rather than working one out."""
     caption: str = SURVIVOR_RULE
 
 
@@ -468,6 +597,9 @@ class Home:
     it is unfinished, so the heading alone never reads as a final answer."""
     status: str
     final: bool
+    weeks_played: int
+    """The last week with results, or 0 before any. Carried for the link preview's "Through
+    week 4", so that line is built from the number rather than read back out of ``status``."""
     money_recorded: bool
     podium: tuple[PodiumSpot, ...]
     columns: tuple[tuple[BoardBlock, ...], ...]
@@ -478,6 +610,41 @@ class Home:
     pot: int
     unawarded: int
     notes: tuple[Note, ...]
+
+
+@dataclass(frozen=True)
+class SeasonRow:
+    """One season's line in the hall of fame on the Seasons page.
+
+    Every field is read off that season's ``Home`` — the object its own page renders — so the
+    index and the page it links to cannot name different winners. There is no second
+    derivation of who won what.
+    """
+
+    season: int
+    final: bool
+    status: str
+    """What an unfinished season says in place of its winners, e.g. "In progress — through
+    week 4". The same string as the pill on that season's own page."""
+    champion: tuple[Named, ...]
+    second: tuple[Named, ...]
+    third: tuple[Named, ...]
+    most_points: tuple[Named, ...]
+    survivor: tuple[Named, ...]
+    unlucky: tuple[Named, ...]
+    pot: int
+    money_recorded: bool
+    """Whether any prize money is on record for the season. Where none is, the pot is a dash
+    and a footnote — ``$0`` would be a claim that the league paid nothing."""
+
+
+@dataclass(frozen=True)
+class SeasonsIndex:
+    rows: tuple[SeasonRow, ...]
+    """Newest season first."""
+    money_footnote: str
+    """The line under the table explaining a dash in the Pot column, or empty when every
+    season on the page has its money on record."""
 
 
 @dataclass(frozen=True)
@@ -515,27 +682,115 @@ class DuesBoard:
 _INLINE_CODE = re.compile(r"`([^`]+)`")
 _BOLD = re.compile(r"\*\*([^*]+)\*\*")
 _ITALIC = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
+_HEADING = re.compile(r"^(#{1,3})\s+(.*)$")
+_SECTION_NUMBER = re.compile(r"^(\d+(?:\.\d+)*)\.?\s+(.*)$")
+_SECTION_REF = re.compile(r"§(\d+(?:\.\d+)?)")
+
+
+@dataclass(frozen=True)
+class OutlineEntry:
+    """One numbered heading of the rules, for the contents list."""
+
+    id: str
+    number: str
+    title: str
+    level: int
+    """1 for a section, 2 for a subsection — the number of ``#`` the heading was written with."""
+
+
+def _section_id(number: str) -> str:
+    """The anchor for section ``2.3``: ``s2-3``.
+
+    Built from the number and nothing else. ``number`` only ever arrives from a regex group of
+    digits and dots, so what reaches an ``id`` or an ``href`` is digits, hyphens and one letter
+    — no character a person typed into the rules file can get into an attribute this way.
+    """
+    return "s" + number.replace(".", "-")
+
+
+def _markdown_blocks(text: str) -> Iterable[list[str]]:
+    """The blank-line-separated blocks of a Markdown source, as their non-empty lines."""
+    for block in re.split(r"\n\s*\n", text.strip()):
+        lines = [line.rstrip() for line in block.splitlines() if line.strip()]
+        if lines:
+            yield lines
+
+
+def rules_outline(text: str) -> tuple[OutlineEntry, ...]:
+    """Every numbered heading in ``text``, in the order it appears. Pure.
+
+    The contents list and the anchors come from this one walk — ``render_markdown`` calls it
+    to learn which ids exist — so the sidebar cannot link to a heading the page did not give
+    an id to. A heading with no number is not in the outline and gets no id.
+
+    ``title`` is plain text with the Markdown marks dropped, and the template escapes it like
+    any other string.
+    """
+    entries: list[OutlineEntry] = []
+    for lines in _markdown_blocks(text):
+        heading = _HEADING.match(lines[0])
+        numbered = _SECTION_NUMBER.match(heading.group(2)) if heading else None
+        if numbered:
+            entries.append(
+                OutlineEntry(
+                    id=_section_id(numbered.group(1)),
+                    number=numbered.group(1),
+                    title=re.sub(r"[*`]", "", numbered.group(2)).strip(),
+                    level=len(heading.group(1)),
+                )
+            )
+    return tuple(entries)
+
+
+def unresolved_section_refs(text: str) -> tuple[str, ...]:
+    """The ``§`` references in ``text`` that point at a section it does not have. Pure.
+
+    A reference to a section that does not exist is still printed — as plain text, with no
+    link — so nothing breaks on the page. That is exactly why it needs reporting somewhere
+    else: a renumbered section leaves its old references looking fine and pointing nowhere.
+    """
+    ids = {entry.id for entry in rules_outline(text)}
+    return tuple(
+        number for number in _SECTION_REF.findall(text) if _section_id(number) not in ids
+    )
 
 
 def render_markdown(text: str) -> Markup:
     """Render the small Markdown subset ``docs/rules.md`` uses.
 
     **Escaping happens first, structure second.** Every line is HTML-escaped before a single
-    tag is added, so the only characters still carrying meaning afterwards are ``*`` and
-    backticks, which escaping leaves alone. Any ``<script>`` in the source comes out as text.
+    tag is added, so the only characters still carrying meaning afterwards are ``*``, backticks
+    and ``§``, which escaping leaves alone. Any ``<script>`` in the source comes out as text.
 
-    That ordering is why this is forty lines of regex instead of a Markdown dependency: the
-    usual libraries pass raw HTML through by design, which would mean handing the rules file
-    the ability to inject markup and reaching for ``|safe`` to do it.
+    That ordering is why this is regex instead of a Markdown dependency: the usual libraries
+    pass raw HTML through by design, which would mean handing the rules file the ability to
+    inject markup and reaching for ``|safe`` to do it.
 
     Supported: ``#``/``##``/``###`` headings, ``-`` bullets, blank-line-separated paragraphs,
-    ``**bold**``, ``*emphasis*`` and ``` `code` ```. Not supported, deliberately: raw HTML,
-    links, images, tables. If the rules page needs one of those, add it here where the
-    escaping is.
+    ``**bold**``, ``*emphasis*`` and ``` `code` ```. Two things are added that the source does
+    not spell out, and both are built from section numbers alone (see ``_section_id``):
+
+    * a numbered heading gets an ``id`` — ``## 2.3 Keeper Fee`` becomes ``id="s2-3"``;
+    * a reference like ``§2.3`` becomes a link to that id, **only when the section exists**.
+
+    Not supported, deliberately: raw HTML, images, tables, and **links written in the source**.
+    The only links this ever emits are the in-page section anchors above; there is still no
+    way for the rules file to point a reader at a URL. If the rules page needs one of those,
+    add it here where the escaping is.
     """
+    ids = {entry.id for entry in rules_outline(text)}
+
+    def link(match: re.Match[str]) -> str:
+        target = _section_id(match.group(1))
+        if target not in ids:
+            return match.group(0)
+        return f'<a href="#{target}">§{match.group(1)}</a>'
 
     def inline(line: str) -> str:
         safe = str(escape(line))
+        # After the escape, and before anything else: the reference is turned into markup made
+        # of its own digits, which none of the patterns below can then disturb.
+        safe = _SECTION_REF.sub(link, safe)
         safe = _INLINE_CODE.sub(r"<code>\1</code>", safe)
         # Bold before emphasis: ``**x**`` must not be read as an empty emphasis either side
         # of ``*x*``.
@@ -545,11 +800,7 @@ def render_markdown(text: str) -> Markup:
 
     html: list[str] = []
 
-    for block in re.split(r"\n\s*\n", text.strip()):
-        lines = [line.rstrip() for line in block.splitlines() if line.strip()]
-        if not lines:
-            continue
-
+    for lines in _markdown_blocks(text):
         # Lines are joined back together before any inline formatting runs. The rules file is
         # hard-wrapped prose, so a bold run routinely opens on one line and closes on the
         # next; formatting line by line would leave both asterisks on the page.
@@ -565,10 +816,12 @@ def render_markdown(text: str) -> Markup:
             html.append("<ul>" + "".join(f"<li>{inline(item)}</li>" for item in items) + "</ul>")
             continue
 
-        heading = re.match(r"^(#{1,3})\s+(.*)$", lines[0])
+        heading = _HEADING.match(lines[0])
         if heading:
             level = len(heading.group(1)) + 1  # h1 is the page title, so ``#`` becomes h2
-            html.append(f"<h{level}>{inline(heading.group(2))}</h{level}>")
+            numbered = _SECTION_NUMBER.match(heading.group(2))
+            anchor = f' id="{_section_id(numbered.group(1))}"' if numbered else ""
+            html.append(f"<h{level}{anchor}>{inline(heading.group(2))}</h{level}>")
             if lines[1:]:
                 html.append("<p>" + inline(" ".join(lines[1:])) + "</p>")
             continue
@@ -941,10 +1194,9 @@ def build_keeper_season(
     #
     # An unrecorded deadline is a distinct state from a past one: a season ESPN has set no
     # deadline for cannot place itself in this window, so the tax applies as usual.
+    now = now if now is not None else utc_now()
     keeper_deadline = _source_time(source, "keeper_deadline")
-    charges_in_base = _charges_in_base(
-        drafted, keeper_deadline, now if now is not None else utc_now()
-    )
+    charges_in_base = _charges_in_base(drafted, keeper_deadline, now)
 
     for warning in review.get("warnings") or []:
         # Transitional, and narrowly scoped: a season synced before the window gate landed still
@@ -1033,6 +1285,7 @@ def build_keeper_season(
                 first_nfl_season=began,
                 acquired_at=entry.acquired_at,
                 after_deadline=deadline is not None and entry.acquired_at > deadline,
+                acquired_label=ACQUIRED_LABELS[entry.source],
                 prospect_state=_prospect_state(
                     position=str(player.position),
                     began=began,
@@ -1071,12 +1324,17 @@ def build_keeper_season(
             )
         )
 
+    deadline_state, days_left, deadline_countdown = deadline_status(deadline, now)
+
     return KeeperSeason(
         season=season,
         drafted=drafted,
         decision_season=decision_season,
         qualifying_season=qualifying_season,
         qualifying_deadline=deadline,
+        deadline_state=deadline_state,
+        days_left=days_left,
+        deadline_countdown=deadline_countdown,
         # Dearest first, then by name so equal salaries have a stable order rather than one
         # that depends on which franchise happened to be read first.
         rows=tuple(
@@ -1353,6 +1611,10 @@ def build_home(season: StatsSeason | None) -> Home | None:
     because a section was built out of the results it held (commissioner, 2026-09-14).
 
     Until the season is final, the prizes the whole season decides show who is **leading**.
+    The page no longer tags them — the "In progress" pill beside the heading says it once for
+    the whole board (commissioner, 2026-10-06) — but ``BoardRow.leading`` still records it.
+
+    A week not played yet is ``pending``: still a row, drawn lighter.
     """
     if season is None:
         return None
@@ -1389,6 +1651,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
         short_label: str = "",
         value: str = "",
         leads: bool = False,
+        pending: bool = False,
     ) -> BoardRow:
         winners, amount, recorded, leading = resolve(label, fallback, leads=leads)
         return BoardRow(
@@ -1401,6 +1664,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
             short_label=short_label,
             value=value,
             leading=leading,
+            pending=pending,
         )
 
     standing = {row.team.manager_id: row for row in season.standings}
@@ -1498,6 +1762,9 @@ def build_home(season: StatsSeason | None) -> Home | None:
                 "",
                 short_label=f"Week {week}",
                 value=_points(high.points) if high else "",
+                # Not played yet, as opposed to played with nothing on file — that second one
+                # is a hole, and it keeps its dash so it still looks like something missing.
+                pending=not final and high is None and week > season.weeks_played,
             )
         )
     # A week's high that the regular season's length does not cover still reaches the page.
@@ -1608,17 +1875,30 @@ def build_home(season: StatsSeason | None) -> Home | None:
         ladder_weeks = max(out_in)
     else:
         ladder_weeks = max(season.franchise_count - 1, max(out_in, default=0), 0)
+    decided = final or bool(season.survivor_winners)
+    ladder = [
+        SurvivorWeek(
+            week=week,
+            out=out_in.get(week),
+            pending=not decided and week not in out_in and week > season.weeks_played,
+        )
+        for week in range(1, ladder_weeks + 1)
+    ]
+    # Teams, not weeks: a tied week takes two out, and it is still one line of the ladder.
+    eliminated = {
+        team.manager_id for out in season.survivor_eliminations for team in out.teams
+    }
     survivor_panel = SurvivorPanel(
         winners=survivor_row.winners,
         amount=survivor_row.amount,
         recorded=survivor_row.recorded,
         eliminations=season.survivor_eliminations,
-        # Latest week first. It is a ladder: the winner on top, each week's elimination under the
-        # one after it, Week 1 at the foot — so a season being played builds up from the bottom
-        # into the empty weeks above it (commissioner, 2026-09-14).
-        weeks=tuple(
-            SurvivorWeek(week=week, out=out_in.get(week)) for week in range(ladder_weeks, 0, -1)
-        ),
+        played=tuple(reversed([line for line in ladder if not line.pending])),
+        upcoming=tuple(line for line in ladder if line.pending),
+        alive=season.franchise_count - len(eliminated)
+        if season.franchise_count >= len(eliminated) and season.franchise_count
+        else None,
+        franchises=season.franchise_count,
     )
 
     # The season's phase, read off the results themselves. ESPN fills in a final rank only
@@ -1649,6 +1929,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
         heading=heading,
         status=status,
         final=season.final,
+        weeks_played=season.weeks_played,
         money_recorded=bool(season.prizes),
         # The placings are settled once, by the bracket, at the very end — a season still being
         # played would show three empty cards every week, so they appear only once it is final
@@ -1662,6 +1943,115 @@ def build_home(season: StatsSeason | None) -> Home | None:
         unawarded=season.unawarded,
         notes=season.notes,
     )
+
+
+def build_seasons_index(homes: Sequence[Home]) -> SeasonsIndex:
+    """The Seasons page: one row per season, from the boards those seasons' pages render.
+
+    Takes ``Home`` objects rather than ``StatsSeason`` ones on purpose. ``build_home`` is where
+    a winner is decided — where a payout row and the standings are reconciled, and where an
+    unfinished season is kept from claiming a champion — and reading its answer back is the
+    only way this page cannot disagree with the one each row links to.
+
+    Unverified notes on a season's stats are not shown here, the same as on the board itself
+    (commissioner, 2026-09-14): ``validate`` and CI carry them.
+    """
+
+    def winners_of(home: Home, label: str) -> tuple[Named, ...]:
+        for column in home.columns:
+            for block in column:
+                for row in block.rows:
+                    if row.label == label:
+                        return row.winners
+        return ()
+
+    rows: list[SeasonRow] = []
+    for home in sorted(homes, key=lambda home: -home.season):
+        placed = {spot.rank: spot.winners for spot in home.podium}
+        rows.append(
+            SeasonRow(
+                season=home.season,
+                final=home.final,
+                status=home.status,
+                champion=placed.get(1, ()),
+                second=placed.get(2, ()),
+                third=placed.get(3, ()),
+                most_points=winners_of(home, "Most Points (Season)"),
+                survivor=home.survivor.winners if home.survivor else (),
+                unlucky=winners_of(home, "Unlucky"),
+                pot=home.pot,
+                money_recorded=home.money_recorded,
+            )
+        )
+
+    without = [row.season for row in rows if not row.money_recorded]
+    recorded = [row.season for row in rows if row.money_recorded]
+    if not without:
+        footnote = ""
+    elif recorded and max(without) < min(recorded):
+        # The real shape of the record: nothing before the sheet, everything since.
+        footnote = f"Prize money was not recorded before {min(recorded)}. Winners are from ESPN."
+    else:
+        footnote = "Prize money is not on record for these seasons. Winners are from ESPN."
+    return SeasonsIndex(rows=tuple(rows), money_footnote=footnote)
+
+
+# ---------------------------------------------------------------------------
+# Link previews
+# ---------------------------------------------------------------------------
+
+
+def _named_or_none(teams: Sequence[Named]) -> str | None:
+    """The franchise names, joined — or ``None`` unless every one of them is on file.
+
+    ``Named.name`` falls back to the ``manager_id`` when a season's names have not been synced,
+    which is right on a page that tags it "name unknown" and wrong in a description that has
+    no room for the tag. A clause built on this is dropped rather than published with an id.
+    """
+    if not teams or not all(team.known and team.name for team in teams):
+        return None
+    return " & ".join(team.name for team in teams)
+
+
+def describe_home(home: Home | None) -> str:
+    """One line for a link to a season's board."""
+    if home is None:
+        return "A 12-team keeper auction league: the prize board, keeper prices and the rules."
+    if home.final:
+        champion = _named_or_none(next((s.winners for s in home.podium if s.rank == 1), ()))
+        return f"{home.season} champion: {champion}." if champion else f"{home.season} final results."
+    if not home.weeks_played:
+        return f"{home.season} season. No results yet."
+    line = f"Through week {home.weeks_played}."
+    top = [leader for leader in home.leaders if leader.rank == 1]
+    leader = _named_or_none([entry.team for entry in top]) if len(top) == 1 else None
+    if leader:
+        line += f" Moneylist leader: {leader}, {money(top[0].total)}."
+    return line
+
+
+def describe_predraft(season: int, predraft: PredraftInfo | None) -> str:
+    """One line for a link to the home page before the auction."""
+    parts = []
+    if predraft and predraft.draft_date:
+        parts.append(f"Draft {mdy(predraft.draft_date)}.")
+    if predraft and predraft.keeper_deadline:
+        parts.append(f"Keeper deadline {mdy(predraft.keeper_deadline)}.")
+    return " ".join(parts) or f"{season} preseason. Draft date to be announced."
+
+
+def describe_keepers(current: KeeperSeason | None) -> str:
+    line = "Keeper prices for every rostered player."
+    if current and current.qualifying_deadline:
+        line += f" Deadline {mdy(current.qualifying_deadline)}."
+    return line
+
+
+def describe_seasons(index: SeasonsIndex) -> str:
+    if not index.rows:
+        return "Champions and prize winners, season by season."
+    first = min(row.season for row in index.rows)
+    return f"Champions and prize winners for every season since {first}."
 
 
 # ---------------------------------------------------------------------------
@@ -1702,8 +2092,22 @@ def build_site(
     manual_dir: Path = MANUAL,
     rules_path: Path = RULES_MD,
     templates: Path = TEMPLATES,
+    static_dir: Path = STATIC,
+    site_url: str | None = None,
+    now: datetime | None = None,
 ) -> list[Path]:
-    """Render every page into ``out_dir``. Returns the files written."""
+    """Render every page into ``out_dir``, and copy the static files beside them. Returns the
+    files written.
+
+    ``site_url`` is where the result will be served, with a trailing slash — see
+    ``site_url_from``. Without it the pages carry a title and a description for a link preview
+    but no ``og:url`` or ``og:image``, because those must be absolute and there is nothing to
+    make them absolute against.
+
+    ``now`` is the instant the site is built at, naive UTC, and defaults to the real clock. It
+    is a parameter so a test can render the whole site on a chosen day — the keeper deadline
+    alert reads differently fifteen days out, nine days out and the morning after.
+    """
     env = environment(templates)
     keeper_years, stats_years = season_files(derived_dir)
     overrides = load_overrides(history_dir, manual_dir)
@@ -1743,6 +2147,7 @@ def build_site(
                     if claim.slot is KeeperSlot.PROSPECT
                 }
             ),
+            now=now,
         )
         if current_year is not None
         else None
@@ -1751,9 +2156,10 @@ def build_site(
 
     # The home page is the most recent season with results — the one being played, or the one
     # just finished. Everything older is a link.
-    home = build_home(
-        seasons[0] if seasons else None,
-    )
+    # Built once per season and used three times: the home page, that season's own page, and
+    # its row on the Seasons page. One object, so the three cannot disagree.
+    homes = [build_home(season) for season in seasons]
+    home = homes[0] if homes else None
 
     # Before the auction, `current` is the season being drafted and there is nothing to award
     # yet — showing last season's finished board there would read as this season's result.
@@ -1777,10 +2183,13 @@ def build_site(
     )
     dues = board if board is not None and not board.all_paid else None
 
+    season_index = build_seasons_index(homes)
     shared = {
         "current": current,
         "seasons": seasons,
+        "season_index": season_index,
         "home": home,
+        "rules_season": RULES_SEASON,
         "fee_tiers": FEE_TIER_ROWS,
         "keeper_tax": KEEPER_TAX,
         "max_keepers": MAX_KEEPERS,
@@ -1790,29 +2199,89 @@ def build_site(
     out_dir.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
 
-    def write(name: str, template: str, **context: Any) -> None:
+    def write(name: str, template: str, *, title: str, description: str, **context: Any) -> None:
         path = out_dir / name
+        meta = PageMeta(
+            title=title,
+            description=description,
+            # The home page is the address itself, not ".../index.html".
+            url=site_url + ("" if name == "index.html" else name) if site_url else None,
+            image=site_url + OG_CARD if site_url else None,
+        )
         path.write_text(
-            env.get_template(template).render(**{**shared, **context}), encoding="utf-8"
+            env.get_template(template).render(**{**shared, **context, "meta": meta}),
+            encoding="utf-8",
         )
         written.append(path)
 
-    write("index.html", "index.html", page="home", predraft=predraft, dues=dues)
-    write("keepers.html", "keepers.html", page="keepers")
-    write("seasons.html", "seasons.html", page="seasons")
+    # The same test the template makes to choose between the pre-draft page and the board, so
+    # the preview describes the page a reader will actually land on.
+    preseason = current is not None and not current.drafted
+    write(
+        "index.html",
+        "index.html",
+        page="home",
+        predraft=predraft,
+        dues=dues,
+        title=f"RS57 — {current.season} Preseason"
+        if preseason
+        else f"RS57 — {home.heading}"
+        if home
+        else "RS57",
+        description=describe_predraft(current.season, predraft)
+        if preseason
+        else describe_home(home),
+    )
+    write(
+        "keepers.html",
+        "keepers.html",
+        page="keepers",
+        title=f"RS57 — {current.decision_season} Keepers" if current else "RS57 — Keepers",
+        description=describe_keepers(current),
+    )
+    write(
+        "seasons.html",
+        "seasons.html",
+        page="seasons",
+        title="RS57 — Past Seasons",
+        description=describe_seasons(season_index),
+    )
     # A past season's page is the home page, archived: same template, same prize board, just
     # that year's data instead of the most recent one. `home` above is `build_home(seasons[0])`;
     # this is that same function run over every other year.
-    for season in seasons:
-        write(f"season-{season.season}.html", "index.html", page="seasons", home=build_home(season))
+    # `homes` is newest first, so the season after this one is the entry before it. The ends
+    # of the list have no neighbour on that side and get no link — never a link to a page
+    # that was not written.
+    for index, archived in enumerate(homes):
+        write(
+            f"season-{archived.season}.html",
+            "index.html",
+            page="seasons",
+            home=archived,
+            title=f"RS57 — {archived.heading}",
+            description=describe_home(archived),
+            next_season=homes[index - 1].season if index > 0 else None,
+            prev_season=homes[index + 1].season if index + 1 < len(homes) else None,
+        )
+    rules_text = rules_path.read_text(encoding="utf-8") if rules_path.exists() else ""
     write(
         "rules.html",
         "rules.html",
         page="rules",
-        rules=render_markdown(rules_path.read_text(encoding="utf-8"))
-        if rules_path.exists()
-        else Markup(""),
+        rules=render_markdown(rules_text),
+        outline=rules_outline(rules_text),
+        title="RS57 — Rules",
+        description=f"RS57 league rules in effect for {RULES_SEASON}.",
     )
+
+    # The icons and the preview card. Copied, never generated: they are source files under
+    # rs57/static/, and this is the only way anything reaches the output directory.
+    if static_dir.exists():
+        for source in sorted(static_dir.iterdir()):
+            if source.is_file() and not source.name.startswith("."):
+                target = out_dir / source.name
+                shutil.copyfile(source, target)
+                written.append(target)
     return written
 
 
@@ -1843,10 +2312,20 @@ def main(argv: list[str] | None = None) -> int:
     if args.clean and out_dir.exists():
         shutil.rmtree(out_dir)
 
-    written = build_site(out_dir, derived_dir=args.derived or DERIVED)
+    site_url = site_url_from(os.environ)
+    written = build_site(out_dir, derived_dir=args.derived or DERIVED, site_url=site_url)
     for path in written:
         print(f"  wrote {path.relative_to(ROOT) if path.is_relative_to(ROOT) else path}")
-    print(f"{len(written)} pages into {out_dir}")
+    print(f"{len(written)} files into {out_dir}")
+    # Said either way. A build with no address still looks complete, and its link previews
+    # would silently have no image.
+    if site_url:
+        print(f"link previews point at {site_url}")
+    else:
+        print(
+            "no site address (RS57_SITE_URL or GITHUB_REPOSITORY): link previews have a title "
+            "and a description but no image — expected for a local preview"
+        )
     if not args.preview:
         print("site/ is the Action's to commit — do not commit a local render")
     return 0

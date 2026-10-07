@@ -18,21 +18,28 @@ import pytest
 
 from rs57.espn import SyncedScoring
 from rs57.keeper_rules import KEEPER_TAX, keeper_salary
-from rs57.models import KeeperSlot
+from rs57.models import AcquisitionSource, KeeperSlot
 from rs57.stats import SeasonStats
 from rs57.stats_sync import stats_document
 from rs57.site import (
+    ACQUIRED_LABELS,
+    RULES_MD,
     TEMPLATES,
+    deadline_status,
     mdy,
     build_dues_board,
     build_home,
     build_keeper_season,
+    build_seasons_index,
     build_site,
     build_stats_season,
     environment,
     load_dues,
     render_markdown,
+    rules_outline,
     season_files,
+    site_url_from,
+    unresolved_section_refs,
 )
 
 SEASON = 2026
@@ -176,7 +183,8 @@ def render(tmp_path: Path, derived: Path, *, drafted: bool = False) -> dict[str,
             keeper_path.write_text(json.dumps(doc), encoding="utf-8")
     out = tmp_path / "out"
     build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory")
-    return {path.name: path.read_text(encoding="utf-8") for path in out.iterdir()}
+    # The pages only. The build also copies icons into ``out``, and those are not text.
+    return {path.name: path.read_text(encoding="utf-8") for path in out.glob("*.html")}
 
 
 def text(html: str) -> str:
@@ -401,7 +409,7 @@ def test_the_grid_does_not_publish_declarations(tmp_path: Path, derived: Path):
     head = re.search(r"<thead>(.*?)</thead>", page, re.S).group(1)
     assert [re.sub(r"<[^>]+>", "", cell).strip()
             for cell in re.findall(r"<th[^>]*>(.*?)</th>", head, re.S)] == [
-        "Player", "Pos", "Team", "NFL", "Prospect", "Acquired", "Base", "Tax", "Salary"
+        "Player", "Pos", "Franchise", "NFL", "Prospect", "Acquired", "Base", "Tax", "Salary"
     ]
 
 
@@ -1418,6 +1426,12 @@ def _twelve_teams(derived: Path) -> None:
     path.write_text(json.dumps(doc), encoding="utf-8")
 
 
+def _survivor_column(page: str) -> str:
+    """The Survivor column's visible text."""
+    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    return text(column[: column.index("</section>")])
+
+
 def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, derived: Path):
     """Drafted, no game final: every prize is on the board, blank, with its money.
 
@@ -1441,9 +1455,12 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     ]
     # Twelve franchises, and survivor runs a week for all but one.
     assert home.survivor is not None
-    # A ladder: latest week on top, Week 1 at the foot.
-    assert [line.week for line in home.survivor.weeks] == list(range(11, 0, -1))
-    assert all(line.out is None for line in home.survivor.weeks)
+    # Nothing played, so nothing is under the heading and all eleven weeks are still to come,
+    # in the order they will be played.
+    assert home.survivor.played == ()
+    assert [line.week for line in home.survivor.upcoming] == list(range(1, 12))
+    assert all(line.out is None and line.pending for line in home.survivor.upcoming)
+    assert (home.survivor.alive, home.survivor.franchises) == (12, 12)
 
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert not any(row.winners for row in rows) and not any(row.leading for row in rows)
@@ -1453,11 +1470,13 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     assert _money_shown(home) == home.pot - 800
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
-    # The survivor column: a blank winner and eleven blank weeks, each one a visible dash.
-    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
-    column = column[: column.index("</section>")]
-    assert text(column).count("—") == 12
-    assert text(column).index("Week 11") < text(column).index("Week 1 "), "Week 1 is at the foot"
+    # The survivor column: everybody still in it, and eleven weeks to come. An unplayed week
+    # is its key and nothing else — a dash there would read as a result.
+    column = _survivor_column(page)
+    assert "Still alive 12 of 12" in column and "Winner" not in column
+    assert "—" not in column
+    assert column.index("Upcoming") < column.index("Week 1 ") < column.index("Week 11")
+    assert page.count('<li class="thin pending">') == 11 + 14, "eleven survivor weeks, 14 highs"
 
     body = text(page)
     for heading in ("Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
@@ -1512,13 +1531,24 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
     assert unlucky.leading and unlucky.short_label == "Week 2"
 
     assert home.survivor is not None and home.survivor.winners == ()
-    ladder = [line.out is not None for line in home.survivor.weeks]
-    assert ladder == [False] * 9 + [True, True], "built up from the bottom, nine weeks to come"
+    assert [line.week for line in home.survivor.played] == [2, 1], "newest first"
+    assert all(line.out is not None for line in home.survivor.played)
+    assert [line.week for line in home.survivor.upcoming] == list(range(3, 12))
+    assert home.survivor.alive == 10
+    assert [row.pending for row in weekly] == [False, False] + [True] * 12
     assert home.podium == ()
     assert _money_shown(home) == home.pot - 800, "everything but the unshown placings"
 
-    body = text(render(tmp_path, derived, drafted=True)["index.html"])
-    assert body.count("leading") == 3
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    body = text(page)
+    # The fields above still say who leads; the page does not tag them. The pill beside the
+    # heading says the season is in progress, once, for the whole board.
+    assert "leading" not in body.lower()
+    assert "In progress — through week 2" in body
+    column = _survivor_column(page)
+    assert "Still alive 10 of 12" in column
+    assert column.index("Week 2") < column.index("Week 1 ") < column.index("Upcoming")
+    assert column.index("Upcoming") < column.index("Week 3") < column.index("Week 11")
     assert "unawarded" not in body
     assert "Prize money nobody was awarded" not in body
 
@@ -2361,7 +2391,7 @@ def render_with_dues(tmp_path: Path, derived: Path, *paid: str, drafted: bool = 
         keeper_path.write_text(json.dumps(doc), encoding="utf-8")
     out = tmp_path / "out"
     build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", manual_dir=manual)
-    return {path.name: path.read_text(encoding="utf-8") for path in out.iterdir()}
+    return {path.name: path.read_text(encoding="utf-8") for path in out.glob("*.html")}
 
 
 def test_every_franchise_appears_with_the_unpaid_ones_marked(tmp_path: Path, derived: Path):
@@ -2485,3 +2515,798 @@ def test_the_dues_panel_records_no_money(tmp_path: Path, derived: Path):
     panel = re.search(r'<ul class="dues">.*?</ul>', page, flags=re.S)
     assert panel, "the dues panel is not on the page"
     assert "$" not in text(panel.group(0))
+
+
+# ---------------------------------------------------------------------------
+# The UI revision (docs/ui-revision-plan.md)
+# ---------------------------------------------------------------------------
+
+
+def _style() -> str:
+    source = (TEMPLATES / "base.html").read_text(encoding="utf-8")
+    return source[source.index("<style>"):source.index("</style>")]
+
+
+def _rule_bodies(style: str) -> str:
+    """The stylesheet with its comments and its token blocks removed — the rules themselves."""
+    style = re.sub(r"/\*.*?\*/", "", style, flags=re.S)
+    return re.sub(r":root\s*\{[^}]*\}", "", style)
+
+
+def _tokens() -> tuple[dict[str, str], dict[str, str]]:
+    """The light tokens, and the dark ones laid over them — what each theme resolves to."""
+    blocks = re.findall(r":root\s*\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", _style(), flags=re.S))
+    assert len(blocks) == 2, "expected one light token block and one dark"
+    light, dark = (dict(re.findall(r"(--[\w-]+):\s*([^;]+);", block)) for block in blocks)
+    return light, {**light, **dark}
+
+
+def _contrast(foreground: str, background: str) -> float:
+    """The WCAG 2 contrast ratio between two ``#rrggbb`` colours."""
+
+    def luminance(colour: str) -> float:
+        channels = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        r, g, b = (c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels)
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    lighter, darker = sorted((luminance(foreground), luminance(background)), reverse=True)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def test_no_rule_carries_a_colour_literal():
+    """A colour written into a rule is one a theme cannot reach.
+
+    The tooltip was ``--ink`` with ``#fff`` on it: white on white the moment ``--ink`` turns
+    light. Every colour is a token, so dark mode is one block that redefines them.
+    """
+    rules = _rule_bodies(_style())
+    assert not re.search(r"#[0-9a-fA-F]{3,8}\b", rules), "a hex colour outside the token block"
+    assert not re.search(r"\brgba?\(", rules), "an rgb() colour outside the token block"
+
+
+def test_gold_is_a_border_colour_and_never_a_text_colour():
+    """``--gold`` is 3.25:1 on white. Small text needs 4.5:1, so wording uses ``--gold-text``."""
+    rules = _rule_bodies(_style())
+    assert not re.search(r"(?<![-\w])color:\s*var\(--gold\)", rules)
+    assert ".spot-1 .spot-money { font-size: 1.35rem; color: var(--gold-text); }" in rules
+
+
+def test_the_season_index_writes_money_the_way_every_other_page_does(
+    tmp_path: Path, derived: Path
+):
+    """It printed ``${{ pot }}`` raw, so a $1,200 pot read ``$1200`` on this page alone."""
+    doc = stats_doc()
+    doc["payouts"][0]["amount"] = 1200
+    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    body = text(render(tmp_path, derived)["seasons.html"])
+    assert "$1,200" in body and "$1200" not in body
+
+
+def test_every_tooltip_can_be_opened_by_a_tap(tmp_path: Path, derived: Path):
+    """Safari does not focus a tapped button, so ``:focus`` alone never opened one on an iPhone.
+
+    The script sets ``aria-expanded``; the stylesheet shows a bubble for it; and every trigger
+    carries the enlarged hit area. Hover is offered only to a pointer that can hover — a touch
+    screen leaves the last thing tapped hovered, which would hold a bubble open.
+    """
+    (derived / "player-origins.json").write_text(origins_doc({1: PRIOR}), encoding="utf-8")
+    pages = render(tmp_path, derived)
+
+    for name, page in pages.items():
+        assert 'setAttribute("aria-expanded"' in page, f"{name} has no tooltip script"
+        triggers = re.findall(r'<button type="button" class="(?:info|pbadge|wbadge)\b.*?</button>',
+                              page, flags=re.S)
+        for trigger in triggers:
+            assert 'class="tip-glyph"' in trigger, f"{name}: a trigger with no hit area"
+    assert 'class="info"' in pages[f"season-{PRIOR}.html"]
+    assert "pbadge is-eligible" in pages["keepers.html"].split("<tbody>")[1]
+
+    style = _rule_bodies(_style())
+    assert '.info[aria-expanded="true"] .info-bubble' in style
+    hover = style[style.index("@media (hover: hover)"):]
+    assert ".info:hover .info-bubble" in hover
+    assert ".info:hover .info-bubble" not in style[: style.index("@media (hover: hover)")]
+
+
+def _survivor_season(derived: Path, eliminations: list[dict], **source) -> None:
+    doc = _empty_season_doc(**source)
+    doc["survivor"]["eliminations"] = eliminations
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+
+
+def test_still_alive_counts_teams_not_weeks(derived: Path):
+    """A tie takes two out in one week. Counting weeks would leave one of them alive.
+
+    Mutation-checked: with ``alive`` computed from ``len(season.survivor_eliminations)`` this
+    reads 10 and fails.
+    """
+    _survivor_season(
+        derived,
+        [
+            {"season": SEASON, "week": 1, "manager_ids": ["t2"], "points": 80.0},
+            {"season": SEASON, "week": 2, "manager_ids": ["t1", "t3"], "points": 90.0},
+        ],
+        weeks_with_results=[1, 2],
+    )
+    panel = build_home(build_stats_season(derived, SEASON)).survivor
+    assert (panel.alive, panel.franchises) == (9, 12)
+    assert [line.week for line in panel.played] == [2, 1]
+
+
+def test_a_played_week_with_nobody_out_is_a_hole_not_an_upcoming_week(derived: Path):
+    """Three weeks played, week 2 missing: it keeps its dash, among the played weeks."""
+    _survivor_season(
+        derived,
+        [
+            {"season": SEASON, "week": 1, "manager_ids": ["t2"], "points": 80.0},
+            {"season": SEASON, "week": 3, "manager_ids": ["t1"], "points": 90.0},
+        ],
+        weeks_with_results=[1, 2, 3],
+    )
+    panel = build_home(build_stats_season(derived, SEASON)).survivor
+    assert [(line.week, line.out is None) for line in panel.played] == [
+        (3, False), (2, True), (1, False)
+    ]
+    assert [line.week for line in panel.upcoming] == list(range(4, 12))
+
+
+def test_a_finished_season_has_no_upcoming_weeks(tmp_path: Path, derived: Path):
+    """The label renders only when there is something under it, so an archived season's
+    Survivor column is exactly what it was."""
+    doc = stats_doc()
+    doc["survivor"]["eliminations"] = [
+        {"season": PRIOR, "week": 1, "manager_ids": ["t2"], "points": 80.0}
+    ]
+    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert home.survivor.upcoming == () and [w.week for w in home.survivor.played] == [1]
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert not any(row.pending for row in rows), "a finished season's empty prize is unawarded"
+
+    page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
+    column = _survivor_column(page)
+    assert "Upcoming" not in column and "Still alive" not in column
+    assert "Winner Fake News" in column
+    assert 'pending">' not in page
+
+
+def test_the_moneylist_is_on_the_page_once_in_its_own_section(tmp_path: Path, derived: Path):
+    """A phone shows it above the prizes by reordering one container, not by printing it twice.
+
+    Two copies with one hidden would be read out twice by a screen reader.
+    """
+    page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
+    assert page.count("Moneylist</h2>") == 1 and page.count('class="leaders"') == 1
+    section = page[page.index('<section class="moneylist">'):]
+    section = section[: section.index("</section>")]
+    assert "Moneylist</h2>" in section and 'class="leaders"' in section
+    # Inside the container the stylesheet reorders, after the boards in source order.
+    board = page[page.index('<div class="board-page">'):]
+    assert board.index('class="boards"') < board.index('class="moneylist"')
+    assert ".board-page > .moneylist { order: 2; }" in _style()
+
+
+# 5pm Eastern on Wednesday 11/25/2026, as ESPN stores it: naive UTC.
+ALERT_DEADLINE = datetime(2026, 11, 25, 22, 0)
+
+
+@pytest.mark.parametrize(
+    "now, state, days, words",
+    [
+        # Fifteen calendar days out is still a quiet fact; fourteen is when it turns amber.
+        (datetime(2026, 11, 10, 15, 0), "upcoming", 15, ""),
+        (datetime(2026, 11, 11, 15, 0), "soon", 14, "14 days left"),
+        (datetime(2026, 11, 24, 15, 0), "soon", 1, "1 day left"),
+        (datetime(2026, 11, 25, 21, 59), "soon", 0, "today"),
+        # The instant itself has not passed; a minute later it has.
+        (datetime(2026, 11, 25, 22, 0), "soon", 0, "today"),
+        (datetime(2026, 11, 25, 22, 1), "passed", None, ""),
+    ],
+)
+def test_the_deadline_alert_changes_state_at_fourteen_days_and_at_the_instant(
+    now, state, days, words
+):
+    """Both thresholds are mutation-checked: move ``DEADLINE_SOON_DAYS`` to 13 or 15 and the
+    14- or 15-day row fails; change ``now > deadline`` to ``>=`` and the 22:00 row fails, and
+    drop the comparison and the 22:01 row fails."""
+    assert deadline_status(ALERT_DEADLINE, now) == (state, days, words)
+
+
+def test_days_left_are_counted_on_the_leagues_clock_not_in_utc():
+    """10pm Eastern on the 24th is already the 25th in UTC — the deadline's own UTC date.
+
+    Counted in UTC that reads "today" a day early, next to a printed date of 11/25. Counted the
+    way the date beside it is printed, there is one day left. Mutation-checked by dropping the
+    two ``to_league_time`` calls.
+    """
+    late_evening_et = datetime(2026, 11, 25, 3, 0)
+    assert deadline_status(ALERT_DEADLINE, late_evening_et) == ("soon", 1, "1 day left")
+    just_after_midnight_et = datetime(2026, 11, 25, 5, 30)
+    assert deadline_status(ALERT_DEADLINE, just_after_midnight_et) == ("soon", 0, "today")
+
+
+def test_a_deadline_that_is_not_on_file_has_no_state_to_be_in():
+    assert deadline_status(None, datetime(2026, 11, 1)) == ("unknown", None, "")
+
+
+def _keepers_page_on(tmp_path: Path, derived: Path, now: datetime) -> str:
+    """keepers.html for a drafted 2026, so the alert is about 2026's own deadline."""
+    doc = keeper_doc()
+    doc["source"]["drafted"] = True
+    doc["source"]["trade_deadline"] = ALERT_DEADLINE.isoformat()
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    out = tmp_path / "out"
+    build_site(out, derived_dir=derived, history_dir=tmp_path / "nohistory", now=now)
+    return (out / "keepers.html").read_text(encoding="utf-8")
+
+
+def _alert(page: str) -> tuple[str, str]:
+    found = re.search(r'<p class="deadline is-(\w+)">(.*?)</p>', page, re.S)
+    return found.group(1), text(found.group(2)).strip()
+
+
+def test_the_alert_on_the_page_follows_the_day_the_site_was_built(tmp_path: Path, derived: Path):
+    """``build_site(now=...)`` reaches the keeper page, and the words change with the colour."""
+    assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 10, 6, 13, 0))) == (
+        "upcoming", "i Keeper deadline: 11/25/2026"
+    )
+    assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 11, 16, 13, 0))) == (
+        "soon", "i Keeper deadline: 11/25/2026 · 9 days left"
+    )
+    assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 11, 26, 13, 0))) == (
+        "passed", "i Keeper deadline passed: 11/25/2026"
+    )
+
+
+def test_a_missing_deadline_keeps_the_red_alert(tmp_path: Path):
+    out = tmp_path / "derived"
+    out.mkdir()
+    (out / f"{SEASON}.json").write_text(json.dumps(keeper_doc()), encoding="utf-8")
+    state, words = _alert(render(tmp_path, out)["keepers.html"])
+    assert state == "unknown" and "not on file" in words
+    style = _rule_bodies(_style())
+    assert ".deadline.is-passed, .deadline.is-unknown {" in style
+    quiet = style.split(".deadline {")[1].split("}")[0]
+    assert "var(--panel)" in quiet and "--bad" not in quiet, "the alert is red before it matters"
+
+
+def test_the_alert_is_measured_against_the_date_it_prints(tmp_path: Path, derived: Path):
+    """``source.keeper_deadline`` is a different date with a different job. A keeper deadline
+    long past must not turn an alert about a trade deadline weeks away red."""
+    doc = keeper_doc()
+    doc["source"].update(
+        drafted=True,
+        trade_deadline=ALERT_DEADLINE.isoformat(),
+        keeper_deadline="2026-09-02T03:00:00",
+    )
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    season = build_keeper_season(derived, SEASON, now=datetime(2026, 10, 6, 13, 0))
+    assert season.qualifying_deadline == ALERT_DEADLINE
+    assert (season.deadline_state, season.days_left) == ("upcoming", 50)
+
+
+def test_every_way_of_acquiring_a_player_has_a_label():
+    """Walks the enum, so a source added to the model fails here instead of printing a blank
+    beside a date. Mutation-checked by deleting an entry from ``ACQUIRED_LABELS``."""
+    assert set(ACQUIRED_LABELS) == set(AcquisitionSource)
+    assert all(ACQUIRED_LABELS[source] for source in AcquisitionSource)
+    assert {ACQUIRED_LABELS[source] for source in AcquisitionSource} == {"Draft", "Trade", "Add"}
+    # ESPN does not separate a waiver claim from a free-agent pickup, so neither does the page.
+    assert ACQUIRED_LABELS[AcquisitionSource.WAIVER] == ACQUIRED_LABELS[AcquisitionSource.FAAB]
+
+
+def test_the_keeper_page_has_a_heading_and_says_how_each_player_arrived(
+    tmp_path: Path, derived: Path
+):
+    doc = keeper_doc()
+    doc["roster"][1]["source"] = "faab"
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    page = render(tmp_path, derived)["keepers.html"]
+    body = text(page)
+    assert "<h1>Keepers</h1>" in page
+    assert f"cost to keep for {SEASON}" in body, "the lede names the season the prices are for"
+
+    drafted = player_row(page, "Puka Nacua")
+    added = player_row(page, "James Cook III")
+    # The column, for a desktop: how, a separator element, then when. The sort key is the date.
+    assert re.search(
+        r'<td class="acq" data-k="2025-08-05">\s*<span class="acq-how">Draft</span><span\s+'
+        r'class="dot" aria-hidden="true">·</span><span>8/5/2025</span>', drafted
+    )
+    assert '<span class="acq-how">Add</span>' in added
+    # Line two, for a phone: the separator is its own element. Typed into the text as " · ",
+    # its leading space was the first character of a flex item and was dropped.
+    assert re.search(
+        r'<span class="franchise">Fake News</span><span\s+class="acq-sub dot" '
+        r'aria-hidden="true">·</span><span\s+class="acq-sub">Draft 8/5/2025</span>', drafted
+    )
+    assert "> · " not in page.split("<tbody>")[1].split("</tbody>")[0]
+    assert ".grid .sub {\n    display: flex; gap: 0.3rem;" in _style()
+
+
+def test_a_desktop_gets_the_franchise_column_and_nothing_narrower_changes():
+    style = _rule_bodies(_style())
+    desktop = style[style.index("@media (min-width: 60rem) {\n    .grid, .controls"):]
+    desktop = desktop[: desktop.index("\n  }\n") ]
+    assert ".grid, .controls { max-width: none; }" in desktop
+    assert ".grid tr > :nth-child(3) { display: table-cell; }" in desktop
+    assert ".grid .sub { display: none; }" in desktop, "the franchise is shown twice"
+    # Everywhere else the franchise column is still hidden and the grid still capped.
+    before = style[: style.index("@media (min-width: 60rem) {\n    .grid, .controls")]
+    assert ".grid, .controls { max-width: 44rem; }" in before
+    assert ".grid tr > :nth-child(3)" in before
+
+
+def _three_seasons(derived: Path) -> None:
+    """2024 with no money on record, 2025 (the fixture) with $1,200, 2026 in progress."""
+    doc = stats_doc()
+    doc["payouts"][0]["amount"] = 1200
+    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    older = PRIOR - 1
+    names = keeper_doc(season=older, roster=[], players=[])
+    names["franchises"] = [
+        {"manager_id": "t1", "season": older, "name": "The Infirmary"},
+        {"manager_id": "t2", "season": older, "name": "Ken Franklins"},
+    ]
+    (derived / f"{older}.json").write_text(json.dumps(names), encoding="utf-8")
+    past = json.loads(json.dumps(stats_doc()).replace(str(PRIOR), str(older)))
+    past["payouts"] = []
+    past["standings"][0].update(manager_id="t2", final_rank=1)
+    past["survivor"]["winner_manager_ids"] = ["t1", "t2"]
+    (derived / f"{older}-stats.json").write_text(json.dumps(past), encoding="utf-8")
+
+    live = _empty_season_doc(weeks_with_results=[1, 2])
+    live["season_points"] = [{"season": SEASON, "manager_id": "t2", "points": 280.4}]
+    live["payouts"] = _in_progress_payouts(SEASON)
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(live), encoding="utf-8")
+
+
+def _hall_rows(page: str) -> dict[str, str]:
+    body = page[page.index('<table class="hall">'):]
+    body = body[body.index("<tbody>"): body.index("</tbody>")]
+    rows = re.findall(r"<tr>(.*?)</tr>", body, re.S)
+    return {re.search(r'season-(\d{4})\.html', row).group(1): row for row in rows}
+
+
+def test_the_seasons_page_is_one_row_per_season_newest_first(tmp_path: Path, derived: Path):
+    _three_seasons(derived)
+    page = render(tmp_path, derived, drafted=True)["seasons.html"]
+    assert page.count("<table") == 1, "one matrix, not a table per season"
+    assert list(_hall_rows(page)) == [str(SEASON), str(PRIOR), str(PRIOR - 1)]
+    head = re.findall(r"<th[^>]*>(.*?)</th>", page[page.index("<thead>"):page.index("</thead>")])
+    assert head == ["Season", "Champion", "2nd", "3rd", "Most Points", "Survivor", "Unlucky", "Pot"]
+
+
+def test_every_row_names_the_champion_its_own_page_names(tmp_path: Path, derived: Path):
+    """The row is read off the ``Home`` the season page renders, so the two cannot disagree.
+
+    Mutation-checked by emptying ``champion``. The fixture below is what would catch the
+    subtler mistake of reading rank 1 off the standings: its payout row and its standings
+    name different franchises, and the board believes the payout.
+    """
+    _three_seasons(derived)
+    # A payout that disagrees with the standings: the board believes the payout, and so must
+    # the index. Reading rank 1 off the standings would put t1 here.
+    doc = json.loads((derived / f"{PRIOR}-stats.json").read_text())
+    doc["payouts"][0]["winner_manager_id"] = "t2"
+    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    homes = [build_home(build_stats_season(derived, year)) for year in (PRIOR - 1, PRIOR, SEASON)]
+    index = build_seasons_index(homes)
+    by_season = {row.season: row for row in index.rows}
+    for home in homes:
+        podium = {spot.rank: spot.winners for spot in home.podium}
+        assert by_season[home.season].champion == podium.get(1, ())
+        assert by_season[home.season].survivor == home.survivor.winners
+    assert [w.manager_id for w in by_season[PRIOR].champion] == ["t2"]
+
+    pages = render(tmp_path, derived, drafted=True)
+    rows = _hall_rows(pages["seasons.html"])
+    champion = re.search(r'<td class="hall-champion">\s*(.*?)\s*<span', rows[str(PRIOR)], re.S)
+    assert html.unescape(champion.group(1)) == "Belichick's  Spy"
+    spot = re.search(r'spot spot-1">.*?spot-team">(.*?)</div>', pages[f"season-{PRIOR}.html"], re.S)
+    assert spot.group(1) == champion.group(1), "the index and the season page disagree"
+    # A tie is written the way the board writes one.
+    assert "The Infirmary &amp; Ken Franklins" in rows[str(PRIOR - 1)]
+
+
+def test_a_season_still_being_played_names_no_winners_on_the_index(tmp_path: Path, derived: Path):
+    """t2 leads 2026 in points. Leaders are not winners, so the row says where the season is."""
+    _three_seasons(derived)
+    page = render(tmp_path, derived, drafted=True)["seasons.html"]
+    live = _hall_rows(page)[str(SEASON)]
+    assert '<td colspan="6" class="muted hall-pending">In progress — through week 2</td>' in live
+    assert "Spy" not in live and "Fake News" not in live
+    assert "$1,200" in text(live), "the pot is known before anybody has won it"
+
+
+def test_the_pot_is_money_or_a_dash_and_never_zero_dollars(tmp_path: Path, derived: Path):
+    _three_seasons(derived)
+    page = render(tmp_path, derived, drafted=True)["seasons.html"]
+    rows = _hall_rows(page)
+    assert "$1,200" in text(rows[str(PRIOR)])
+    unrecorded = html.unescape(text(rows[str(PRIOR - 1)]))
+    assert "—" in unrecorded and "$" not in unrecorded
+    body = text(page)
+    assert "$1200" not in body and "$0" not in body
+    assert f"* Prize money was not recorded before {PRIOR}. Winners are from ESPN." in body
+
+
+def test_the_money_footnote_appears_only_when_a_season_needs_it(tmp_path: Path, derived: Path):
+    """``derived`` alone is one season with its money on record: nothing to explain."""
+    page = render(tmp_path, derived)["seasons.html"]
+    assert "not recorded" not in text(page) and 'id="no-money"' not in page
+    assert build_seasons_index(
+        [build_home(build_stats_season(derived, PRIOR))]
+    ).money_footnote == ""
+
+
+def test_an_archived_season_links_back_and_to_its_neighbours(tmp_path: Path, derived: Path):
+    """No link to a page that was not written: the oldest has no previous, the newest no next."""
+    _three_seasons(derived)
+    pages = render(tmp_path, derived, drafted=True)
+
+    def nav(year: int) -> list[str]:
+        block = re.search(r'<p class="season-nav small">(.*?)</p>', pages[f"season-{year}.html"], re.S)
+        return re.findall(r'href="([^"]+)"', block.group(1))
+
+    assert nav(PRIOR - 1) == ["seasons.html", f"season-{PRIOR}.html"]
+    assert nav(PRIOR) == ["seasons.html", f"season-{PRIOR - 1}.html", f"season-{SEASON}.html"]
+    assert nav(SEASON) == ["seasons.html", f"season-{PRIOR}.html"]
+    for year in (PRIOR - 1, PRIOR, SEASON):
+        for href in nav(year):
+            assert href in pages, f"season-{year}.html links to {href}, which was not written"
+    assert "season-nav" not in pages["index.html"].split("</style>")[1], (
+        "the live home page is not one of a series"
+    )
+
+
+RULES_SAMPLE = """Preamble, see §2.1.
+
+# 1. Definitions
+
+- **Fee** — the amount under §2.1, or under
+  §2.2 where it applies.
+
+# 2. Keepers
+
+## 2.1 Limits
+
+Three. See §1 and §2.1.
+
+## 2.2 Salary
+
+# Appendix
+"""
+
+
+def test_every_numbered_heading_gets_an_id_made_of_its_number():
+    rendered = str(render_markdown(RULES_SAMPLE))
+    assert '<h2 id="s1">1. Definitions</h2>' in rendered
+    assert '<h2 id="s2">2. Keepers</h2>' in rendered
+    assert '<h3 id="s2-1">2.1 Limits</h3>' in rendered
+    assert '<h3 id="s2-2">2.2 Salary</h3>' in rendered
+    # A heading with no number has nothing to build an id from, and gets none.
+    assert "<h2>Appendix</h2>" in rendered
+
+    # And the real file: every heading in it is numbered, and every one is anchored.
+    real = RULES_MD.read_text(encoding="utf-8")
+    headings = re.findall(r"^#{1,3}\s+(\d+(?:\.\d+)*)", real, re.M)
+    assert len(headings) > 20
+    page = str(render_markdown(real))
+    for number in headings:
+        assert f' id="s{number.replace(".", "-")}">' in page, f"section {number} has no anchor"
+    assert len(re.findall(r"<h[234] id=", page)) == len(headings)
+
+
+def test_the_outline_lists_the_numbered_headings_in_order():
+    outline = rules_outline(RULES_SAMPLE)
+    assert [(e.id, e.number, e.title, e.level) for e in outline] == [
+        ("s1", "1", "Definitions", 1),
+        ("s2", "2", "Keepers", 1),
+        ("s2-1", "2.1", "Limits", 2),
+        ("s2-2", "2.2", "Salary", 2),
+    ]
+    # The same order the page has them in, which is what a contents list promises.
+    rendered = str(render_markdown(RULES_SAMPLE))
+    assert re.findall(r'<h\d id="([^"]+)"', rendered) == [entry.id for entry in outline]
+
+
+def test_a_section_reference_links_to_its_section():
+    rendered = str(render_markdown(RULES_SAMPLE))
+    assert 'see <a href="#s2-1">§2.1</a>.' in rendered
+    # One wrapped onto the next line of a bullet is still found: lines are joined first.
+    assert 'under <a href="#s2-2">§2.2</a> where' in rendered
+    assert 'See <a href="#s1">§1</a> and <a href="#s2-1">§2.1</a>.' in rendered
+    assert unresolved_section_refs(RULES_SAMPLE) == ()
+
+
+def test_a_reference_to_a_section_that_does_not_exist_is_text_and_is_reported():
+    """It must not become a link to nowhere, and it must not pass unnoticed either."""
+    broken = RULES_SAMPLE + "\nAlso §9.9.\n"
+    rendered = str(render_markdown(broken))
+    assert "Also §9.9." in rendered and 'href="#s9-9"' not in rendered
+    assert unresolved_section_refs(broken) == ("9.9",)
+
+
+def test_every_section_reference_in_the_rules_resolves():
+    """A renumbered section leaves its old references looking fine and pointing nowhere.
+
+    The mutation check is the test above it: add a bogus ``§9.9`` and
+    ``unresolved_section_refs`` names it. Here the real file must name none, and every
+    reference in it must have come out as a link.
+    """
+    real = RULES_MD.read_text(encoding="utf-8")
+    assert "§" in real, "the rules no longer reference their own sections; this test is idle"
+    assert unresolved_section_refs(real) == ()
+    page = str(render_markdown(real))
+    assert page.count("§") == len(re.findall(r'<a href="#s[\d-]+">§', page)), "an unlinked §"
+
+
+def test_an_anchor_is_built_from_digits_and_nothing_a_person_typed():
+    """A heading is text somebody will edit, so none of it may reach an attribute."""
+    nasty = '# 3. Prizes" onmouseover="alert(1)\n\n## 3.1 <script>alert(1)</script>\n\nSee §3.1.'
+    rendered = str(render_markdown(nasty))
+    assert "<script>" not in rendered and "&lt;script&gt;" in rendered
+    assert re.findall(r'<h\d([^>]*)>', rendered) == [' id="s3"', ' id="s3-1"']
+    assert re.findall(r"<a ([^>]*)>", rendered) == ['href="#s3-1"']
+    # The outline is plain text; the template escapes it like any other string.
+    page = environment().get_template("rules.html").render(
+        page="rules", rules=render_markdown(nasty), outline=rules_outline(nasty)
+    )
+    assert "<script>alert" not in page and "onmouseover=\"alert" not in page
+
+
+def test_the_rules_page_has_one_outline_shown_two_ways(tmp_path: Path, derived: Path):
+    page = render(tmp_path, derived)["rules.html"]
+    body = page.split("</style>")[1]
+    outline = rules_outline(RULES_MD.read_text(encoding="utf-8"))
+    for entry in outline:
+        assert body.count(f'<a href="#{entry.id}"><span class="toc-n">') == 2, entry.id
+        assert f' id="{entry.id}">' in body
+    assert body.count('class="rules-toc"') == 1 and body.count('<details class="rules-toc-fold">') == 1
+
+    style = _rule_bodies(_style())
+    assert ".rules-prose { max-width: 42rem;" in style
+    # Exactly one of the two is displayed at any width.
+    assert ".rules-toc { display: none; }" in style
+    desktop = style[style.index("@media (min-width: 60rem) {\n    .rules-page"):]
+    assert ".rules-toc-fold { display: none; }" in desktop
+    assert "position: sticky" in desktop and "display: block" in desktop
+
+
+# Every place the stylesheet sets one token as text on another as its background.
+TEXT_ON = [
+    ("--ink", "--bg"), ("--ink", "--panel"),
+    ("--muted", "--bg"), ("--muted", "--panel"), ("--muted", "--bad-bg"),
+    ("--faint", "--bg"),
+    ("--accent", "--bg"), ("--on-accent", "--accent"),
+    ("--flag", "--flag-bg"), ("--bad", "--bad-bg"), ("--good", "--good-bg"),
+    ("--gold-text", "--bg"),
+    ("--bubble-fg", "--bubble-bg"),
+    # The alert's icon is the fill colour reversed out of itself.
+    ("--panel", "--muted"), ("--flag-bg", "--flag"), ("--bad-bg", "--bad"),
+]
+
+
+@pytest.mark.parametrize("theme", ["light", "dark"])
+def test_every_text_colour_is_readable_on_its_background_in_both_themes(theme: str):
+    """4.5:1, the AA floor for small text, computed from the tokens the page actually ships.
+
+    Mutation-checked: dark ``--muted`` set to the light value ``#5b6470`` fails here at 2.9:1,
+    which is the mistake of a token missed out of the dark block.
+    """
+    light, dark = _tokens()
+    tokens = light if theme == "light" else dark
+    for foreground, background in TEXT_ON:
+        ratio = _contrast(tokens[foreground], tokens[background])
+        assert ratio >= 4.5, f"{theme}: {foreground} on {background} is {ratio:.2f}:1"
+
+
+def test_dark_mode_redefines_every_colour_and_adds_none():
+    """A token left out of the dark block keeps its light value on a dark page."""
+    blocks = re.findall(r":root\s*\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", _style(), flags=re.S))
+    light, dark = (set(re.findall(r"(--[\w-]+):", block)) for block in blocks)
+    assert dark == light, f"only in one theme: {sorted(dark ^ light)}"
+    style = _style()
+    assert style.count("@media (prefers-color-scheme: dark)") == 1, "one block, not scattered"
+    assert "color-scheme: light dark;" in style
+
+
+def test_every_page_tells_the_browser_it_has_two_themes(tmp_path: Path, derived: Path):
+    for name, page in render(tmp_path, derived).items():
+        head = page[: page.index("<style>")]
+        assert '<meta name="color-scheme" content="light dark">' in head, name
+        assert head.count('<meta name="theme-color"') == 2, name
+    _, dark = _tokens()
+    assert f'content="{dark["--bg"]}" media="(prefers-color-scheme: dark)"' in page
+
+
+# ---------------------------------------------------------------------------
+# Icons and link previews
+# ---------------------------------------------------------------------------
+
+WHERE = "https://example.github.io/league/"
+
+
+def _published(tmp_path: Path, derived: Path, *, drafted: bool = True, site_url: str | None = WHERE):
+    """The whole output directory, built as the Action builds it: with an address."""
+    if drafted:
+        path = derived / f"{SEASON}.json"
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["source"]["drafted"] = True
+        path.write_text(json.dumps(doc), encoding="utf-8")
+    out = tmp_path / "published"
+    written = build_site(
+        out, derived_dir=derived, history_dir=tmp_path / "nohistory", site_url=site_url,
+        now=datetime(2026, 10, 6, 13, 0),
+    )
+    return out, written
+
+
+def _meta(page: str, key: str) -> str | None:
+    found = re.search(rf'<meta (?:name|property)="{re.escape(key)}" content="([^"]*)">', page)
+    return html.unescape(found.group(1)) if found else None
+
+
+def _pages(out: Path) -> dict[str, str]:
+    return {path.name: path.read_text(encoding="utf-8") for path in out.glob("*.html")}
+
+
+def test_every_page_has_a_preview_with_an_absolute_image(tmp_path: Path, derived: Path):
+    """A chat app fetching ``og:image`` has no page to resolve a relative address against."""
+    out, _ = _published(tmp_path, derived)
+    pages = _pages(out)
+    assert len(pages) >= 5
+    for name, page in pages.items():
+        assert _meta(page, "og:image") == WHERE + "og-card.png", name
+        assert _meta(page, "og:image").startswith("https://"), name
+        assert _meta(page, "twitter:card") == "summary_large_image", name
+        assert _meta(page, "og:title") and _meta(page, "og:description"), name
+        assert _meta(page, "og:description") == _meta(page, "description"), name
+        expected = WHERE if name == "index.html" else WHERE + name
+        assert _meta(page, "og:url") == expected, name
+    # The image the tags point at is really in the build.
+    assert (out / "og-card.png").exists()
+
+
+def test_a_build_with_no_address_has_no_image_rather_than_a_relative_one(
+    tmp_path: Path, derived: Path
+):
+    """A laptop preview does not know where it will be served, and must not guess."""
+    out, _ = _published(tmp_path, derived, site_url=None)
+    for name, page in _pages(out).items():
+        assert _meta(page, "og:image") is None and _meta(page, "og:url") is None, name
+        assert _meta(page, "og:description"), name
+        assert _meta(page, "twitter:card") == "summary", name
+
+
+def test_the_site_address_is_read_at_build_time_and_never_written_down():
+    """It contains an account name, which this repo holds nowhere — so no constant."""
+    assert site_url_from({"GITHUB_REPOSITORY": "Someone/league"}) == "https://someone.github.io/league/"
+    assert site_url_from({"RS57_SITE_URL": "https://rs57.example"}) == "https://rs57.example/"
+    assert site_url_from(
+        {"RS57_SITE_URL": "https://rs57.example/", "GITHUB_REPOSITORY": "someone/league"}
+    ) == "https://rs57.example/"
+    assert site_url_from({}) is None
+    assert site_url_from({"GITHUB_REPOSITORY": "no-slash"}) is None
+    assert site_url_from({"RS57_SITE_URL": "http://rs57.example"}) is None, "not https"
+    source = (TEMPLATES.parent / "site.py").read_text(encoding="utf-8")
+    hosts = set(re.findall(r"https://([\w.-]+)\.github\.io", source))
+    assert not hosts, f"an account's address is written into site.py: {hosts}"
+
+
+def test_each_page_describes_itself(tmp_path: Path, derived: Path):
+    _three_seasons(derived)
+    doc = json.loads((derived / f"{SEASON}.json").read_text())
+    doc["source"]["trade_deadline"] = ALERT_DEADLINE.isoformat()
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    # One franchise out in front: t1 takes both weekly highs.
+    live = json.loads((derived / f"{SEASON}-stats.json").read_text())
+    for row in live["payouts"]:
+        if row.get("winner_manager_id") == "t2":
+            row["winner_manager_id"] = "t1"
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(live), encoding="utf-8")
+    out, _ = _published(tmp_path, derived)
+    pages = _pages(out)
+    described = {name: _meta(page, "og:description") for name, page in pages.items()}
+
+    assert described["index.html"] == "Through week 2. Moneylist leader: Fake News, $20."
+    assert _meta(pages["index.html"], "og:title") == f"RS57 — {SEASON} Week 2"
+    assert described[f"season-{PRIOR}.html"] == f"{PRIOR} champion: Fake News."
+    assert described["keepers.html"] == (
+        "Keeper prices for every rostered player. Deadline 11/25/2026."
+    )
+    assert described["seasons.html"] == (
+        f"Champions and prize winners for every season since {PRIOR - 1}."
+    )
+    assert described["rules.html"] == "RS57 league rules in effect for 2026."
+    # One year, in the preview and on the page.
+    assert "In effect for the 2026 season." in text(pages["rules.html"])
+
+
+def test_the_preseason_home_page_describes_the_dates_it_shows(tmp_path: Path, derived: Path):
+    doc = keeper_doc()
+    doc["source"].update(draft_date="2026-09-04T01:00:00", keeper_deadline="2026-08-26T03:59:00")
+    (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
+    out, _ = _published(tmp_path, derived, drafted=False)
+    page = _pages(out)["index.html"]
+    # Eastern, like the page: 01:00 UTC on the 4th is 9pm on the 3rd.
+    assert _meta(page, "og:description") == "Draft 9/3/2026. Keeper deadline 8/25/2026."
+    assert _meta(page, "og:title") == f"RS57 — {SEASON} Preseason"
+    assert "9/3/2026" in text(page) and "8/25/2026" in text(page)
+
+
+def test_no_preview_ever_names_a_manager_id(tmp_path: Path, derived: Path):
+    """A description is public the moment a link is pasted, and cached for days after.
+
+    Three seasons whose franchise names are not on file: a finished one, the one in progress,
+    and the keeper season. On the page each shows ``t1`` tagged "name unknown"; a description
+    has no room for the tag, so the clause goes instead. Mutation-checked by making
+    ``_named_or_none`` return the joined names unconditionally — this then finds
+    "2025 champion: t1." and "Moneylist leader: t1".
+    """
+    _three_seasons(derived)
+    for year in (PRIOR - 1, PRIOR, SEASON):
+        path = derived / f"{year}.json"
+        doc = json.loads(path.read_text())
+        doc["franchises"] = []
+        path.write_text(json.dumps(doc), encoding="utf-8")
+
+    out, _ = _published(tmp_path, derived)
+    pages = _pages(out)
+    assert "name unknown" in text(pages[f"season-{PRIOR}.html"]), "the fixture has its names"
+    for name, page in pages.items():
+        for key in ("description", "og:description", "og:title"):
+            value = _meta(page, key)
+            assert value, f"{name} has no {key}"
+            assert not re.search(r"\bt\d+\b", value), f"{name} {key}: {value!r}"
+            assert "unknown" not in value, f"{name} {key}: {value!r}"
+    assert _meta(pages[f"season-{PRIOR}.html"], "og:description") == f"{PRIOR} final results."
+    assert _meta(pages["index.html"], "og:description") == "Through week 2."
+
+
+def test_a_tie_for_first_on_the_moneylist_names_no_single_leader(derived: Path):
+    from rs57.site import describe_home
+
+    doc = _empty_season_doc(weeks_with_results=[1, 2])
+    doc["payouts"] = _in_progress_payouts(SEASON)   # t1 and t2 each hold one $10 weekly high
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    home = build_home(build_stats_season(derived, SEASON))
+    assert [line.rank for line in home.leaders] == [1, 1]
+    assert describe_home(home) == "Through week 2."
+
+
+STATIC_FILES = {"favicon.svg", "favicon.ico", "apple-touch-icon.png", "og-card.png"}
+
+
+def test_the_icons_and_the_card_are_copied_into_the_build(tmp_path: Path, derived: Path):
+    """``site/`` has one writer. The files are source under ``rs57/static/`` and reach the
+    output only by this copy — and they are in the list ``build_site`` returns."""
+    out, written = _published(tmp_path, derived)
+    assert STATIC_FILES <= {path.name for path in out.iterdir()}
+    assert STATIC_FILES <= {path.name for path in written}
+    static = TEMPLATES.parent / "static"
+    for name in STATIC_FILES:
+        assert (out / name).read_bytes() == (static / name).read_bytes(), name
+    # What the fallbacks actually are, read off the files rather than trusted from their names.
+    assert (static / "og-card.png").read_bytes()[16:24] == (1200).to_bytes(4) + (630).to_bytes(4)
+    assert (static / "apple-touch-icon.png").read_bytes()[16:24] == (180).to_bytes(4) * 2
+    assert (static / "favicon.ico").read_bytes()[:4] == b"\x00\x00\x01\x00"
+    page = (out / "keepers.html").read_text(encoding="utf-8")
+    for link in ('<link rel="icon" href="favicon.svg" type="image/svg+xml">',
+                 '<link rel="icon" href="favicon.ico" sizes="32x32">',
+                 '<link rel="apple-touch-icon" href="apple-touch-icon.png">'):
+        assert link in page
+
+
+def test_the_static_files_are_packaged():
+    """The nightly installs this package. Without ``static/*`` in the package data an installed
+    copy builds a site with no icons and a preview with no image, and nothing fails."""
+    import tomllib
+
+    pyproject = tomllib.loads((TEMPLATES.parent.parent / "pyproject.toml").read_text())
+    assert "static/*" in pyproject["tool"]["setuptools"]["package-data"]["rs57"]
+    assert "pillow" not in json.dumps(pyproject).lower(), "the image script is a one-off"

@@ -3,8 +3,10 @@
 12-team ESPN keeper/auction fantasy football league. Manages keeper salaries, prize
 tracking, and league history. NOT live scoring — that stays on ESPN.
 
-All six build phases are complete. The plan and its Corrections log are in
-`rs57-league-app-plan.md`; each phase's handoff is in `docs/phase-*-notes.md`. Read the
+All six build phases are complete, and two more followed: Phase 7 (prospect eligibility) and
+Phase 8 (the public site's UI revision, planned in `docs/ui-revision-plan.md`). The plan and
+its Corrections log are in `rs57-league-app-plan.md`; each phase's handoff is in
+`docs/phase-*-notes.md`. Read the
 Corrections log before deciding any verification is unnecessary — every phase had an
 acceptance check that was tempting to wave through, and each one was hiding a real bug.
 
@@ -81,6 +83,13 @@ and **from 2026 on the admin tool is the record** and its rows are copied across
   logs on a public repo are public.
 - Jinja autoescaping stays on. No |safe on manual text fields. `SalaryOverride.reason` is
   free text a human types and the site renders — it is the injection path.
+- **The site's own address is not written down either.** It is
+  `https://<account>.github.io/<repo>/` and the account is a handle. Link previews need it
+  absolute, so `site.site_url_from` reads `RS57_SITE_URL` or the Action's `GITHUB_REPOSITORY`
+  at build time; a local preview has neither and carries no `og:image` rather than a guess.
+- **A link-preview description is public and cached for days.** Franchise names only, built
+  through `site._named_or_none`, which gives nothing back for a franchise whose name is not on
+  file — the clause is dropped, never filled with a `manager_id`.
 
 ## Rules
 - Max 3 keepers + 1 prospect per team
@@ -311,8 +320,13 @@ but one, and a high score for every regular-season week. Results fill the rows i
 Champion / 2nd / 3rd podium appears only once the season is final** (same day): the bracket
 decides the placings once, at the end, so mid-season it was three empty cards taking up the top
 of the page. Its payout rows are still resolved, so they never fall into "Other prizes". Until the season is final, Most Points, the studs and Unlucky show the current
-leader marked **leading**; an empty row reads "—", and only a *finished* season says
-"unawarded". It used to be built out of the results it held, so 2026's first board had no studs,
+leader. **The page does not tag him "leading"** (commissioner, 2026-10-06): the "In progress"
+pill beside the heading says it once for the whole board, and `BoardRow.leading` still records
+it. A week not played yet is `pending` — still a row, drawn lighter, with no dash; a played
+week with nothing on file keeps its "—", and only a *finished* season says "unawarded".
+**Survivor shows the played weeks newest first, then the weeks to come in order under
+"Upcoming"** (same day), and until somebody wins it the Winner slot reads "Still alive: N of
+12" — counted in *teams* out, never weeks, because a tie takes two. It used to be built out of the results it held, so 2026's first board had no studs,
 Unlucky or weekly highs at all.
 
 **Stats REVIEW and ERROR notes are not published on the board** (same decision). They were
@@ -390,6 +404,25 @@ has no derived file to check against.
 
 The public homepage panel shows dues only, and **removes itself once every franchise has paid**
 (decided in `site.build_site`, not in the template). Prize *handoff* status stays admin-only.
+
+## The public site's presentation
+
+Settled in Phase 8; `docs/phase-8-notes.md` has the reasons.
+
+- **Every colour in a rule is a token.** Dark mode is one `prefers-color-scheme` block that
+  redefines them, following the device with no toggle. A test computes WCAG contrast for every
+  text-on-background pairing in both themes from the stylesheet itself; a new pairing needs a
+  row in its `TEXT_ON` list. The admin tool has its own stylesheet and stays light.
+- **`rs57/static/` is source; `site/` still has one writer.** Icons and the preview card are
+  committed there and `build_site` copies them. The PNG and ICO were drawn once with a
+  throwaway Pillow script. Pillow is not a dependency and must not become one.
+- **The keeper deadline alert is display only**, like the deadline itself. `deadline_status`
+  reads `qualifying_deadline` — the date the alert prints — never `source.keeper_deadline`.
+  Neutral past 14 days, amber inside, red once the instant has passed.
+- **The Seasons matrix is read off each season's `Home`**, the object its own page renders, so
+  the index and the page cannot name different winners.
+- **`render_markdown` emits only the links it builds**: section anchors, from digits, after
+  escaping. A `§` reference to a section that does not exist fails a test.
 
 ## Conventions
 - Key franchises on espn_team_id. Display names change yearly and are unreliable

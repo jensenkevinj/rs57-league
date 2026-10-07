@@ -31,7 +31,7 @@
    is escaped in both places; it is never rendered as markup. #}
 {% macro info(text) -%}
 {%- if text -%}
-<button type="button" class="info" aria-label="{{ text }}"><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">{{ text }}</span></button>
+<button type="button" class="info" aria-label="{{ text }}"><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">{{ text }}</span></button>
 {%- endif -%}
 {%- endmacro %}
 
