@@ -3,9 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
 <title>RS57 — Home</title>
+<meta name="description" content="Through week 4. Moneylist leader: Jaxian McJigberson, $30.">
+<meta property="og:site_name" content="RS57">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RS57 — 2026 Week 4">
+<meta property="og:description" content="Through week 4. Moneylist leader: Jaxian McJigberson, $30.">
+<meta property="og:url" content="https://jensenkevinj.github.io/rs57-league/">
+<meta property="og:image" content="https://jensenkevinj.github.io/rs57-league/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RS57 — 12-team keeper auction league">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root {
+    color-scheme: light dark;
     --ink: #1b1f24;
     --muted: #5b6470;
     --line: #dfe3e8;
@@ -24,6 +42,51 @@
     --gold: #b8860b;
     --silver: #98a0aa;
     --bronze: #a2704a;
+    /* Every colour a rule uses is a token, so a theme is one block that redefines them. A
+       literal left in a rule is a colour that theme cannot reach: the tooltip was `--ink`
+       with `#fff` on it, which is white on white the moment `--ink` turns light. */
+    --faint: #6e7681;
+    --gold-text: #8a6508;
+    --gold-wash: rgba(184, 134, 11, 0.09);
+    --gold-shadow: 0 1px 4px rgba(184, 134, 11, 0.22);
+    --on-accent: #ffffff;
+    --bubble-bg: #1b1f24;
+    --bubble-fg: #ffffff;
+  }
+  /* Dark mode is this block and nothing else: the same tokens, redefined. It follows the
+     device's setting and has no switch. Every pairing of a text token with the background it
+     is set on is held to 4.5:1 in both themes by a test that reads these two blocks, so a
+     value changed here that stops being readable fails there rather than on somebody's phone.
+     The gold wash is far fainter and its shadow is gone — a glow on a dark page reads as a
+     smudge. The admin tool has its own stylesheet and stays light. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e6e9ed;
+      --muted: #9aa4b0;
+      --line: #2e353d;
+      --bg: #111418;
+      --panel: #1a1f25;
+      --accent: #5aa2ec;
+      --flag: #e0b45a;
+      --flag-bg: #2a2214;
+      --flag-line: #6b5520;
+      --bad: #f08a78;
+      --bad-bg: #2c1714;
+      --bad-line: #7a3a30;
+      --good: #6cc493;
+      --good-bg: #13261b;
+      --good-line: #2f5c42;
+      --gold: #d4a537;
+      --silver: #7d8590;
+      --bronze: #b98a63;
+      --faint: #7d8691;
+      --gold-text: #d4a537;
+      --gold-wash: rgba(212, 165, 55, 0.05);
+      --gold-shadow: none;
+      --on-accent: #0b1a2b;
+      --bubble-bg: #e6e9ed;
+      --bubble-fg: #111418;
+    }
   }
   * { box-sizing: border-box; }
   body {
@@ -82,6 +145,8 @@
     font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--flag); background: var(--flag-bg); border: 1px solid var(--flag-line);
     border-radius: 3px; padding: 0.05rem 0.3rem; vertical-align: 0.08em; white-space: nowrap;
+    /* It always follows a name it is about, and sat flush against it. */
+    margin-left: 0.35rem;
   }
   /* --- the keeper page: one grid, every roster ---------------------------- */
 
@@ -133,7 +198,7 @@
      `auto` the un-wrappable subtext sets the Player column's width from its longest franchise
      name and shoulders Salary off the side of a phone — the clip below never gets to run. */
   .grid { margin: 0; table-layout: fixed; }
-  .grid th:nth-child(6) { width: 6.6rem; }              /* Acquired */
+  .grid th:nth-child(6) { width: 8.5rem; }              /* Acquired: how, then when */
   .grid th:nth-child(7), .grid th:nth-child(8) { width: 4.6rem; }  /* Base, Tax */
   .grid th:nth-child(9) { width: 5.6rem; }              /* Salary */
   /* Deliberately NOT `.scroll`. `overflow-x: auto` makes this div the scroll container, and a
@@ -156,6 +221,8 @@
     text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
     background: none; border: 0; border-radius: 0; padding: 0.45rem 0.6rem;
     text-align: inherit; cursor: pointer;
+    /* The arrow is part of the word it marks; on a phone it dropped to a line of its own. */
+    white-space: nowrap;
   }
   .grid .sort:hover { color: var(--ink); }
   .grid th.num .sort { text-align: right; }
@@ -181,6 +248,10 @@
   }
 
   .grid .acq { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+  /* The separator is an element with space around it, never " · " typed into the text. A
+     leading space is the first character of its flex item on line two, and a flex item
+     drops it — which is how a phone came to read "Belichick's Spy· 9/3/2026". */
+  .grid .acq .dot { margin: 0 0.3rem; }
   /* The same date, folded onto line two. Off wherever Acquired is a column of its own — it is
      never shown twice, the same arrangement as position, club and franchise. */
   .grid .acq-sub, .grid .prospect-sub { display: none; }
@@ -201,7 +272,7 @@
     border: none; font-family: inherit; font-size: 0.62rem; font-weight: 700; line-height: 1;
     cursor: help; vertical-align: 0.08em; flex: none;
   }
-  .pbadge.is-eligible { background: var(--accent); color: #fff; }
+  .pbadge.is-eligible { background: var(--accent); color: var(--on-accent); }
   .pbadge.is-unknown {
     border: 1px dashed var(--flag-line); background: var(--flag-bg); color: var(--flag);
   }
@@ -234,22 +305,34 @@
   .grid tbody tr.late .who { color: var(--muted); font-weight: 400; }
   .grid tbody tr.late .money { color: var(--muted); }
 
-  /* The alert. Red rather than a muted aside: it is the one number on the page that decides
-     whether a row below it counts, and the rows that fail it are red too. */
+  /* The alert, and how loud it is. It was red all year, which left red meaning nothing by the
+     time the date mattered. Now it is a quiet fact while the deadline is far off, amber inside
+     two weeks, and red once it has passed — when red means the same thing it means on the rows
+     below it: this cannot be acted on. A deadline that is not on file stays red; a missing
+     date is a gap in the season's record. The wording changes with the colour, so the state
+     never depends on telling amber from red. */
   /* Sized to its content rather than stretched across the container — it is one short fact,
-     and a full-width bar promises more than it says. Same red as the rows it is about. */
+     and a full-width bar promises more than it says. */
   .deadline {
-    display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 0 0.75rem;
-    background: var(--bad-bg); border: 1px solid var(--bad-line); border-left-width: 4px;
+    display: inline-flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0 0.75rem;
+    background: var(--panel); border: 1px solid var(--line); border-left-width: 4px;
     border-radius: 6px; padding: 0.45rem 0.75rem;
-    color: var(--bad); font-size: 0.9rem; font-weight: 600;
+    color: var(--ink); font-size: 0.9rem; font-weight: 600;
   }
   .deadline strong { font-variant-numeric: tabular-nums; }
   .deadline-i {
     display: inline-flex; align-items: center; justify-content: center; flex: none;
     width: 1.15rem; height: 1.15rem; border-radius: 50%;
-    background: var(--bad); color: var(--bad-bg);
+    background: var(--muted); color: var(--panel);
     font-size: 0.72rem; font-weight: 700; font-style: italic; line-height: 1;
+  }
+  .deadline.is-soon { background: var(--flag-bg); border-color: var(--flag-line); color: var(--flag); }
+  .deadline.is-soon .deadline-i { background: var(--flag); color: var(--flag-bg); }
+  .deadline.is-passed, .deadline.is-unknown {
+    background: var(--bad-bg); border-color: var(--bad-line); color: var(--bad);
+  }
+  .deadline.is-passed .deadline-i, .deadline.is-unknown .deadline-i {
+    background: var(--bad); color: var(--bad-bg);
   }
   /* One line, always. "Aiyukiddinme? I'm Odunze here" is long enough to wrap the subtext on a
      phone, and a grid where half the rows are two lines and half are three is harder to read
@@ -259,7 +342,7 @@
      the acquisition date is unique to the row and was asked for, so it must not be the thing
      that gets clipped. Letting the whole line ellipsize clipped the date on 79 rows. */
   .grid .sub {
-    display: flex; font-size: 0.82rem; color: var(--muted); letter-spacing: 0.01em;
+    display: flex; gap: 0.3rem; font-size: 0.82rem; color: var(--muted); letter-spacing: 0.01em;
     white-space: nowrap; overflow: hidden;
   }
   .grid .franchise { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -291,6 +374,25 @@
     .grid td, .grid .sort { padding: 0.4rem 0.22rem; }
     .pbadge { width: 1rem; height: 1rem; font-size: 0.56rem; margin-left: 0.3rem; }
     .count { margin-left: 0; }
+    /* Safari zooms the whole page into any focused field set under 16px, and does not zoom
+       back out. These computed to 14.4px. */
+    .controls input, .controls select { font-size: 1rem; }
+  }
+
+  /* A desktop has the room the cap above was protecting a narrower window from, so there the
+     grid runs the full page and the franchise gets its column back. The wall of repeated
+     names the folding avoided is answered by setting them in `--muted`: twelve repeats down a
+     column read as a quiet key rather than as the loudest thing on the row. Line two goes
+     away, since everything on it now has a column. If the column still reads busy, deleting
+     this one query is the whole revert. Between 34rem and 60rem nothing changes. */
+  @media (min-width: 60rem) {
+    .grid, .controls { max-width: none; }
+    .grid tr > :nth-child(3) { display: table-cell; }
+    .grid th:nth-child(3) { width: 13rem; }
+    .grid td:nth-child(3) {
+      color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .grid .sub { display: none; }
   }
 
   /* --- the home page: a prize board ------------------------------------- */
@@ -318,13 +420,15 @@
   .spot-1 {
     border-top-color: var(--gold); border-top-width: 4px;
     background:
-      linear-gradient(180deg, rgba(184, 134, 11, 0.09), rgba(184, 134, 11, 0) 62%),
+      linear-gradient(180deg, var(--gold-wash), transparent 62%),
       var(--bg);
-    box-shadow: 0 1px 4px rgba(184, 134, 11, 0.22);
+    box-shadow: var(--gold-shadow);
   }
-  .spot-1 .spot-place { color: var(--gold); letter-spacing: 0.13em; }
+  /* `--gold` is a border colour: as text it is 3.25:1 on white, under the 4.5:1 that small
+     text needs. The wording uses the darker `--gold-text`; the rule above keeps the bright one. */
+  .spot-1 .spot-place { color: var(--gold-text); letter-spacing: 0.13em; }
   .spot-1 .spot-team { font-size: 1.22rem; font-weight: 700; }
-  .spot-1 .spot-money { font-size: 1.35rem; color: var(--gold); }
+  .spot-1 .spot-money { font-size: 1.35rem; color: var(--gold-text); }
   .spot-2 { border-top-color: var(--silver); }
   .spot-3 { border-top-color: var(--bronze); }
   .spot-place {
@@ -386,6 +490,33 @@
     text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap;
   }
 
+  /* A week not played yet. Still a row — the board is a template and every prize is always
+     on it — but about two-thirds the height and a shade lighter, so fourteen of them in week
+     1 do not stand between a reader and the one result there is. `--faint` still clears
+     4.5:1; it is quieter, not unreadable. */
+  li.thin.pending {
+    padding: 0.12rem 0; font-size: 0.82rem; border-bottom-style: dotted;
+  }
+  /* Restated, because the rule above gives the last row a style again and a border with a
+     style and no width is drawn at the default three pixels. */
+  li.thin.pending:last-child { border-bottom: none; }
+  li.thin.pending .thin-key { color: var(--faint); }
+  .spot-place.upcoming { margin: 0.9rem 0 0.2rem; }
+
+  /* The board, the pot and the Moneylist in one column, so a phone can put the Moneylist
+     first: it is twelve short lines and the answer to "who is winning", and it sat under
+     three screens of prizes. Only the visual order moves. The source order is unchanged, so
+     a screen reader still meets the board first — nothing here depends on reading order. */
+  .board-page { display: flex; flex-direction: column; }
+  .moneylist h2 { margin-top: 0.9rem; }
+  @media (max-width: 34rem) {
+    .board-page > .podium { order: 1; }
+    .board-page > .moneylist { order: 2; }
+    .board-page > .boards { order: 3; }
+    .board-page > .pot { order: 4; }
+    .moneylist h2 { margin-top: 0.6rem; }
+  }
+
   .pot {
     margin: 0 0 1.75rem; padding-top: 0.75rem; border-top: 2px solid var(--ink);
   }
@@ -405,25 +536,62 @@
   .info-bubble {
     position: absolute; left: 50%; bottom: calc(100% + 0.4rem); transform: translateX(-50%);
     width: max-content; max-width: 17rem;
-    background: var(--ink); color: #fff; border-radius: 6px; padding: 0.5rem 0.65rem;
+    background: var(--bubble-bg); color: var(--bubble-fg); border-radius: 6px;
+    padding: 0.5rem 0.65rem;
     font-size: 0.8rem; font-weight: 400; line-height: 1.45; text-align: left;
     text-transform: none; letter-spacing: 0;
     opacity: 0; visibility: hidden; transition: opacity 0.12s ease; z-index: 5;
   }
-  .info:hover .info-bubble, .info:focus .info-bubble,
-  .pbadge:hover .info-bubble, .pbadge:focus .info-bubble,
-  .wbadge:hover .info-bubble, .wbadge:focus .info-bubble { opacity: 1; visibility: visible; }
+  /* Three ways to open one, because no single one works everywhere.
+     - `aria-expanded`, set by the script at the foot of the page on a tap or a click. This is
+       the one a phone uses: Safari does not reliably focus a tapped button, so `:focus` alone
+       never fired on an iPhone.
+     - `:focus-visible`, for a keyboard.
+     - `:focus`, only while the script has NOT run (`html.tips` is its mark), so a page with no
+       JavaScript still opens on tap wherever the browser does focus.
+     - `:hover`, only where there is a pointer that can hover. A touch screen leaves the last
+       thing tapped "hovered", which would hold a bubble open after the second tap closed it. */
+  .info[aria-expanded="true"] .info-bubble, .pbadge[aria-expanded="true"] .info-bubble,
+  .wbadge[aria-expanded="true"] .info-bubble,
+  .info:focus-visible .info-bubble, .pbadge:focus-visible .info-bubble,
+  .wbadge:focus-visible .info-bubble,
+  html:not(.tips) .info:focus .info-bubble, html:not(.tips) .pbadge:focus .info-bubble,
+  html:not(.tips) .wbadge:focus .info-bubble { opacity: 1; visibility: visible; }
+  @media (hover: hover) {
+    .info:hover .info-bubble, .pbadge:hover .info-bubble,
+    .wbadge:hover .info-bubble { opacity: 1; visibility: visible; }
+  }
+  /* The circle stays 17px and the target becomes about 31px, clear of the 24px minimum. It
+     hangs off the glyph inside the trigger rather than off the trigger itself, because on a
+     phone the trigger stops being a positioned box (below) and a pseudo-element of its own
+     would then stretch to the heading it sits in. */
+  .tip-glyph {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%;
+  }
+  .tip-glyph::before { content: ""; position: absolute; inset: -0.45rem; }
+  /* On a phone a bubble centred on its trigger runs off whichever edge the trigger is near.
+     It is anchored to the row it belongs to instead — the heading, or the Player cell — and
+     spans it, so it cannot leave the screen on either side. */
+  @media (max-width: 34rem) {
+    .col-head, .grid td:first-child { position: relative; }
+    .col-head .info, .grid .pbadge, .grid .wbadge { position: static; }
+    .col-head .info-bubble, .grid .info-bubble {
+      left: 0; right: 0; transform: none; width: auto; max-width: none;
+    }
+  }
   .survivor-won { padding: 0.1rem 0 0.6rem; border-bottom: 1px solid var(--line); }
 
   /* A printed results sheet's leader board: one line each, a dotted rule running from the
-     franchise to what it won. No bar — the ordering and the figures carry it. */
+     franchise to what it won. No bar — the ordering and the figures carry it. And no rule
+     under the row either: the dotted leader is the line, and a solid one beneath it was two
+     rules for one row. */
   .leaders { list-style: none; margin: 0.75rem 0 1.5rem; padding: 0; max-width: 26rem; }
   .leaders li {
     display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto;
     align-items: baseline; gap: 0.6rem;
-    padding: 0.34rem 0; border-bottom: 1px solid var(--line); font-size: 0.95rem;
+    padding: 0.34rem 0; font-size: 0.95rem;
   }
-  .leaders li:last-child { border-bottom: none; }
   .leader-rank {
     color: var(--muted); font-size: 0.75rem; text-align: right;
     font-variant-numeric: tabular-nums;
@@ -437,7 +605,94 @@
     position: relative; background: var(--bg); padding-right: 0.35rem; font-weight: 600;
   }
   .leader-money { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .leaders li.top .leader-money { color: var(--gold); }
+  .leaders li.top .leader-money { color: var(--gold-text); }
+
+  /* --- the seasons page: the hall of fame ------------------------------- */
+
+  /* Fixed layout with set widths, so the columns line up down the whole page rather than each
+     row negotiating its own. Season and Pot are the two that hold a known amount of text; the
+     six columns of franchise names share what is left equally. Names wrap inside their cell —
+     the longest is five words — and the minimum width keeps a tablet from squeezing a column
+     to a word a line; below it the wrapper scrolls sideways. */
+  .hall { table-layout: fixed; min-width: 46rem; font-size: 0.88rem; }
+  .hall th, .hall td { vertical-align: top; padding: 0.5rem 0.5rem; overflow-wrap: anywhere; }
+  .hall .hall-season { width: 5.2rem; }
+  .hall .hall-pot { width: 4.8rem; }
+  .hall tbody th {
+    font-size: 0.95rem; text-transform: none; letter-spacing: 0; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .hall .hall-champion { font-weight: 700; }
+  .hall .hall-fold { display: none; }
+  .hall .hall-mark { text-decoration: none; margin-left: 0.1rem; }
+  /* A phone keeps Season and Champion. Second and third fold under the champion, and the rest
+     is one tap away on the season's own page — which is where the year links. */
+  @media (max-width: 34rem) {
+    /* Automatic layout here. Fixed layout sizes columns off the first row and still counts
+       the six an in-progress season's one cell spans, which left Champion a sixth of the
+       screen and broke names a syllable to a line. */
+    .hall { table-layout: auto; min-width: 0; font-size: 0.95rem; }
+    .hall th, .hall td { overflow-wrap: normal; }
+    .hall .hall-wide { display: none; }
+    /* The footnote explains a mark in the Pot column, which is not on a phone. */
+    .hall-note { display: none; }
+    .hall .hall-fold {
+      display: block; font-weight: 400; font-size: 0.82rem; color: var(--muted);
+      margin-top: 0.15rem;
+    }
+  }
+  .season-nav { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0.5rem 0 0; }
+  .season-nav a { text-decoration: none; }
+  .season-nav a:hover { text-decoration: underline; }
+
+  /* --- the rules page ---------------------------------------------------- */
+
+  /* Prose at a readable measure — about seventy characters, down from the ninety-five the
+     full page width gave it — with the contents beside it on a desktop and folded above it
+     anywhere narrower. Both are the same list; only one is ever displayed. */
+  .rules-prose { max-width: 42rem; min-width: 0; }
+  .rules-prose :first-child { margin-top: 0; }
+  /* A jump lands the heading a little below the top edge rather than against it. */
+  .rules-prose h2, .rules-prose h3 { scroll-margin-top: 1rem; }
+  .rules-toc { display: none; }
+  .rules-toc ol, .rules-toc-fold ol { list-style: none; margin: 0; padding: 0; }
+  .rules-toc a, .rules-toc-fold a {
+    display: block; padding: 0.18rem 0; color: var(--muted); text-decoration: none;
+    font-size: 0.88rem; line-height: 1.35;
+  }
+  .rules-toc a:hover, .rules-toc-fold a:hover { color: var(--accent); }
+  .rules-toc a[aria-current] { color: var(--accent); font-weight: 600; }
+  .toc-n {
+    display: inline-block; min-width: 1.9rem; font-variant-numeric: tabular-nums;
+    color: var(--faint);
+  }
+  .toc-1 { font-weight: 600; margin-top: 0.45rem; }
+  .toc-1:first-child { margin-top: 0; }
+  .toc-1 > a { color: var(--ink); }
+  .toc-2 { padding-left: 0.9rem; }
+  .toc-head {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .rules-toc-fold {
+    max-width: 42rem; margin: 1rem 0 1.5rem; padding: 0.6rem 0.9rem;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .rules-toc-fold summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+  .rules-toc-fold ol { margin-top: 0.5rem; }
+  @media (min-width: 60rem) {
+    .rules-page {
+      display: grid; grid-template-columns: 13rem minmax(0, 42rem); gap: 2.5rem;
+      align-items: start; margin-top: 1.5rem;
+    }
+    /* Follows the reader down the page, and scrolls on its own if it is taller than the
+       window — otherwise its last entries could never be reached. */
+    .rules-toc {
+      display: block; position: sticky; top: 1rem;
+      max-height: calc(100vh - 2rem); overflow-y: auto;
+    }
+    .rules-toc-fold { display: none; }
+  }
 
   /* --- the home page: who still owes their dues ------------------------- */
 
@@ -486,171 +741,117 @@
       <span class="pill">In progress — through week 4</span>
   </div>
 
+  <div class="board-page">
 
   <div class="boards">
       <section class="board-col">
           <h2 class="col-head">
-            Most Points<button type="button" class="info" aria-label="The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it."><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it.</span></button>              <span class="col-money">$100</span>          </h2>
+            Most Points<button type="button" class="info" aria-label="The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it.</span></button>              <span class="col-money">$100</span>          </h2>
           <ol class="prizes">
               <li class="thin nokey">
-                <span class="thin-name">
-                  Belichick&#39;s Spy<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span>                </span>
+                <span class="thin-name">                  Belichick&#39;s Spy                </span>
                 <span class="thin-num">535.48</span>              </li>
           </ol>
           <h2 class="col-head">
-            Stud<button type="button" class="info" aria-label="The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud."><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud.</span></button>              <span class="col-money">$25 each</span>          </h2>
+            Stud<button type="button" class="info" aria-label="The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud.</span></button>              <span class="col-money">$25 each</span>          </h2>
           <ol class="prizes">
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">QB</span>
-                <span class="thin-name">
-                  Calling Audibles<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span><span class="thin-why">Josh Allen · Week 2</span>                </span>
+                <span class="thin-name">                  Calling Audibles<span class="thin-why">Josh Allen · Week 2</span>                </span>
                 <span class="thin-num">40.82</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">RB</span>
-                <span class="thin-name">
-                  Calling Audibles<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span><span class="thin-why">Jahmyr Gibbs · Week 3</span>                </span>
+                <span class="thin-name">                  Calling Audibles<span class="thin-why">Jahmyr Gibbs · Week 3</span>                </span>
                 <span class="thin-num">37.90</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">WR</span>
-                <span class="thin-name">
-                  Tic Tet Taylor<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span><span class="thin-why">Tetairoa McMillan · Week 4</span>                </span>
+                <span class="thin-name">                  Tic Tet Taylor<span class="thin-why">Tetairoa McMillan · Week 4</span>                </span>
                 <span class="thin-num">38.20</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">TE</span>
-                <span class="thin-name">
-                  Tic Tet Taylor<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span><span class="thin-why">George Kittle · Week 3</span>                </span>
+                <span class="thin-name">                  Tic Tet Taylor<span class="thin-why">George Kittle · Week 3</span>                </span>
                 <span class="thin-num">23.20</span>              </li>
           </ol>
           <h2 class="col-head">
-            Unlucky<button type="button" class="info" aria-label="The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss."><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss.</span></button>              <span class="col-money">$20</span>          </h2>
+            Unlucky<button type="button" class="info" aria-label="The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss.</span></button>              <span class="col-money">$20</span>          </h2>
           <ol class="prizes">
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">Week 3</span>
-                <span class="thin-name">
-                  Burrdwalk and Parker’s Place<span class="tag-inline" title="The season is still being played — this is who is ahead, not who won">leading</span>                </span>
+                <span class="thin-name">                  Burrdwalk and Parker’s Place                </span>
                 <span class="thin-num">121.28</span>              </li>
           </ol>
       </section>
       <section class="board-col">
           <h2 class="col-head">
-            Weekly top score<button type="button" class="info" aria-label="The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score."><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score.</span></button>              <span class="col-money">$10 each</span>          </h2>
+            Weekly top score<button type="button" class="info" aria-label="The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score.</span></button>              <span class="col-money">$10 each</span>          </h2>
           <ol class="prizes">
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">Week 1</span>
-                <span class="thin-name">
-                  Jaxian McJigberson                </span>
+                <span class="thin-name">                  Jaxian McJigberson                </span>
                 <span class="thin-num">164.90</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">Week 2</span>
-                <span class="thin-name">
-                  Jaxian McJigberson                </span>
+                <span class="thin-name">                  Jaxian McJigberson                </span>
                 <span class="thin-num">137.38</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">Week 3</span>
-                <span class="thin-name">
-                  Jaxian McJigberson                </span>
+                <span class="thin-name">                  Jaxian McJigberson                </span>
                 <span class="thin-num">142.94</span>              </li>
-              <li class="thin ">
+              <li class="thin">
                   <span class="thin-key">Week 4</span>
-                <span class="thin-name">
-                  Tic Tet Taylor                </span>
+                <span class="thin-name">                  Tic Tet Taylor                </span>
                 <span class="thin-num">177.96</span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 5</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 6</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 7</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 8</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 9</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 10</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 11</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 12</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 13</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
-              <li class="thin ">
+              <li class="thin pending">
                   <span class="thin-key">Week 14</span>
-                <span class="thin-name">
-                  <span class="muted">—</span>                </span>
+                <span class="thin-name">                </span>
                 <span class="thin-num"></span>              </li>
           </ol>
       </section>
 
       <section class="board-col">
         <h2 class="col-head">
-          Survivor<button type="button" class="info" aria-label="Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one."><span aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one.</span></button>            <span class="col-money">$40</span>        </h2>
+          Survivor<button type="button" class="info" aria-label="Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one.</span></button>            <span class="col-money">$40</span>        </h2>
         <div class="survivor-won">
-          <div class="spot-place">Winner</div>
-          <div class="spot-team"><span class="muted">—</span></div>
+            <div class="spot-place">Still alive</div>
+            <div class="spot-team">8 of 12</div>
         </div>
         <ol class="prizes">
-            <li class="thin">
-              <span class="thin-key">Week 11</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 10</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 9</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 8</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 7</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 6</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
-            <li class="thin">
-              <span class="thin-key">Week 5</span>
-                <span class="thin-name muted">—</span>
-                <span class="thin-num"></span>
-            </li>
             <li class="thin">
               <span class="thin-key">Week 4</span>
                 <span class="thin-name muted">Jaxian McJigberson</span>
@@ -672,10 +873,35 @@
                 <span class="thin-num">49.36</span>
             </li>
         </ol>
+        <div class="spot-place upcoming">Upcoming</div>
+        <ol class="prizes">
+            <li class="thin pending">
+              <span class="thin-key">Week 5</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 6</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 7</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 8</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 9</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 10</span>
+            </li>
+            <li class="thin pending">
+              <span class="thin-key">Week 11</span>
+            </li>
+        </ol>
       </section>
   </div>
 
 
+    <section class="moneylist">
     <h2>Moneylist</h2>
     <ol class="leaders">
         <li class="top">
@@ -695,8 +921,35 @@
           <span class="leader-money">$10</span>
         </li>
     </ol>
+    </section>
+  </div>
 
 
 </div>
+<script>
+/* Opens an "i" or a badge on a tap, and closes it on a second tap, a tap anywhere else, or
+   Escape. One listener on the document, so rows the keeper grid re-sorts need nothing. If this
+   never runs the bubbles still open on hover and on focus — see the stylesheet. */
+(function () {
+  var tips = ".info, .pbadge, .wbadge";
+  if (!document.documentElement.closest) return;
+  document.documentElement.classList.add("tips");
+  function close(except) {
+    Array.prototype.forEach.call(document.querySelectorAll(tips), function (tip) {
+      if (tip !== except) tip.setAttribute("aria-expanded", "false");
+    });
+  }
+  document.addEventListener("click", function (event) {
+    var tip = event.target.closest(tips);
+    close(tip);
+    if (tip) tip.setAttribute("aria-expanded", String(tip.getAttribute("aria-expanded") !== "true"));
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    close(null);
+    if (document.activeElement.matches(tips)) document.activeElement.blur();
+  });
+})();
+</script>
 </body>
 </html>
