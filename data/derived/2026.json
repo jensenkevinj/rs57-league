@@ -75,6 +75,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": -16028,
+      "name": "Commanders D/ST",
+      "nfl_team": "WSH",
+      "position": "DEF"
+    },
+    {
       "espn_player_id": -16026,
       "name": "Seahawks D/ST",
       "nfl_team": "SEA",
@@ -126,12 +132,6 @@
       "espn_player_id": -16003,
       "name": "Bears D/ST",
       "nfl_team": "CHI",
-      "position": "DEF"
-    },
-    {
-      "espn_player_id": -16002,
-      "name": "Bills D/ST",
-      "nfl_team": "BUF",
       "position": "DEF"
     },
     {
@@ -1035,12 +1035,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 4685415,
-      "name": "Travis Hunter",
-      "nfl_team": "JAX",
-      "position": "WR"
-    },
-    {
       "espn_player_id": 4685472,
       "name": "Tetairoa McMillan",
       "nfl_team": "CAR",
@@ -1092,6 +1086,12 @@
       "espn_player_id": 4696981,
       "name": "Cam Skattebo",
       "nfl_team": "NYG",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4697815,
+      "name": "Rachaad White",
+      "nfl_team": "WSH",
       "position": "RB"
     },
     {
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 43,
+    "waiver_bases_verified": 44,
     "warnings": []
   },
   "roster": [
@@ -2489,9 +2489,9 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-30T07:47:38.591000",
-      "base_salary": 2,
-      "espn_player_id": -16002,
+      "acquired_at": "2026-10-07T23:30:12.557000",
+      "base_salary": 0,
+      "espn_player_id": -16028,
       "kept_prior_year": false,
       "manager_id": "t7",
       "season": 2026,
@@ -2606,13 +2606,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 2,
-      "espn_player_id": 4685415,
+      "acquired_at": "2026-10-08T11:39:51.229000",
+      "base_salary": 0,
+      "espn_player_id": 4697815,
       "kept_prior_year": false,
       "manager_id": "t7",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
