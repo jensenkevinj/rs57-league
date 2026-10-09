@@ -135,6 +135,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": 8439,
+      "name": "Aaron Rodgers",
+      "nfl_team": "PIT",
+      "position": "QB"
+    },
+    {
       "espn_player_id": 12483,
       "name": "Matthew Stafford",
       "nfl_team": "LAR",
@@ -174,6 +180,12 @@
       "espn_player_id": 2577417,
       "name": "Dak Prescott",
       "nfl_team": "DAL",
+      "position": "QB"
+    },
+    {
+      "espn_player_id": 2578570,
+      "name": "Jacoby Brissett",
+      "nfl_team": "ARI",
       "position": "QB"
     },
     {
@@ -285,12 +297,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 3912547,
-      "name": "Sam Darnold",
-      "nfl_team": "SEA",
-      "position": "QB"
-    },
-    {
       "espn_player_id": 3915416,
       "name": "DJ Moore",
       "nfl_team": "BUF",
@@ -324,12 +330,6 @@
       "espn_player_id": 3917315,
       "name": "Kyler Murray",
       "nfl_team": "MIN",
-      "position": "QB"
-    },
-    {
-      "espn_player_id": 3917792,
-      "name": "Daniel Jones",
-      "nfl_team": "IND",
       "position": "QB"
     },
     {
@@ -2084,6 +2084,15 @@
       "source": "waiver"
     },
     {
+      "acquired_at": "2026-10-08T16:38:32.700000",
+      "base_salary": 0,
+      "espn_player_id": 2578570,
+      "kept_prior_year": false,
+      "manager_id": "t4",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 3917315,
@@ -2091,15 +2100,6 @@
       "manager_id": "t4",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-30T12:01:13.324000",
-      "base_salary": 0,
-      "espn_player_id": 3917792,
-      "kept_prior_year": false,
-      "manager_id": "t4",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
@@ -2786,6 +2786,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-10-09T13:33:18.548000",
+      "base_salary": 0,
+      "espn_player_id": 8439,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 3116365,
@@ -2793,15 +2802,6 @@
       "manager_id": "t9",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-10-01T16:22:08.510000",
-      "base_salary": 0,
-      "espn_player_id": 3912547,
-      "kept_prior_year": false,
-      "manager_id": "t9",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
