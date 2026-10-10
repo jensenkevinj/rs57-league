@@ -1065,6 +1065,12 @@
       "position": "QB"
     },
     {
+      "espn_player_id": 4686658,
+      "name": "Mike Washington Jr.",
+      "nfl_team": "LV",
+      "position": "RB"
+    },
+    {
       "espn_player_id": 4688813,
       "name": "Josh Downs",
       "nfl_team": "IND",
@@ -1137,12 +1143,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4869961,
-      "name": "Chris Bell",
-      "nfl_team": "MIA",
-      "position": "WR"
-    },
-    {
       "espn_player_id": 4870653,
       "name": "KC Concepcion",
       "nfl_team": "CLE",
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 44,
+    "waiver_bases_verified": 45,
     "warnings": []
   },
   "roster": [
@@ -1769,13 +1769,13 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 3,
-      "espn_player_id": 4869961,
+      "acquired_at": "2026-10-10T11:54:06.961000",
+      "base_salary": 0,
+      "espn_player_id": 4686658,
       "kept_prior_year": false,
       "manager_id": "t12",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
