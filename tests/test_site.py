@@ -3344,6 +3344,12 @@ def test_every_board_page_offers_every_season_and_only_pages_that_exist(
         assert re.findall(r'aria-current="page">(\d+)<', block) == [str(year)], name
         assert f"Season {year}" in text(block)
     assert "season-nav" not in pages[f"season-{PRIOR}.html"]
+    # A past season opens in the Home tab — the selector that reached it lives there — and
+    # the Seasons tab is lit only on the Seasons page itself.
+    for name in ("index.html", f"season-{PRIOR}.html"):
+        assert '<a href="index.html" class="on">Home</a>' in pages[name], name
+        assert '<a href="seasons.html" class="">Seasons</a>' in pages[name], name
+    assert '<a href="seasons.html" class="on">Seasons</a>' in pages["seasons.html"]
 
 
 RULES_SAMPLE = """Preamble, see §2.1.

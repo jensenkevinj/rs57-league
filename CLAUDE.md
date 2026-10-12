@@ -328,6 +328,8 @@ the left — "Thru Week 4", "Thru Semifinals", "No results yet", "Final" (`Home.
 wrote, newest first, the newest being `index.html`. The year is also in the Moneylist's
 heading. `Home.heading` is still the page's `<h1>`, read out and not drawn, and the title in a
 link preview. The selector replaced the "All seasons / ‹ 2024 / 2026 ›" links on archived pages.
+**A past season's page keeps the Home tab lit** (`page="season"`), since the selector that
+reaches it is on that tab.
 **Long-term the Seasons tab becomes a Stats tab** — all-time league stats ESPN does not show —
 which the selector is what makes possible: it is how a past season is reached without that tab. A week not played yet is `pending` and is left off the page (see below); a played
 week with nothing on file keeps its "—", and only a *finished* season says "unawarded".

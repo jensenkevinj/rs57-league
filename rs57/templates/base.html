@@ -838,7 +838,7 @@
   <div class="wrap">
     <div class="brand"><a href="index.html">RS57</a></div>
     <nav>
-      <a href="index.html" class="{% if page == 'home' %}on{% endif %}">Home</a>
+      <a href="index.html" class="{% if page in ('home', 'season') %}on{% endif %}">Home</a>
       <a href="keepers.html" class="{% if page == 'keepers' %}on{% endif %}">Keepers</a>
       <a href="seasons.html" class="{% if page == 'seasons' %}on{% endif %}">Seasons</a>
       <a href="rules.html" class="{% if page == 'rules' %}on{% endif %}">Rules</a>

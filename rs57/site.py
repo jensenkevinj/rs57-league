@@ -2480,7 +2480,10 @@ def build_site(
         write(
             f"season-{archived.season}.html",
             "index.html",
-            page="seasons",
+            # Its own value, not "home" and not "seasons": the page is reached from the season
+            # selector on the Home tab, so Home is the tab that stays lit, but it is not the
+            # live home page and gets none of what that page alone carries.
+            page="season",
             home=archived,
             title=f"RS57 — {archived.heading}",
             description=describe_home(archived),
