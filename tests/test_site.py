@@ -2698,6 +2698,11 @@ def test_a_finished_season_has_no_upcoming_weeks(tmp_path: Path, derived: Path):
     column = _survivor_column(page)
     assert "Upcoming" not in column and "Still alive" not in column
     assert "Winner Fake News" in column
+    # As the ladder's first row, bold like any prize's winner — not a block above the list.
+    assert "survivor-won" not in page
+    ladder = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    first = ladder[ladder.index("<li "):ladder.index("</li>")]
+    assert 'class="thin-key">Winner<' in first and "muted" not in first
     assert 'pending">' not in page
 
 

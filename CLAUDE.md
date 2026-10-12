@@ -373,7 +373,8 @@ Unlucky or weekly highs at all.
   **newest first**, and the week just played marked as the top row —
   yellow for the high score, red for who went out. Both build downward over the season. A week
   still to come is on neither list: Survivor's "Upcoming" rows and its "Still alive: N of 12"
-  header are both gone, and the column names a Winner only once there is one. It is still resolved, so its payout row never lands in "Other
+  header are both gone. Survivor's winner is the ladder's first row, keyed "Winner" and bold like
+  any prize's winner, and only once there is one; the teams that went out follow, greyed. It is still resolved, so its payout row never lands in "Other
   prizes"; a played week with nothing on file is a hole and keeps its dash.
 
 **Stats REVIEW and ERROR notes are not published on the board** (same decision). They were
