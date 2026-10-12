@@ -219,8 +219,10 @@
             </li>
           {% endif %}
           {% for team in home.survivor.still_in %}
-            <li class="thin">
-              <span class="thin-key">Alive</span>
+            {# No key: every row above the grey ones is a team still alive, and saying so on
+               each was redundant. The empty cell keeps the names in their column. #}
+            <li class="thin still-in">
+              <span class="thin-key"></span>
               <span class="thin-name"><span class="thin-who">{{ ui.team(team) }}</span></span>
               <span class="thin-num"></span>
             </li>

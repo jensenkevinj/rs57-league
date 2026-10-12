@@ -365,8 +365,8 @@ Unlucky or weekly highs at all.
   The Won / Projected key is in ink, not grey.
 - **Tooltip rules are written the way a manager would say them** — short, no hedging. They are
   compared against the page unescaped by a test, so they carry no apostrophes.
-- **Every franchise is always on the Survivor ladder.** Still alive at the top, bold, most
-  season points first (`SurvivorPanel.still_in`); each team that goes out drops to the grey
+- **Every franchise is always on the Survivor ladder.** Still alive at the top, bold, with no
+  key, most season points first (`SurvivorPanel.still_in`); each team that goes out drops to the grey
   rows beneath, newest first, with its week and score. Once somebody has won, the one left is
   the Winner row. **Once the season is final the eliminated teams fold away** behind an
   "Eliminated (N)" `<details>` and the winner stands alone. Weekly top score is never folded —

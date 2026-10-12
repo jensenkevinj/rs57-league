@@ -2984,10 +2984,13 @@ def test_every_franchise_is_on_the_survivor_ladder_alive_first(tmp_path: Path, d
     page = render(tmp_path, derived, drafted=True)["index.html"]
     column = page[page.index('<h2 class="col-head">\n          Survivor'):]
     column = column[: column.index("</section>")]
-    assert column.count("<li ") == 12 and column.count('class="thin-key">Alive<') == 9
+    assert column.count("<li ") == 12 and column.count('<li class="thin still-in">') == 9
     assert "more-rows" not in column and "Winner" not in column
     body = text(column)
-    assert body.rindex("Alive") < body.index("Week 3") < body.index("Week 2") < body.index("Week 1")
+    # The alive rows carry no key — being above the grey rows is what says it.
+    assert "Alive" not in body
+    assert column.rindex("still-in") < column.index("Week 3")
+    assert body.index("Week 3") < body.index("Week 2") < body.index("Week 1")
     alive_rows = column[: column.index("out-rows")]
     assert "muted" not in alive_rows, "a team still alive is not greyed"
 
