@@ -1022,12 +1022,33 @@ def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
     home = build_home(build_stats_season(derived, PRIOR))
     assert not home.final
     assert home.status == "In progress — through week 9"
-    assert home.heading == f"{PRIOR} Week 9"
+    assert (home.heading, home.progress) == (f"{PRIOR} Season", "Thru Week 9")
 
-    body = text(render(tmp_path, derived, drafted=True)["index.html"])
-    assert "In progress — through week 9" in body
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    body = text(page)
+    # The heading is the season and the pill says how far it has got (commissioner,
+    # 2026-10-12) — shorter than the "In progress — through week 9" it replaced.
+    assert f"{PRIOR} Season" in body and '<span class="pill">Thru Week 9</span>' in page
+    assert "In progress" not in body
     # Not in the heading, not in a pill, not anywhere: nothing here is settled.
     assert "Final" not in body
+
+
+def _assert_phase(home, expected: str, body: str) -> None:
+    """``expected`` is the season and its phase, e.g. "2025 Week 9" or "2025 Final Results".
+
+    While a season is being played the heading is only "2025 Season" and the phase is the
+    pill, "Thru Week 9" (commissioner, 2026-10-12). Before any result the pill says so, and
+    once the season is over it says "Final". The heading is the page's <h1>, read out and not
+    drawn; the pill is always on the page.
+    """
+    phase = expected.removeprefix(f"{home.season} ")
+    if phase in ("Season", "Final Results"):
+        assert home.heading == expected
+        assert home.progress == ("No results yet" if phase == "Season" else "Final")
+    else:
+        assert (home.heading, home.progress) == (f"{home.season} Season", f"Thru {phase}")
+    assert home.heading in body and home.progress in body
 
 
 @pytest.mark.parametrize(
@@ -1060,8 +1081,7 @@ def test_the_heading_names_the_phase_of_the_season(
     derived = one_stats_season(tmp_path, doc)
 
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.heading == expected
-    assert expected in text(render(tmp_path, derived, drafted=True)["index.html"])
+    _assert_phase(home, expected, text(render(tmp_path, derived, drafted=True)["index.html"]))
 
 
 @pytest.mark.parametrize(
@@ -1101,8 +1121,7 @@ def test_the_playoff_round_is_named_from_the_bracket(
     derived = one_stats_season(tmp_path, doc)
 
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.heading == expected
-    assert expected in text(render(tmp_path, derived, drafted=True)["index.html"])
+    _assert_phase(home, expected, text(render(tmp_path, derived, drafted=True)["index.html"]))
 
 
 def test_the_sync_writes_the_bracket_size_the_site_reads(tmp_path: Path):
@@ -1155,7 +1174,7 @@ def test_a_phase_is_not_guessed_when_the_season_length_is_unknown(tmp_path: Path
     derived = one_stats_season(tmp_path, doc)
 
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.heading == f"{PRIOR} Season"
+    assert (home.heading, home.progress) == (f"{PRIOR} Season", "Thru Week 15")
     assert "Playoffs" not in text(render(tmp_path, derived, drafted=True)["index.html"])
 
 
@@ -1450,9 +1469,8 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     assert len(_block(home, "Most Points").rows) == 1
     assert [row.short_label for row in _block(home, "Stud").rows] == ["QB", "RB", "WR", "TE"]
     assert len(_block(home, "Unlucky").rows) == 1
-    assert [row.short_label for row in _block(home, "Weekly top score").rows] == [
-        f"Week {week}" for week in range(1, 15)
-    ]
+    # No week has been played, so Weekly top score has nothing to list and is not headed.
+    assert not [b for column in home.columns for b in column if b.title == "Weekly top score"]
     # Twelve franchises, and survivor runs a week for all but one.
     assert home.survivor is not None
     # Nothing played, so nothing is under the heading and all eleven weeks are still to come,
@@ -1467,29 +1485,29 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     # 500 + 200 + 100 placings, 100 Most Points, 40 Survivor, 4 x 25 studs, 20 Unlucky, 14 x 10.
     # The placings' $800 is the podium's, which is not shown until the season is final.
     assert home.pot == 1200
-    assert _money_shown(home) == home.pot - 800
+    # ...and the fourteen weekly highs' $140 is on the page only as each week is played.
+    assert _money_shown(home) == home.pot - 800 - 140
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
-    # The survivor column: everybody still in it, and eleven weeks to come. An unplayed week
-    # is its key and nothing else — a dash there would read as a result.
+    # The survivor column: everybody still in it, and no week listed until one is played —
+    # the same as Weekly top score (commissioner, 2026-10-12).
     column = _survivor_column(page)
-    assert "Still alive 12 of 12" in column and "Winner" not in column
-    assert "—" not in column
-    assert column.index("Upcoming") < column.index("Week 1 ") < column.index("Week 11")
-    assert page.count('<li class="thin pending">') == 11 + 14, "eleven survivor weeks, 14 highs"
+    assert "Still alive" not in column and "Winner" not in column
+    assert "—" not in column and "Upcoming" not in column and "Week" not in column
+    assert "pending" not in page
 
     body = text(page)
-    for heading in ("Most Points", "Stud", "Unlucky", "Survivor", "Weekly top score"):
+    for heading in ("Most Points", "Stud", "Unlucky", "Survivor"):
         assert heading in body, heading
     for placing in ("Champion", "2nd Place", "3rd Place", "$500", "$200"):
         assert placing not in body, placing
-    assert 'class="podium"' not in page
+    assert 'class="prizes placings"' not in page and "Final Standings" not in body
     assert "unawarded" not in body, "an unplayed prize is not unawarded, it is not decided yet"
     assert "Prize money nobody was awarded" not in body
     assert "unawarded" not in text(render(tmp_path, derived, drafted=True)["seasons.html"]).split(
         str(PRIOR)
     )[0], "the season index calls a prize still to be played unawarded"
-    assert "$1,200" not in body and "$25 each" in body and "$10 each" in body
+    assert "$1,200" not in body and "$25 each" in body
 
 
 def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, derived: Path):
@@ -1519,7 +1537,11 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
     assert not home.final
 
     weekly = _block(home, "Weekly top score").rows
-    assert [bool(row.winners) for row in weekly] == [True, True] + [False] * 12
+    # The two weeks played, and none of the twelve still to come (commissioner, 2026-10-12).
+    # Newest first, and the week just played is the marked one.
+    assert [row.short_label for row in weekly] == ["Week 2", "Week 1"]
+    assert all(row.winners and not row.pending for row in weekly)
+    assert [row.latest for row in weekly] == [True, False]
     assert not any(row.leading for row in weekly), "a week is won or not played, never led"
 
     most = _block(home, "Most Points").rows[0]
@@ -1535,20 +1557,21 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
     assert all(line.out is not None for line in home.survivor.played)
     assert [line.week for line in home.survivor.upcoming] == list(range(3, 12))
     assert home.survivor.alive == 10
-    assert [row.pending for row in weekly] == [False, False] + [True] * 12
     assert home.podium == ()
-    assert _money_shown(home) == home.pot - 800, "everything but the unshown placings"
+    assert _money_shown(home) == home.pot - 800 - 120, "less the placings and 12 unplayed weeks"
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
     body = text(page)
     # The fields above still say who leads; the page does not tag them. The pill beside the
-    # heading says the season is in progress, once, for the whole board.
-    assert "leading" not in body.lower()
-    assert "In progress — through week 2" in body
+    # heading says how far the season has got, once, for the whole board.
+    # Scoped to the board: the Moneylist's footnote explains its Projected column in terms of
+    # the prizes a franchise is leading, which is a sentence, not a tag on a row.
+    assert "leading" not in text(page[page.index('<div class="boards">'):]).lower()
+    assert f"{SEASON} Season Thru Week 2" in body and "In progress" not in body
     column = _survivor_column(page)
-    assert "Still alive 10 of 12" in column
-    assert column.index("Week 2") < column.index("Week 1 ") < column.index("Upcoming")
-    assert column.index("Upcoming") < column.index("Week 3") < column.index("Week 11")
+    assert "Still alive" not in column and "Winner" not in column
+    assert column.index("Week 2") < column.index("Week 1")
+    assert "Upcoming" not in column and "Week 3" not in column
     assert "unawarded" not in body
     assert "Prize money nobody was awarded" not in body
 
@@ -1563,7 +1586,15 @@ def test_a_finished_season_has_no_leaders(tmp_path: Path, derived: Path):
     assert "leading" not in text(page)
     # And its placings are back: the podium is hidden only while the season is being played.
     assert [spot.place for spot in home.podium] == ["Champion", "2nd Place", "3rd Place"]
-    assert "Champion" in text(page) and 'class="podium"' in page
+    # As the first block of the board, three rows washed gold, silver and bronze, and not as
+    # three cards across the page (commissioner, 2026-10-12).
+    assert 'class="podium"' not in page and page.count('class="prizes placings"') == 1
+    board = page[page.index('<div class="boards">'):]
+    assert board.index("Final Standings") < board.index("Most Points")
+    assert [board.index(f'class="thin place-{rank}"') for rank in (1, 2, 3)] == sorted(
+        board.index(f'class="thin place-{rank}"') for rank in (1, 2, 3)
+    )
+    assert [(spot.key, spot.record) for spot in home.podium][0] == ("1st", "10-4")
 
 
 def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
@@ -1571,9 +1602,9 @@ def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
     assert home.final and home.status == "Final"
     assert home.heading == f"{PRIOR} Final Results"
     body = text(render(tmp_path, derived, drafted=True)["index.html"])
-    # The heading carries this now — a finished season shows no pill at all.
-    assert f"{PRIOR} Final Results" in body
-    assert "In progress" not in body
+    # The pill at the top left switches to "Final" (commissioner, 2026-10-12).
+    assert home.progress == "Final" and f"{PRIOR} Final Results Final" in body
+    assert "In progress" not in body and "Thru" not in body
 
 
 def test_a_tie_on_the_board_shows_both_winners_and_the_whole_prize(tmp_path: Path):
@@ -1628,14 +1659,12 @@ def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
     assert [line.rank for line in home.leaders] == [1, 1]
     assert {line.total for line in home.leaders} == {100}
 
-    # Neither is shown as second on a board whose ordering is the only thing saying who led.
-    # Scoped to the leaders list itself rather than to a slice of the page after "Moneylist":
-    # the list is what the claim is about, and a fixed-width window silently takes in whatever
-    # is rendered next.
+    # On the chart the bar is what says who led, so level money is level bars.
+    assert [line.won_height for line in home.leaders] == [100, 100]
     page = render(tmp_path, derived, drafted=True)["index.html"]
-    leaders = re.search(r'<ol class="leaders">.*?</ol>', page, flags=re.S)
-    assert leaders, "the Moneylist is not on the page at all"
-    assert " 2 " not in text(leaders.group(0))
+    chart = re.search(r'<ol class="money-chart">.*?</ol>', page, flags=re.S)
+    assert chart, "the Moneylist is not on the page at all"
+    assert chart.group(0).count('style="--won: 100%; --leading: 0%"') == 2
 
 
 def test_the_home_page_survives_a_season_with_no_stats_at_all(tmp_path: Path):
@@ -2565,10 +2594,11 @@ def test_no_rule_carries_a_colour_literal():
 
 
 def test_gold_is_a_border_colour_and_never_a_text_colour():
-    """``--gold`` is 3.25:1 on white. Small text needs 4.5:1, so wording uses ``--gold-text``."""
+    """``--gold`` is 3.25:1 on white and small text needs 4.5:1. It is the bar down the side of
+    the champion's row; the wording on that row stays in ink."""
     rules = _rule_bodies(_style())
-    assert not re.search(r"(?<![-\w])color:\s*var\(--gold\)", rules)
-    assert ".spot-1 .spot-money { font-size: 1.35rem; color: var(--gold-text); }" in rules
+    assert not re.search(r"(?<![-\w])color:\s*var\(--(gold|silver|bronze)\)", rules)
+    assert "li.thin.place-1 { background: var(--gold-wash); box-shadow: inset 3px 0 0 var(--gold); }" in rules
 
 
 def test_the_season_index_writes_money_the_way_every_other_page_does(
@@ -2672,19 +2702,282 @@ def test_a_finished_season_has_no_upcoming_weeks(tmp_path: Path, derived: Path):
 
 
 def test_the_moneylist_is_on_the_page_once_in_its_own_section(tmp_path: Path, derived: Path):
-    """A phone shows it above the prizes by reordering one container, not by printing it twice.
+    """Above everything else on the page, a finished season's podium included, in the source
+    itself (commissioner, 2026-10-12).
 
-    Two copies with one hidden would be read out twice by a screen reader.
+    It used to sit under the board and be lifted above it on a phone by a CSS ``order``. Now
+    the source order is the order on every screen, so nothing reorders it.
     """
     page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
-    assert page.count("Moneylist</h2>") == 1 and page.count('class="leaders"') == 1
+    # Headed like the blocks of the board: the same small caps over the same heavy rule.
+    heading = re.compile(rf'<h2 class="col-head">\s*{PRIOR} Moneylist\b')
+    assert len(heading.findall(page)) == 1 and page.count('class="money-chart"') == 1
     section = page[page.index('<section class="moneylist">'):]
     section = section[: section.index("</section>")]
-    assert "Moneylist</h2>" in section and 'class="leaders"' in section
-    # Inside the container the stylesheet reorders, after the boards in source order.
+    assert heading.search(section) and 'class="money-chart"' in section
     board = page[page.index('<div class="board-page">'):]
-    assert board.index('class="boards"') < board.index('class="moneylist"')
-    assert ".board-page > .moneylist { order: 2; }" in _style()
+    assert (
+        board.index('class="moneylist"')
+        < board.index('class="boards"')
+        < board.index('class="prizes placings"')
+    )
+    assert ".board-page > " not in _style(), "nothing reorders the page any more"
+    # A finished season projects nothing: what was won is the whole of it.
+    assert "Projected" not in text(page)
+
+
+def _week_three_doc() -> dict:
+    """Through week 3, with who led a week earlier on file. t2 took Most Points from t1 this
+    week; t1 still holds the QB stud and Unlucky; nobody has started an RB, WR or TE."""
+    doc = _empty_season_doc(weeks_with_results=[1, 2, 3])
+    doc["weekly_high_scores"] = [
+        {"season": SEASON, "week": 1, "manager_ids": ["t1"], "points": 140.1},
+        {"season": SEASON, "week": 2, "manager_ids": ["t2"], "points": 150.2},
+        {"season": SEASON, "week": 3, "manager_ids": ["t2"], "points": 151.0},
+    ]
+    doc["season_points"] = [
+        {"season": SEASON, "manager_id": "t2", "points": 420.4},
+        {"season": SEASON, "manager_id": "t1", "points": 410.0},
+    ]
+    doc["positional_studs"] = [
+        {"season": SEASON, "position": "QB", "espn_player_id": 9, "player_name": "Josh Allen",
+         "week": 2, "points": 38.2, "manager_ids": ["t1"]},
+    ]
+    doc["unlucky"] = {"season": SEASON, "week": 2, "manager_ids": ["t1"], "points": 131.5}
+    doc["survivor"]["eliminations"] = [
+        {"season": SEASON, "week": 1, "manager_ids": ["t5"], "points": 80.0},
+        {"season": SEASON, "week": 2, "manager_ids": ["t4"], "points": 90.0},
+        {"season": SEASON, "week": 3, "manager_ids": ["t3"], "points": 91.0},
+    ]
+    doc["prior_leaders"] = {
+        "season": SEASON,
+        "through_week": 2,
+        "leaders": {"Most Points (Season)": ["t1"], "QB Stud": ["t1"], "Unlucky": ["t1"]},
+    }
+    payouts = _in_progress_payouts(SEASON)
+    next(row for row in payouts if row["label"] == "Week 3 High Score")["winner_manager_id"] = "t2"
+    doc["payouts"] = payouts
+    return doc
+
+
+def test_a_prize_that_changed_hands_this_week_is_marked_and_no_other(
+    tmp_path: Path, derived: Path
+):
+    """Yellow for a new leader, red for the week's survivor casualty (commissioner, 2026-10-12).
+
+    Mutation-checked: comparing against ``{}`` instead of last week's leaders marks every
+    leading row and fails on the QB stud; dropping ``week == weeks_played`` from ``latest``
+    marks all three eliminations and fails the count.
+    """
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(_week_three_doc()), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert [row.label for row in rows if row.changed] == ["Most Points (Season)"]
+    assert all(row.leading for row in rows if row.changed)
+    assert [line.week for line in home.survivor.played if line.latest] == [3]
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    assert page.count(" changed\"") == 1 and page.count("out-latest\"") == 1
+    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    marked = column[column.index("out-latest"):]
+    assert "Week 3" in text(marked[: marked.index("</li>")])
+
+
+def test_most_points_shows_the_two_franchises_behind_the_leader(tmp_path: Path, derived: Path):
+    """Second and third, greyed, and no part of the prize (commissioner, 2026-10-12).
+
+    Mutation-checked: dropping the ``!= best`` filter lists the leader again under himself
+    and fails here.
+    """
+    doc = _week_three_doc()
+    doc["season_points"] += [
+        {"season": SEASON, "manager_id": "t3", "points": 400.0},
+        {"season": SEASON, "manager_id": "t4", "points": 390.0},
+    ]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+    block = _block(home, "Most Points")
+    assert [w.manager_id for w in block.rows[0].winners] == ["t2"]
+    assert [(line.key, line.team.manager_id, line.value) for line in block.also] == [
+        ("2nd", "t1", "410.00"), ("3rd", "t3", "400.00")
+    ]
+    assert block.rows[0].short_label == "1st" and block.show_labels
+    assert len(block.rows) == 1 and block.each == 100
+    assert _money_shown(home) == home.pot - 800 - 110
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    assert page.count('<li class="thin also">') == 2 and 'class="thin nokey' not in page
+    assert all(not b.also for column in home.columns for b in column if b.title != "Most Points")
+
+
+def test_with_no_earlier_week_on_file_nothing_is_marked_as_changed(derived: Path):
+    """Week 1, or a file synced before last week's leaders were recorded: nothing to compare
+    against, so no row claims a change. Every leader being "new" would be twelve yellow rows."""
+    doc = _week_three_doc()
+    del doc["prior_leaders"]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    home = build_home(build_stats_season(derived, SEASON))
+    rows = [row for column in home.columns for block in column for row in block.rows]
+    assert any(row.leading for row in rows) and not any(row.changed for row in rows)
+
+
+def test_the_moneylist_projects_what_each_franchise_is_leading(tmp_path: Path, derived: Path):
+    """Projected is won-so-far plus the franchise's share of every prize it is leading.
+
+    t1 has won $10 and leads the QB stud ($25) and Unlucky ($20); t2 has won $20 and leads
+    Most Points ($100). Mutation-checked: leaving ``leading_share`` out of the sum makes the
+    column repeat the Won column and fails here.
+    """
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(_week_three_doc()), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+    assert home.show_projected
+    assert [(line.team.manager_id, line.rank, line.total, line.projected)
+            for line in home.leaders] == [("t2", 1, 20, 120), ("t1", 2, 10, 55)]
+    # Nothing is projected that is not on the board: the leaders' prizes, and no more.
+    assert sum(line.projected - line.total for line in home.leaders) == 100 + 25 + 20
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    section = page[page.index('<section class="moneylist">'):]
+    section = text(section[: section.index("</section>")])
+    assert "Won Projected" in section and "$120" in section and "$55" in section
+    assert page.index('class="moneylist"') < page.index('class="boards"')
+
+
+def test_the_moneylist_is_a_bar_for_every_franchise(tmp_path: Path, derived: Path):
+    """All twelve, most won first, the tallest stack filling the chart (commissioner,
+    2026-10-12). A bar is two segments: won, and above it what is only being led.
+
+    Mutation-checked: leaving the standings out of the franchise list draws two bars, not
+    twelve; scaling on money won instead of on the projection sends t1's stack past 100.
+    """
+    doc = _week_three_doc()
+    doc["standings"] = [
+        {"season": SEASON, "manager_id": f"t{i}", "wins": 0, "losses": 0, "ties": 0,
+         "points_for": 0.0, "points_against": 0.0, "final_rank": None, "playoff_seed": None}
+        for i in range(1, 13)
+    ]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+    assert len(home.leaders) == 12
+    bars = {line.team.manager_id: line for line in home.leaders}
+    # t2: $20 won + $100 led is the tallest, so it is the whole height. t1: $10 + $45.
+    assert (bars["t2"].won_height, bars["t2"].leading_height) == (17, 83)
+    assert (bars["t1"].won_height, bars["t1"].leading_height) == (8, 38)
+    assert all(l.won_height + l.leading_height <= 100 for l in home.leaders)
+    assert [l.team.manager_id for l in home.leaders][:2] == ["t2", "t1"]
+    assert all((l.total, l.projected, l.won_height) == (0, 0, 0) for l in home.leaders[2:])
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    chart = re.search(r'<ol class="money-chart">.*?</ol>', page, flags=re.S).group(0)
+    assert chart.count("<li ") == 12 and chart.count("bar-seg-won") == 12
+    assert chart.count("bar-seg-leading") == 2, "only a franchise leading something has one"
+    assert 'style="--won: 17%; --leading: 83%"' in chart
+    assert "Projected = " not in page
+    # A $0 is not printed over a bar, won or projected: only t2 and t1 have figures at all.
+    assert chart.count('class="bar-won"') == 2 and chart.count('class="bar-projected"') == 2
+    assert "$0" not in text(chart)
+    # Under the bar, won first: the track comes before the figures, and won before projected.
+    first = chart[chart.index("<li "):chart.index("</li>")]
+    assert first.index("bar-track") < first.index("bar-won") < first.index("bar-projected")
+
+
+def test_a_stud_row_is_one_line_with_the_player_cut_down_to_fit(tmp_path: Path, derived: Path):
+    """The player and week sit beside the franchise, shortened; the full wording is the hover
+    text, so nothing the row used to say has left the page."""
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(_week_three_doc()), encoding="utf-8")
+    home = build_home(build_stats_season(derived, SEASON))
+    qb = _block(home, "Stud").rows[0]
+    assert (qb.detail, qb.brief) == ("Josh Allen · Week 2", "J. Allen · W2")
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    assert '<span class="thin-why" title="Josh Allen · Week 2">J. Allen · W2</span>' in page
+
+
+def test_a_season_with_no_money_on_it_has_no_chart(tmp_path: Path, derived: Path):
+    """Twelve names over an empty axis says nothing: before anything is won or led, and for a
+    season whose prize money was never recorded."""
+    doc = _empty_season_doc()
+    doc["payouts"] = [{k: v for k, v in row.items() if k != "winner_manager_id"}
+                      for row in _in_progress_payouts(SEASON)]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+    assert build_home(build_stats_season(derived, SEASON)).leaders == ()
+    assert "money-chart" not in render(tmp_path, derived, drafted=True)["index.html"].split("</style>")[1]
+
+
+def test_a_franchise_leading_a_prize_is_on_the_moneylist_before_it_has_won_anything(
+    derived: Path,
+):
+    doc = _week_three_doc()
+    doc["season_points"].insert(0, {"season": SEASON, "manager_id": "t7", "points": 500.0})
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+    assert [(line.team.manager_id, line.rank, line.total, line.projected)
+            for line in home.leaders] == [("t2", 1, 20, 20), ("t1", 2, 10, 55), ("t7", 3, 0, 100)]
+
+
+def test_a_tied_lead_projects_the_split_each_would_be_paid(derived: Path):
+    doc = _week_three_doc()
+    doc["unlucky"]["manager_ids"] = ["t1", "t2"]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    home = build_home(build_stats_season(derived, SEASON))
+    projected = {line.team.manager_id: line.projected for line in home.leaders}
+    assert projected == {"t2": 20 + 100 + 10, "t1": 10 + 25 + 10}
+
+
+def test_the_board_runs_in_order_of_what_a_prize_pays(tmp_path: Path, derived: Path):
+    """Placings, Most Points, Survivor, the studs, Unlucky, the weekly highs — largest prize
+    first, which on a phone is the order down the page (commissioner, 2026-10-12).
+
+    Mutation-checked: rendering the survivor ladder after the last column instead of at the
+    foot of the first puts it below the weekly highs and fails here.
+    """
+    home = build_home(build_stats_season(derived, PRIOR))
+    assert [[block.title for block in column] for column in home.columns] == [
+        ["Most Points"], ["Stud", "Unlucky", "Weekly top score"]
+    ]
+    page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
+    board = text(page[page.index('<div class="boards">'):])
+    order = ["Final Standings", "Most Points", "Survivor", "Stud", "Unlucky", "Weekly top score"]
+    assert [board.index(title) for title in order] == sorted(board.index(t) for t in order)
+    assert page.count('<section class="board-col">') == 2
+
+
+def test_weekly_top_score_lists_only_the_weeks_that_are_due(tmp_path: Path, derived: Path):
+    """A week still to come is off the list; its money is not lost and not "Other" either.
+
+    Mutation-checked: listing ``tuple(weekly)`` again puts eleven empty rows back and fails the
+    first assertion; dropping ``week == season.weeks_played`` from ``latest`` marks every row;
+    skipping ``line()`` for an unplayed week instead of filtering afterwards
+    drops its payout row into "Other prizes" and fails the second.
+    """
+    doc = _week_three_doc()
+    # Week 2 was played and nothing is on file for it: a hole, which must still show.
+    doc["weekly_high_scores"] = [h for h in doc["weekly_high_scores"] if h["week"] != 2]
+    del next(r for r in doc["payouts"] if r["label"] == "Week 2 High Score")["winner_manager_id"]
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    home = build_home(build_stats_season(derived, SEASON))
+    weekly = _block(home, "Weekly top score")
+    assert [row.short_label for row in weekly.rows] == ["Week 3", "Week 2", "Week 1"]
+    # Only the week just played is marked, and a finished season marks none.
+    assert [row.latest for row in weekly.rows] == [True, False, False]
+    prior = build_home(build_stats_season(derived, PRIOR))
+    assert not any(row.latest for row in _block(prior, "Weekly top score").rows)
+    assert not [b for column in home.columns for b in column if b.title == "Other prizes"]
+    assert weekly.rows[1].winners == () and not weekly.rows[1].pending
+    assert weekly.each == 10
+    # Every row on the board is one line: a long name is cut, never wrapped.
+    assert "white-space: nowrap" in _style() and "line-clamp" not in _style()
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    assert page.count("won-latest\"") == 1 and page.count("out-latest\"") == 1
+    body = text(page)
+    assert "Week 3" in body and "Week 12" not in body and "Week 14" not in body
 
 
 # 5pm Eastern on Wednesday 11/25/2026, as ESPN stores it: naive UTC.
@@ -2906,7 +3199,9 @@ def test_every_row_names_the_champion_its_own_page_names(tmp_path: Path, derived
     rows = _hall_rows(pages["seasons.html"])
     champion = re.search(r'<td class="hall-champion">\s*(.*?)\s*<span', rows[str(PRIOR)], re.S)
     assert html.unescape(champion.group(1)) == "Belichick's  Spy"
-    spot = re.search(r'spot spot-1">.*?spot-team">(.*?)</div>', pages[f"season-{PRIOR}.html"], re.S)
+    spot = re.search(
+        r'class="thin place-1">.*?thin-who">(.*?)</span>', pages[f"season-{PRIOR}.html"], re.S
+    )
     assert spot.group(1) == champion.group(1), "the index and the season page disagree"
     # A tie is written the way the board writes one.
     assert "The Infirmary &amp; Ken Franklins" in rows[str(PRIOR - 1)]
@@ -2943,24 +3238,34 @@ def test_the_money_footnote_appears_only_when_a_season_needs_it(tmp_path: Path, 
     ).money_footnote == ""
 
 
-def test_an_archived_season_links_back_and_to_its_neighbours(tmp_path: Path, derived: Path):
-    """No link to a page that was not written: the oldest has no previous, the newest no next."""
+def test_every_board_page_offers_every_season_and_only_pages_that_exist(
+    tmp_path: Path, derived: Path
+):
+    """The season selector, top right. Newest first; the newest is the home page itself, and
+    the page being read is marked. No link to a page that was not written.
+
+    Mutation-checked: linking the newest season to its own ``season-{year}.html`` instead of
+    ``index.html`` fails the first assertion.
+    """
     _three_seasons(derived)
     pages = render(tmp_path, derived, drafted=True)
+    offered = ["index.html", f"season-{PRIOR}.html", f"season-{PRIOR - 1}.html"]
 
-    def nav(year: int) -> list[str]:
-        block = re.search(r'<p class="season-nav small">(.*?)</p>', pages[f"season-{year}.html"], re.S)
-        return re.findall(r'href="([^"]+)"', block.group(1))
+    def picker(name: str) -> str:
+        return re.search(r'<details class="season-pick">(.*?)</details>', pages[name], re.S).group(1)
 
-    assert nav(PRIOR - 1) == ["seasons.html", f"season-{PRIOR}.html"]
-    assert nav(PRIOR) == ["seasons.html", f"season-{PRIOR - 1}.html", f"season-{SEASON}.html"]
-    assert nav(SEASON) == ["seasons.html", f"season-{PRIOR}.html"]
-    for year in (PRIOR - 1, PRIOR, SEASON):
-        for href in nav(year):
-            assert href in pages, f"season-{year}.html links to {href}, which was not written"
-    assert "season-nav" not in pages["index.html"].split("</style>")[1], (
-        "the live home page is not one of a series"
-    )
+    for name, year in (
+        ("index.html", SEASON),
+        (f"season-{SEASON}.html", SEASON),
+        (f"season-{PRIOR}.html", PRIOR),
+        (f"season-{PRIOR - 1}.html", PRIOR - 1),
+    ):
+        block = picker(name)
+        assert re.findall(r'href="([^"]+)"', block) == offered, name
+        assert all(href in pages for href in offered)
+        assert re.findall(r'aria-current="page">(\d+)<', block) == [str(year)], name
+        assert f"Season {year}" in text(block)
+    assert "season-nav" not in pages[f"season-{PRIOR}.html"]
 
 
 RULES_SAMPLE = """Preamble, see §2.1.
@@ -3081,10 +3386,15 @@ def test_the_rules_page_has_one_outline_shown_two_ways(tmp_path: Path, derived: 
 TEXT_ON = [
     ("--ink", "--bg"), ("--ink", "--panel"),
     ("--muted", "--bg"), ("--muted", "--panel"), ("--muted", "--bad-bg"),
+    # A board row washed yellow (a new leader) or red (out of Survivor this week).
+    ("--ink", "--flag-bg"), ("--muted", "--flag-bg"), ("--ink", "--bad-bg"),
+    # A franchise's name runs up its Moneylist bar, across both fills.
+    ("--bar-name", "--won-fill"), ("--bar-name", "--leading-fill"),
+    # ...and its two figures sit under the baseline in the greens of their segments.
+    ("--won-text", "--bg"), ("--leading-text", "--bg"),
     ("--faint", "--bg"),
     ("--accent", "--bg"), ("--on-accent", "--accent"),
     ("--flag", "--flag-bg"), ("--bad", "--bad-bg"), ("--good", "--good-bg"),
-    ("--gold-text", "--bg"),
     ("--bubble-fg", "--bubble-bg"),
     # The alert's icon is the fill colour reversed out of itself.
     ("--panel", "--muted"), ("--flag-bg", "--flag"), ("--bad-bg", "--bad"),
@@ -3214,7 +3524,7 @@ def test_each_page_describes_itself(tmp_path: Path, derived: Path):
     described = {name: _meta(page, "og:description") for name, page in pages.items()}
 
     assert described["index.html"] == "Through week 2. Moneylist leader: Fake News, $20."
-    assert _meta(pages["index.html"], "og:title") == f"RS57 — {SEASON} Week 2"
+    assert _meta(pages["index.html"], "og:title") == f"RS57 — {SEASON} Season"
     assert described[f"season-{PRIOR}.html"] == f"{PRIOR} champion: Fake News."
     assert described["keepers.html"] == (
         "Keeper prices for every rostered player. Deadline 11/25/2026."

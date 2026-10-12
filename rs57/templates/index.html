@@ -53,48 +53,93 @@
     {% endif %}
   </p>
 {% elif home %}
+  {# The top of the page is two things: how far the season has got, and which season this
+     is. There is no drawn heading — the year is in the selector and in the Moneylist's
+     heading below — but the page still has an <h1>, read out and not shown. #}
   <div class="page-head">
-    <h1>{{ home.heading }}</h1>
-    {# The heading already says a finished season is finished. The pill is what warns that
-       one is not, so it renders only when there is something to warn about. #}
-    {% if not home.final %}
-      <span class="pill">{{ home.status }}</span>
+    <h1 class="sr">{{ home.heading }}</h1>
+    <span class="pill">{{ home.progress }}</span>
+    {# A <details>, so it opens with no script; the script at the foot of the page only
+       closes it on a tap elsewhere. site.build_site lists exactly the pages it wrote. #}
+    {% if season_links %}
+      <details class="season-pick">
+        <summary><span class="sr">Season </span>{{ home.season }}</summary>
+        <ul>
+          {% for link in season_links %}
+            <li><a href="{{ link.href }}"{% if link.season == home.season %} aria-current="page"{% endif %}>{{ link.season }}</a></li>
+          {% endfor %}
+        </ul>
+      </details>
     {% endif %}
   </div>
-  {# An archived season's way back, and sideways. The live home page gets neither: it is not
-     one of a series, and site.build_site passes these only to season-{year}.html. A year
-     with no page written has no link — the ends of the run simply stop. #}
-  {% if page == 'seasons' %}
-    <p class="season-nav small">
-      <a href="seasons.html">&larr; All seasons</a>
-      {% if prev_season %}<a href="season-{{ prev_season }}.html" rel="prev">&lsaquo; {{ prev_season }}</a>{% endif %}
-      {% if next_season %}<a href="season-{{ next_season }}.html" rel="next">{{ next_season }} &rsaquo;</a>{% endif %}
-    </p>
-  {% endif %}
   {% set blank = "unawarded" if home.final else "—" %}
 
-  {# One container so a phone can reorder what is in it — see `.board-page` in base.html. The
-     order here is the desktop order and the one a screen reader meets. #}
   <div class="board-page">
-  {# Empty until the season is final: the bracket decides the placings once, at the end. #}
-  {% if home.podium %}
-  <div class="podium">
-    {% for spot in home.podium %}
-      <div class="spot spot-{{ spot.rank }}">
-        <div class="spot-place">{{ spot.place }}</div>
-        <div class="spot-team">{{ ui.teams(spot.winners, blank) }}</div>
-        <div class="spot-meta">{% if spot.detail %}{{ spot.detail }}{% else %}&nbsp;{% endif %}</div>
-        {% if spot.recorded %}
-          <div class="spot-money">{{ spot.amount | money }}</div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
+  {# First on every board page, a finished season's included: its podium comes after
+     (commissioner, 2026-10-12). #}
+  {% if home.leaders %}
+    <section class="moneylist">
+    {# Headed like every block on the board below it: small caps over a heavy rule. The key
+       to the two greens sits where a block's money does, at the right-hand end. #}
+    <h2 class="col-head">
+      {{ home.season }} Moneylist
+      {%- if home.show_projected %}
+        <span class="chart-key" aria-hidden="true">
+          <span><i class="swatch swatch-won"></i>Won</span>
+          <span><i class="swatch swatch-leading"></i>Projected</span>
+        </span>
+      {%- endif %}
+    </h2>
+    {# One bar per franchise, most won first. The heights are percentages site.build_home
+       worked out; the figures above each bar are the same numbers as text, so nothing on the
+       chart is said by colour or height alone. #}
+    <ol class="money-chart">
+      {% for line in home.leaders %}
+        <li style="--won: {{ line.won_height }}%; --leading: {{ line.leading_height }}%"
+            title="{{ line.team.name if line.team.known else line.team.manager_id }}: {{ line.total | money }} won{% if home.show_projected %}, {{ line.projected | money }} projected{% endif %}">
+          <span class="bar-track">
+            {% if line.leading_height %}<span class="bar-seg bar-seg-leading"></span>{% endif %}
+            <span class="bar-seg bar-seg-won"></span>
+            <span class="bar-name">{{ ui.team(line.team) }}</span>
+          </span>
+          {# Under the baseline. A $0 is not printed: seven pairs of them was noise. #}
+          <span class="bar-figs">
+            {% if line.total %}
+              <span class="bar-won"><span class="sr">Won </span>{{ line.total | money }}</span>
+            {% endif %}
+            {% if home.show_projected and line.projected %}
+              <span class="bar-projected"><span class="sr">Projected </span>{{ line.projected | money }}</span>
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ol>
+    </section>
   {% endif %}
 
   <div class="boards">
     {% for column in home.columns %}
       <section class="board-col">
+        {# The placings lead the board, once there are any: the bracket decides them at the
+           very end, so a season being played has none. Rows like every other block's, washed
+           gold, silver and bronze. #}
+        {% if loop.first and home.podium %}
+          <h2 class="col-head">
+            Final Standings{{ ui.info("How the playoffs finished. The record is the regular season.") }}
+          </h2>
+          <ol class="prizes placings">
+            {% for spot in home.podium %}
+              <li class="thin place-{{ spot.rank }}">
+                <span class="thin-key">{{ spot.key }}</span>
+                <span class="thin-name"><span class="thin-who">{{ ui.teams(spot.winners, blank) }}</span></span>
+                <span class="thin-num">{{ spot.record }}</span>
+                {%- if spot.recorded %}
+                  <span class="thin-pays">{{ spot.amount | money }}</span>
+                {%- endif %}
+              </li>
+            {% endfor %}
+          </ol>
+        {% endif %}
         {% for group in column %}
           <h2 class="col-head">
             {{ group.title }}{{ ui.info(group.caption) }}
@@ -108,7 +153,9 @@
             {% for row in group.rows %}
               {# One row shape everywhere on the board: a key, a name, and the number that won
                  it. A prize whose heading already names it has no key. #}
-              <li class="thin{% if not group.show_labels %} nokey{% endif %}{% if row.pending %} pending{% endif %}">
+              <li class="thin{% if not group.show_labels %} nokey{% endif %}{% if row.changed %} changed{% endif %}{% if row.latest %} won-latest{% endif %}"
+                  {%- if row.changed %} title="New leader this week"{% endif %}
+                  {%- if row.latest %} title="This week's high score"{% endif %}>
                 {% if group.show_labels %}
                   <span class="thin-key">
                     {%- if row.short_label %}{{ row.short_label }}{% else %}{{ row.label }}{% endif -%}
@@ -116,12 +163,15 @@
                 {% endif %}
                 {# A week not played yet is its key and nothing else — no dash to read as a
                    result. Whoever is ahead mid-season is not tagged either: the pill beside
-                   the heading says the season is in progress, once, for the whole board. #}
+                   the heading says how far the season has got, once, for the whole board. #}
+                {# One line, always: a long name is cut, and what explains the number — the
+                   player and week behind a stud — is cut before the name is. Its full wording
+                   is the hover text. #}
                 <span class="thin-name">
                   {%- if not row.pending %}
-                  {{ ui.teams(row.winners, blank) }}
+                  <span class="thin-who">{{ ui.teams(row.winners, blank) }}</span>
                   {%- if row.split %}<span class="tag-inline" title="A tie — the prize was split evenly">split</span>{% endif %}
-                  {%- if row.detail %}<span class="thin-why">{{ row.detail }}</span>{% endif %}
+                  {%- if row.detail %}<span class="thin-why" title="{{ row.detail }}">{{ row.brief }}</span>{% endif %}
                   {%- endif %}
                 </span>
                 <span class="thin-num">{{ row.value }}</span>
@@ -132,14 +182,20 @@
                 {%- endif %}
               </li>
             {% endfor %}
+            {# Who is next behind the leader. Greyed like the teams out of Survivor: on the
+               board, not on the prize. #}
+            {% for line in group.also %}
+              <li class="thin also">
+                <span class="thin-key">{{ line.key }}</span>
+                <span class="thin-name muted"><span class="thin-who">{{ ui.team(line.team) }}</span></span>
+                <span class="thin-num">{{ line.value }}</span>
+              </li>
+            {% endfor %}
           </ol>
         {% endfor %}
-      </section>
-    {% endfor %}
-
-    {% if home.survivor %}
-      {# Survivor is this column, not a row in the season awards — the money is here. #}
-      <section class="board-col">
+    {% if loop.first and home.survivor %}
+      {# Survivor follows Most Points, its place by what it pays. It is its own ladder, not a
+         row in a block — the money is in its heading. #}
         <h2 class="col-head">
           Survivor
           {{- ui.info(home.survivor.caption) }}
@@ -147,24 +203,23 @@
             <span class="col-money">{{ home.survivor.amount | money }}</span>
           {%- endif %}
         </h2>
-        {# Until somebody has won it, the slot says how many are left — the one fact about a
-           ladder in progress that the rows below do not state. #}
+        {# Only once there is a winner to name. Mid-season the ladder below is the column. #}
+        {% if home.final or home.survivor.winners %}
         <div class="survivor-won">
-          {% if not home.final and not home.survivor.winners and home.survivor.alive is not none %}
-            <div class="spot-place">Still alive</div>
-            <div class="spot-team">{{ home.survivor.alive }} of {{ home.survivor.franchises }}</div>
-          {% else %}
-            <div class="spot-place">Winner</div>
-            <div class="spot-team">{{ ui.teams(home.survivor.winners, blank) }}</div>
-          {% endif %}
+          <div class="spot-place">Winner</div>
+          <div class="spot-team">{{ ui.teams(home.survivor.winners, blank) }}</div>
         </div>
+        {% endif %}
         {% if home.survivor.played %}
+        {# Same shape as Weekly top score: only the weeks played, newest first, the
+           week just played marked, every row one height. #}
         <ol class="prizes">
           {% for line in home.survivor.played %}
-            <li class="thin">
+            <li class="thin{% if line.latest %} out-latest{% endif %}"
+                {%- if line.latest %} title="Eliminated this week"{% endif %}>
               <span class="thin-key">Week {{ line.week }}</span>
               {% if line.out %}
-                <span class="thin-name muted">{{ ui.teams(line.out.teams) }}</span>
+                <span class="thin-name muted"><span class="thin-who">{{ ui.teams(line.out.teams) }}</span></span>
                 <span class="thin-num">{{ "%.2f" | format(line.out.points) }}</span>
               {% else %}
                 <span class="thin-name muted">—</span>
@@ -174,18 +229,10 @@
           {% endfor %}
         </ol>
         {% endif %}
-        {% if home.survivor.upcoming %}
-        <div class="spot-place upcoming">Upcoming</div>
-        <ol class="prizes">
-          {% for line in home.survivor.upcoming %}
-            <li class="thin pending">
-              <span class="thin-key">Week {{ line.week }}</span>
-            </li>
-          {% endfor %}
-        </ol>
-        {% endif %}
-      </section>
     {% endif %}
+      </section>
+    {% endfor %}
+
   </div>
 
   {# Mid-season this would be the whole pot, which says nothing — the money is simply not won
@@ -199,25 +246,6 @@
     </dl>
   {% endif %}
 
-  {% if home.leaders %}
-    <section class="moneylist">
-    <h2>Moneylist</h2>
-    <ol class="leaders">
-      {% for line in home.leaders %}
-        <li {% if line.rank == 1 %}class="top"{% endif %}>
-          <span class="leader-rank">{{ line.rank }}</span>
-          {# The dots run the width of the cell and the name sits on top of them, masking the
-             ones it covers — a printed results sheet's leader rule. #}
-          <span class="leader-name">
-            <span class="leader-dots"></span>
-            <span class="leader-team">{{ ui.team(line.team) }}</span>
-          </span>
-          <span class="leader-money">{{ line.total | money }}</span>
-        </li>
-      {% endfor %}
-    </ol>
-    </section>
-  {% endif %}
   </div>
 {% else %}
   <h1>RS57</h1>

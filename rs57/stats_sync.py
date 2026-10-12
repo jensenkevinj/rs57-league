@@ -82,6 +82,9 @@ def stats_document(
             "winner_manager_ids": list(stats.survivor_winner_ids),
         },
         "unlucky": stats.unlucky,
+        # Last week's leaders of the season-long prizes, so the site can mark the ones that
+        # changed hands. ``None`` for a finished season and for week 1.
+        "prior_leaders": stats.prior_leaders,
         "payouts": payouts,
         "review": {
             "consolation_winner_manager_ids": list(stats.consolation_winner_ids),

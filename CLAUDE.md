@@ -317,17 +317,64 @@ board a week into 2026. Two rules keep that from weakening a finished season:
 **The prize board is a template, the same for every season** (commissioner, 2026-09-14). Every
 prize is always on it: Most Points, all four studs, Unlucky, a survivor ladder one week per team
 but one, and a high score for every regular-season week. Results fill the rows in. **The
-Champion / 2nd / 3rd podium appears only once the season is final** (same day): the bracket
-decides the placings once, at the end, so mid-season it was three empty cards taking up the top
-of the page. Its payout rows are still resolved, so they never fall into "Other prizes". Until the season is final, Most Points, the studs and Unlucky show the current
-leader. **The page does not tag him "leading"** (commissioner, 2026-10-06): the "In progress"
-pill beside the heading says it once for the whole board, and `BoardRow.leading` still records
-it. A week not played yet is `pending` — still a row, drawn lighter, with no dash; a played
+Champion / 2nd / 3rd placings appear only once the season is final** (same day): the bracket
+decides them once, at the end. They are the board's first block, "Final Standings" — three
+rows like any other block's, washed gold, silver and bronze (commissioner, 2026-10-12); they
+were three large cards across the top of the page, which mid-season stood empty. Its payout rows are still resolved, so they never fall into "Other prizes". Until the season is final, Most Points, the studs and Unlucky show the current
+leader. **The page does not tag him "leading"** (commissioner, 2026-10-06), and `BoardRow.leading`
+still records it. **A board page has no drawn heading** (commissioner, 2026-10-12). Its top is a status pill at
+the left — "Thru Week 4", "Thru Semifinals", "No results yet", "Final" (`Home.progress`) — and a
+**season selector** at the right, a `<details>` listing exactly the season pages `build_site`
+wrote, newest first, the newest being `index.html`. The year is also in the Moneylist's
+heading. `Home.heading` is still the page's `<h1>`, read out and not drawn, and the title in a
+link preview. The selector replaced the "All seasons / ‹ 2024 / 2026 ›" links on archived pages.
+**Long-term the Seasons tab becomes a Stats tab** — all-time league stats ESPN does not show —
+which the selector is what makes possible: it is how a past season is reached without that tab. A week not played yet is `pending` and is left off the page (see below); a played
 week with nothing on file keeps its "—", and only a *finished* season says "unawarded".
-**Survivor shows the played weeks newest first, then the weeks to come in order under
-"Upcoming"** (same day), and until somebody wins it the Winner slot reads "Still alive: N of
-12" — counted in *teams* out, never weeks, because a tie takes two. It used to be built out of the results it held, so 2026's first board had no studs,
+**Survivor shows the played weeks newest first** (same day; the weeks to come were listed
+under "Upcoming" until 2026-10-12), and until somebody wins it the column has no Winner slot at all ("Still alive: N of 12" sat
+there until 2026-10-12). It used to be built out of the results it held, so 2026's first board had no studs,
 Unlucky or weekly highs at all.
+
+**What the home page shows about the week just played** (commissioner, 2026-10-12):
+- **The Moneylist is first**, above the board, in the source and on every screen. A finished
+  season's placings come after it, as the board's first block. It is headed like a block of the board — the same
+  `col-head`, as wide as the board, with the Won / Projected key at the right-hand end.
+- **It is a bar chart, one bar for every franchise**, most won first, with the franchise's
+  name running up its column. A bar is two greens stacked: money won, and above it the
+  **projected** money — the franchise's share of every prize it is *leading* (Most Points, the
+  studs, Unlucky), split the way `award_prizes` splits a tie. Survivor and the placings
+  project nothing; nobody leads them. A finished season's bars are one green. The heights are
+  whole percentages worked out in `build_home`, and both figures are printed under each bar. A
+  season with no money on it — none recorded, or nothing won or led yet — has no chart.
+- **A season-long prize whose leader changed this week is drawn yellow; the week's Survivor
+  casualty is drawn red.** "Changed" needs last week to compare against, and the current
+  leaders cannot give it, so `stats.leaders_through` derives the same prizes with the latest
+  week left out and the nightly writes them as `prior_leaders` in `{year}-stats.json`. Compared
+  as a *set of franchises*. No `prior_leaders` on file (week 1, a final season, an older file)
+  means nothing to compare against and marks nothing.
+- **Most Points lists second and third under the leader**, greyed like the teams out of
+  Survivor. They are `BoardBlock.also`, not rows: a row is a prize and carries money.
+- **Every row on the board is one line.** A long franchise name is cut with an ellipsis, never
+  wrapped. A stud row carries its player beside the franchise in `BoardRow.brief` ("J. Allen ·
+  W2"), which gives way before the franchise does; the full `detail` is the hover text.
+- **The Moneylist's figures sit under its baseline**, won in bold above projected, each in the
+  green of its segment — as `--won-text` / `--leading-text`, the same hue taken dark enough to
+  read, because the fills themselves are too pale for text. No $0 is printed. The name over a
+  bar is `--bar-name`, a grey watermark; the won fill is kept pale enough for it to hold 4.5:1.
+  The Won / Projected key is in ink, not grey.
+- **Tooltip rules are written the way a manager would say them** — short, no hedging. They are
+  compared against the page unescaped by a test, so they carry no apostrophes.
+- **The board runs in order of what a prize pays**: Final Standings, Most Points and Survivor
+  down the first column, then Stud, Unlucky and Weekly top score down the second. On a phone
+  that is one list, largest prize first. The placings and the survivor ladder are set into
+  the first column by the template; they are not `BoardBlock`s.
+- **Weekly top score and Survivor are one pair, drawn the same way**: only the weeks played,
+  **newest first**, and the week just played marked as the top row —
+  yellow for the high score, red for who went out. Both build downward over the season. A week
+  still to come is on neither list: Survivor's "Upcoming" rows and its "Still alive: N of 12"
+  header are both gone, and the column names a Winner only once there is one. It is still resolved, so its payout row never lands in "Other
+  prizes"; a played week with nothing on file is a hole and keeps its dash.
 
 **Stats REVIEW and ERROR notes are not published on the board** (same decision). They were
 yellow banners over the prizes, asking twelve managers to check things none of them can act on.
