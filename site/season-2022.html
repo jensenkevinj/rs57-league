@@ -46,19 +46,29 @@
        literal left in a rule is a colour that theme cannot reach: the tooltip was `--ink`
        with `#fff` on it, which is white on white the moment `--ink` turns light. */
     --faint: #6e7681;
-    --gold-text: #8a6508;
-    --gold-wash: rgba(184, 134, 11, 0.09);
-    --gold-shadow: 0 1px 4px rgba(184, 134, 11, 0.22);
+    --gold-wash: rgba(184, 134, 11, 0.13);
+    --silver-wash: rgba(152, 160, 170, 0.14);
+    --bronze-wash: rgba(162, 112, 74, 0.12);
     --on-accent: #ffffff;
     --bubble-bg: #1b1f24;
     --bubble-fg: #ffffff;
+    --shade: rgba(27, 31, 36, 0.14);
+    --won-fill: #9ad6b1;
+    --leading-fill: #dff3e7;
+    /* The chart's two greens as text. The fills themselves are far too pale to read as
+       figures on the page, so these are the same hue taken dark enough to clear 4.5:1 —
+       still the darker green for won and the lighter for projected. */
+    --won-text: #1a6b3c;
+    --leading-text: #2c8053;
+    /* A franchise's name over its bar: grey, a watermark rather than a heading. The won
+       fill is kept pale enough for it to clear 4.5:1 there. */
+    --bar-name: #4a525c;
   }
   /* Dark mode is this block and nothing else: the same tokens, redefined. It follows the
      device's setting and has no switch. Every pairing of a text token with the background it
      is set on is held to 4.5:1 in both themes by a test that reads these two blocks, so a
      value changed here that stops being readable fails there rather than on somebody's phone.
-     The gold wash is far fainter and its shadow is gone — a glow on a dark page reads as a
-     smudge. The admin tool has its own stylesheet and stays light. */
+     The admin tool has its own stylesheet and stays light. */
   @media (prefers-color-scheme: dark) {
     :root {
       --ink: #e6e9ed;
@@ -80,12 +90,18 @@
       --silver: #7d8590;
       --bronze: #b98a63;
       --faint: #7d8691;
-      --gold-text: #d4a537;
-      --gold-wash: rgba(212, 165, 55, 0.05);
-      --gold-shadow: none;
+      --gold-wash: rgba(212, 165, 55, 0.12);
+      --silver-wash: rgba(125, 133, 144, 0.14);
+      --bronze-wash: rgba(185, 138, 99, 0.12);
       --on-accent: #0b1a2b;
       --bubble-bg: #e6e9ed;
       --bubble-fg: #111418;
+      --shade: rgba(0, 0, 0, 0.5);
+      --won-fill: #1c4a31;
+      --leading-fill: #14291c;
+      --won-text: #6cc493;
+      --leading-text: #4f9b72;
+      --bar-name: #a6afba;
     }
   }
   * { box-sizing: border-box; }
@@ -397,11 +413,30 @@
 
   /* --- the home page: a prize board ------------------------------------- */
 
-  /* Centered, not baseline: the pill's small text sat on the heading's baseline and its padding
-     and border hung below it, 8px low. Centered, its middle is within half a pixel of the
-     heading's glyphs. */
-  .page-head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
-  .page-head h1 { margin-bottom: 0; }
+  /* The top of a board page: the status pill at the left, the season selector at the right. */
+  .page-head { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.4rem; }
+  .season-pick { position: relative; margin-left: auto; }
+  .season-pick summary {
+    list-style: none; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--line); border-radius: 6px; background: var(--bg);
+    padding: 0.3rem 0.65rem; font-size: 0.9rem; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .season-pick summary::-webkit-details-marker { display: none; }
+  .season-pick summary::after { content: "\25BE"; margin-left: 0.4rem; color: var(--muted); }
+  .season-pick summary:hover, .season-pick[open] summary { border-color: var(--accent); }
+  .season-pick ul {
+    position: absolute; right: 0; top: calc(100% + 0.3rem); z-index: 6;
+    list-style: none; margin: 0; padding: 0.25rem; min-width: 100%;
+    border: 1px solid var(--line); border-radius: 6px; background: var(--bg);
+    box-shadow: 0 4px 14px var(--shade);
+  }
+  .season-pick a {
+    display: block; padding: 0.35rem 0.6rem; border-radius: 4px; text-decoration: none;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .season-pick a:hover { background: var(--panel); }
+  .season-pick a[aria-current] { font-weight: 700; color: var(--accent); }
   .pill {
     font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
     border: 1px solid var(--line); background: var(--panel); color: var(--muted);
@@ -416,21 +451,6 @@
     border: 1px solid var(--line); border-top: 3px solid var(--line);
     border-radius: 8px; padding: 0.8rem 1rem;
   }
-  /* The champion is the prize the league plays for. It gets the gold. */
-  .spot-1 {
-    border-top-color: var(--gold); border-top-width: 4px;
-    background:
-      linear-gradient(180deg, var(--gold-wash), transparent 62%),
-      var(--bg);
-    box-shadow: var(--gold-shadow);
-  }
-  /* `--gold` is a border colour: as text it is 3.25:1 on white, under the 4.5:1 that small
-     text needs. The wording uses the darker `--gold-text`; the rule above keeps the bright one. */
-  .spot-1 .spot-place { color: var(--gold-text); letter-spacing: 0.13em; }
-  .spot-1 .spot-team { font-size: 1.22rem; font-weight: 700; }
-  .spot-1 .spot-money { font-size: 1.35rem; color: var(--gold-text); }
-  .spot-2 { border-top-color: var(--silver); }
-  .spot-3 { border-top-color: var(--bronze); }
   .spot-place {
     display: flex; align-items: center;
     font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
@@ -480,42 +500,54 @@
   li.thin .thin-key {
     font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
   }
-  li.thin .thin-name { font-weight: 600; }
+  /* Every row is one line (commissioner, 2026-10-12). A name too long for its column is cut
+     with an ellipsis, and the context beside it — the player behind a stud — gives way
+     first, so the franchise is the last thing to go. */
+  li.thin .thin-name {
+    display: flex; align-items: baseline; gap: 0.4rem; min-width: 0;
+    font-weight: 600; white-space: nowrap;
+  }
+  li.thin .thin-who { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* Behind the leader: on the board, not on the prize. */
+  li.thin.also .thin-name { font-weight: 400; }
   li.thin .thin-why {
-    display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted);
+    flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 400; font-size: 0.8rem; color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
+  li.thin .tag-inline { flex: none; }
   li.thin .thin-num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
   li.thin .thin-pays {
     text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap;
   }
 
-  /* A week not played yet. Still a row — the board is a template and every prize is always
-     on it — but about two-thirds the height and a shade lighter, so fourteen of them in week
-     1 do not stand between a reader and the one result there is. `--faint` still clears
-     4.5:1; it is quieter, not unreadable. */
-  li.thin.pending {
-    padding: 0.12rem 0; font-size: 0.82rem; border-bottom-style: dotted;
+  /* Every row is one line of the row's own type, whatever is in it. A row with no name and no
+     score in it — a played week with nothing on file — would otherwise be only as tall as its
+     small-caps key, so the number cell always carries a zero-width character. */
+  li.thin .thin-num::before { content: "\200b"; }
+  /* What the week just played changed. Yellow: a season-long prize has a new leader, or
+     the week's high score. Red: who went out of Survivor. The last two are always the top row
+     of their lists, which run newest first. The wash runs a little past the text on both sides so the row reads
+     as a band, and the bar on the left says the same thing without the colour. */
+  li.thin.changed, li.thin.out-latest, li.thin.won-latest, .placings li.thin {
+    margin: 0 -0.45rem; padding-left: 0.45rem; padding-right: 0.45rem; border-radius: 3px;
   }
-  /* Restated, because the rule above gives the last row a style again and a border with a
-     style and no width is drawn at the default three pixels. */
-  li.thin.pending:last-child { border-bottom: none; }
-  li.thin.pending .thin-key { color: var(--faint); }
-  .spot-place.upcoming { margin: 0.9rem 0 0.2rem; }
+  li.thin.changed, li.thin.won-latest {
+    background: var(--flag-bg); box-shadow: inset 3px 0 0 var(--flag-line);
+  }
+  li.thin.out-latest { background: var(--bad-bg); box-shadow: inset 3px 0 0 var(--bad-line); }
+  /* The placings: the same band, in gold, silver and bronze. The washes are faint enough
+     that the text on them reads as it does on the page; the bar carries the metal. */
+  li.thin.place-1 { background: var(--gold-wash); box-shadow: inset 3px 0 0 var(--gold); }
+  li.thin.place-2 { background: var(--silver-wash); box-shadow: inset 3px 0 0 var(--silver); }
+  li.thin.place-3 { background: var(--bronze-wash); box-shadow: inset 3px 0 0 var(--bronze); }
+  li.thin.place-1 .thin-who { font-weight: 700; }
 
-  /* The board, the pot and the Moneylist in one column, so a phone can put the Moneylist
-     first: it is twelve short lines and the answer to "who is winning", and it sat under
-     three screens of prizes. Only the visual order moves. The source order is unchanged, so
-     a screen reader still meets the board first — nothing here depends on reading order. */
+  /* The board, the pot and the Moneylist in one column. The Moneylist comes first in the
+     source as well as on screen: it is twelve short lines and the answer to "who is
+     winning". */
   .board-page { display: flex; flex-direction: column; }
-  .moneylist h2 { margin-top: 0.9rem; }
-  @media (max-width: 34rem) {
-    .board-page > .podium { order: 1; }
-    .board-page > .moneylist { order: 2; }
-    .board-page > .boards { order: 3; }
-    .board-page > .pot { order: 4; }
-    .moneylist h2 { margin-top: 0.6rem; }
-  }
+  .moneylist { margin-top: 1.5rem; }
 
   .pot {
     margin: 0 0 1.75rem; padding-top: 0.75rem; border-top: 2px solid var(--ink);
@@ -580,32 +612,76 @@
       left: 0; right: 0; transform: none; width: auto; max-width: none;
     }
   }
-  .survivor-won { padding: 0.1rem 0 0.6rem; border-bottom: 1px solid var(--line); }
 
-  /* A printed results sheet's leader board: one line each, a dotted rule running from the
-     franchise to what it won. No bar — the ordering and the figures carry it. And no rule
-     under the row either: the dotted leader is the line, and a solid one beneath it was two
-     rules for one row. */
-  .leaders { list-style: none; margin: 0.75rem 0 1.5rem; padding: 0; max-width: 26rem; }
-  .leaders li {
-    display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto;
-    align-items: baseline; gap: 0.6rem;
-    padding: 0.34rem 0; font-size: 0.95rem;
+  /* The Moneylist: one bar per franchise, most won first. Each column is a row of figures
+     over a track; the bar stands on the track's floor and the franchise's name runs up the
+     column over it, like a watermark. Two greens of one hue — the money won, and above it
+     the money a franchise is only leading — with a 2px gap of page between them. Both fills
+     are light enough (dark enough, in dark mode) for `--ink` to be read on, which a test
+     holds to 4.5:1, because the name crosses them. */
+  .money-chart {
+    /* As wide as the board under it, so its heading's rule ends where the board's do. The
+       bottom margin and the board's own top margin add up to the gap between two blocks. */
+    list-style: none; margin: 0.6rem 0 0.4rem; padding: 0;
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.3rem;
+    height: 17rem; position: relative;
   }
-  .leader-rank {
-    color: var(--muted); font-size: 0.75rem; text-align: right;
-    font-variant-numeric: tabular-nums;
+  /* The baseline, drawn once across the whole chart rather than under each column, so the
+     gaps between bars do not break it. The figures sit beneath it like axis labels. */
+  .money-chart::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 2.4rem;
+    border-top: 1px solid var(--muted);
   }
-  .leader-name { position: relative; overflow: hidden; }
-  .leader-dots {
-    position: absolute; left: 0; right: 0; bottom: 0.15em;
-    border-bottom: 1px dotted var(--line);
+  .money-chart li { display: flex; flex-direction: column; min-width: 0; }
+  /* Under the baseline: won in bold, and what is projected beneath it, each in the green of
+     its own segment (commissioner, 2026-10-12). A franchise with neither has an empty slot,
+     which keeps every baseline at the same height. */
+  .bar-figs {
+    display: grid; grid-template-rows: 1.25em 1.25em; justify-items: center;
+    height: 2.4rem; padding-top: 0.3rem; flex: none;
+    font-size: 0.72rem; line-height: 1.25; font-variant-numeric: tabular-nums;
   }
-  .leader-team {
-    position: relative; background: var(--bg); padding-right: 0.35rem; font-weight: 600;
+  /* Each figure keeps its own line, so a projection with nothing won above it still lines up
+     with every other projection instead of rising into the won row. */
+  .bar-won { grid-row: 1; font-weight: 700; color: var(--won-text); }
+  .bar-projected { grid-row: 2; color: var(--leading-text); }
+  .bar-track { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+  .bar-seg { position: absolute; left: 0; right: 0; }
+  .bar-seg-won { bottom: 0; height: var(--won); background: var(--won-fill); }
+  .bar-seg-leading {
+    bottom: calc(var(--won) + 2px); height: calc(var(--leading) - 2px);
+    background: var(--leading-fill);
   }
-  .leader-money { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .leaders li.top .leader-money { color: var(--gold-text); }
+  /* The top of the stack is rounded, whichever segment that is. */
+  .bar-seg-leading, .bar-seg-won:first-child { border-radius: 3px 3px 0 0; }
+  .bar-name {
+    position: absolute; left: 50%; bottom: 0.4rem; max-height: calc(100% - 0.6rem);
+    /* `sideways`, or a curly apostrophe is set upright and lands a line away from its word. */
+    writing-mode: vertical-rl; text-orientation: sideways;
+    transform: translateX(-50%) rotate(180deg);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 0.74rem; font-weight: 600; line-height: 1.1; letter-spacing: 0.01em;
+    color: var(--bar-name);
+  }
+  .chart-key {
+    display: flex; gap: 0.9rem; margin-left: auto;
+    font-size: 0.8rem; font-weight: 400; letter-spacing: 0; text-transform: none;
+  }
+  .swatch {
+    display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px;
+    margin-right: 0.35rem; vertical-align: -0.05em;
+  }
+  .swatch-won { background: var(--won-fill); }
+  .swatch-leading { background: var(--leading-fill); }
+  /* Read out, not shown: what each of a bar's two figures is. */
+  .sr {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  @media (max-width: 34rem) {
+    .money-chart { gap: 0.2rem; }
+    .bar-figs { font-size: 0.64rem; }
+  }
 
   /* --- the seasons page: the hall of fame ------------------------------- */
 
@@ -641,9 +717,6 @@
       margin-top: 0.15rem;
     }
   }
-  .season-nav { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0.5rem 0 0; }
-  .season-nav a { text-decoration: none; }
-  .season-nav a:hover { text-decoration: underline; }
 
   /* --- the rules page ---------------------------------------------------- */
 
@@ -737,197 +810,218 @@
 
 <div class="wrap">
   <div class="page-head">
-    <h1>2022 Final Results</h1>
+    <h1 class="sr">2022 Final Results</h1>
+    <span class="pill">Final</span>
+      <details class="season-pick">
+        <summary><span class="sr">Season </span>2022</summary>
+        <ul>
+            <li><a href="index.html">2026</a></li>
+            <li><a href="season-2025.html">2025</a></li>
+            <li><a href="season-2024.html">2024</a></li>
+            <li><a href="season-2023.html">2023</a></li>
+            <li><a href="season-2022.html" aria-current="page">2022</a></li>
+            <li><a href="season-2021.html">2021</a></li>
+            <li><a href="season-2020.html">2020</a></li>
+            <li><a href="season-2019.html">2019</a></li>
+        </ul>
+      </details>
   </div>
-    <p class="season-nav small">
-      <a href="seasons.html">&larr; All seasons</a>
-<a href="season-2021.html" rel="prev">&lsaquo; 2021</a><a href="season-2023.html" rel="next">2023 &rsaquo;</a>    </p>
 
   <div class="board-page">
-  <div class="podium">
-      <div class="spot spot-1">
-        <div class="spot-place">Champion</div>
-        <div class="spot-team">Titan&#39;s Pans</div>
-        <div class="spot-meta">8-6 · 1,403.94 points</div>
-      </div>
-      <div class="spot spot-2">
-        <div class="spot-place">2nd Place</div>
-        <div class="spot-team">Joquon Andrupp</div>
-        <div class="spot-meta">7-7 · 1,761.60 points</div>
-      </div>
-      <div class="spot spot-3">
-        <div class="spot-place">3rd Place</div>
-        <div class="spot-team">Hinkie Died For Your Sins</div>
-        <div class="spot-meta">11-3 · 1,738.12 points</div>
-      </div>
-  </div>
 
   <div class="boards">
       <section class="board-col">
           <h2 class="col-head">
-            Most Points<button type="button" class="info" aria-label="The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The most points scored over the regular season, weeks 1–14. The playoff weeks do not count toward it.</span></button>          </h2>
+            Final Standings<button type="button" class="info" aria-label="How the playoffs finished. The record is the regular season."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">How the playoffs finished. The record is the regular season.</span></button>
+          </h2>
+          <ol class="prizes placings">
+              <li class="thin place-1">
+                <span class="thin-key">1st</span>
+                <span class="thin-name"><span class="thin-who">Titan&#39;s Pans</span></span>
+                <span class="thin-num">8-6</span>              </li>
+              <li class="thin place-2">
+                <span class="thin-key">2nd</span>
+                <span class="thin-name"><span class="thin-who">Joquon Andrupp</span></span>
+                <span class="thin-num">7-7</span>              </li>
+              <li class="thin place-3">
+                <span class="thin-key">3rd</span>
+                <span class="thin-name"><span class="thin-who">Hinkie Died For Your Sins</span></span>
+                <span class="thin-num">11-3</span>              </li>
+          </ol>
+          <h2 class="col-head">
+            Most Points<button type="button" class="info" aria-label="Most total points in the regular season (weeks 1–14). No playoff weeks."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Most total points in the regular season (weeks 1–14). No playoff weeks.</span></button>          </h2>
           <ol class="prizes">
-              <li class="thin nokey">
-                <span class="thin-name">                  Joquon Andrupp                </span>
+              <li class="thin">
+                  <span class="thin-key">1st</span>
+                <span class="thin-name">                  <span class="thin-who">Joquon Andrupp</span>                </span>
                 <span class="thin-num">1,761.60</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin also">
+                <span class="thin-key">2nd</span>
+                <span class="thin-name muted"><span class="thin-who">Hinkie Died For Your Sins</span></span>
+                <span class="thin-num">1,738.12</span>
+              </li>
+              <li class="thin also">
+                <span class="thin-key">3rd</span>
+                <span class="thin-name muted"><span class="thin-who">Pajama Sam</span></span>
+                <span class="thin-num">1,720.38</span>
+              </li>
           </ol>
-          <h2 class="col-head">
-            Stud<button type="button" class="info" aria-label="The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The best single week by a started player at that position, across the whole season including the playoff weeks — not a season total. A player on the bench or on IR does not count, and only QB, RB, WR and TE pay a stud.</span></button>          </h2>
-          <ol class="prizes">
-              <li class="thin">
-                  <span class="thin-key">QB</span>
-                <span class="thin-name">                  Calling Audibles<span class="thin-why">Lamar Jackson · Week 2</span>                </span>
-                <span class="thin-num">42.62</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">RB</span>
-                <span class="thin-name">                  Bishop Sycamore All-Stars<span class="thin-why">Joe Mixon · Week 9</span>                </span>
-                <span class="thin-num">53.10</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">WR</span>
-                <span class="thin-name">                  Titan&#39;s Pans<span class="thin-why">Mike Evans · Week 17</span>                </span>
-                <span class="thin-num">43.70</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">TE</span>
-                <span class="thin-name">                  Titan&#39;s Pans<span class="thin-why">T.J. Hockenson · Week 4</span>                </span>
-                <span class="thin-num">35.90</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-          </ol>
-          <h2 class="col-head">
-            Unlucky<button type="button" class="info" aria-label="The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The single highest score that still lost — once for the whole season, not once a week. Regular season only, and a tie is not a loss.</span></button>          </h2>
-          <ol class="prizes">
-              <li class="thin">
-                  <span class="thin-key">Week 2</span>
-                <span class="thin-name">                  Calling Audibles                </span>
-                <span class="thin-num">149.32</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-          </ol>
-      </section>
-      <section class="board-col">
-          <h2 class="col-head">
-            Weekly top score<button type="button" class="info" aria-label="The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">The top score of the week, weeks 1–14. The playoff weeks do not pay a weekly high score.</span></button>          </h2>
-          <ol class="prizes">
-              <li class="thin">
-                  <span class="thin-key">Week 1</span>
-                <span class="thin-name">                  Pajama Sam                </span>
-                <span class="thin-num">156.92</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 2</span>
-                <span class="thin-name">                  Joquon Andrupp                </span>
-                <span class="thin-num">172.48</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 3</span>
-                <span class="thin-name">                  Joquon Andrupp                </span>
-                <span class="thin-num">152.20</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 4</span>
-                <span class="thin-name">                  Bishop Sycamore All-Stars                </span>
-                <span class="thin-num">144.00</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 5</span>
-                <span class="thin-name">                  Joquon Andrupp                </span>
-                <span class="thin-num">192.16</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 6</span>
-                <span class="thin-name">                  Pajama Sam                </span>
-                <span class="thin-num">116.80</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 7</span>
-                <span class="thin-name">                  Hinkie Died For Your Sins                </span>
-                <span class="thin-num">130.12</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 8</span>
-                <span class="thin-name">                  Pajama Sam                </span>
-                <span class="thin-num">151.90</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 9</span>
-                <span class="thin-name">                  Bishop Sycamore All-Stars                </span>
-                <span class="thin-num">140.40</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 10</span>
-                <span class="thin-name">                  Belichick&#39;s Spy                </span>
-                <span class="thin-num">149.00</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 11</span>
-                <span class="thin-name">                  Hinkie Died For Your Sins &amp; Calling Audibles<span class="tag-inline" title="A tie — the prize was split evenly">split</span>                </span>
-                <span class="thin-num">134.26</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 12</span>
-                <span class="thin-name">                  Joquon Andrupp                </span>
-                <span class="thin-num">133.72</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 13</span>
-                <span class="thin-name">                  Hinkie Died For Your Sins                </span>
-                <span class="thin-num">157.12</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-              <li class="thin">
-                  <span class="thin-key">Week 14</span>
-                <span class="thin-name">                  Hinkie Died For Your Sins                </span>
-                <span class="thin-num">133.48</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
-          </ol>
-      </section>
-
-      <section class="board-col">
         <h2 class="col-head">
-          Survivor<button type="button" class="info" aria-label="Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Every week the lowest score among the teams still alive is eliminated, and the last team standing wins. It runs one week for every team but one.</span></button>        </h2>
-        <div class="survivor-won">
-            <div class="spot-place">Winner</div>
-            <div class="spot-team">Hinkie Died For Your Sins</div>
-        </div>
+          Survivor<button type="button" class="info" aria-label="Each week the lowest-scoring team still alive is out. Last team left wins."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Each week the lowest-scoring team still alive is out. Last team left wins.</span></button>        </h2>
         <ol class="prizes">
             <li class="thin">
+              <span class="thin-key">Winner</span>
+              <span class="thin-name"><span class="thin-who">Hinkie Died For Your Sins</span></span>
+              <span class="thin-num"></span>
+            </li>
+            <li class="thin">
               <span class="thin-key">Week 11</span>
-                <span class="thin-name muted">Belichick&#39;s Spy</span>
+                <span class="thin-name muted"><span class="thin-who">Belichick&#39;s Spy</span></span>
                 <span class="thin-num">105.88</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 10</span>
-                <span class="thin-name muted">Titan&#39;s Pans</span>
+                <span class="thin-name muted"><span class="thin-who">Titan&#39;s Pans</span></span>
                 <span class="thin-num">101.38</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 9</span>
-                <span class="thin-name muted">Joquon Andrupp</span>
+                <span class="thin-name muted"><span class="thin-who">Joquon Andrupp</span></span>
                 <span class="thin-num">94.70</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 8</span>
-                <span class="thin-name muted">The Infirmary</span>
+                <span class="thin-name muted"><span class="thin-who">The Infirmary</span></span>
                 <span class="thin-num">92.10</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 7</span>
-                <span class="thin-name muted">Pajama Sam</span>
+                <span class="thin-name muted"><span class="thin-who">Pajama Sam</span></span>
                 <span class="thin-num">76.42</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 6</span>
-                <span class="thin-name muted">Too Much Moxie</span>
+                <span class="thin-name muted"><span class="thin-who">Too Much Moxie</span></span>
                 <span class="thin-num">84.30</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 5</span>
-                <span class="thin-name muted">CeeDee Drive</span>
+                <span class="thin-name muted"><span class="thin-who">CeeDee Drive</span></span>
                 <span class="thin-num">87.04</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 4</span>
-                <span class="thin-name muted">New OLine</span>
+                <span class="thin-name muted"><span class="thin-who">New OLine</span></span>
                 <span class="thin-num">77.88</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 3</span>
-                <span class="thin-name muted">Taxpayer Funded Stadiums</span>
+                <span class="thin-name muted"><span class="thin-who">Taxpayer Funded Stadiums</span></span>
                 <span class="thin-num">75.24</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 2</span>
-                <span class="thin-name muted">Bishop Sycamore All-Stars</span>
+                <span class="thin-name muted"><span class="thin-who">Bishop Sycamore All-Stars</span></span>
                 <span class="thin-num">57.70</span>
             </li>
             <li class="thin">
               <span class="thin-key">Week 1</span>
-                <span class="thin-name muted">Calling Audibles</span>
+                <span class="thin-name muted"><span class="thin-who">Calling Audibles</span></span>
                 <span class="thin-num">71.62</span>
             </li>
         </ol>
       </section>
+      <section class="board-col">
+          <h2 class="col-head">
+            Stud<button type="button" class="info" aria-label="Biggest single game by a starter at each position, any week of the season, playoffs included. No bench or IR."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Biggest single game by a starter at each position, any week of the season, playoffs included. No bench or IR.</span></button>          </h2>
+          <ol class="prizes">
+              <li class="thin">
+                  <span class="thin-key">QB</span>
+                <span class="thin-name">                  <span class="thin-who">Calling Audibles</span><span class="thin-why" title="Lamar Jackson · Week 2">L. Jackson · W2</span>                </span>
+                <span class="thin-num">42.62</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">RB</span>
+                <span class="thin-name">                  <span class="thin-who">Bishop Sycamore All-Stars</span><span class="thin-why" title="Joe Mixon · Week 9">J. Mixon · W9</span>                </span>
+                <span class="thin-num">53.10</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">WR</span>
+                <span class="thin-name">                  <span class="thin-who">Titan&#39;s Pans</span><span class="thin-why" title="Mike Evans · Week 17">M. Evans · W17</span>                </span>
+                <span class="thin-num">43.70</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">TE</span>
+                <span class="thin-name">                  <span class="thin-who">Titan&#39;s Pans</span><span class="thin-why" title="T.J. Hockenson · Week 4">T. Hockenson · W4</span>                </span>
+                <span class="thin-num">35.90</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+          </ol>
+          <h2 class="col-head">
+            Unlucky<button type="button" class="info" aria-label="Highest score in a loss. One winner for the whole season. Regular season only. A tie is not a loss."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Highest score in a loss. One winner for the whole season. Regular season only. A tie is not a loss.</span></button>          </h2>
+          <ol class="prizes">
+              <li class="thin">
+                  <span class="thin-key">Week 2</span>
+                <span class="thin-name">                  <span class="thin-who">Calling Audibles</span>                </span>
+                <span class="thin-num">149.32</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+          </ol>
+          <h2 class="col-head">
+            Weekly top score<button type="button" class="info" aria-label="Highest score each week of the regular season (weeks 1–14). Nothing for playoff weeks."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Highest score each week of the regular season (weeks 1–14). Nothing for playoff weeks.</span></button>          </h2>
+          <ol class="prizes">
+              <li class="thin">
+                  <span class="thin-key">Week 14</span>
+                <span class="thin-name">                  <span class="thin-who">Hinkie Died For Your Sins</span>                </span>
+                <span class="thin-num">133.48</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 13</span>
+                <span class="thin-name">                  <span class="thin-who">Hinkie Died For Your Sins</span>                </span>
+                <span class="thin-num">157.12</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 12</span>
+                <span class="thin-name">                  <span class="thin-who">Joquon Andrupp</span>                </span>
+                <span class="thin-num">133.72</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 11</span>
+                <span class="thin-name">                  <span class="thin-who">Hinkie Died For Your Sins &amp; Calling Audibles</span><span class="tag-inline" title="A tie — the prize was split evenly">split</span>                </span>
+                <span class="thin-num">134.26</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 10</span>
+                <span class="thin-name">                  <span class="thin-who">Belichick&#39;s Spy</span>                </span>
+                <span class="thin-num">149.00</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 9</span>
+                <span class="thin-name">                  <span class="thin-who">Bishop Sycamore All-Stars</span>                </span>
+                <span class="thin-num">140.40</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 8</span>
+                <span class="thin-name">                  <span class="thin-who">Pajama Sam</span>                </span>
+                <span class="thin-num">151.90</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 7</span>
+                <span class="thin-name">                  <span class="thin-who">Hinkie Died For Your Sins</span>                </span>
+                <span class="thin-num">130.12</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 6</span>
+                <span class="thin-name">                  <span class="thin-who">Pajama Sam</span>                </span>
+                <span class="thin-num">116.80</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 5</span>
+                <span class="thin-name">                  <span class="thin-who">Joquon Andrupp</span>                </span>
+                <span class="thin-num">192.16</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 4</span>
+                <span class="thin-name">                  <span class="thin-who">Bishop Sycamore All-Stars</span>                </span>
+                <span class="thin-num">144.00</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 3</span>
+                <span class="thin-name">                  <span class="thin-who">Joquon Andrupp</span>                </span>
+                <span class="thin-num">152.20</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 2</span>
+                <span class="thin-name">                  <span class="thin-who">Joquon Andrupp</span>                </span>
+                <span class="thin-num">172.48</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+              <li class="thin">
+                  <span class="thin-key">Week 1</span>
+                <span class="thin-name">                  <span class="thin-who">Pajama Sam</span>                </span>
+                <span class="thin-num">156.92</span>                  <span class="thin-pays"><span class="muted">&mdash;</span></span>              </li>
+          </ol>
+      </section>
+
   </div>
 
 
@@ -949,6 +1043,11 @@
     });
   }
   document.addEventListener("click", function (event) {
+    /* The season selector is a <details>, which opens by itself; this only shuts it when the
+       tap lands anywhere else. */
+    Array.prototype.forEach.call(document.querySelectorAll(".season-pick[open]"), function (pick) {
+      if (!pick.contains(event.target)) pick.removeAttribute("open");
+    });
     var tip = event.target.closest(tips);
     close(tip);
     if (tip) tip.setAttribute("aria-expanded", String(tip.getAttribute("aria-expanded") !== "true"));

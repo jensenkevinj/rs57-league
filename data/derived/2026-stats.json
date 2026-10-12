@@ -215,6 +215,30 @@
       "week": 3
     }
   ],
+  "prior_leaders": {
+    "leaders": {
+      "Most Points (Season)": [
+        "t3"
+      ],
+      "QB Stud": [
+        "t8"
+      ],
+      "RB Stud": [
+        "t8"
+      ],
+      "TE Stud": [
+        "t10"
+      ],
+      "Unlucky": [
+        "t2"
+      ],
+      "WR Stud": [
+        "t3"
+      ]
+    },
+    "season": 2026,
+    "through_week": 3
+  },
   "review": {
     "consolation_winner_manager_ids": [],
     "issues": [],
