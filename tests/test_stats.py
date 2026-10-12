@@ -546,6 +546,45 @@ class TestSeasonInProgress:
         assert sum(p.amount for p in payouts) == schedule().total(14)
         assert StatIssueCode.PRIZE_TOTAL_MISMATCH not in {i.code for i in issues}
 
+    def test_last_weeks_leaders_are_derived_from_the_season_without_its_latest_week(self):
+        """What the home page compares against to mark a prize that changed hands.
+
+        t1 leads on points through two weeks; a huge week 3 from t2 takes it. The prior
+        leaders must still say t1. Mutation-checked: filtering on ``<= through_week + 1``
+        reports t2 as last week's leader and this fails.
+        """
+        scores = [
+            score(1, "t1", 120.0), score(1, "t2", 100.0),
+            score(2, "t1", 120.0), score(2, "t2", 101.0),
+            score(3, "t1", 100.0), score(3, "t2", 200.0),
+        ]
+        matchups = [
+            game(1, "t1", 120.0, "t2", 100.0),
+            game(2, "t1", 120.0, "t2", 101.0),
+            game(3, "t2", 200.0, "t1", 100.0),
+        ]
+        weeks = [played(1, "t1", 30.0), played(3, "t2", 45.0)]
+        stats = _season(
+            scores, matchups, weeks, regular_season_weeks=14, current_matchup_period=4
+        )
+        assert stats.season_points[0].manager_id == "t2"
+        prior = stats.prior_leaders
+        assert prior is not None and prior.through_week == 2
+        position = weeks[0].position
+        assert prior.leaders == {
+            "Most Points (Season)": ("t1",),
+            f"{position} Stud": ("t1",),
+            "Unlucky": ("t2",),
+        }
+
+    def test_there_are_no_prior_leaders_in_week_one_or_once_the_season_is_final(self):
+        assert self._through(1, current_matchup_period=2).prior_leaders is None
+        assert self._through(2, current_matchup_period=3).prior_leaders is not None
+        final = self._through(
+            2, current_matchup_period=3, final_ranks={"t1": 1, "t2": 2, "t3": 3}
+        )
+        assert final.prior_leaders is None
+
     def test_survivor_pays_once_it_is_decided_even_mid_season(self):
         stats = self._through(3, current_matchup_period=4)
         assert stats.survivor_winner_ids == ("t4",)

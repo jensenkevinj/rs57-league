@@ -65,6 +65,7 @@ from rs57.models import (
     KeeperClaim,
     KeeperSlot,
     Payout,
+    PriorLeaders,
     Player,
     RosterEntry,
     SalaryOverride,
@@ -80,7 +81,13 @@ from rs57.models import (
 )
 from rs57.history import HistoryStore
 from rs57.origins import load_first_season_bounds, load_player_origins
-from rs57.stats import STUD_POSITIONS
+from rs57.stats import (
+    MOST_POINTS_LABEL,
+    STUD_POSITIONS,
+    UNLUCKY_LABEL,
+    split_prize,
+    stud_label,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -142,8 +149,7 @@ class PageMeta:
 
 
 SURVIVOR_RULE = (
-    "Every week the lowest score among the teams still alive is eliminated, and the last team "
-    "standing wins. It runs one week for every team but one."
+    "Each week the lowest-scoring team still alive is out. Last team left wins."
 )
 """Stated once. Survivor is shown as a column when it has a ladder and as a block when it does
 not, and the two must not drift apart."""
@@ -413,6 +419,10 @@ class StatsSeason:
     survivor_eliminations: tuple[HighLine, ...]
     survivor_winners: tuple[Named, ...]
     unlucky: HighLine | None
+    prior_leaders: Mapping[str, tuple[str, ...]] | None
+    """Who led each season-long prize a week ago, by payout label — or ``None`` when the file
+    does not say: a finished season, week 1, or a file synced before this was recorded. ``None``
+    is "nothing to compare against" and marks no row as changed."""
     prizes: tuple[PrizeGroup, ...]
     earnings: tuple[Earning, ...]
     pot: int
@@ -434,7 +444,9 @@ class StatsSeason:
 
 @dataclass(frozen=True)
 class PodiumSpot:
-    """A placing prize — the top row is the three the playoff bracket decided, and only those.
+    """A placing prize — the three the playoff bracket decided, and only those. Drawn as the
+    first block of the board, one row each, washed gold, silver and bronze
+    (commissioner, 2026-10-12); they were three large cards across the top of the page.
 
     Most Points pays what third place pays but is deliberately NOT here: the podium is what
     the bracket decided, and a team can lead the league in points and miss the playoffs
@@ -452,6 +464,11 @@ class PodiumSpot:
     """Whether an amount is on record. A season with no recorded prize money shows no
     figure at all — ``$0`` would be a claim that it paid nothing."""
     detail: str
+    key: str = ""
+    """The row's key, "1st" — the same key column every block on the board has."""
+    record: str = ""
+    """The franchise's regular-season record, the number at the end of the row. Empty when
+    the winner cannot be tied to one line of the standings."""
 
 
 @dataclass(frozen=True)
@@ -467,6 +484,10 @@ class BoardRow:
     detail: str
     """Context for the number, on its own line under the winner — the player and week behind a
     stud, say. Empty when the number speaks for itself."""
+    brief: str = ""
+    """``detail`` cut down to fit beside the winner on the row's one line — "J. Allen · W2".
+    Every row on the board is a single line (commissioner, 2026-10-12), so the full wording
+    is the hover text and this is what is drawn. Empty when there is no detail."""
     value: str = ""
     """The number that won the prize, in the row's last column. Every row on the board ends in
     one, which is what makes them line up."""
@@ -479,11 +500,34 @@ class BoardRow:
 
     **Display only.** ``label`` is what the payout rows are matched on, so it is not free to
     change — "Week 1 High Score" is the key that finds the money in ``payouts.json``."""
+    changed: bool = False
+    """The leader is not who it was a week ago. Only ever true of a ``leading`` row, and only
+    when last week's leaders are on file — the page draws it yellow (commissioner, 2026-10-12).
+    Compared as a set of franchises, so a team that beats its own stud with another player has
+    not changed hands."""
+    latest: bool = False
+    """The high score of the week just played, in a season still being played. The page draws
+    it green, as the top row of its list — the counterpart of ``SurvivorWeek.latest``."""
     pending: bool = False
     """A week that has not been played yet, in a season still being played. The row stays on
     the board — it is a template, and every prize is always on it — but it recedes, so the
     weeks that have results are what a reader sees first. Decided here from the weeks played;
     the template reads the flag and never works out which weeks those are."""
+
+
+@dataclass(frozen=True)
+class AlsoRan:
+    """A franchise behind the leader of a prize: shown under him, greyed, and paid nothing.
+
+    Not a ``BoardRow`` on purpose. A row is a prize and carries money; putting the runners-up
+    in ``BoardBlock.rows`` would put two more amounts under a heading that pays once.
+    """
+
+    team: Named
+    value: str
+    key: str = ""
+    """His place, for the key column — "2nd". Standard competition ranking, so two franchises
+    level on points share a place."""
 
 
 @dataclass(frozen=True)
@@ -505,6 +549,9 @@ class BoardBlock:
     hold a single row, and hiding that row's label would take the prize's name off the page
     entirely — which is how a prize disappears without anything looking wrong."""
 
+    also: tuple[AlsoRan, ...] = ()
+    """Who is next behind the row above — second and third on points under Most Points
+    (commissioner, 2026-10-12). Drawn muted, like the teams out of Survivor."""
     @property
     def each(self) -> int:
         """The one figure every prize here pays, or 0 when they do not all pay the same.
@@ -541,6 +588,9 @@ class SurvivorWeek:
     out: HighLine | None
     pending: bool = False
     """Not played yet, in a ladder nobody has won. Same meaning as ``BoardRow.pending``."""
+    latest: bool = False
+    """Who went out in the week just played, in a season still being played. The page draws it
+    red (commissioner, 2026-10-12). A finished season has no latest week."""
 
 
 @dataclass(frozen=True)
@@ -563,13 +613,17 @@ class SurvivorPanel:
     came for, so it sits directly under the heading. On a decided ladder this is every week it
     took. A played week with nobody out is a hole and keeps its dash; it is not ``upcoming``."""
     upcoming: tuple[SurvivorWeek, ...] = ()
-    """The weeks still to come, **in week order**, under their own label below the played ones.
-    Empty once the ladder is decided, which is what leaves a finished season's column as it was.
+    """The weeks still to come, **in week order**. Empty once the ladder is decided.
+
+    **Not drawn** (commissioner, 2026-10-12): the column lists only the weeks played, the same
+    as Weekly top score, and "Still alive: N of 12" says what is left. Kept because it is how
+    ``played`` is told apart from a hole — a played week with nobody out is not upcoming.
 
     The two replace a single latest-first ``weeks`` (commissioner, 2026-10-06). That put eleven
     empty rows above the first result in week 1, and the results are the point of the column."""
     alive: int | None = None
-    """How many franchises are still in it: the season's franchises minus the **teams** that
+    """**Not drawn** since 2026-10-12 — the "Still alive: 8 of 12" header went with the
+    Upcoming rows. How many franchises are still in it: the season's franchises minus the **teams** that
     have gone out. Teams, not weeks — a tie takes two out in one week, and counting weeks would
     leave one of them alive. ``None`` when the season does not say how many franchises it has."""
     franchises: int = 0
@@ -580,11 +634,22 @@ class SurvivorPanel:
 
 @dataclass(frozen=True)
 class LeaderLine:
-    """A franchise's take for the season, with the bar width the template draws."""
+    """A franchise's take for the season: one bar of the Moneylist chart.
+
+    Every franchise in the season has one, whether or not it has won anything
+    (commissioner, 2026-10-12)."""
 
     rank: int
     team: Named
     total: int
+    projected: int = 0
+    """``total`` plus this franchise's share of every prize it is **leading** — what it would
+    be paid if the season ended on today's board. Equal to ``total`` once nothing leads."""
+    won_height: int = 0
+    """How tall the bar's won segment is, as a whole percentage of the chart — the tallest bar
+    on it is 100. Worked out here so the template draws a number it was handed."""
+    leading_height: int = 0
+    """The segment stacked on top of it: the money this franchise is only leading."""
 
 
 @dataclass(frozen=True)
@@ -596,6 +661,14 @@ class Home:
     """What the page calls itself. A settled season claims its result; an unfinished one says
     it is unfinished, so the heading alone never reads as a final answer."""
     status: str
+    progress: str
+    """How far the season has got, for the pill at the top left of the page: "Thru Week 4",
+    "Thru Semifinals", "No results yet", or "Final" once it is over.
+
+    The page has no visible heading of its own (commissioner, 2026-10-12): this pill and the
+    season selector opposite it are the top of the page, and the year is in the Moneylist's
+    heading. ``heading`` is still the page's ``<h1>``, read out but not drawn, and its title
+    in a link preview."""
     final: bool
     weeks_played: int
     """The last week with results, or 0 before any. Carried for the link preview's "Through
@@ -610,6 +683,21 @@ class Home:
     pot: int
     unawarded: int
     notes: tuple[Note, ...]
+    show_projected: bool = False
+    """Whether the Moneylist carries its Projected column: a season still being played, with
+    prize money on record. A finished season's projection is what was won, twice."""
+
+
+@dataclass(frozen=True)
+class SeasonLink:
+    """One entry in the season selector at the top right of a board page.
+
+    Built in ``build_site`` from the pages it is about to write, so the selector can never
+    offer a season that has no page. The newest season's page is the home page itself.
+    """
+
+    season: int
+    href: str
 
 
 @dataclass(frozen=True)
@@ -1405,6 +1493,12 @@ def build_stats_season(derived_dir: Path, season: int) -> StatsSeason:
                 points=award.points,
             )
 
+    prior_leaders = None
+    if doc.get("prior_leaders"):
+        loaded = _rows(PriorLeaders, [doc["prior_leaders"]], notes, f"{season}-stats.json prior")
+        if loaded:
+            prior_leaders = dict(loaded[0].leaders)
+
     # Prizes are grouped by label because a tie splits one prize across several rows, and a
     # prize with no winner still carries its money so the pot reconciles.
     grouped: dict[str, list[PrizeRow]] = {}
@@ -1497,6 +1591,7 @@ def build_stats_season(derived_dir: Path, season: int) -> StatsSeason:
             _named(mid, names) for mid in survivor.get("winner_manager_ids") or []
         ),
         unlucky=unlucky,
+        prior_leaders=prior_leaders,
         prizes=tuple(PrizeGroup(label=label, rows=tuple(grouped[label])) for label in order),
         earnings=earnings,
         pot=sum(payout.amount for payout in payouts),
@@ -1590,6 +1685,19 @@ def _playoff_round(week: int, regular_season_weeks: int, playoff_team_count: int
     )
 
 
+def _initialled(player_name: str) -> str:
+    """"Josh Allen" as "J. Allen", to fit a one-line row. A single word is left alone."""
+    first, _, rest = player_name.strip().partition(" ")
+    return f"{first[0]}. {rest}" if first and rest else player_name
+
+
+def _ordinal(place: int) -> str:
+    """1st, 2nd, 3rd, 4th — and 11th, not 11st."""
+    if 10 <= place % 100 <= 20:
+        return f"{place}th"
+    return f"{place}{ {1: 'st', 2: 'nd', 3: 'rd'}.get(place % 10, 'th') }"
+
+
 def build_home(season: StatsSeason | None) -> Home | None:
     """The prize board for the most recent season with results.
 
@@ -1614,7 +1722,9 @@ def build_home(season: StatsSeason | None) -> Home | None:
     The page no longer tags them — the "In progress" pill beside the heading says it once for
     the whole board (commissioner, 2026-10-06) — but ``BoardRow.leading`` still records it.
 
-    A week not played yet is ``pending``: still a row, drawn lighter.
+    A week not played yet is ``pending``. On the survivor ladder it is still a row, drawn
+    lighter, under "Upcoming"; in Weekly top score it is left off until it is played
+    (commissioner, 2026-10-12), so that block is the one part of the template that grows.
     """
     if season is None:
         return None
@@ -1652,8 +1762,18 @@ def build_home(season: StatsSeason | None) -> Home | None:
         value: str = "",
         leads: bool = False,
         pending: bool = False,
+        latest: bool = False,
+        brief: str = "",
     ) -> BoardRow:
         winners, amount, recorded, leading = resolve(label, fallback, leads=leads)
+        # Against last week's leaders, as a set of franchises. With none on file there is
+        # nothing to compare against, and week 1's leaders are not "changed" from nobody.
+        changed = (
+            leading
+            and season.prior_leaders is not None
+            and {winner.manager_id for winner in winners}
+            != set(season.prior_leaders.get(label, ()))
+        )
         return BoardRow(
             label=label,
             winners=winners,
@@ -1661,10 +1781,13 @@ def build_home(season: StatsSeason | None) -> Home | None:
             recorded=recorded,
             split=len(winners) > 1,
             detail=detail,
+            brief=brief or detail,
             short_label=short_label,
             value=value,
             leading=leading,
+            changed=changed,
             pending=pending,
+            latest=latest,
         )
 
     standing = {row.team.manager_id: row for row in season.standings}
@@ -1687,6 +1810,8 @@ def build_home(season: StatsSeason | None) -> Home | None:
                 detail=f"{_record(described)} · {_points(described.points_for)} points"
                 if described
                 else "",
+                key=_ordinal(rank),
+                record=_record(described) if described else "",
             )
         )
 
@@ -1696,12 +1821,26 @@ def build_home(season: StatsSeason | None) -> Home | None:
     best = max((row.points for row in season.season_points), default=None)
     leaders_by_points = tuple(row.team for row in season.season_points if row.points == best)
     most_points = line(
-        "Most Points (Season)",
+        MOST_POINTS_LABEL,
         leaders_by_points,
         "",
+        # A place, so the block has the same key column as every other on the board.
+        short_label="1st",
         value=_points(best) if best is not None else "",
         leads=True,
     )
+
+    # Second and third on points, under the leader. The next two franchises down the list, so a
+    # tie for the lead — which puts both on the prize row — is still followed by two more.
+    chasing = tuple(
+        AlsoRan(
+            team=row.team,
+            value=_points(row.points),
+            key=_ordinal(1 + sum(other.points > row.points for other in season.season_points)),
+        )
+        for row in season.season_points
+        if row.points != best
+    )[:2]
 
     survived = len(season.survivor_eliminations)
     # Survivor is shown as its own column, so it is built here but not put in a season-awards
@@ -1717,7 +1856,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
     unlucky = season.unlucky
     unlucky_rows = [
         line(
-            "Unlucky",
+            UNLUCKY_LABEL,
             unlucky.teams if unlucky else (),
             "",
             short_label=f"Week {unlucky.week}" if unlucky else "—",
@@ -1735,9 +1874,10 @@ def build_home(season: StatsSeason | None) -> Home | None:
         stud = stud_at.get(str(position))
         studs.append(
             line(
-                f"{position} Stud",
+                stud_label(position),
                 stud.teams if stud else (),
                 f"{stud.player_name} · Week {stud.week}" if stud else "",
+                brief=f"{_initialled(stud.player_name)} · W{stud.week}" if stud else "",
                 short_label=str(position),
                 value=_points(stud.points) if stud else "",
                 leads=True,
@@ -1765,6 +1905,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
                 # Not played yet, as opposed to played with nothing on file — that second one
                 # is a hole, and it keeps its dash so it still looks like something missing.
                 pending=not final and high is None and week > season.weeks_played,
+                latest=not final and high is not None and week == season.weeks_played,
             )
         )
     # A week's high that the regular season's length does not cover still reaches the page.
@@ -1793,9 +1934,12 @@ def build_home(season: StatsSeason | None) -> Home | None:
         if label not in claimed
     ]
 
-    # The first column is three separate prizes stacked, each headed like any other block on
-    # the board. Blocks with no rows are dropped rather than heading nothing: not every season
-    # has every prize.
+    # The board runs in order of what a prize pays (commissioner, 2026-10-12): the placings,
+    # Most Points and Survivor down the first column, then the studs, Unlucky and the weekly
+    # highs down the second — which on a phone is one list, largest prize first. The placings
+    # and the survivor ladder are not blocks here; the template sets them above and below
+    # Most Points. Blocks with no rows are dropped rather than heading nothing: not every
+    # season has every prize.
     columns = tuple(
         filled
         for filled in (
@@ -1805,44 +1949,45 @@ def build_home(season: StatsSeason | None) -> Home | None:
                     BoardBlock(
                         "Most Points",
                         (most_points,),
-                        caption=f"The most points scored over the regular season, weeks 1–"
-                        f"{season.regular_season_weeks}. The playoff weeks do not count "
-                        "toward it.",
-                        heading_is_the_prize=True,
+                        caption=f"Most total points in the regular season (weeks 1–"
+                        f"{season.regular_season_weeks}). No playoff weeks.",
+                        also=chasing,
                     ),
+                ),
+                (
                     # "Stud" names the category; the rows name the positions under it.
                     BoardBlock(
                         "Stud",
                         tuple(studs),
-                        caption="The best single week by a started player at that position, "
-                        "across the whole season including the playoff weeks — not a season "
-                        "total. A player on the bench or on IR does not count, and only QB, "
-                        "RB, WR and TE pay a stud.",
+                        caption="Biggest single game by a starter at each position, any week "
+                        "of the season, playoffs included. No bench or IR.",
                     ),
                     # The week is the row's key here, so the heading is not repeated on it.
                     BoardBlock(
                         "Unlucky",
                         tuple(unlucky_rows),
-                        caption="The single highest score that still lost — once for the "
-                        "whole season, not once a week. Regular season only, and a tie is "
-                        "not a loss.",
+                        caption="Highest score in a loss. One winner for the whole season. "
+                        "Regular season only. A tie is not a loss.",
                     ),
-                ),
-                (
+                    # Only the weeks that are due. A week still to come is resolved above —
+                    # which keeps its payout row out of "Other prizes" — and left off the
+                    # page: ten empty rows under four results said nothing
+                    # (commissioner, 2026-10-12). A played week with nothing on file is not
+                    # pending, so a hole still shows, with its dash.
                     BoardBlock(
                         "Weekly top score",
-                        tuple(weekly),
-                        caption=f"The top score of the week, weeks 1–"
-                        f"{season.regular_season_weeks}. The playoff weeks do not pay a "
-                        "weekly high score.",
+                        # Newest first, like the survivor ladder: the week just played is
+                        # the top row of both, and both build downward.
+                        tuple(row for row in reversed(weekly) if not row.pending),
+                        caption=f"Highest score each week of the regular season (weeks 1–"
+                        f"{season.regular_season_weeks}). Nothing for playoff weeks.",
                     ),
                 ),
                 (
                     BoardBlock(
                         "Other prizes",
                         tuple(leftover),
-                        caption="Recorded as paid, but not explained by this season's "
-                        "derived stats.",
+                        caption="On the payout list, but not one of the standard prizes.",
                     ),
                 ),
             )
@@ -1850,20 +1995,61 @@ def build_home(season: StatsSeason | None) -> Home | None:
         if filled
     )
 
+    # What each franchise would add if the season ended on today's board: its share of every
+    # prize it is leading. Split the way `award_prizes` splits a tie, so the projection is the
+    # figure that would actually be paid. Survivor and the placings are nobody's until they
+    # are decided, so they project nothing.
+    leading_share: dict[str, int] = {}
+    teams_by_id: dict[str, Named] = {
+        earning.team.manager_id: earning.team for earning in season.earnings
+    }
+    for row in (most_points, *studs, *unlucky_rows):
+        if not (row.leading and row.recorded and row.winners):
+            continue
+        each, _ = split_prize(row.amount, len(row.winners))
+        for winner in row.winners:
+            leading_share[winner.manager_id] = leading_share.get(winner.manager_id, 0) + each
+            teams_by_id.setdefault(winner.manager_id, winner)
+    won = {earning.team.manager_id: earning.total for earning in season.earnings}
+
+    # Every franchise in the season is a bar, at $0 if that is what it has. The standings
+    # and the points table both name all of them.
+    everyone = (*(r.team for r in season.standings), *(r.team for r in season.season_points))
+    for team in everyone:
+        teams_by_id.setdefault(team.manager_id, team)
+
+    # Ordered and ranked on money actually won; the projection only breaks a tie in the order.
     # Standard competition ranking: franchises on the same money share a place.
+    tallest = max(
+        (won.get(mid, 0) + leading_share.get(mid, 0) for mid in teams_by_id), default=0
+    )
     leaders: list[LeaderLine] = []
     place_number = 0
     previous: int | None = None
-    for index, earning in enumerate(season.earnings, start=1):
-        if earning.total != previous:
-            place_number, previous = index, earning.total
+    listed = sorted(
+        teams_by_id,
+        key=lambda mid: (-won.get(mid, 0), -leading_share.get(mid, 0), mid),
+    )
+    for index, manager_id in enumerate(listed, start=1):
+        total = won.get(manager_id, 0)
+        if total != previous:
+            place_number, previous = index, total
         leaders.append(
             LeaderLine(
                 rank=place_number,
-                team=earning.team,
-                total=earning.total,
+                team=teams_by_id[manager_id],
+                total=total,
+                projected=total + leading_share.get(manager_id, 0),
+                won_height=round(100 * total / tallest) if tallest else 0,
+                leading_height=round(100 * leading_share.get(manager_id, 0) / tallest)
+                if tallest
+                else 0,
             )
         )
+    # A chart with no money on it is twelve names over a line: a season with no prize money
+    # on record, or one where nothing is won or led yet.
+    if not tallest:
+        leaders = []
 
     # Survivor is always its own column, and the column is the prize: the money appears here
     # and nowhere else. One line per week the ladder runs — a team out each week until one is
@@ -1881,6 +2067,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
             week=week,
             out=out_in.get(week),
             pending=not decided and week not in out_in and week > season.weeks_played,
+            latest=not final and week in out_in and week == season.weeks_played,
         )
         for week in range(1, ladder_weeks + 1)
     ]
@@ -1904,30 +2091,32 @@ def build_home(season: StatsSeason | None) -> Home | None:
     # The season's phase, read off the results themselves. ESPN fills in a final rank only
     # once the season completes, and the regular season's length is where the playoffs start.
     if season.final:
-        heading, status = f"{season.season} Final Results", "Final"
+        heading, status, progress = f"{season.season} Final Results", "Final", "Final"
     elif not season.weeks_played:
         # Not "Preseason": a stats file only exists once the season is under way, and the
         # pre-draft page already carries that word. This is the week between the auction and
         # the first final score.
         heading, status = f"{season.season} Season", "No results yet"
+        progress = status
     else:
+        heading = f"{season.season} Season"
         status = f"In progress — through week {season.weeks_played}"
-        if not season.regular_season_weeks:
-            # Without the regular season's length a playoff week cannot be told from a
-            # regular one, so the heading claims neither rather than guessing.
-            heading = f"{season.season} Season"
-        elif season.weeks_played > season.regular_season_weeks:
+        if season.regular_season_weeks and season.weeks_played > season.regular_season_weeks:
             round_name = _playoff_round(
                 season.weeks_played, season.regular_season_weeks, season.playoff_team_count
             )
-            heading = f"{season.season} {round_name}"
+            progress = f"Thru {round_name}"
         else:
-            heading = f"{season.season} Week {season.weeks_played}"
+            # Also where the regular season's length is unknown: a playoff week cannot then
+            # be told from a regular one, so the pill gives the week number and claims no
+            # round.
+            progress = f"Thru Week {season.weeks_played}"
 
     return Home(
         season=season.season,
         heading=heading,
         status=status,
+        progress=progress,
         final=season.final,
         weeks_played=season.weeks_played,
         money_recorded=bool(season.prizes),
@@ -1942,6 +2131,7 @@ def build_home(season: StatsSeason | None) -> Home | None:
         pot=season.pot,
         unawarded=season.unawarded,
         notes=season.notes,
+        show_projected=not final and bool(season.prizes),
     )
 
 
@@ -2184,7 +2374,17 @@ def build_site(
     dues = board if board is not None and not board.all_paid else None
 
     season_index = build_seasons_index(homes)
+    # Newest first, the order they are offered in. The newest is the home page: picking it
+    # from an older season's page goes home, not to a second copy of the same board.
+    season_links = tuple(
+        SeasonLink(
+            season=each.season,
+            href="index.html" if index == 0 else f"season-{each.season}.html",
+        )
+        for index, each in enumerate(homes)
+    )
     shared = {
+        "season_links": season_links,
         "current": current,
         "seasons": seasons,
         "season_index": season_index,
@@ -2249,10 +2449,8 @@ def build_site(
     # A past season's page is the home page, archived: same template, same prize board, just
     # that year's data instead of the most recent one. `home` above is `build_home(seasons[0])`;
     # this is that same function run over every other year.
-    # `homes` is newest first, so the season after this one is the entry before it. The ends
-    # of the list have no neighbour on that side and get no link — never a link to a page
-    # that was not written.
-    for index, archived in enumerate(homes):
+    # Moving between them is the season selector's job, which every board page carries.
+    for archived in homes:
         write(
             f"season-{archived.season}.html",
             "index.html",
@@ -2260,8 +2458,6 @@ def build_site(
             home=archived,
             title=f"RS57 — {archived.heading}",
             description=describe_home(archived),
-            next_season=homes[index - 1].season if index > 0 else None,
-            prev_season=homes[index + 1].season if index + 1 < len(homes) else None,
         )
     rules_text = rules_path.read_text(encoding="utf-8") if rules_path.exists() else ""
     write(

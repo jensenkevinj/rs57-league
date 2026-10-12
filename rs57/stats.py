@@ -66,6 +66,7 @@ from rs57.models import (
     PlayerWeek,
     PlayoffTier,
     Position,
+    PriorLeaders,
     PrizeSchedule,
     SeasonPoints,
     StandingRow,
@@ -630,6 +631,49 @@ def check_champion_won_the_final(
     ]
 
 
+MOST_POINTS_LABEL = "Most Points (Season)"
+UNLUCKY_LABEL = "Unlucky"
+
+
+def stud_label(position: object) -> str:
+    return f"{position} Stud"
+
+
+def leaders_through(
+    *,
+    season: int,
+    scores: Sequence[WeeklyScore],
+    matchups: Sequence[Matchup],
+    player_weeks: Sequence[PlayerWeek],
+    weeks: Sequence[int],
+    through_week: int,
+) -> PriorLeaders:
+    """Who led Most Points, each stud and Unlucky with only weeks 1-``through_week`` played.
+
+    The same three functions that name today's leaders, run on less of the season — not a
+    second implementation of any rule. Weekly highs and Survivor are not here: a week's high
+    is won outright, and nobody leads Survivor.
+    """
+    leaders: dict[str, tuple[str, ...]] = {}
+    totals = season_points([s for s in scores if s.week <= through_week], weeks)
+    if totals:
+        best = totals[0].points
+        leaders[MOST_POINTS_LABEL] = tuple(
+            sorted(row.manager_id for row in totals if row.points == best)
+        )
+    studs, _ = positional_studs(
+        [w for w in player_weeks if w.week <= through_week], in_progress=True
+    )
+    for stud in studs:
+        leaders[stud_label(stud.position)] = stud.manager_ids
+    award, _ = unlucky(
+        [m for m in matchups if m.week <= through_week], weeks, in_progress=True
+    )
+    if award is not None:
+        leaders[UNLUCKY_LABEL] = award.manager_ids
+    return PriorLeaders(season=season, through_week=through_week, leaders=leaders)
+
+
 @dataclass(frozen=True)
 class SeasonStats:
     """Everything Phase 2 derives for one season, plus what it could not vouch for."""
@@ -648,6 +692,9 @@ class SeasonStats:
     in_progress: bool = False
     """Still being played: no final ranks, and ESPN names a week not yet due. See the module
     docstring for what that relaxes and what it does not."""
+    prior_leaders: PriorLeaders | None = None
+    """Who led the season-long prizes a week ago. Only for a season in progress with at least
+    two weeks played — a finished season has winners, and week 1 has no week before it."""
 
     @property
     def blocked(self) -> bool:
@@ -717,6 +764,20 @@ def compute_season_stats(
                     )
                 )
 
+    latest_week = max((score.week for score in scores), default=0)
+    prior = (
+        leaders_through(
+            season=season,
+            scores=scores,
+            matchups=matchups,
+            player_weeks=player_weeks,
+            weeks=weeks,
+            through_week=latest_week - 1,
+        )
+        if in_progress and latest_week > 1
+        else None
+    )
+
     return SeasonStats(
         season=season,
         regular_season_weeks=tuple(weeks),
@@ -730,6 +791,7 @@ def compute_season_stats(
         consolation_winner_ids=consolation,
         issues=tuple(issues),
         in_progress=in_progress,
+        prior_leaders=prior,
     )
 
 
@@ -802,7 +864,7 @@ def award_prizes(
     if stats.season_points and not stats.in_progress:
         best = stats.season_points[0].points
         leaders = [row.manager_id for row in stats.season_points if row.points == best]
-    rows, found = _award(stats.season, "Most Points (Season)", schedule.most_points, leaders)
+    rows, found = _award(stats.season, MOST_POINTS_LABEL, schedule.most_points, leaders)
     payouts += rows
     issues += found
 
@@ -814,18 +876,18 @@ def award_prizes(
 
     if stats.in_progress:
         for position in STUD_POSITIONS:
-            payouts += _award(stats.season, f"{position} Stud", schedule.stud, [])[0]
-        payouts += _award(stats.season, "Unlucky", schedule.unlucky, [])[0]
+            payouts += _award(stats.season, stud_label(position), schedule.stud, [])[0]
+        payouts += _award(stats.season, UNLUCKY_LABEL, schedule.unlucky, [])[0]
     for stud in () if stats.in_progress else stats.studs:
         rows, found = _award(
-            stats.season, f"{stud.position} Stud", schedule.stud, list(stud.manager_ids)
+            stats.season, stud_label(stud.position), schedule.stud, list(stud.manager_ids)
         )
         payouts += rows
         issues += found
 
     if stats.unlucky is not None and not stats.in_progress:
         rows, found = _award(
-            stats.season, "Unlucky", schedule.unlucky, list(stats.unlucky.manager_ids)
+            stats.season, UNLUCKY_LABEL, schedule.unlucky, list(stats.unlucky.manager_ids)
         )
         payouts += rows
         issues += found

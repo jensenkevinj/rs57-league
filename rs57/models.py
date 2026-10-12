@@ -503,6 +503,23 @@ class UnluckyAward(Base):
     points: float
 
 
+class PriorLeaders(Base):
+    """Who led each season-long prize **one week ago**, in a season still being played.
+
+    The home page marks a prize whose leader changed in the week just played, and "changed"
+    needs the week before to compare against. That cannot be read back out of the current
+    leaders — a season total says nothing about last week's order — so the engine derives the
+    same prizes again with the latest week left out and the nightly records the answer.
+
+    ``leaders`` is keyed on the prize's payout label, the same key the money is found by. A
+    prize nobody led a week ago is simply absent.
+    """
+
+    season: int
+    through_week: int
+    leaders: dict[str, tuple[str, ...]]
+
+
 class PrizeSchedule(Base):
     """What each prize paid in one season.
 
