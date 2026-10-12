@@ -484,7 +484,22 @@
     margin-left: auto; font-size: 0.8rem; letter-spacing: 0; text-transform: none;
     font-variant-numeric: tabular-nums; white-space: nowrap;
   }
-  .prizes + .col-head { margin-top: 1.9rem; }
+  .prizes + .col-head, .more-rows + .col-head { margin-top: 1.9rem; }
+  /* Rows folded away under a list: the teams that went out of Survivor, once the season is
+     final. The summary is a quiet line the width of a row, and the list it opens carries on
+     from the one above. */
+  /* The grey rows follow the alive ones as one list: a rule between them, no gap. */
+  .prizes + .out-rows { border-top: 1px solid var(--line); }
+  .more-rows { border-top: 1px solid var(--line); }
+  .more-rows summary {
+    list-style: none; cursor: pointer; padding: 0.4rem 0;
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+  }
+  .more-rows summary::-webkit-details-marker { display: none; }
+  .more-rows summary::before { content: "\25B8"; display: inline-block; width: 1rem; }
+  .more-rows[open] summary::before { content: "\25BE"; }
+  .more-rows summary:hover { color: var(--accent); }
+  .more-rows[open] summary { border-bottom: 1px solid var(--line); }
   .prizes { list-style: none; margin: 0; padding: 0; }
 
   /* One row shape for the whole board: a key, a name, and a number. `nokey` is for a prize
@@ -874,6 +889,10 @@
               <span class="thin-name"><span class="thin-who">Hinkie Died For Your Sins</span></span>
               <span class="thin-num"></span>
             </li>
+        </ol>
+        <details class="more-rows">
+          <summary>Eliminated (11)</summary>
+        <ol class="prizes out-rows">
             <li class="thin">
               <span class="thin-key">Week 11</span>
                 <span class="thin-name muted"><span class="thin-who">Belichick&#39;s Spy</span></span>
@@ -930,7 +949,7 @@
                 <span class="thin-num">71.62</span>
             </li>
         </ol>
-      </section>
+</details>      </section>
       <section class="board-col">
           <h2 class="col-head">
             Stud<button type="button" class="info" aria-label="Biggest single game by a starter at each position, any week of the season, playoffs included. No bench or IR."><span class="tip-glyph" aria-hidden="true">i</span><span class="info-bubble" aria-hidden="true">Biggest single game by a starter at each position, any week of the season, playoffs included. No bench or IR.</span></button>          </h2>
