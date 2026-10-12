@@ -612,6 +612,18 @@ class SurvivorPanel:
     """The weeks that have been played, **newest first** — what happened last is what a reader
     came for, so it sits directly under the heading. On a decided ladder this is every week it
     took. A played week with nobody out is a hole and keeps its dash; it is not ``upcoming``."""
+    still_in: tuple[Named, ...] = ()
+    """The franchises not yet out, most season points first — the top of the ladder while
+    it is being played (commissioner, 2026-10-12). Every franchise is always on the ladder:
+    alive at the top, and each one that goes out drops to the grey rows beneath, newest first.
+
+    Empty once somebody has won it or the season is final: the one left is then the Winner
+    row, taken from the prize itself. Ordered on season points only so the order is stable
+    and means something; it says nothing about who goes out next."""
+    fold_out: bool = False
+    """Whether the teams that went out are folded away behind one line, leaving the Winner
+    alone at the top. True once the season is final (same decision): the ladder is then a
+    record, not news, and the winner is what the block is for."""
     upcoming: tuple[SurvivorWeek, ...] = ()
     """The weeks still to come, **in week order**. Empty once the ladder is decided.
 
@@ -2075,12 +2087,26 @@ def build_home(season: StatsSeason | None) -> Home | None:
     eliminated = {
         team.manager_id for out in season.survivor_eliminations for team in out.teams
     }
+    # Who is still in it: every franchise the season names that has not gone out, most season
+    # points first. The points table and the standings both list them all; a dict keeps the
+    # first sighting of each, in that order.
+    in_order = {
+        team.manager_id: team
+        for team in (
+            *(row.team for row in season.season_points),
+            *(row.team for row in season.standings),
+        )
+    }
     survivor_panel = SurvivorPanel(
         winners=survivor_row.winners,
         amount=survivor_row.amount,
         recorded=survivor_row.recorded,
         eliminations=season.survivor_eliminations,
         played=tuple(reversed([line for line in ladder if not line.pending])),
+        still_in=()
+        if decided
+        else tuple(team for mid, team in in_order.items() if mid not in eliminated),
+        fold_out=final,
         upcoming=tuple(line for line in ladder if line.pending),
         alive=season.franchise_count - len(eliminated)
         if season.franchise_count >= len(eliminated) and season.franchise_count

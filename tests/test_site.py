@@ -2953,6 +2953,79 @@ def test_the_board_runs_in_order_of_what_a_prize_pays(tmp_path: Path, derived: P
     assert page.count('<section class="board-col">') == 2
 
 
+def _standings(season: int) -> list[dict]:
+    return [
+        {"season": season, "manager_id": f"t{i}", "wins": 0, "losses": 0, "ties": 0,
+         "points_for": 0.0, "points_against": 0.0, "final_rank": None, "playoff_seed": None}
+        for i in range(1, 13)
+    ]
+
+
+def test_every_franchise_is_on_the_survivor_ladder_alive_first(tmp_path: Path, derived: Path):
+    """All twelve, always (commissioner, 2026-10-12): still alive at the top in bold, most
+    season points first, and the teams that went out greyed beneath, newest first.
+
+    Mutation-checked: leaving the eliminated teams in ``still_in`` lists three franchises
+    twice and fails the first assertion.
+    """
+    doc = _week_three_doc()
+    doc["standings"] = _standings(SEASON)
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    _twelve_teams(derived)
+    home = build_home(build_stats_season(derived, SEASON))
+    alive = [team.manager_id for team in home.survivor.still_in]
+    out = [team.manager_id for line in home.survivor.played for team in line.out.teams]
+    assert out == ["t3", "t4", "t5"] and len(alive) == 9 and not set(alive) & set(out)
+    assert sorted(alive + out, key=lambda m: int(m[1:])) == [f"t{i}" for i in range(1, 13)]
+    # t2 then t1 are the two with points on file; the rest follow in standings order.
+    assert alive[:2] == ["t2", "t1"]
+    assert not home.survivor.fold_out
+
+    page = render(tmp_path, derived, drafted=True)["index.html"]
+    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    column = column[: column.index("</section>")]
+    assert column.count("<li ") == 12 and column.count('<li class="thin still-in">') == 9
+    assert "more-rows" not in column and "Winner" not in column
+    body = text(column)
+    # The alive rows carry no key — being above the grey rows is what says it.
+    assert "Alive" not in body
+    assert column.rindex("still-in") < column.index("Week 3")
+    assert body.index("Week 3") < body.index("Week 2") < body.index("Week 1")
+    alive_rows = column[: column.index("out-rows")]
+    assert "muted" not in alive_rows, "a team still alive is not greyed"
+
+
+def test_a_finished_survivor_ladder_folds_to_its_winner(tmp_path: Path, derived: Path):
+    """Once the season is final the winner stands alone and the teams that went out are one
+    tap away. Won mid-season but not yet final, the whole ladder still shows.
+
+    Mutation-checked: ``fold_out=decided`` folds the ladder the week it is won and fails the
+    second half; ``fold_out=False`` fails the first.
+    """
+    prior = json.loads((derived / f"{PRIOR}-stats.json").read_text())
+    prior["survivor"]["eliminations"] = [
+        {"season": PRIOR, "week": 1, "manager_ids": ["t2"], "points": 80.0},
+    ]
+    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(prior), encoding="utf-8")
+    finished = build_home(build_stats_season(derived, PRIOR))
+    assert finished.final and finished.survivor.fold_out and finished.survivor.still_in == ()
+    page = render(tmp_path, derived, drafted=True)[f"season-{PRIOR}.html"]
+    column = page[page.index('<h2 class="col-head">\n          Survivor'):]
+    column = column[: column.index("</section>")]
+    shown, folded = column.split('<details class="more-rows">')
+    assert "Winner Fake News" in text(shown) and "Week 1" not in text(shown)
+    assert "Eliminated (1)" in text(folded) and "Week 1" in text(folded)
+
+    doc = _week_three_doc()
+    doc["survivor"]["winner_manager_ids"] = ["t1"]
+    next(r for r in doc["payouts"] if r["label"] == "Survivor")["winner_manager_id"] = "t1"
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
+    won = build_home(build_stats_season(derived, SEASON))
+    assert not won.final and won.survivor.winners and won.survivor.still_in == ()
+    assert not won.survivor.fold_out
+    assert "more-rows" not in render(tmp_path, derived, drafted=True)["index.html"].split("</style>")[1]
+
+
 def test_weekly_top_score_lists_only_the_weeks_that_are_due(tmp_path: Path, derived: Path):
     """A week still to come is off the list; its money is not lost and not "Other" either.
 

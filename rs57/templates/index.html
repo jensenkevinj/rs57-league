@@ -203,11 +203,13 @@
             <span class="col-money">{{ home.survivor.amount | money }}</span>
           {%- endif %}
         </h2>
-        {# The winner is the ladder's first row, bold like any prize's winner, once there is
-           one to name (commissioner, 2026-10-12). The teams that went out follow, greyed,
-           newest first: the same shape as Weekly top score. #}
+        {# Every franchise is always on the ladder (commissioner, 2026-10-12). Still alive at
+           the top, bold; each one that goes out drops to the grey rows beneath, newest first,
+           with the week it went and the score that sent it. Once somebody has won, the one
+           left is the Winner row. Once the season is final the teams that went out fold away
+           behind one line and the winner stands alone. site.build_home decides all of it. #}
         {% set survivor_decided = home.final or home.survivor.winners %}
-        {% if survivor_decided or home.survivor.played %}
+        {% if survivor_decided or home.survivor.still_in %}
         <ol class="prizes">
           {% if survivor_decided %}
             <li class="thin">
@@ -216,6 +218,24 @@
               <span class="thin-num"></span>
             </li>
           {% endif %}
+          {% for team in home.survivor.still_in %}
+            {# No key: every row above the grey ones is a team still alive, and saying so on
+               each was redundant. The empty cell keeps the names in their column. #}
+            <li class="thin still-in">
+              <span class="thin-key"></span>
+              <span class="thin-name"><span class="thin-who">{{ ui.team(team) }}</span></span>
+              <span class="thin-num"></span>
+            </li>
+          {% endfor %}
+        </ol>
+        {% endif %}
+        {% if home.survivor.played %}
+        {% if home.survivor.fold_out %}
+        {# A <details>, so it opens without any script. #}
+        <details class="more-rows">
+          <summary>Eliminated ({{ home.survivor.played | length }})</summary>
+        {% endif %}
+        <ol class="prizes out-rows">
           {% for line in home.survivor.played %}
             <li class="thin{% if line.latest %} out-latest{% endif %}"
                 {%- if line.latest %} title="Eliminated this week"{% endif %}>
@@ -230,6 +250,7 @@
             </li>
           {% endfor %}
         </ol>
+        {% if home.survivor.fold_out %}</details>{% endif %}
         {% endif %}
     {% endif %}
       </section>

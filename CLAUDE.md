@@ -365,6 +365,12 @@ Unlucky or weekly highs at all.
   The Won / Projected key is in ink, not grey.
 - **Tooltip rules are written the way a manager would say them** — short, no hedging. They are
   compared against the page unescaped by a test, so they carry no apostrophes.
+- **Every franchise is always on the Survivor ladder.** Still alive at the top, bold, with no
+  key, most season points first (`SurvivorPanel.still_in`); each team that goes out drops to the grey
+  rows beneath, newest first, with its week and score. Once somebody has won, the one left is
+  the Winner row. **Once the season is final the eliminated teams fold away** behind an
+  "Eliminated (N)" `<details>` and the winner stands alone. Weekly top score is never folded —
+  each of its rows is a prize somebody won.
 - **The board runs in order of what a prize pays**: Final Standings, Most Points and Survivor
   down the first column, then Stud, Unlucky and Weekly top score down the second. On a phone
   that is one list, largest prize first. The placings and the survivor ladder are set into
@@ -373,8 +379,7 @@ Unlucky or weekly highs at all.
   **newest first**, and the week just played marked as the top row —
   yellow for the high score, red for who went out. Both build downward over the season. A week
   still to come is on neither list: Survivor's "Upcoming" rows and its "Still alive: N of 12"
-  header are both gone. Survivor's winner is the ladder's first row, keyed "Winner" and bold like
-  any prize's winner, and only once there is one; the teams that went out follow, greyed. It is still resolved, so its payout row never lands in "Other
+  header are both gone; see the Survivor ladder above for what took their place. It is still resolved, so its payout row never lands in "Other
   prizes"; a played week with nothing on file is a hole and keeps its dash.
 
 **Stats REVIEW and ERROR notes are not published on the board** (same decision). They were
