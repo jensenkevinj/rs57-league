@@ -687,55 +687,43 @@
     }
   }
 
-  /* The Moneylist: one bar per franchise, most won first. Each column is a row of figures
-     over a track; the bar stands on the track's floor and the franchise's name runs up the
-     column over it, like a watermark. Two greens of one hue — the money won, and above it
-     the money a franchise is only leading — with a 2px gap of page between them. Both fills
-     are light enough (dark enough, in dark mode) for `--ink` to be read on, which a test
-     holds to 4.5:1, because the name crosses them. */
+  /* The Moneylist: one row per franchise, most won first. A row is a track with the figures
+     after it; the bar runs along the track from the left and the franchise's name is written
+     over the start of it, like a watermark, so a name is read the way everything else on the
+     page is. Two greens of one hue — the money won, then the money a franchise is only
+     leading — with a 2px gap of page between them. Both fills are light enough (dark enough,
+     in dark mode) for `--bar-name` to be read on, which a test holds to 4.5:1, because the
+     name crosses them. */
   .money-chart {
     /* As wide as the board under it, so its heading's rule ends where the board's do. The
        bottom margin and the board's own top margin add up to the gap between two blocks. */
     list-style: none; margin: 0.6rem 0 0.4rem; padding: 0;
-    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.3rem;
-    height: 17rem; position: relative;
+    display: flex; flex-direction: column; gap: 0.25rem;
   }
-  /* The baseline, drawn once across the whole chart rather than under each column, so the
-     gaps between bars do not break it. The figures sit beneath it like axis labels. */
-  .money-chart::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: 2.4rem;
-    border-top: 1px solid var(--muted);
+  .money-chart li {
+    display: grid; grid-template-columns: minmax(0, 1fr) 3rem; align-items: center;
+    column-gap: 0.5rem; font-variant-numeric: tabular-nums;
   }
-  .money-chart li { display: flex; flex-direction: column; min-width: 0; }
-  /* Under the baseline: won in bold, and what is projected beneath it, each in the green of
-     its own segment (commissioner, 2026-10-12). A franchise with neither has an empty slot,
-     which keeps every baseline at the same height. */
-  .bar-figs {
-    display: grid; grid-template-rows: 1.25em 1.25em; justify-items: center;
-    height: 2.4rem; padding-top: 0.3rem; flex: none;
-    font-size: 0.72rem; line-height: 1.25; font-variant-numeric: tabular-nums;
+  .money-chart.two-figs li { grid-template-columns: minmax(0, 1fr) 2.6rem 2.8rem; }
+  /* The figures, at the end of the row: won in bold, then what is projected, each in the
+     green of its own segment and each in its own column. */
+  .bar-won, .bar-projected { font-size: 0.8rem; text-align: right; }
+  .bar-won { font-weight: 700; color: var(--won-text); }
+  .bar-projected { color: var(--leading-text); }
+  /* The track's left edge is the axis every bar starts from. */
+  .bar-track {
+    position: relative; display: flex; gap: 2px; height: 1.6rem; min-width: 0;
+    border-left: 1px solid var(--muted);
   }
-  /* Each figure keeps its own line, so a projection with nothing won above it still lines up
-     with every other projection instead of rising into the won row. */
-  .bar-won { grid-row: 1; font-weight: 700; color: var(--won-text); }
-  .bar-projected { grid-row: 2; color: var(--leading-text); }
-  .bar-track { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-  .bar-seg { position: absolute; left: 0; right: 0; }
-  .bar-seg-won { bottom: 0; height: var(--won); background: var(--won-fill); }
-  .bar-seg-leading {
-    bottom: calc(var(--won) + 2px); height: calc(var(--leading) - 2px);
-    background: var(--leading-fill);
-  }
-  /* The top of the stack is rounded, whichever segment that is. */
-  .bar-seg-leading, .bar-seg-won:first-child { border-radius: 3px 3px 0 0; }
+  .bar-seg { flex: none; }
+  .bar-seg-won { width: var(--won); background: var(--won-fill); }
+  .bar-seg-leading { width: calc(var(--leading) - 2px); background: var(--leading-fill); }
+  /* The far end of the bar is rounded, whichever segment that is. */
+  .bar-seg:nth-last-child(2) { border-radius: 0 3px 3px 0; }
   .bar-name {
-    position: absolute; left: 50%; bottom: 0.4rem; max-height: calc(100% - 0.6rem);
-    /* `sideways`, or a curly apostrophe is set upright and lands a line away from its word. */
-    writing-mode: vertical-rl; text-orientation: sideways;
-    transform: translateX(-50%) rotate(180deg);
+    position: absolute; left: 0.5rem; right: 0.3rem; top: 50%; transform: translateY(-50%);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    font-size: 0.74rem; font-weight: 600; line-height: 1.1; letter-spacing: 0.01em;
-    color: var(--bar-name);
+    font-size: 0.85rem; font-weight: 600; line-height: 1.2; color: var(--bar-name);
   }
   .chart-key {
     display: flex; gap: 0.9rem; margin-left: auto;
@@ -752,11 +740,6 @@
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip-path: inset(50%); white-space: nowrap;
   }
-  @media (max-width: 34rem) {
-    .money-chart { gap: 0.2rem; }
-    .bar-figs { font-size: 0.64rem; }
-  }
-
   /* --- the rules page ---------------------------------------------------- */
 
   /* Prose at a readable measure — about seventy characters, down from the ninety-five the
@@ -886,9 +869,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">The Infirmary</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$525</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$525</span>
         </li>
         <li style="--won: 71%; --leading: 0%"
             title="Ken Franklins: $375 won">
@@ -896,9 +877,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Ken Franklins</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$375</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$375</span>
         </li>
         <li style="--won: 28%; --leading: 0%"
             title="Purdy Good at Fantasy: $145 won">
@@ -906,9 +885,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Purdy Good at Fantasy</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$145</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$145</span>
         </li>
         <li style="--won: 14%; --leading: 0%"
             title="Coopren Tayddleson: $75 won">
@@ -916,9 +893,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Coopren Tayddleson</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$75</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$75</span>
         </li>
         <li style="--won: 10%; --leading: 0%"
             title="CeeDee Drive: $50 won">
@@ -926,9 +901,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">CeeDee Drive</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$50</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$50</span>
         </li>
         <li style="--won: 2%; --leading: 0%"
             title="All Sizzle, All Steak: $10 won">
@@ -936,9 +909,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">All Sizzle, All Steak</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$10</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$10</span>
         </li>
         <li style="--won: 2%; --leading: 0%"
             title="Bijan&#39;s Mustard: $10 won">
@@ -946,9 +917,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Bijan&#39;s Mustard</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$10</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$10</span>
         </li>
         <li style="--won: 2%; --leading: 0%"
             title="Too Much Moxie: $10 won">
@@ -956,9 +925,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Too Much Moxie</span>
           </span>
-          <span class="bar-figs">
-              <span class="bar-won"><span class="sr">Won </span>$10</span>
-          </span>
+          <span class="bar-won"><span class="sr">Won </span>$10</span>
         </li>
         <li style="--won: 0%; --leading: 0%"
             title="Belichick&#39;s Spy: $0 won">
@@ -966,8 +933,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Belichick&#39;s Spy</span>
           </span>
-          <span class="bar-figs">
-          </span>
+          <span class="bar-won"></span>
         </li>
         <li style="--won: 0%; --leading: 0%"
             title="Cooking Rice: $0 won">
@@ -975,8 +941,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Cooking Rice</span>
           </span>
-          <span class="bar-figs">
-          </span>
+          <span class="bar-won"></span>
         </li>
         <li style="--won: 0%; --leading: 0%"
             title="Aiyukiddinme? I&#39;m Odunze here: $0 won">
@@ -984,8 +949,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Aiyukiddinme? I&#39;m Odunze here</span>
           </span>
-          <span class="bar-figs">
-          </span>
+          <span class="bar-won"></span>
         </li>
         <li style="--won: 0%; --leading: 0%"
             title="Calling Audibles: $0 won">
@@ -993,8 +957,7 @@
             <span class="bar-seg bar-seg-won"></span>
             <span class="bar-name">Calling Audibles</span>
           </span>
-          <span class="bar-figs">
-          </span>
+          <span class="bar-won"></span>
         </li>
     </ol>
     </section>
