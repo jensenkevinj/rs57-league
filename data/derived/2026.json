@@ -1005,12 +1005,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4678008,
-      "name": "Jonathon Brooks",
-      "nfl_team": "CAR",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4683062,
       "name": "Xavier Worthy",
       "nfl_team": "KC",
@@ -1314,15 +1308,6 @@
       "base_salary": 12,
       "espn_player_id": 4596448,
       "kept_prior_year": true,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 6,
-      "espn_player_id": 4678008,
-      "kept_prior_year": false,
       "manager_id": "t1",
       "season": 2026,
       "source": "draft"
