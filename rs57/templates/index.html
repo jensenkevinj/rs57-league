@@ -153,27 +153,23 @@
           <ol class="prizes">
             {% for row in group.rows %}
               {# One row shape everywhere on the board: a key, a name, and the number that won
-                 it. A prize whose heading already names it has no key. #}
-              <li class="thin{% if not group.show_labels %} nokey{% endif %}{% if row.changed %} changed{% endif %}{% if row.latest %} won-latest{% endif %}"
+                 it. #}
+              <li class="thin{% if row.changed %} changed{% endif %}{% if row.latest %} won-latest{% endif %}"
                   {%- if row.changed %} title="New leader this week"{% endif %}
                   {%- if row.latest %} title="This week's high score"{% endif %}>
-                {% if group.show_labels %}
-                  <span class="thin-key">
-                    {%- if row.short_label %}{{ row.short_label }}{% else %}{{ row.label }}{% endif -%}
-                  </span>
-                {% endif %}
-                {# A week not played yet is its key and nothing else — no dash to read as a
-                   result. Whoever is ahead mid-season is not tagged either: the pill beside
-                   the heading says how far the season has got, once, for the whole board. #}
-                {# One line, always: a long name is cut, and what explains the number — the
+                <span class="thin-key">
+                  {%- if row.short_label %}{{ row.short_label }}{% else %}{{ row.label }}{% endif -%}
+                </span>
+                {# Whoever is ahead mid-season is not tagged: the pill at the top of the page
+                   says how far the season has got, once, for the whole board.
+
+                   One line, always: a long name is cut, and what explains the number — the
                    player and week behind a stud — is cut before the name is. Its full wording
                    is the hover text. #}
                 <span class="thin-name">
-                  {%- if not row.pending %}
                   <span class="thin-who">{{ ui.teams(row.winners, blank) }}</span>
                   {%- if row.split %}<span class="tag-inline" title="A tie — the prize was split evenly">split</span>{% endif %}
                   {%- if row.detail %}<span class="thin-why" title="{{ row.detail }}">{{ row.brief }}</span>{% endif %}
-                  {%- endif %}
                 </span>
                 <span class="thin-num">{{ row.value }}</span>
                 {%- if not group.each_recorded %}

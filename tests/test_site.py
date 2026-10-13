@@ -395,7 +395,7 @@ def test_the_grid_is_one_row_per_rostered_player(tmp_path: Path, derived: Path):
     rows = grid_rows(render(tmp_path, derived)["keepers.html"])
 
     assert len(rows) == sum(len(team.lines) for team in season.teams)
-    assert all(len(row) == 9 for row in rows), f"a row is not nine cells: {rows}"
+    assert all(len(row) == 7 for row in rows), f"a row is not seven cells: {rows}"
     # ``Belichick's  Spy`` carries a real double space. It survives into the HTML; only this
     # test's own whitespace-collapsing needs undoing, so collapse the expected names too.
     named = {re.sub(r"\s+", " ", team.name) for team in season.teams}
@@ -408,7 +408,7 @@ def test_the_grid_does_not_publish_declarations(tmp_path: Path, derived: Path):
     head = re.search(r"<thead>(.*?)</thead>", page, re.S).group(1)
     assert [re.sub(r"<[^>]+>", "", cell).strip()
             for cell in re.findall(r"<th[^>]*>(.*?)</th>", head, re.S)] == [
-        "Player", "Pos", "Franchise", "NFL", "Prospect", "Acquired", "Base", "Tax", "Salary"
+        "Player", "Pos", "Franchise", "NFL", "Prospect", "Acquired", "Salary"
     ]
 
 
@@ -440,8 +440,10 @@ def test_the_sort_reads_money_from_an_attribute_not_from_the_dollars(
     row = next(row for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S)
                if "Puka Nacua" in row)
     nacua = lines["Puka Nacua"]
-    for amount in (nacua.base, nacua.tax, nacua.price):
-        assert f'data-v="{amount}"' in row, f"${amount} is rendered with no sortable value"
+    # One money column now, so one sortable value: the salary. The base and the tax are
+    # printed beside it for a taxed player, as text, and nothing sorts on them.
+    assert nacua.tax and f'data-v="{nacua.price}"' in row
+    assert row.count("data-v=") == 1
 
 
 def test_the_player_cell_keeps_a_sort_key_apart_from_what_it_displays(
@@ -621,20 +623,42 @@ def test_a_stored_waiver_mismatch_is_not_published_in_the_entered_prices_window(
     assert any("disagree with the FAAB" in n.message for n in still_checked.notes)
 
 
-def test_the_tax_column_reads_as_a_dash_rather_than_zero_dollars(tmp_path: Path, derived: Path):
-    """A player who owes no tax must not render "$0" — that reads as a figure somebody
+def test_a_taxed_salary_shows_what_it_is_made_of_and_an_untaxed_one_shows_nothing(
+    tmp_path: Path, derived: Path
+):
+    """One money column (commissioner, 2026-10-12). Base and Tax were columns of their own and
+    Base repeated Salary on every row but the taxed ones, so the breakdown now appears only
+    where there is one: under the salary of a player who carries the keeper tax.
+
+    A player who owes no tax must not render "$0" or "+ $0" — that reads as a figure somebody
     computed, when the truth is that no charge applies to him at all.
 
     Rendered through ``build_site``, on the real ``utc_now`` clock rather than an injected one,
     so this also pins the default wiring the tests above bypass.
+
+    Mutation-checked: printing the breakdown on every row fails the untaxed half.
     """
     page = render(tmp_path, derived)["keepers.html"]
-    row = next(r for r in grid_rows(page) if r[0].startswith("James Cook III"))
-    assert "$0" not in row, "an absent tax must not read as a computed zero"
-    assert "—" in row
+    season = build_keeper_season(derived, SEASON)
+    lines = {line.player_name: line for team in season.teams for line in team.lines}
 
+    cook = next(r for r in grid_rows(page) if r[0].startswith("James Cook III"))
+    assert not lines["James Cook III"].tax
+    assert cook[-1] == f"${lines['James Cook III'].price}", "an untaxed salary stands alone"
+    assert "$0" not in cook and "tax" not in cook[-1]
+
+    nacua = lines["Puka Nacua"]
     taxed = next(r for r in grid_rows(page) if r[0].startswith("Puka Nacua"))
-    assert "$5" in taxed, "and a player who does owe it sees the figure"
+    assert nacua.tax and nacua.price == nacua.base + nacua.tax
+    assert taxed[-1] == f"${nacua.price}${nacua.base} + ${nacua.tax} tax"
+    assert '<span class="parts">' in player_row(page, "Puka Nacua")
+    # The same fact, as a badge beside the name: K for kept last season, which is what the
+    # tax is for. Keyed on the tax, so a row has the badge exactly when it has the breakdown.
+    assert 'class="kbadge"' in player_row(page, "Puka Nacua")
+    assert "Kept last season — the $5 keeper tax applies" in player_row(page, "Puka Nacua")
+    assert "kbadge" not in player_row(page, "James Cook III")
+    body = page.split("<tbody>")[1].split("</tbody>")[0]
+    assert body.count('class="kbadge"') == body.count('class="parts"')
 
 
 def test_the_page_never_says_the_charges_are_inside_the_base(tmp_path: Path, derived: Path):
@@ -1366,7 +1390,7 @@ def test_survivor_is_shown_once_and_paid_once(tmp_path: Path):
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert home.survivor is not None
-    assert len(home.survivor.eliminations) == 2
+    assert len(home.survivor.played) == 2
 
     # The column is the prize, so it carries the money and there is no row beside the others.
     assert home.survivor.amount == 40 and home.survivor.recorded
@@ -1378,8 +1402,8 @@ def test_survivor_is_shown_once_and_paid_once(tmp_path: Path):
     body = text(render(tmp_path, derived, drafted=True)["index.html"])
     assert "Winner" in body
     assert "$40" in body
-    for elimination in home.survivor.eliminations:
-        assert f"Week {elimination.week}" in body
+    for line in home.survivor.played:
+        assert f"Week {line.week}" in body
 
 
 def test_a_season_with_no_survivor_ladder_still_has_the_survivor_column(
@@ -1473,9 +1497,6 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     # Nothing played, so nothing is under the heading and all eleven weeks are still to come,
     # in the order they will be played.
     assert home.survivor.played == ()
-    assert [line.week for line in home.survivor.upcoming] == list(range(1, 12))
-    assert all(line.out is None and line.pending for line in home.survivor.upcoming)
-    assert (home.survivor.alive, home.survivor.franchises) == (12, 12)
 
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert not any(row.winners for row in rows) and not any(row.leading for row in rows)
@@ -1549,8 +1570,8 @@ def test_mid_season_the_board_fills_in_and_marks_its_leaders(tmp_path: Path, der
     assert home.survivor is not None and home.survivor.winners == ()
     assert [line.week for line in home.survivor.played] == [2, 1], "newest first"
     assert all(line.out is not None for line in home.survivor.played)
-    assert [line.week for line in home.survivor.upcoming] == list(range(3, 12))
-    assert home.survivor.alive == 10
+    # Weeks still to come are not on the ladder at all.
+    assert max(line.week for line in home.survivor.played) == 2
     assert home.podium == ()
     assert _money_shown(home) == home.pot - 800 - 120, "less the placings and 12 unplayed weeks"
 
@@ -2151,13 +2172,21 @@ def test_the_salary_column_carries_no_colour_scale(tmp_path: Path, derived: Path
     assert not re.search(r"\.sal[.\s{]", style), "a salary-specific style survived"
 
 
-def test_prospects_only_is_a_checkbox_not_a_dropdown(tmp_path: Path, derived: Path):
+def test_position_and_prospects_are_chips_and_franchise_is_the_only_dropdown(
+    tmp_path: Path, derived: Path
+):
+    """Six positions are one tap each, not a dropdown; Prospects is a toggle and sits with
+    them. Franchise comes first, then the name search (commissioner, 2026-10-12)."""
     page = render(tmp_path, derived)["keepers.html"]
-    assert '<input type="checkbox" id="f-prospect">' in page
-    assert '<select id="f-prospect"' not in page
+    controls = page[page.index('<div class="controls"'):page.index('<div class="grid-scroll">')]
+    assert controls.count("<select") == 1 and 'type="checkbox"' not in controls
+    assert controls.index('id="f-team"') < controls.index('id="q"') < controls.index('id="f-pos"')
+    assert '<button type="button" class="chip" id="f-prospect" aria-pressed="false">' in controls
+    assert 'id="f-pos" role="group" aria-label="Filter by position"' in controls
 
     script = page[page.index("<script>"):]
-    assert "byProspect.checked" in script
+    assert 'chip.setAttribute("data-pos", name);' in script
+    assert "localStorage" not in script, "the page must not open already filtered"
     assert 'cellText(row, PROSPECT) === "Eligible"' in script, (
         "the checkbox does not filter to eligible players"
     )
@@ -2206,19 +2235,29 @@ def test_a_declared_keeper_is_not_highlighted(tmp_path: Path, derived: Path):
     assert ".kept" not in page, "the declared-row style outlived the column it explained"
 
 
-def test_the_deadline_banner_is_sized_to_its_content(tmp_path: Path, derived: Path):
-    """One short fact. A full-width bar promises more than it says, and it carries the mark."""
+def test_the_deadline_is_a_pill_like_the_one_that_opens_the_home_tab(
+    tmp_path: Path, derived: Path
+):
+    """One short fact, so one small pill — not a boxed notice (commissioner, 2026-10-12)."""
     page = render(tmp_path, derived)["keepers.html"]
-    assert 'class="deadline-i"' in page, "the banner has no information mark"
-    assert "display: inline-flex" in page.split(".deadline {")[1].split("}")[0]
+    assert '<p class="pill deadline is-' in page and "deadline-i" not in page
+    assert "display: inline-block" in page.split(".deadline {")[1].split("}")[0]
 
 
 def test_the_player_count_only_appears_while_filtering(tmp_path: Path, derived: Path):
     """Feedback while something is being narrowed, not a label sitting there permanently."""
     page = render(tmp_path, derived)["keepers.html"]
-    assert '<span class="count" id="count" role="status" hidden></span>' in page
+    # The count and Clear are one line, hidden until a filter is on: a Clear with nothing to
+    # clear is as much a permanent label as a bare "188 players".
+    assert '<span class="filter-status" id="filter-status" hidden>' in page
+    status = page[page.index('id="filter-status"'):]
+    status = status[: status.index("</button>")]
+    assert 'id="count" role="status"' in status and 'id="reset"' in status
     script = page[page.index("<script>"):]
-    assert "count.hidden = shown === rows.length;" in script
+    assert "status.hidden = !(needle || pos || team || prospectsOnly);" in script
+    # It appears in the Player header, laid over the cell, so the table does not move.
+    assert "headers[PLAYER].appendChild(status);" in script
+    assert "position: absolute" in _style().split(".filter-status {")[1].split("}")[0]
 
 
 def test_an_ineligible_row_is_greyed_as_well_as_tinted(tmp_path: Path, derived: Path):
@@ -2307,7 +2346,7 @@ def test_an_override_is_filed_against_the_season_whose_base_is_wrong(tmp_path: P
     wrong = with_overrides(tmp_path / "b", derived, [override_row(1, SEASON - 1, 99)])
     row = player_row(wrong, "Puka Nacua")
     assert "wbadge" not in row, "an override for the wrong season appeared to work"
-    assert ">$5<" in row, "the wrong-season override changed the base anyway"
+    assert ">$5 + $5 tax<" in row, "the wrong-season override changed the base anyway"
 
 
 def test_the_commissioners_reason_is_not_published(tmp_path: Path, derived: Path):
@@ -2353,7 +2392,7 @@ def test_an_override_recorded_in_the_admin_tool_reaches_the_grid(tmp_path: Path,
 
     row = player_row(page, "Puka Nacua")
     assert 'class="wbadge"' in row, "an override recorded in the admin tool never reached the grid"
-    assert 'data-v="99"' in row, "the corrected base is not being published"
+    assert "$99 + $5 tax" in row, "the corrected base is not being published"
     assert "Manually Overridden Salary" in row
 
 
@@ -2607,7 +2646,7 @@ def test_every_tooltip_can_be_opened_by_a_tap(tmp_path: Path, derived: Path):
 
     for name, page in pages.items():
         assert 'setAttribute("aria-expanded"' in page, f"{name} has no tooltip script"
-        triggers = re.findall(r'<button type="button" class="(?:info|pbadge|wbadge)\b.*?</button>',
+        triggers = re.findall(r'<button type="button" class="(?:info|pbadge|wbadge|kbadge)\b.*?</button>',
                               page, flags=re.S)
         for trigger in triggers:
             assert 'class="tip-glyph"' in trigger, f"{name}: a trigger with no hit area"
@@ -2631,8 +2670,9 @@ def _survivor_season(derived: Path, eliminations: list[dict], **source) -> None:
 def test_still_alive_counts_teams_not_weeks(derived: Path):
     """A tie takes two out in one week. Counting weeks would leave one of them alive.
 
-    Mutation-checked: with ``alive`` computed from ``len(season.survivor_eliminations)`` this
-    reads 10 and fails.
+    The count is no longer printed, but it is still what the ladder shows: the teams above
+    the grey rows. Mutation-checked: taking only the first team out of a tied week leaves ten
+    in ``still_in`` and fails.
     """
     _survivor_season(
         derived,
@@ -2642,8 +2682,12 @@ def test_still_alive_counts_teams_not_weeks(derived: Path):
         ],
         weeks_with_results=[1, 2],
     )
+    doc = json.loads((derived / f"{SEASON}-stats.json").read_text())
+    doc["standings"] = _standings(SEASON)
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
     panel = build_home(build_stats_season(derived, SEASON)).survivor
-    assert (panel.alive, panel.franchises) == (9, 12)
+    assert len(panel.still_in) == 9
+    assert not {"t1", "t2", "t3"} & {team.manager_id for team in panel.still_in}
     assert [line.week for line in panel.played] == [2, 1]
 
 
@@ -2661,7 +2705,8 @@ def test_a_played_week_with_nobody_out_is_a_hole_not_an_upcoming_week(derived: P
     assert [(line.week, line.out is None) for line in panel.played] == [
         (3, False), (2, True), (1, False)
     ]
-    assert [line.week for line in panel.upcoming] == list(range(4, 12))
+    # ...and nothing past the last week with results is on the ladder.
+    assert max(line.week for line in panel.played) == 3
 
 
 def test_a_finished_season_has_no_upcoming_weeks(tmp_path: Path, derived: Path):
@@ -2673,7 +2718,7 @@ def test_a_finished_season_has_no_upcoming_weeks(tmp_path: Path, derived: Path):
     ]
     (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.survivor.upcoming == () and [w.week for w in home.survivor.played] == [1]
+    assert [w.week for w in home.survivor.played] == [1]
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert not any(row.pending for row in rows), "a finished season's empty prize is unawarded"
 
@@ -2792,7 +2837,7 @@ def test_most_points_shows_the_two_franchises_behind_the_leader(tmp_path: Path, 
     assert [(line.key, line.team.manager_id, line.value) for line in block.also] == [
         ("2nd", "t1", "410.00"), ("3rd", "t3", "400.00")
     ]
-    assert block.rows[0].short_label == "1st" and block.show_labels
+    assert block.rows[0].short_label == "1st"
     assert len(block.rows) == 1 and block.each == 100
     assert _money_shown(home) == home.pot - 800 - 110
 
@@ -3096,20 +3141,20 @@ def _keepers_page_on(tmp_path: Path, derived: Path, now: datetime) -> str:
 
 
 def _alert(page: str) -> tuple[str, str]:
-    found = re.search(r'<p class="deadline is-(\w+)">(.*?)</p>', page, re.S)
+    found = re.search(r'<p class="pill deadline is-(\w+)">(.*?)</p>', page, re.S)
     return found.group(1), text(found.group(2)).strip()
 
 
 def test_the_alert_on_the_page_follows_the_day_the_site_was_built(tmp_path: Path, derived: Path):
     """``build_site(now=...)`` reaches the keeper page, and the words change with the colour."""
     assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 10, 6, 13, 0))) == (
-        "upcoming", "i Keeper deadline: 11/25/2026"
+        "upcoming", "Keeper deadline: 11/25/2026"
     )
     assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 11, 16, 13, 0))) == (
-        "soon", "i Keeper deadline: 11/25/2026 · 9 days left"
+        "soon", "Keeper deadline: 11/25/2026 · 9 days left"
     )
     assert _alert(_keepers_page_on(tmp_path, derived, datetime(2026, 11, 26, 13, 0))) == (
-        "passed", "i Keeper deadline passed: 11/25/2026"
+        "passed", "Keeper deadline passed: 11/25/2026"
     )
 
 
@@ -3121,7 +3166,7 @@ def test_a_missing_deadline_keeps_the_red_alert(tmp_path: Path):
     assert state == "unknown" and "not on file" in words
     style = _rule_bodies(_style())
     assert ".deadline.is-passed, .deadline.is-unknown {" in style
-    quiet = style.split(".deadline {")[1].split("}")[0]
+    quiet = style.split(".pill {")[1].split("}")[0] + style.split(".deadline {")[1].split("}")[0]
     assert "var(--panel)" in quiet and "--bad" not in quiet, "the alert is red before it matters"
 
 
@@ -3158,8 +3203,12 @@ def test_the_keeper_page_has_a_heading_and_says_how_each_player_arrived(
     (derived / f"{SEASON}.json").write_text(json.dumps(doc), encoding="utf-8")
     page = render(tmp_path, derived)["keepers.html"]
     body = text(page)
-    assert "<h1>Keepers</h1>" in page
-    assert f"cost to keep for {SEASON}" in body, "the lede names the season the prices are for"
+    # No drawn heading and no introduction (commissioner, 2026-10-12): the <h1> is read out,
+    # not drawn, and the column headers are set like the Home tab's block headings.
+    assert f'<h1 class="sr">{SEASON} Keepers</h1>' in page
+    assert "<h2" not in page.split("</style>")[1]
+    assert "cost to keep" not in body and 'class="lede"' not in page
+    assert ".grid thead th { box-shadow: inset 0 -2px 0 var(--ink); }" in _style()
 
     drafted = player_row(page, "Puka Nacua")
     added = player_row(page, "James Cook III")
@@ -3173,21 +3222,34 @@ def test_the_keeper_page_has_a_heading_and_says_how_each_player_arrived(
     # its leading space was the first character of a flex item and was dropped.
     assert re.search(
         r'<span class="franchise">Fake News</span><span\s+class="acq-sub dot" '
-        r'aria-hidden="true">·</span><span\s+class="acq-sub">Draft 8/5/2025</span>', drafted
+        r'aria-hidden="true">·</span><span\s+class="acq-sub">Draft</span>', drafted
     )
+    # Line two is the franchise and one more word: "Draft", or for anybody who arrived later
+    # the date alone (commissioner, 2026-10-12). The drafted all share a date, so it is not
+    # repeated down the page; "Add" and "Trade" stay in the Acquired column.
+    assert re.search(r'class="acq-sub">\d+/\d+/\d{4}</span>', added)
+    assert not re.search(r'class="acq-sub">(Add|Trade|Draft )', page)
     assert "> · " not in page.split("<tbody>")[1].split("</tbody>")[0]
     assert ".grid .sub {\n    display: flex; gap: 0.3rem;" in _style()
 
 
 def test_a_desktop_gets_the_franchise_column_and_nothing_narrower_changes():
     style = _rule_bodies(_style())
-    desktop = style[style.index("@media (min-width: 60rem) {\n    .grid, .controls"):]
+    capped = style.index(".grid, .controls { max-width: 53rem; }")
+    desktop = style[style.rindex("@media (min-width: 60rem) {", 0, capped):]
     desktop = desktop[: desktop.index("\n  }\n") ]
-    assert ".grid, .controls { max-width: none; }" in desktop
+    # Only as wide as its columns need, so there is no gap between a player and his franchise.
+    assert ".grid, .controls { max-width: 53rem; }" in desktop
     assert ".grid tr > :nth-child(3) { display: table-cell; }" in desktop
     assert ".grid .sub { display: none; }" in desktop, "the franchise is shown twice"
+    # Wide enough that no franchise name is cut: the longest needs 228px, and 13rem clipped 48.
+    assert ".grid th:nth-child(3) { width: 15.5rem; }" in desktop
+    # The breakdown under a taxed salary is stacked at every width, never set beside it.
+    assert "row-reverse" not in style
+    # ...and every desktop row is the height a taxed one needs, so none is taller than the rest.
+    assert ".grid td { height: 2.75rem; }" in desktop
     # Everywhere else the franchise column is still hidden and the grid still capped.
-    before = style[: style.index("@media (min-width: 60rem) {\n    .grid, .controls")]
+    before = style[: style.index(".grid, .controls { max-width: 53rem; }")]
     assert ".grid, .controls { max-width: 44rem; }" in before
     assert ".grid tr > :nth-child(3)" in before
 
@@ -3368,6 +3430,10 @@ def test_the_rules_page_has_one_outline_shown_two_ways(tmp_path: Path, derived: 
 # Every place the stylesheet sets one token as text on another as its background.
 TEXT_ON = [
     ("--ink", "--bg"), ("--ink", "--panel"),
+    # A filter chip that is on: the page colour reversed out of ink.
+    ("--bg", "--ink"),
+    # The K badge: the page colour on the quiet grey.
+    ("--bg", "--muted"),
     ("--muted", "--bg"), ("--muted", "--panel"), ("--muted", "--bad-bg"),
     # A board row washed yellow (a new leader) or red (out of Survivor this week).
     ("--ink", "--flag-bg"), ("--muted", "--flag-bg"), ("--ink", "--bad-bg"),
@@ -3379,8 +3445,6 @@ TEXT_ON = [
     ("--accent", "--bg"), ("--on-accent", "--accent"),
     ("--flag", "--flag-bg"), ("--bad", "--bad-bg"), ("--good", "--good-bg"),
     ("--bubble-fg", "--bubble-bg"),
-    # The alert's icon is the fill colour reversed out of itself.
-    ("--panel", "--muted"), ("--flag-bg", "--flag"), ("--bad-bg", "--bad"),
 ]
 
 
@@ -3512,6 +3576,16 @@ def test_the_stats_tab_replaced_the_seasons_tab_and_says_only_that_it_is_coming(
     assert ".hall" not in _style() and not (TEMPLATES / "seasons.html").exists()
 
 
+def test_the_rules_page_is_dressed_like_the_other_tabs(tmp_path: Path, derived: Path):
+    """No large heading: a pill for the season, and sections headed like the Home board's
+    blocks (commissioner, 2026-10-12). The <h1> is read out, not drawn."""
+    page = render(tmp_path, derived)["rules.html"]
+    assert '<h1 class="sr">RS57 League Rules</h1>' in page and 'class="lede"' not in page
+    assert '<p class="pill rules-pill">In effect for the 2026 season</p>' in page
+    heading = _rule_bodies(_style()).split(".rules-prose h2 {")[1].split("}")[0]
+    assert "border-bottom: 2px solid var(--ink)" in heading and "text-transform: uppercase" in heading
+
+
 def test_each_page_describes_itself(tmp_path: Path, derived: Path):
     _three_seasons(derived)
     doc = json.loads((derived / f"{SEASON}.json").read_text())
@@ -3536,7 +3610,7 @@ def test_each_page_describes_itself(tmp_path: Path, derived: Path):
     assert described["stats.html"] == "All-time RS57 league stats. Coming soon."
     assert described["rules.html"] == "RS57 league rules in effect for 2026."
     # One year, in the preview and on the page.
-    assert "In effect for the 2026 season." in text(pages["rules.html"])
+    assert "In effect for the 2026 season" in text(pages["rules.html"])
 
 
 def test_the_preseason_home_page_describes_the_dates_it_shows(tmp_path: Path, derived: Path):

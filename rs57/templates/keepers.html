@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% import "_notes.html" as ui %}
 
-{# The page opens on its name and one line saying which season the prices are for. It used to
-   carry no heading and opened on the red deadline box, which reads as an error page to
-   somebody arriving from a link. Everything the commissioner has to
+{# The page has no drawn heading and no introduction (commissioner, 2026-10-12): the deadline,
+   the filters, and the table, whose column headers are set like the Home tab's block
+   headings. The <h1> is read out and not drawn, and the tab's title names the season the
+   prices are for. Everything the commissioner has to
    check — the sync's own warnings, the derived consolation waiver — lives in the admin tool,
    which is the thing he actually works in. An ERROR still surfaces here, because an error is
    a row missing from the grid below and nothing else on this page would say so.
@@ -24,11 +25,7 @@
     writes them.
   </p>
 {% else %}
-  <h1>Keepers</h1>
-  <p class="lede">
-    What every rostered player would cost to keep for {{ current.decision_season }}. Sort by
-    any column, or filter by player, position or franchise.
-  </p>
+  <h1 class="sr">{{ current.decision_season }} Keepers</h1>
 
   {{ ui.flags(current.notes | selectattr("kind", "equalto", "error")) }}
 
@@ -39,28 +36,45 @@
      How loud it is depends on how close the date is — site.deadline_status decides, and the
      words change with the colour so the state never rests on the colour alone. It is only
      ever a notice: nothing on this page or anywhere else is gated on the date. #}
-  <p class="deadline is-{{ current.deadline_state }}">
-    <span class="deadline-i" aria-hidden="true">i</span>
+  {# A pill, like the status pill that opens the Home tab — it was a boxed notice with an
+     "i", twice the height for one short fact (commissioner, 2026-10-12). #}
+  <p class="pill deadline is-{{ current.deadline_state }}">
     {% if current.deadline_state == "passed" %}
-      <span>Keeper deadline passed: <strong>{{ current.qualifying_deadline | mdy }}</strong></span>
+      Keeper deadline passed: <strong>{{ current.qualifying_deadline | mdy }}</strong>
     {% elif current.qualifying_deadline %}
-      <span>Keeper deadline: <strong>{{ current.qualifying_deadline | mdy }}</strong>
-      {%- if current.deadline_countdown %} · {{ current.deadline_countdown }}{% endif %}</span>
+      Keeper deadline: <strong>{{ current.qualifying_deadline | mdy }}</strong>
+      {%- if current.deadline_countdown %} · {{ current.deadline_countdown }}{% endif %}
     {% else %}
       {{ current.qualifying_season }}'s keeper deadline is not on file — no row is marked
       against it
     {% endif %}
   </p>
 
-  {# Hidden until the script runs. Controls that cannot filter anything are worse than none. #}
+  {# Hidden until the script runs. Controls that cannot filter anything are worse than none.
+
+     Two rows, on purpose (commissioner, 2026-10-12). Row one is the two things with a lot of
+     values — whose roster, and a name. Row two is chips: the position, which has six values
+     and so is one tap rather than a dropdown, and Prospects, which is a toggle and sits with
+     the other toggles. The script fills in the position chips from the rows on the page.
+
+     How many rows are left, and the way back, show only while something is narrowed — and in
+     the Player column's header, where the script moves them, not under the chips: a line that
+     appears there pushes the whole table down every time a filter goes on. #}
   <div class="controls" id="controls" hidden>
-    <input type="search" id="q" placeholder="Filter by player name"
-           aria-label="Filter by player name" autocomplete="off">
-    <select id="f-pos" aria-label="Filter by position"></select>
-    <select id="f-team" aria-label="Filter by franchise"></select>
-    <label class="check"><input type="checkbox" id="f-prospect"> Prospects only</label>
-    <button type="button" id="reset">Clear</button>
-    <span class="count" id="count" role="status" hidden></span>
+    <div class="controls-row">
+      <select id="f-team" aria-label="Filter by franchise"></select>
+      <input type="search" id="q" placeholder="Filter by player name"
+             aria-label="Filter by player name" autocomplete="off">
+    </div>
+    <div class="controls-row chips">
+      <span class="chip-set" id="f-pos" role="group" aria-label="Filter by position"></span>
+      <button type="button" class="chip" id="f-prospect" aria-pressed="false">Prospects</button>
+    </div>
+    <span class="filter-status" id="filter-status" hidden>
+      <span id="count" role="status"></span>
+      <span aria-hidden="true">·</span>
+      <button type="button" id="reset">Clear</button>
+    </span>
   </div>
 
   <div class="grid-scroll">
@@ -78,8 +92,6 @@
           <th data-sort="text">NFL</th>
           <th data-sort="text">Prospect</th>
           <th data-sort="text">Acquired</th>
-          <th data-sort="num" class="num">Base</th>
-          <th data-sort="num" class="num">Tax</th>
           <th data-sort="num" class="num" aria-sort="descending">Salary</th>
         </tr>
       </thead>
@@ -89,8 +101,11 @@
         {% for line in current.rows %}
           <tr{% if line.after_deadline %} class="late"{% endif %}>
             {# Two lines. The name carries the position and club inline beside it, because those
-               three are one thought — who he is — and the prospect badge sits with them, since
-               it is a fact about the player rather than a column of its own. The franchise is a
+               three are one thought — who he is — and the badges sit with them, since each
+               is a fact about the player rather than a column of its own: P for a prospect, K
+               for a player kept last season, which is what puts the keeper tax on his salary
+               (commissioner, 2026-10-12). K is keyed on the tax itself, so the badge and the
+               breakdown under the salary can never disagree. The franchise is a
                separate thought and gets line two.
 
                `data-k` is the name on its own. Without it the sort would read "Jahmyr Gibbs RB
@@ -107,6 +122,11 @@
                     class="tip-glyph" aria-hidden="true">P</span><span class="info-bubble" aria-hidden="true">Prospect eligibility
                     unknown — ESPN has no first season for him</span></button>{%
                 endif %}{%
+                if line.tax %}<button type="button" class="kbadge"
+                  aria-label="Kept last season — the ${{ line.tax }} keeper tax applies"><span
+                    class="tip-glyph" aria-hidden="true">K</span><span class="info-bubble" aria-hidden="true">Kept last season —
+                    the ${{ line.tax }} keeper tax applies</span></button>{%
+                endif %}{%
                 if line.overridden %}<button type="button" class="wbadge"
                   aria-label="Manually Overridden Salary. Contact League Commissioner to update ESPN keeper value."><span
                     class="tip-glyph" aria-hidden="true">!</span><span class="info-bubble" aria-hidden="true">Manually Overridden
@@ -114,7 +134,7 @@
                 endif %}</span><span
               class="sub"><span class="franchise">{{ line.team_name }}</span><span
                 class="acq-sub dot" aria-hidden="true">·</span><span
-                class="acq-sub{% if line.after_deadline %} late-date{% endif %}">{{ line.acquired_label }} {{ line.acquired_at | mdy }}</span></span></td>
+                class="acq-sub{% if line.after_deadline %} late-date{% endif %}">{% if line.drafted %}Draft{% else %}{{ line.acquired_at | mdy }}{% endif %}</span></span></td>
             <td class="muted">{{ line.position }}</td>
             <td class="team-cell">{{ line.team_name }}</td>
             <td class="muted">{{ line.nfl_team }}</td>
@@ -134,13 +154,19 @@
                 title="Acquired after the {{ current.qualifying_season }} keeper deadline"{% endif
                 %}>{{ line.acquired_at | mdy }}</span>
             </td>
-            <td class="num" data-v="{{ line.base }}">${{ line.base }}</td>
-            <td class="num" data-v="{{ line.tax }}">
-              {# Keyed on the tax itself rather than on `kept_prior_year`: a player who owes
-                 nothing on top reads as a dash instead of a computed "$0". #}
-              {% if line.tax %}${{ line.tax }}{% else %}<span class="muted">—</span>{% endif %}
+            {# One money column (commissioner, 2026-10-12). Base and Tax were columns of their
+               own, and on most rows Base was the same number as Salary — they differ only for
+               a player who carries the keeper tax. So the salary stands alone, and a taxed
+               player's is followed by what it is made of. Both figures are ones the template
+               was handed; nothing is added up here. A player who owes no tax shows no
+               breakdown at all, rather than a "+ $0". #}
+            <td class="num money" data-v="{{ line.price }}">
+              {%- if line.tax -%}
+                <span class="pay">${{ line.price }}<span class="parts">${{ line.base }} + ${{ line.tax }} tax</span></span>
+              {%- else -%}
+                ${{ line.price }}
+              {%- endif -%}
             </td>
-            <td class="num money" data-v="{{ line.price }}">${{ line.price }}</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -169,13 +195,18 @@
   var rows = Array.prototype.slice.call(body.rows);
   var headers = Array.prototype.slice.call(table.tHead.rows[0].cells);
   var q = document.getElementById("q");
-  var byPos = document.getElementById("f-pos");
+  var posChips = document.getElementById("f-pos");
   var byTeam = document.getElementById("f-team");
   var byProspect = document.getElementById("f-prospect");
   var count = document.getElementById("count");
+  var status = document.getElementById("filter-status");
+  /* The position being shown, or "" for all of them. Chips, not a select, so the state lives
+     here and `aria-pressed` on the chips is how it is shown and announced. */
+  var pos = "";
+  var prospectsOnly = false;
   var empty = document.getElementById("empty");
 
-  var PLAYER = 0, POS = 1, TEAM = 2, NFL = 3, PROSPECT = 4, SALARY = 8;
+  var PLAYER = 0, POS = 1, TEAM = 2, NFL = 3, PROSPECT = 4, SALARY = 6;
   /* The server's order is Team, then cheapest first. Every sort runs off this copy, and
      Array.sort is stable, so sorting by Team returns exactly the page you started on. */
   var original = rows.slice();
@@ -245,9 +276,7 @@
 
   function filter() {
     var needle = q.value.trim().toLowerCase();
-    var pos = byPos.value;
     var team = byTeam.value;
-    var prospectsOnly = byProspect.checked;
     var shown = 0;
     rows.forEach(function (row) {
       var hit =
@@ -259,9 +288,11 @@
       if (hit) shown += 1;
     });
     /* Only while something is actually being narrowed. A bare "188 players" sitting there
-       permanently is a label, not feedback. */
-    count.textContent = shown + " of " + rows.length + " players";
-    count.hidden = shown === rows.length;
+       permanently is a label, not feedback — and neither is a Clear with nothing to clear. It
+       keys on the filters rather than on the count, so a filter that happens to match every
+       row still shows the way back. */
+    count.textContent = shown + " of " + rows.length;
+    status.hidden = !(needle || pos || team || prospectsOnly);
     empty.hidden = shown !== 0;
   }
 
@@ -286,19 +317,56 @@
     });
   });
 
-  fill(byPos, "All positions", POS);
+  /* One chip per position on the page, in the order a roster is read, after "All". A position
+     this list has not heard of still gets a chip, at the end. */
+  var known = ["QB", "RB", "WR", "TE", "DEF"];
+  var found = {};
+  rows.forEach(function (row) { found[cellText(row, POS)] = true; });
+  var positions = known.filter(function (name) { return found[name]; }).concat(
+    Object.keys(found).filter(function (name) { return name && known.indexOf(name) === -1; }).sort()
+  );
+  function press() {
+    Array.prototype.forEach.call(posChips.children, function (chip) {
+      chip.setAttribute("aria-pressed", String(chip.getAttribute("data-pos") === pos));
+    });
+    byProspect.setAttribute("aria-pressed", String(prospectsOnly));
+  }
+  [""].concat(positions).forEach(function (name) {
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.textContent = name || "All";
+    chip.setAttribute("data-pos", name);
+    chip.addEventListener("click", function () {
+      pos = name;
+      press();
+      filter();
+    });
+    posChips.appendChild(chip);
+  });
+
+  /* Into the Player header, beside its sort button rather than inside it — a button cannot
+     hold a button. It sits over the empty right-hand end of the widest column, so showing it
+     moves nothing. */
+  headers[PLAYER].appendChild(status);
+
   fill(byTeam, "All franchises", TEAM);
   q.addEventListener("input", filter);
-  byPos.addEventListener("change", filter);
   byTeam.addEventListener("change", filter);
-  byProspect.addEventListener("change", filter);
-  document.getElementById("reset").addEventListener("click", function () {
-    q.value = "";
-    byPos.value = "";
-    byTeam.value = "";
-    byProspect.checked = false;
+  byProspect.addEventListener("click", function () {
+    prospectsOnly = !prospectsOnly;
+    press();
     filter();
   });
+  document.getElementById("reset").addEventListener("click", function () {
+    q.value = "";
+    byTeam.value = "";
+    pos = "";
+    prospectsOnly = false;
+    press();
+    filter();
+  });
+  press();
 
   var controls = document.getElementById("controls");
   controls.hidden = false;

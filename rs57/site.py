@@ -273,6 +273,11 @@ class KeeperLine:
     acquired_label: str = ""
     """``Draft``, ``Trade`` or ``Add`` — see ``ACQUIRED_LABELS``. Display only: nothing sorts
     or filters on it, and the Acquired column still sorts on the date."""
+    drafted: bool = False
+    """Whether he was bought at the auction. The line under a player's name then says only
+    "Draft" — every drafted player has the same date, so it tells a reader nothing — and
+    anybody who arrived later shows the date alone (commissioner, 2026-10-12). The Acquired
+    column, where it has room for one, still gives both."""
 
 
 @dataclass(frozen=True)
@@ -463,7 +468,6 @@ class PodiumSpot:
     recorded: bool
     """Whether an amount is on record. A season with no recorded prize money shows no
     figure at all — ``$0`` would be a claim that it paid nothing."""
-    detail: str
     key: str = ""
     """The row's key, "1st" — the same key column every block on the board has."""
     record: str = ""
@@ -543,12 +547,6 @@ class BoardBlock:
     caption: str = ""
     """The block's rule, shown behind an "i" beside its heading. Empty when the prizes under
     it each carry their own."""
-    heading_is_the_prize: bool = False
-    """Whether the heading IS this block's prize, in which case the row beneath does not repeat
-    it. **Not inferrable from the row count.** "Other prizes" is a category heading that can
-    hold a single row, and hiding that row's label would take the prize's name off the page
-    entirely — which is how a prize disappears without anything looking wrong."""
-
     also: tuple[AlsoRan, ...] = ()
     """Who is next behind the row above — second and third on points under Most Points
     (commissioner, 2026-10-12). Drawn muted, like the teams out of Survivor."""
@@ -575,19 +573,14 @@ class BoardBlock:
     def each_recorded(self) -> bool:
         return self.each > 0
 
-    @property
-    def show_labels(self) -> bool:
-        return not self.heading_is_the_prize
-
 
 @dataclass(frozen=True)
 class SurvivorWeek:
-    """One line of the survivor ladder. ``out`` is ``None`` until that week has been played."""
+    """One played week of the survivor ladder. ``out`` is ``None`` for a hole: a week that was
+    played with nobody on file as having gone out."""
 
     week: int
     out: HighLine | None
-    pending: bool = False
-    """Not played yet, in a ladder nobody has won. Same meaning as ``BoardRow.pending``."""
     latest: bool = False
     """Who went out in the week just played, in a season still being played. The page draws it
     red (commissioner, 2026-10-12). A finished season has no latest week."""
@@ -607,11 +600,11 @@ class SurvivorPanel:
     winners: tuple[Named, ...]
     amount: int
     recorded: bool
-    eliminations: tuple[HighLine, ...]
     played: tuple[SurvivorWeek, ...] = ()
     """The weeks that have been played, **newest first** — what happened last is what a reader
     came for, so it sits directly under the heading. On a decided ladder this is every week it
-    took. A played week with nobody out is a hole and keeps its dash; it is not ``upcoming``."""
+    took. A played week with nobody out is a hole and keeps its dash. A week still to come is
+    not on the ladder at all."""
     still_in: tuple[Named, ...] = ()
     """The franchises not yet out, most season points first — the top of the ladder while
     it is being played (commissioner, 2026-10-12). Every franchise is always on the ladder:
@@ -624,23 +617,6 @@ class SurvivorPanel:
     """Whether the teams that went out are folded away behind one line, leaving the Winner
     alone at the top. True once the season is final (same decision): the ladder is then a
     record, not news, and the winner is what the block is for."""
-    upcoming: tuple[SurvivorWeek, ...] = ()
-    """The weeks still to come, **in week order**. Empty once the ladder is decided.
-
-    **Not drawn** (commissioner, 2026-10-12): the column lists only the weeks played, the same
-    as Weekly top score, and "Still alive: N of 12" says what is left. Kept because it is how
-    ``played`` is told apart from a hole — a played week with nobody out is not upcoming.
-
-    The two replace a single latest-first ``weeks`` (commissioner, 2026-10-06). That put eleven
-    empty rows above the first result in week 1, and the results are the point of the column."""
-    alive: int | None = None
-    """**Not drawn** since 2026-10-12 — the "Still alive: 8 of 12" header went with the
-    Upcoming rows. How many franchises are still in it: the season's franchises minus the **teams** that
-    have gone out. Teams, not weeks — a tie takes two out in one week, and counting weeks would
-    leave one of them alive. ``None`` when the season does not say how many franchises it has."""
-    franchises: int = 0
-    """How many started, for "8 of 12". Carried so the template prints two numbers it was
-    handed rather than working one out."""
     caption: str = SURVIVOR_RULE
 
 
@@ -692,7 +668,6 @@ class Home:
     leaders: tuple[LeaderLine, ...]
     pot: int
     unawarded: int
-    notes: tuple[Note, ...]
     show_projected: bool = False
     """Whether the Moneylist carries its Projected column: a season still being played, with
     prize money on record. A finished season's projection is what was won, twice."""
@@ -1349,6 +1324,7 @@ def build_keeper_season(
                 acquired_at=entry.acquired_at,
                 after_deadline=deadline is not None and entry.acquired_at > deadline,
                 acquired_label=ACQUIRED_LABELS[entry.source],
+                drafted=entry.source is AcquisitionSource.DRAFT,
                 prospect_state=_prospect_state(
                     position=str(player.position),
                     began=began,
@@ -1782,9 +1758,6 @@ def build_home(season: StatsSeason | None) -> Home | None:
                 winners=winners,
                 amount=amount,
                 recorded=recorded,
-                detail=f"{_record(described)} · {_points(described.points_for)} points"
-                if described
-                else "",
                 key=_ordinal(rank),
                 record=_record(described) if described else "",
             )
@@ -1817,14 +1790,13 @@ def build_home(season: StatsSeason | None) -> Home | None:
         if row.points != best
     )[:2]
 
-    survived = len(season.survivor_eliminations)
-    # Survivor is shown as its own column, so it is built here but not put in a season-awards
+    # Survivor is shown as its own ladder, so it is built here but not put in a season-awards
     # group. `line` still resolves the label, which is what keeps it out of "Other prizes".
     # It never leads: it is decided the week one team is left, and until then nobody has it.
     survivor_row = line(
         "Survivor",
         season.survivor_winners,
-        f"last standing after {survived} eliminations" if survived else "last team standing",
+        "",
     )
     # Unlucky is always on the board. Before anyone has lost there is no week to key it on, so
     # the key is a dash rather than the prize's own name repeated under its heading.
@@ -2037,14 +2009,17 @@ def build_home(season: StatsSeason | None) -> Home | None:
     else:
         ladder_weeks = max(season.franchise_count - 1, max(out_in, default=0), 0)
     decided = final or bool(season.survivor_winners)
+    # Only the weeks that have been played. Until the ladder is decided, a week past the last
+    # one with results is still to come and is simply not on it; a week before that with
+    # nobody out is a hole and stays, with its dash.
     ladder = [
         SurvivorWeek(
             week=week,
             out=out_in.get(week),
-            pending=not decided and week not in out_in and week > season.weeks_played,
             latest=not final and week in out_in and week == season.weeks_played,
         )
         for week in range(1, ladder_weeks + 1)
+        if decided or week in out_in or week <= season.weeks_played
     ]
     # Teams, not weeks: a tied week takes two out, and it is still one line of the ladder.
     eliminated = {
@@ -2064,17 +2039,11 @@ def build_home(season: StatsSeason | None) -> Home | None:
         winners=survivor_row.winners,
         amount=survivor_row.amount,
         recorded=survivor_row.recorded,
-        eliminations=season.survivor_eliminations,
-        played=tuple(reversed([line for line in ladder if not line.pending])),
+        played=tuple(reversed(ladder)),
         still_in=()
         if decided
         else tuple(team for mid, team in in_order.items() if mid not in eliminated),
         fold_out=final,
-        upcoming=tuple(line for line in ladder if line.pending),
-        alive=season.franchise_count - len(eliminated)
-        if season.franchise_count >= len(eliminated) and season.franchise_count
-        else None,
-        franchises=season.franchise_count,
     )
 
     # The season's phase, read off the results themselves. ESPN fills in a final rank only
@@ -2115,7 +2084,6 @@ def build_home(season: StatsSeason | None) -> Home | None:
         leaders=tuple(leaders),
         pot=season.pot,
         unawarded=season.unawarded,
-        notes=season.notes,
         show_projected=not final and bool(season.prizes),
     )
 
