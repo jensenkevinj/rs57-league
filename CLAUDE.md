@@ -373,7 +373,9 @@ Unlucky or weekly highs at all.
 - **The Moneylist's figures sit at the end of each row**, won in bold then projected, each in the
   green of its segment — as `--won-text` / `--leading-text`, the same hue taken dark enough to
   read, because the fills themselves are too pale for text. No $0 is printed. The name over a
-  bar is `--bar-name`, a grey watermark; the won fill is kept pale enough for it to hold 4.5:1.
+  bar is `--bar-name`, a grey watermark in light mode; the won fill is kept pale enough for it
+  to hold 4.5:1. In dark mode the name is full ink instead, which is what lets the two fills be
+  bright enough to read as bars — grey names forced them nearly as dark as the page.
   The Won / Projected key is in ink, not grey.
 - **Tooltip rules are written the way a manager would say them** — short, no hedging. They are
   compared against the page unescaped by a test, so they carry no apostrophes.
