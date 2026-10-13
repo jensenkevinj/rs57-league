@@ -26,8 +26,18 @@ name: Nightly
 
 on:
   schedule:
-    # 09:17 UTC, off the top of the hour so it does not queue behind everyone else's cron.
+    # 5:17 AM Eastern in summer, 4:17 in winter — after waivers clear, before anyone is up.
+    # Off the top of the hour so it does not queue behind everyone else's cron.
+    #
+    # Three attempts an hour apart, not one. GitHub does not promise a scheduled run starts on
+    # time, and for this repo it has not: the 09:17 run started at 15:38 UTC on 2026-10-11 and
+    # at 19:01 on 2026-10-12, six and ten hours late, so Monday night's results were not on the
+    # site the next morning. A run that finds nothing new commits nothing and redeploys the
+    # same pages, and the concurrency group below keeps two from overlapping, so the extra
+    # attempts cost a few minutes of runner time and nothing else.
     - cron: "17 9 * * *"
+    - cron: "17 10 * * *"
+    - cron: "17 11 * * *"
   workflow_dispatch:
     inputs:
       seasons:
