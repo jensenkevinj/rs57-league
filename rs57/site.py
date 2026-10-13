@@ -672,7 +672,6 @@ class Home:
     heading: str
     """What the page calls itself. A settled season claims its result; an unfinished one says
     it is unfinished, so the heading alone never reads as a final answer."""
-    status: str
     progress: str
     """How far the season has got, for the pill at the top left of the page: "Thru Week 4",
     "Thru Semifinals", "No results yet", or "Final" once it is over.
@@ -684,8 +683,7 @@ class Home:
     final: bool
     weeks_played: int
     """The last week with results, or 0 before any. Carried for the link preview's "Through
-    week 4", so that line is built from the number rather than read back out of ``status``."""
-    money_recorded: bool
+    week 4", so that line is built from the number rather than read back out of the pill."""
     podium: tuple[PodiumSpot, ...]
     columns: tuple[tuple[BoardBlock, ...], ...]
     """The board, as columns of headed blocks. A column is a plain tuple — it needs no type of
@@ -710,41 +708,6 @@ class SeasonLink:
 
     season: int
     href: str
-
-
-@dataclass(frozen=True)
-class SeasonRow:
-    """One season's line in the hall of fame on the Seasons page.
-
-    Every field is read off that season's ``Home`` — the object its own page renders — so the
-    index and the page it links to cannot name different winners. There is no second
-    derivation of who won what.
-    """
-
-    season: int
-    final: bool
-    status: str
-    """What an unfinished season says in place of its winners, e.g. "In progress — through
-    week 4". The same string as the pill on that season's own page."""
-    champion: tuple[Named, ...]
-    second: tuple[Named, ...]
-    third: tuple[Named, ...]
-    most_points: tuple[Named, ...]
-    survivor: tuple[Named, ...]
-    unlucky: tuple[Named, ...]
-    pot: int
-    money_recorded: bool
-    """Whether any prize money is on record for the season. Where none is, the pot is a dash
-    and a footnote — ``$0`` would be a claim that the league paid nothing."""
-
-
-@dataclass(frozen=True)
-class SeasonsIndex:
-    rows: tuple[SeasonRow, ...]
-    """Newest season first."""
-    money_footnote: str
-    """The line under the table explaining a dash in the Pot column, or empty when every
-    season on the page has its money on record."""
 
 
 @dataclass(frozen=True)
@@ -2117,16 +2080,14 @@ def build_home(season: StatsSeason | None) -> Home | None:
     # The season's phase, read off the results themselves. ESPN fills in a final rank only
     # once the season completes, and the regular season's length is where the playoffs start.
     if season.final:
-        heading, status, progress = f"{season.season} Final Results", "Final", "Final"
+        heading, progress = f"{season.season} Final Results", "Final"
     elif not season.weeks_played:
         # Not "Preseason": a stats file only exists once the season is under way, and the
         # pre-draft page already carries that word. This is the week between the auction and
         # the first final score.
-        heading, status = f"{season.season} Season", "No results yet"
-        progress = status
+        heading, progress = f"{season.season} Season", "No results yet"
     else:
         heading = f"{season.season} Season"
-        status = f"In progress — through week {season.weeks_played}"
         if season.regular_season_weeks and season.weeks_played > season.regular_season_weeks:
             round_name = _playoff_round(
                 season.weeks_played, season.regular_season_weeks, season.playoff_team_count
@@ -2141,11 +2102,9 @@ def build_home(season: StatsSeason | None) -> Home | None:
     return Home(
         season=season.season,
         heading=heading,
-        status=status,
         progress=progress,
         final=season.final,
         weeks_played=season.weeks_played,
-        money_recorded=bool(season.prizes),
         # The placings are settled once, by the bracket, at the very end — a season still being
         # played would show three empty cards every week, so they appear only once it is final
         # (commissioner, 2026-09-14). They are still resolved above, which is what keeps their
@@ -2159,57 +2118,6 @@ def build_home(season: StatsSeason | None) -> Home | None:
         notes=season.notes,
         show_projected=not final and bool(season.prizes),
     )
-
-
-def build_seasons_index(homes: Sequence[Home]) -> SeasonsIndex:
-    """The Seasons page: one row per season, from the boards those seasons' pages render.
-
-    Takes ``Home`` objects rather than ``StatsSeason`` ones on purpose. ``build_home`` is where
-    a winner is decided — where a payout row and the standings are reconciled, and where an
-    unfinished season is kept from claiming a champion — and reading its answer back is the
-    only way this page cannot disagree with the one each row links to.
-
-    Unverified notes on a season's stats are not shown here, the same as on the board itself
-    (commissioner, 2026-09-14): ``validate`` and CI carry them.
-    """
-
-    def winners_of(home: Home, label: str) -> tuple[Named, ...]:
-        for column in home.columns:
-            for block in column:
-                for row in block.rows:
-                    if row.label == label:
-                        return row.winners
-        return ()
-
-    rows: list[SeasonRow] = []
-    for home in sorted(homes, key=lambda home: -home.season):
-        placed = {spot.rank: spot.winners for spot in home.podium}
-        rows.append(
-            SeasonRow(
-                season=home.season,
-                final=home.final,
-                status=home.status,
-                champion=placed.get(1, ()),
-                second=placed.get(2, ()),
-                third=placed.get(3, ()),
-                most_points=winners_of(home, "Most Points (Season)"),
-                survivor=home.survivor.winners if home.survivor else (),
-                unlucky=winners_of(home, "Unlucky"),
-                pot=home.pot,
-                money_recorded=home.money_recorded,
-            )
-        )
-
-    without = [row.season for row in rows if not row.money_recorded]
-    recorded = [row.season for row in rows if row.money_recorded]
-    if not without:
-        footnote = ""
-    elif recorded and max(without) < min(recorded):
-        # The real shape of the record: nothing before the sheet, everything since.
-        footnote = f"Prize money was not recorded before {min(recorded)}. Winners are from ESPN."
-    else:
-        footnote = "Prize money is not on record for these seasons. Winners are from ESPN."
-    return SeasonsIndex(rows=tuple(rows), money_footnote=footnote)
 
 
 # ---------------------------------------------------------------------------
@@ -2261,13 +2169,6 @@ def describe_keepers(current: KeeperSeason | None) -> str:
     if current and current.qualifying_deadline:
         line += f" Deadline {mdy(current.qualifying_deadline)}."
     return line
-
-
-def describe_seasons(index: SeasonsIndex) -> str:
-    if not index.rows:
-        return "Champions and prize winners, season by season."
-    first = min(row.season for row in index.rows)
-    return f"Champions and prize winners for every season since {first}."
 
 
 # ---------------------------------------------------------------------------
@@ -2372,8 +2273,8 @@ def build_site(
 
     # The home page is the most recent season with results — the one being played, or the one
     # just finished. Everything older is a link.
-    # Built once per season and used three times: the home page, that season's own page, and
-    # its row on the Seasons page. One object, so the three cannot disagree.
+    # Built once per season and used twice: the home page and that season's own page. One
+    # object, so the two cannot disagree.
     homes = [build_home(season) for season in seasons]
     home = homes[0] if homes else None
 
@@ -2399,7 +2300,6 @@ def build_site(
     )
     dues = board if board is not None and not board.all_paid else None
 
-    season_index = build_seasons_index(homes)
     # Newest first, the order they are offered in. The newest is the home page: picking it
     # from an older season's page goes home, not to a second copy of the same board.
     season_links = tuple(
@@ -2412,8 +2312,6 @@ def build_site(
     shared = {
         "season_links": season_links,
         "current": current,
-        "seasons": seasons,
-        "season_index": season_index,
         "home": home,
         "rules_season": RULES_SEASON,
         "fee_tiers": FEE_TIER_ROWS,
@@ -2466,11 +2364,11 @@ def build_site(
         description=describe_keepers(current),
     )
     write(
-        "seasons.html",
-        "seasons.html",
-        page="seasons",
-        title="RS57 — Past Seasons",
-        description=describe_seasons(season_index),
+        "stats.html",
+        "stats.html",
+        page="stats",
+        title="RS57 — Stats",
+        description="All-time RS57 league stats. Coming soon.",
     )
     # A past season's page is the home page, archived: same template, same prize board, just
     # that year's data instead of the most recent one. `home` above is `build_home(seasons[0])`;

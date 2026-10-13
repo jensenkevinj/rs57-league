@@ -330,8 +330,11 @@ heading. `Home.heading` is still the page's `<h1>`, read out and not drawn, and 
 link preview. The selector replaced the "All seasons / ‹ 2024 / 2026 ›" links on archived pages.
 **A past season's page keeps the Home tab lit** (`page="season"`), since the selector that
 reaches it is on that tab.
-**Long-term the Seasons tab becomes a Stats tab** — all-time league stats ESPN does not show —
-which the selector is what makes possible: it is how a past season is reached without that tab. A week not played yet is `pending` and is left off the page (see below); a played
+**The Seasons tab is gone and a Stats tab is in its place** (commissioner, 2026-10-12). The
+selector is how a past season is reached now. Stats is to hold all-time league stats ESPN does
+not show — championships, the all-time moneylist — and today says only "Coming soon.": ESPN
+serves nothing before 2019, so those seasons have to be entered by hand first. The nightly
+builds with `--clean`, so a page the site stops writing leaves `site/` as well. A week not played yet is `pending` and is left off the page (see below); a played
 week with nothing on file keeps its "—", and only a *finished* season says "unawarded".
 **Survivor shows the played weeks newest first** (same day; the weeks to come were listed
 under "Upcoming" until 2026-10-12), and until somebody wins it the column has no Winner slot at all ("Still alive: N of 12" sat
@@ -474,8 +477,6 @@ Settled in Phase 8; `docs/phase-8-notes.md` has the reasons.
 - **The keeper deadline alert is display only**, like the deadline itself. `deadline_status`
   reads `qualifying_deadline` — the date the alert prints — never `source.keeper_deadline`.
   Neutral past 14 days, amber inside, red once the instant has passed.
-- **The Seasons matrix is read off each season's `Home`**, the object its own page renders, so
-  the index and the page cannot name different winners.
 - **`render_markdown` emits only the links it builds**: section anchors, from digits, after
   escaping. A `§` reference to a section that does not exist fails a test.
 

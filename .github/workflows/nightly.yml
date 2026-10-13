@@ -190,8 +190,11 @@ jobs:
             exit 1
           fi
 
+      # --clean, so a page the site no longer writes leaves site/ too. Without it a retired
+      # page stays committed and keeps being served — which is what seasons.html would have
+      # done when the Seasons tab was removed. Everything in site/ is rebuilt every run.
       - name: Build site
-        run: python -m rs57.site
+        run: python -m rs57.site --clean
 
       - name: Stage and check ownership
         id: stage

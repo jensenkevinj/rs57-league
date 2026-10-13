@@ -30,7 +30,6 @@ from rs57.site import (
     build_dues_board,
     build_home,
     build_keeper_season,
-    build_seasons_index,
     build_site,
     build_stats_season,
     environment,
@@ -312,7 +311,7 @@ def test_stats_notes_stay_off_the_public_prize_board(tmp_path: Path):
     assert {"review", "error"} <= {note.kind for note in season.notes}
 
     pages = render(tmp_path, derived, drafted=True)
-    for name in (f"season-{PRIOR}.html", "index.html", "seasons.html"):
+    for name in (f"season-{PRIOR}.html", "index.html"):
         body = text(pages[name]).lower()
         assert "2-way tie" not in body, name
         assert "no scores recorded for week 3" not in body, name
@@ -1000,7 +999,6 @@ def test_a_season_with_no_recorded_money_shows_no_amount_rather_than_zero(tmp_pa
     derived = one_stats_season(tmp_path, doc)
 
     home = build_home(build_stats_season(derived, PRIOR))
-    assert not home.money_recorded
     assert home.pot == 0
     rows = [row for column in home.columns for block in column for row in block.rows]
     assert rows, "the board went blank when the money did"
@@ -1021,7 +1019,6 @@ def test_an_unfinished_season_is_not_presented_as_settled(tmp_path: Path):
 
     home = build_home(build_stats_season(derived, PRIOR))
     assert not home.final
-    assert home.status == "In progress — through week 9"
     assert (home.heading, home.progress) == (f"{PRIOR} Season", "Thru Week 9")
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
@@ -1504,9 +1501,6 @@ def test_an_empty_season_is_the_whole_board_with_nothing_on_it(tmp_path: Path, d
     assert 'class="prizes placings"' not in page and "Final Standings" not in body
     assert "unawarded" not in body, "an unplayed prize is not unawarded, it is not decided yet"
     assert "Prize money nobody was awarded" not in body
-    assert "unawarded" not in text(render(tmp_path, derived, drafted=True)["seasons.html"]).split(
-        str(PRIOR)
-    )[0], "the season index calls a prize still to be played unawarded"
     assert "$1,200" not in body and "$25 each" in body
 
 
@@ -1599,7 +1593,7 @@ def test_a_finished_season_has_no_leaders(tmp_path: Path, derived: Path):
 
 def test_a_finished_season_says_so(tmp_path: Path, derived: Path):
     home = build_home(build_stats_season(derived, PRIOR))
-    assert home.final and home.status == "Final"
+    assert home.final
     assert home.heading == f"{PRIOR} Final Results"
     body = text(render(tmp_path, derived, drafted=True)["index.html"])
     # The pill at the top left switches to "Final" (commissioner, 2026-10-12).
@@ -2601,17 +2595,6 @@ def test_gold_is_a_border_colour_and_never_a_text_colour():
     assert "li.thin.place-1 { background: var(--gold-wash); box-shadow: inset 3px 0 0 var(--gold); }" in rules
 
 
-def test_the_season_index_writes_money_the_way_every_other_page_does(
-    tmp_path: Path, derived: Path
-):
-    """It printed ``${{ pot }}`` raw, so a $1,200 pot read ``$1200`` on this page alone."""
-    doc = stats_doc()
-    doc["payouts"][0]["amount"] = 1200
-    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
-    body = text(render(tmp_path, derived)["seasons.html"])
-    assert "$1,200" in body and "$1200" not in body
-
-
 def test_every_tooltip_can_be_opened_by_a_tap(tmp_path: Path, derived: Path):
     """Safari does not focus a tapped button, so ``:focus`` alone never opened one on an iPhone.
 
@@ -3234,88 +3217,6 @@ def _three_seasons(derived: Path) -> None:
     (derived / f"{SEASON}-stats.json").write_text(json.dumps(live), encoding="utf-8")
 
 
-def _hall_rows(page: str) -> dict[str, str]:
-    body = page[page.index('<table class="hall">'):]
-    body = body[body.index("<tbody>"): body.index("</tbody>")]
-    rows = re.findall(r"<tr>(.*?)</tr>", body, re.S)
-    return {re.search(r'season-(\d{4})\.html', row).group(1): row for row in rows}
-
-
-def test_the_seasons_page_is_one_row_per_season_newest_first(tmp_path: Path, derived: Path):
-    _three_seasons(derived)
-    page = render(tmp_path, derived, drafted=True)["seasons.html"]
-    assert page.count("<table") == 1, "one matrix, not a table per season"
-    assert list(_hall_rows(page)) == [str(SEASON), str(PRIOR), str(PRIOR - 1)]
-    head = re.findall(r"<th[^>]*>(.*?)</th>", page[page.index("<thead>"):page.index("</thead>")])
-    assert head == ["Season", "Champion", "2nd", "3rd", "Most Points", "Survivor", "Unlucky", "Pot"]
-
-
-def test_every_row_names_the_champion_its_own_page_names(tmp_path: Path, derived: Path):
-    """The row is read off the ``Home`` the season page renders, so the two cannot disagree.
-
-    Mutation-checked by emptying ``champion``. The fixture below is what would catch the
-    subtler mistake of reading rank 1 off the standings: its payout row and its standings
-    name different franchises, and the board believes the payout.
-    """
-    _three_seasons(derived)
-    # A payout that disagrees with the standings: the board believes the payout, and so must
-    # the index. Reading rank 1 off the standings would put t1 here.
-    doc = json.loads((derived / f"{PRIOR}-stats.json").read_text())
-    doc["payouts"][0]["winner_manager_id"] = "t2"
-    (derived / f"{PRIOR}-stats.json").write_text(json.dumps(doc), encoding="utf-8")
-
-    homes = [build_home(build_stats_season(derived, year)) for year in (PRIOR - 1, PRIOR, SEASON)]
-    index = build_seasons_index(homes)
-    by_season = {row.season: row for row in index.rows}
-    for home in homes:
-        podium = {spot.rank: spot.winners for spot in home.podium}
-        assert by_season[home.season].champion == podium.get(1, ())
-        assert by_season[home.season].survivor == home.survivor.winners
-    assert [w.manager_id for w in by_season[PRIOR].champion] == ["t2"]
-
-    pages = render(tmp_path, derived, drafted=True)
-    rows = _hall_rows(pages["seasons.html"])
-    champion = re.search(r'<td class="hall-champion">\s*(.*?)\s*<span', rows[str(PRIOR)], re.S)
-    assert html.unescape(champion.group(1)) == "Belichick's  Spy"
-    spot = re.search(
-        r'class="thin place-1">.*?thin-who">(.*?)</span>', pages[f"season-{PRIOR}.html"], re.S
-    )
-    assert spot.group(1) == champion.group(1), "the index and the season page disagree"
-    # A tie is written the way the board writes one.
-    assert "The Infirmary &amp; Ken Franklins" in rows[str(PRIOR - 1)]
-
-
-def test_a_season_still_being_played_names_no_winners_on_the_index(tmp_path: Path, derived: Path):
-    """t2 leads 2026 in points. Leaders are not winners, so the row says where the season is."""
-    _three_seasons(derived)
-    page = render(tmp_path, derived, drafted=True)["seasons.html"]
-    live = _hall_rows(page)[str(SEASON)]
-    assert '<td colspan="6" class="muted hall-pending">In progress — through week 2</td>' in live
-    assert "Spy" not in live and "Fake News" not in live
-    assert "$1,200" in text(live), "the pot is known before anybody has won it"
-
-
-def test_the_pot_is_money_or_a_dash_and_never_zero_dollars(tmp_path: Path, derived: Path):
-    _three_seasons(derived)
-    page = render(tmp_path, derived, drafted=True)["seasons.html"]
-    rows = _hall_rows(page)
-    assert "$1,200" in text(rows[str(PRIOR)])
-    unrecorded = html.unescape(text(rows[str(PRIOR - 1)]))
-    assert "—" in unrecorded and "$" not in unrecorded
-    body = text(page)
-    assert "$1200" not in body and "$0" not in body
-    assert f"* Prize money was not recorded before {PRIOR}. Winners are from ESPN." in body
-
-
-def test_the_money_footnote_appears_only_when_a_season_needs_it(tmp_path: Path, derived: Path):
-    """``derived`` alone is one season with its money on record: nothing to explain."""
-    page = render(tmp_path, derived)["seasons.html"]
-    assert "not recorded" not in text(page) and 'id="no-money"' not in page
-    assert build_seasons_index(
-        [build_home(build_stats_season(derived, PRIOR))]
-    ).money_footnote == ""
-
-
 def test_every_board_page_offers_every_season_and_only_pages_that_exist(
     tmp_path: Path, derived: Path
 ):
@@ -3344,12 +3245,10 @@ def test_every_board_page_offers_every_season_and_only_pages_that_exist(
         assert re.findall(r'aria-current="page">(\d+)<', block) == [str(year)], name
         assert f"Season {year}" in text(block)
     assert "season-nav" not in pages[f"season-{PRIOR}.html"]
-    # A past season opens in the Home tab — the selector that reached it lives there — and
-    # the Seasons tab is lit only on the Seasons page itself.
+    # A past season opens in the Home tab — the selector that reached it lives there.
     for name in ("index.html", f"season-{PRIOR}.html"):
         assert '<a href="index.html" class="on">Home</a>' in pages[name], name
-        assert '<a href="seasons.html" class="">Seasons</a>' in pages[name], name
-    assert '<a href="seasons.html" class="on">Seasons</a>' in pages["seasons.html"]
+        assert '<a href="stats.html" class="">Stats</a>' in pages[name], name
 
 
 RULES_SAMPLE = """Preamble, see §2.1.
@@ -3592,6 +3491,27 @@ def test_the_site_address_is_read_at_build_time_and_never_written_down():
     assert not hosts, f"an account's address is written into site.py: {hosts}"
 
 
+def test_the_stats_tab_replaced_the_seasons_tab_and_says_only_that_it_is_coming(
+    tmp_path: Path, derived: Path
+):
+    """The Seasons page is gone, not hidden: no file, no link to one, no styles left behind
+    (commissioner, 2026-10-12). Its job is the season selector's. Stats is a placeholder until
+    the seasons ESPN does not serve have been entered by hand.
+
+    Mutation-checked: a link to ``seasons.html`` left in the nav fails here.
+    """
+    _three_seasons(derived)
+    pages = render(tmp_path, derived, drafted=True)
+    assert "seasons.html" not in pages and "stats.html" in pages
+    for name, page in pages.items():
+        assert "seasons.html" not in page, f"{name} still links to the Seasons page"
+        assert page.count('<a href="stats.html"') == 1, name
+    stats = pages["stats.html"]
+    assert '<a href="stats.html" class="on">Stats</a>' in stats
+    assert "Coming soon." in text(stats.split("</style>")[1])
+    assert ".hall" not in _style() and not (TEMPLATES / "seasons.html").exists()
+
+
 def test_each_page_describes_itself(tmp_path: Path, derived: Path):
     _three_seasons(derived)
     doc = json.loads((derived / f"{SEASON}.json").read_text())
@@ -3613,9 +3533,7 @@ def test_each_page_describes_itself(tmp_path: Path, derived: Path):
     assert described["keepers.html"] == (
         "Keeper prices for every rostered player. Deadline 11/25/2026."
     )
-    assert described["seasons.html"] == (
-        f"Champions and prize winners for every season since {PRIOR - 1}."
-    )
+    assert described["stats.html"] == "All-time RS57 league stats. Coming soon."
     assert described["rules.html"] == "RS57 league rules in effect for 2026."
     # One year, in the preview and on the page.
     assert "In effect for the 2026 season." in text(pages["rules.html"])
