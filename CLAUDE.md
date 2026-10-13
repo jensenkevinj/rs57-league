@@ -345,13 +345,20 @@ Unlucky or weekly highs at all.
 - **The Moneylist is first**, above the board, in the source and on every screen. A finished
   season's placings come after it, as the board's first block. It is headed like a block of the board — the same
   `col-head`, as wide as the board, with the Won / Projected key at the right-hand end.
-- **It is a bar chart, one bar for every franchise**, most won first, with the franchise's
-  name running up its column. A bar is two greens stacked: money won, and above it the
-  **projected** money — the franchise's share of every prize it is *leading* (Most Points, the
-  studs, Unlucky), split the way `award_prizes` splits a tie. Survivor and the placings
-  project nothing; nobody leads them. A finished season's bars are one green. The heights are
-  whole percentages worked out in `build_home`, and both figures are printed under each bar. A
-  season with no money on it — none recorded, or nothing won or led yet — has no chart.
+- **It is a bar chart, one row for every franchise**, most won first, the bars running left
+  to right with the franchise's name written over the start of its bar. A bar is two greens:
+  money won, then the **projected** money — the franchise's share of every prize it is
+  *leading* (Most Points, the studs, Unlucky), split the way `award_prizes` splits a tie.
+  Survivor and the placings project nothing; nobody leads them. A finished season's bars are
+  one green. The lengths are whole percentages worked out in `build_home`, and both figures
+  are printed at the end of each row. A season with no money on it — none recorded, or nothing
+  won or led yet — has no chart. (The bars stood upright, with the names running up them,
+  until 2026-10-12.) **While a season is being played a full-width bar
+  stands for what last season's biggest winner took home** (`build_home(full_bar=...)`), so the
+  chart fills in over the year; it stretches if somebody passes that, and a finished season is
+  its own scale. The chart is full width at every size: a narrower, centred
+  version was tried the same day and dropped, since most of the league reads the site on a
+  phone, where it is full width either way.
 - **A season-long prize whose leader changed this week is drawn yellow; the week's Survivor
   casualty is drawn red.** "Changed" needs last week to compare against, and the current
   leaders cannot give it, so `stats.leaders_through` derives the same prizes with the latest
@@ -363,7 +370,7 @@ Unlucky or weekly highs at all.
 - **Every row on the board is one line.** A long franchise name is cut with an ellipsis, never
   wrapped. A stud row carries its player beside the franchise in `BoardRow.brief` ("J. Allen ·
   W2"), which gives way before the franchise does; the full `detail` is the hover text.
-- **The Moneylist's figures sit under its baseline**, won in bold above projected, each in the
+- **The Moneylist's figures sit at the end of each row**, won in bold then projected, each in the
   green of its segment — as `--won-text` / `--leading-text`, the same hue taken dark enough to
   read, because the fills themselves are too pale for text. No $0 is printed. The name over a
   bar is `--bar-name`, a grey watermark; the won fill is kept pale enough for it to hold 4.5:1.

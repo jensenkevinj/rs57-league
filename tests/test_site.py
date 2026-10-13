@@ -1675,7 +1675,7 @@ def test_franchises_on_the_same_money_share_a_place(tmp_path: Path):
     assert {line.total for line in home.leaders} == {100}
 
     # On the chart the bar is what says who led, so level money is level bars.
-    assert [line.won_height for line in home.leaders] == [100, 100]
+    assert [line.won_length for line in home.leaders] == [100, 100]
     page = render(tmp_path, derived, drafted=True)["index.html"]
     chart = re.search(r'<ol class="money-chart">.*?</ol>', page, flags=re.S)
     assert chart, "the Moneylist is not on the page at all"
@@ -2755,6 +2755,9 @@ def test_the_moneylist_is_on_the_page_once_in_its_own_section(tmp_path: Path, de
         < board.index('class="prizes placings"')
     )
     assert ".board-page > " not in _style(), "nothing reorders the page any more"
+    # Full width at every size, like the board under it: no rule narrows or centres it.
+    assert ".moneylist { margin-top: 1.5rem; }" in _rule_bodies(_style())
+    assert ".moneylist { width" not in _rule_bodies(_style())
     # A finished season projects nothing: what was won is the whole of it.
     assert "Projected" not in text(page)
 
@@ -2881,8 +2884,9 @@ def test_the_moneylist_projects_what_each_franchise_is_leading(tmp_path: Path, d
 
 
 def test_the_moneylist_is_a_bar_for_every_franchise(tmp_path: Path, derived: Path):
-    """All twelve, most won first, the tallest stack filling the chart (commissioner,
-    2026-10-12). A bar is two segments: won, and above it what is only being led.
+    """All twelve, most won first, the longest bar filling the chart (commissioner,
+    2026-10-12). A bar is two segments: won, and after it what is only being led. They run
+    left to right, with the franchise's name written over the start of the bar.
 
     Mutation-checked: leaving the standings out of the franchise list draws two bars, not
     twelve; scaling on money won instead of on the projection sends t1's stack past 100.
@@ -2899,22 +2903,28 @@ def test_the_moneylist_is_a_bar_for_every_franchise(tmp_path: Path, derived: Pat
     assert len(home.leaders) == 12
     bars = {line.team.manager_id: line for line in home.leaders}
     # t2: $20 won + $100 led is the tallest, so it is the whole height. t1: $10 + $45.
-    assert (bars["t2"].won_height, bars["t2"].leading_height) == (17, 83)
-    assert (bars["t1"].won_height, bars["t1"].leading_height) == (8, 38)
-    assert all(l.won_height + l.leading_height <= 100 for l in home.leaders)
+    assert (bars["t2"].won_length, bars["t2"].leading_length) == (17, 83)
+    assert (bars["t1"].won_length, bars["t1"].leading_length) == (8, 38)
+    assert all(l.won_length + l.leading_length <= 100 for l in home.leaders)
     assert [l.team.manager_id for l in home.leaders][:2] == ["t2", "t1"]
-    assert all((l.total, l.projected, l.won_height) == (0, 0, 0) for l in home.leaders[2:])
+    assert all((l.total, l.projected, l.won_length) == (0, 0, 0) for l in home.leaders[2:])
 
     page = render(tmp_path, derived, drafted=True)["index.html"]
-    chart = re.search(r'<ol class="money-chart">.*?</ol>', page, flags=re.S).group(0)
+    chart = re.search(r'<ol class="money-chart two-figs">.*?</ol>', page, flags=re.S).group(0)
     assert chart.count("<li ") == 12 and chart.count("bar-seg-won") == 12
     assert chart.count("bar-seg-leading") == 2, "only a franchise leading something has one"
-    assert 'style="--won: 17%; --leading: 83%"' in chart
+    # On the page the bars are measured against last season's biggest winner, not against
+    # this season's own leader — see the test below. The fixture's 2025 top earner took $500,
+    # so t2's $20 won and $100 led are 4% and 20% of the width.
+    prior_top = max(e.total for e in build_stats_season(derived, PRIOR).earnings)
+    assert prior_top == 500
+    assert 'style="--won: 4%; --leading: 20%"' in chart
     assert "Projected = " not in page
-    # A $0 is not printed over a bar, won or projected: only t2 and t1 have figures at all.
-    assert chart.count('class="bar-won"') == 2 and chart.count('class="bar-projected"') == 2
-    assert "$0" not in text(chart)
-    # Under the bar, won first: the track comes before the figures, and won before projected.
+    # A $0 is not printed, won or projected: only t2 and t1 have figures at all. The cells
+    # are still there, empty, so the two columns of figures stay lined up down the chart.
+    assert chart.count('class="bar-won"') == 12 and chart.count('class="bar-projected"') == 12
+    assert "$0" not in text(chart) and text(chart).count("$") == 4
+    # After the bar, won first: the track comes before the figures, and won before projected.
     first = chart[chart.index("<li "):chart.index("</li>")]
     assert first.index("bar-track") < first.index("bar-won") < first.index("bar-projected")
 
@@ -2928,6 +2938,34 @@ def test_a_stud_row_is_one_line_with_the_player_cut_down_to_fit(tmp_path: Path, 
     assert (qb.detail, qb.brief) == ("Josh Allen · Week 2", "J. Allen · W2")
     page = render(tmp_path, derived, drafted=True)["index.html"]
     assert '<span class="thin-why" title="Josh Allen · Week 2">J. Allen · W2</span>' in page
+
+
+def test_in_season_bars_are_measured_against_last_seasons_biggest_winner(derived: Path):
+    """A full-width bar is what last year's top earner took home, so the chart fills in over
+    the season instead of the leader's bar filling it from week 1 (commissioner, 2026-10-12).
+
+    Mutation-checked: scaling on ``max(tallest, full_bar)`` for a finished season too shrinks
+    the champion's bar and fails the last assertion; ignoring ``full_bar`` fails the first.
+    """
+    (derived / f"{SEASON}-stats.json").write_text(json.dumps(_week_three_doc()), encoding="utf-8")
+    season = build_stats_season(derived, SEASON)
+
+    # t2: $20 won and $100 led. Against a $600 season that is 3% and 17% of the width.
+    scaled = {l.team.manager_id: l for l in build_home(season, full_bar=600).leaders}
+    assert (scaled["t2"].won_length, scaled["t2"].leading_length) == (3, 17)
+    assert (scaled["t2"].total, scaled["t2"].projected) == (20, 120), "the money is not scaled"
+
+    # Somebody already past last season's best still fits: the scale stretches to them.
+    record = {l.team.manager_id: l for l in build_home(season, full_bar=60).leaders}
+    assert record["t2"].won_length + record["t2"].leading_length == 100
+
+    # With no earlier season to measure against, the leader fills the chart as before.
+    alone = {l.team.manager_id: l for l in build_home(season).leaders}
+    assert alone["t2"].won_length + alone["t2"].leading_length == 100
+
+    # A finished season is its own scale, whatever came before it.
+    finished = build_home(build_stats_season(derived, PRIOR), full_bar=5000)
+    assert finished.final and max(l.won_length for l in finished.leaders) == 100
 
 
 def test_a_season_with_no_money_on_it_has_no_chart(tmp_path: Path, derived: Path):

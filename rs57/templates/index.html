@@ -91,27 +91,25 @@
         </span>
       {%- endif %}
     </h2>
-    {# One bar per franchise, most won first. The heights are percentages site.build_home
-       worked out; the figures above each bar are the same numbers as text, so nothing on the
-       chart is said by colour or height alone. #}
-    <ol class="money-chart">
+    {# One row per franchise, most won first: a bar running left to right, with the name
+       written over the start of it, and the figures at the end of the row. The lengths are
+       percentages site.build_home worked out; the figures are the same numbers as text, so
+       nothing on the chart is said by colour or length alone. #}
+    <ol class="money-chart{% if home.show_projected %} two-figs{% endif %}">
       {% for line in home.leaders %}
-        <li style="--won: {{ line.won_height }}%; --leading: {{ line.leading_height }}%"
+        <li style="--won: {{ line.won_length }}%; --leading: {{ line.leading_length }}%"
             title="{{ line.team.name if line.team.known else line.team.manager_id }}: {{ line.total | money }} won{% if home.show_projected %}, {{ line.projected | money }} projected{% endif %}">
           <span class="bar-track">
-            {% if line.leading_height %}<span class="bar-seg bar-seg-leading"></span>{% endif %}
             <span class="bar-seg bar-seg-won"></span>
+            {% if line.leading_length %}<span class="bar-seg bar-seg-leading"></span>{% endif %}
             <span class="bar-name">{{ ui.team(line.team) }}</span>
           </span>
-          {# Under the baseline. A $0 is not printed: seven pairs of them was noise. #}
-          <span class="bar-figs">
-            {% if line.total %}
-              <span class="bar-won"><span class="sr">Won </span>{{ line.total | money }}</span>
-            {% endif %}
-            {% if home.show_projected and line.projected %}
-              <span class="bar-projected"><span class="sr">Projected </span>{{ line.projected | money }}</span>
-            {% endif %}
-          </span>
+          {# A $0 is not printed: seven pairs of them was noise. Each figure keeps its own
+             column, so a projection with nothing won beside it still lines up. #}
+          <span class="bar-won">{% if line.total %}<span class="sr">Won </span>{{ line.total | money }}{% endif %}</span>
+          {% if home.show_projected %}
+            <span class="bar-projected">{% if line.projected %}<span class="sr">Projected </span>{{ line.projected | money }}{% endif %}</span>
+          {% endif %}
         </li>
       {% endfor %}
     </ol>
