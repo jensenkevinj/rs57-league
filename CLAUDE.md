@@ -476,7 +476,28 @@ Settled in Phase 8; `docs/phase-8-notes.md` has the reasons.
   throwaway Pillow script. Pillow is not a dependency and must not become one.
 - **The keeper deadline alert is display only**, like the deadline itself. `deadline_status`
   reads `qualifying_deadline` — the date the alert prints — never `source.keeper_deadline`.
-  Neutral past 14 days, amber inside, red once the instant has passed.
+  Neutral past 14 days, amber inside, red once the instant has passed. It is a pill at the
+  top left of the Keepers page, like the status pill on Home (commissioner, 2026-10-12).
+- **The Keepers page is dressed like the Home board** (commissioner, 2026-10-12): no large
+  heading, title or introduction — the deadline, the filters, then the table. Its column
+  headers are set like the board's block headings (small caps, ink, heavy rule) and its rows
+  are in the board's type: bold name and bold salary. **Salary is the only money column**:
+  Base repeated it on every row but the taxed ones, so a player who carries the keeper tax
+  shows "$50 + $5 tax" under his salary, at every width, and everyone else shows the salary
+  alone. On a desktop the table is only as wide as its columns need (53rem), not the
+  full page. Every row is one height at every width. A taxed player also carries a grey **K** badge
+  beside his name — kept last season — next to the blue P for a prospect; it is keyed on the
+  tax, so the badge and the breakdown always appear together. The line under a player's
+  name is the franchise and one more thing: "Draft", or the date alone for a later arrival. It is still a table, because it
+  has nine columns and a sort.
+- **The Keepers filters are two rows** (commissioner, 2026-10-12): the franchise dropdown and
+  the name search, then chips — one per position (six values, so one tap, not a dropdown) and
+  a Prospects toggle. "N of 190 · Clear" shows only while a filter is on, laid over the end of
+  the Player column's header so that turning a filter on does not move the table. **The page
+  never remembers a filter**: managers mostly look up other teams' players, so opening
+  already narrowed to one franchise would be wrong more often than right.
+- **The Rules page is dressed the same way**: no drawn heading, a pill saying which season the
+  rules are for, and each numbered section headed like a block of the Home board.
 - **`render_markdown` emits only the links it builds**: section anchors, from digits, after
   escaping. A `§` reference to a section that does not exist fails a test.
 

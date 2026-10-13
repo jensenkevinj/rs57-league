@@ -14,8 +14,10 @@
 {% endmacro %}
 
 {% block content %}
-<h1>RS57 League Rules</h1>
-<p class="lede">In effect for the {{ rules_season }} season.</p>
+{# No drawn heading, like the other tabs: a pill says which season the rules are for, and the
+   <h1> is read out, not shown. #}
+<h1 class="sr">RS57 League Rules</h1>
+<p class="pill rules-pill">In effect for the {{ rules_season }} season</p>
 
 <div class="rules-page">
   {% if outline %}
