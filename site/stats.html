@@ -6,13 +6,13 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
-<title>RS57 — Past Seasons</title>
-<meta name="description" content="Champions and prize winners for every season since 2019.">
+<title>RS57 — Stats</title>
+<meta name="description" content="All-time RS57 league stats. Coming soon.">
 <meta property="og:site_name" content="RS57">
 <meta property="og:type" content="website">
-<meta property="og:title" content="RS57 — Past Seasons">
-<meta property="og:description" content="Champions and prize winners for every season since 2019.">
-<meta property="og:url" content="https://jensenkevinj.github.io/rs57-league/seasons.html">
+<meta property="og:title" content="RS57 — Stats">
+<meta property="og:description" content="All-time RS57 league stats. Coming soon.">
+<meta property="og:url" content="https://jensenkevinj.github.io/rs57-league/stats.html">
 <meta property="og:image" content="https://jensenkevinj.github.io/rs57-league/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -142,7 +142,6 @@
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   tbody tr:hover { background: var(--panel); }
   .money { font-variant-numeric: tabular-nums; font-weight: 600; }
-  .scroll { overflow-x: auto; }
   .panel {
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
     padding: 1rem 1.15rem; margin: 1.25rem 0;
@@ -217,7 +216,7 @@
   .grid th:nth-child(6) { width: 8.5rem; }              /* Acquired: how, then when */
   .grid th:nth-child(7), .grid th:nth-child(8) { width: 4.6rem; }  /* Base, Tax */
   .grid th:nth-child(9) { width: 5.6rem; }              /* Salary */
-  /* Deliberately NOT `.scroll`. `overflow-x: auto` makes this div the scroll container, and a
+  /* Deliberately not `overflow-x: auto`, which makes this div the scroll container, and a
      sticky header then sticks to a box that never scrolls — the header stops working. The
      grid fits a desktop column, so the scroller only comes back where it is needed. */
   .grid-scroll { overflow-x: visible; }
@@ -698,41 +697,6 @@
     .bar-figs { font-size: 0.64rem; }
   }
 
-  /* --- the seasons page: the hall of fame ------------------------------- */
-
-  /* Fixed layout with set widths, so the columns line up down the whole page rather than each
-     row negotiating its own. Season and Pot are the two that hold a known amount of text; the
-     six columns of franchise names share what is left equally. Names wrap inside their cell —
-     the longest is five words — and the minimum width keeps a tablet from squeezing a column
-     to a word a line; below it the wrapper scrolls sideways. */
-  .hall { table-layout: fixed; min-width: 46rem; font-size: 0.88rem; }
-  .hall th, .hall td { vertical-align: top; padding: 0.5rem 0.5rem; overflow-wrap: anywhere; }
-  .hall .hall-season { width: 5.2rem; }
-  .hall .hall-pot { width: 4.8rem; }
-  .hall tbody th {
-    font-size: 0.95rem; text-transform: none; letter-spacing: 0; color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .hall .hall-champion { font-weight: 700; }
-  .hall .hall-fold { display: none; }
-  .hall .hall-mark { text-decoration: none; margin-left: 0.1rem; }
-  /* A phone keeps Season and Champion. Second and third fold under the champion, and the rest
-     is one tap away on the season's own page — which is where the year links. */
-  @media (max-width: 34rem) {
-    /* Automatic layout here. Fixed layout sizes columns off the first row and still counts
-       the six an in-progress season's one cell spans, which left Champion a sixth of the
-       screen and broke names a syllable to a line. */
-    .hall { table-layout: auto; min-width: 0; font-size: 0.95rem; }
-    .hall th, .hall td { overflow-wrap: normal; }
-    .hall .hall-wide { display: none; }
-    /* The footnote explains a mark in the Pot column, which is not on a phone. */
-    .hall-note { display: none; }
-    .hall .hall-fold {
-      display: block; font-weight: 400; font-size: 0.82rem; color: var(--muted);
-      margin-top: 0.15rem;
-    }
-  }
-
   /* --- the rules page ---------------------------------------------------- */
 
   /* Prose at a readable measure — about seventy characters, down from the ninety-five the
@@ -817,149 +781,15 @@
     <nav>
       <a href="index.html" class="">Home</a>
       <a href="keepers.html" class="">Keepers</a>
-      <a href="seasons.html" class="on">Seasons</a>
+      <a href="stats.html" class="on">Stats</a>
       <a href="rules.html" class="">Rules</a>
     </nav>
   </div>
 </header>
 
 <div class="wrap">
-<h1>Seasons</h1>
-<p class="lede">
-  Every season at a glance. Tap a year for its full prize board and moneylist.
-</p>
-
-  <div class="scroll">
-    <table class="hall">
-      <thead>
-        <tr>
-          <th class="hall-season">Season</th>
-          <th>Champion</th>
-          <th class="hall-wide">2nd</th>
-          <th class="hall-wide">3rd</th>
-          <th class="hall-wide">Most Points</th>
-          <th class="hall-wide">Survivor</th>
-          <th class="hall-wide">Unlucky</th>
-          <th class="num hall-pot hall-wide">Pot</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2026.html">2026</a></th>
-              <td colspan="6" class="muted hall-pending">In progress — through week 4</td>
-            <td class="num hall-wide">
-                <span class="money">$1,200</span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2025.html">2025</a></th>
-              <td class="hall-champion">
-                Purdy Good at Fantasy
-                <span class="hall-fold">2nd Cooking Rice · 3rd Too Much Moxie</span>
-              </td>
-              <td class="hall-wide">Cooking Rice</td>
-              <td class="hall-wide">Too Much Moxie</td>
-              <td class="hall-wide">Purdy Good at Fantasy</td>
-              <td class="hall-wide">Bijan&#39;s Mustard</td>
-              <td class="hall-wide">Jaxian McJigberson</td>
-            <td class="num hall-wide">
-                <span class="money">$1,200</span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2024.html">2024</a></th>
-              <td class="hall-champion">
-                The Infirmary
-                <span class="hall-fold">2nd Ken Franklins · 3rd Purdy Good at Fantasy</span>
-              </td>
-              <td class="hall-wide">Ken Franklins</td>
-              <td class="hall-wide">Purdy Good at Fantasy</td>
-              <td class="hall-wide">Ken Franklins</td>
-              <td class="hall-wide">Coopren Tayddleson</td>
-              <td class="hall-wide">Ken Franklins</td>
-            <td class="num hall-wide">
-                <span class="money">$1,200</span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2023.html">2023</a></th>
-              <td class="hall-champion">
-                Brosh Chaylor
-                <span class="hall-fold">2nd Too Much Moxie · 3rd CeeDee Drive</span>
-              </td>
-              <td class="hall-wide">Too Much Moxie</td>
-              <td class="hall-wide">CeeDee Drive</td>
-              <td class="hall-wide">Too Much Moxie</td>
-              <td class="hall-wide">Brosh Chaylor</td>
-              <td class="hall-wide">Bishop Sycamore All-Stars</td>
-            <td class="num hall-wide">
-                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2022.html">2022</a></th>
-              <td class="hall-champion">
-                Titan&#39;s Pans
-                <span class="hall-fold">2nd Joquon Andrupp · 3rd Hinkie Died For Your Sins</span>
-              </td>
-              <td class="hall-wide">Joquon Andrupp</td>
-              <td class="hall-wide">Hinkie Died For Your Sins</td>
-              <td class="hall-wide">Joquon Andrupp</td>
-              <td class="hall-wide">Hinkie Died For Your Sins</td>
-              <td class="hall-wide">Calling Audibles</td>
-            <td class="num hall-wide">
-                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2021.html">2021</a></th>
-              <td class="hall-champion">
-                Davash Kupgomery
-                <span class="hall-fold">2nd Cam Girl Newton · 3rd Hinkie Died For Your Sins</span>
-              </td>
-              <td class="hall-wide">Cam Girl Newton</td>
-              <td class="hall-wide">Hinkie Died For Your Sins</td>
-              <td class="hall-wide">Davash Kupgomery</td>
-              <td class="hall-wide">Cam Girl Newton</td>
-              <td class="hall-wide">Cam Girl Newton</td>
-            <td class="num hall-wide">
-                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2020.html">2020</a></th>
-              <td class="hall-champion">
-                Hinkie Died For Your Sins
-                <span class="hall-fold">2nd My Guy Joe · 3rd Thicker Than A Bowl Of Oatmeal</span>
-              </td>
-              <td class="hall-wide">My Guy Joe</td>
-              <td class="hall-wide">Thicker Than A Bowl Of Oatmeal</td>
-              <td class="hall-wide">Electric Alvinue</td>
-              <td class="hall-wide">Greatest Show On Paper</td>
-              <td class="hall-wide">Absolute Unit</td>
-            <td class="num hall-wide">
-                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row" class="hall-season"><a href="season-2019.html">2019</a></th>
-              <td class="hall-champion">
-                Belichick&#39;s Spy
-                <span class="hall-fold">2nd Ay Gio Mio · 3rd It&#39;s Just Business</span>
-              </td>
-              <td class="hall-wide">Ay Gio Mio</td>
-              <td class="hall-wide">It&#39;s Just Business</td>
-              <td class="hall-wide">Hinkie Died For Your Sins</td>
-              <td class="hall-wide">Electric Alvinue</td>
-              <td class="hall-wide">Belichick&#39;s Spy</td>
-            <td class="num hall-wide">
-                <span class="muted">&mdash;<a class="hall-mark" href="#no-money" aria-label="Prize money not on record">*</a></span>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-  </div>
-    <p class="small muted hall-note" id="no-money">* Prize money was not recorded before 2024. Winners are from ESPN.</p>
+<h1>Stats</h1>
+<p class="lede">Coming soon.</p>
 
 </div>
 <script>

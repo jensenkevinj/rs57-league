@@ -142,7 +142,6 @@
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   tbody tr:hover { background: var(--panel); }
   .money { font-variant-numeric: tabular-nums; font-weight: 600; }
-  .scroll { overflow-x: auto; }
   .panel {
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
     padding: 1rem 1.15rem; margin: 1.25rem 0;
@@ -217,7 +216,7 @@
   .grid th:nth-child(6) { width: 8.5rem; }              /* Acquired: how, then when */
   .grid th:nth-child(7), .grid th:nth-child(8) { width: 4.6rem; }  /* Base, Tax */
   .grid th:nth-child(9) { width: 5.6rem; }              /* Salary */
-  /* Deliberately NOT `.scroll`. `overflow-x: auto` makes this div the scroll container, and a
+  /* Deliberately not `overflow-x: auto`, which makes this div the scroll container, and a
      sticky header then sticks to a box that never scrolls — the header stops working. The
      grid fits a desktop column, so the scroller only comes back where it is needed. */
   .grid-scroll { overflow-x: visible; }
@@ -698,41 +697,6 @@
     .bar-figs { font-size: 0.64rem; }
   }
 
-  /* --- the seasons page: the hall of fame ------------------------------- */
-
-  /* Fixed layout with set widths, so the columns line up down the whole page rather than each
-     row negotiating its own. Season and Pot are the two that hold a known amount of text; the
-     six columns of franchise names share what is left equally. Names wrap inside their cell —
-     the longest is five words — and the minimum width keeps a tablet from squeezing a column
-     to a word a line; below it the wrapper scrolls sideways. */
-  .hall { table-layout: fixed; min-width: 46rem; font-size: 0.88rem; }
-  .hall th, .hall td { vertical-align: top; padding: 0.5rem 0.5rem; overflow-wrap: anywhere; }
-  .hall .hall-season { width: 5.2rem; }
-  .hall .hall-pot { width: 4.8rem; }
-  .hall tbody th {
-    font-size: 0.95rem; text-transform: none; letter-spacing: 0; color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .hall .hall-champion { font-weight: 700; }
-  .hall .hall-fold { display: none; }
-  .hall .hall-mark { text-decoration: none; margin-left: 0.1rem; }
-  /* A phone keeps Season and Champion. Second and third fold under the champion, and the rest
-     is one tap away on the season's own page — which is where the year links. */
-  @media (max-width: 34rem) {
-    /* Automatic layout here. Fixed layout sizes columns off the first row and still counts
-       the six an in-progress season's one cell spans, which left Champion a sixth of the
-       screen and broke names a syllable to a line. */
-    .hall { table-layout: auto; min-width: 0; font-size: 0.95rem; }
-    .hall th, .hall td { overflow-wrap: normal; }
-    .hall .hall-wide { display: none; }
-    /* The footnote explains a mark in the Pot column, which is not on a phone. */
-    .hall-note { display: none; }
-    .hall .hall-fold {
-      display: block; font-weight: 400; font-size: 0.82rem; color: var(--muted);
-      margin-top: 0.15rem;
-    }
-  }
-
   /* --- the rules page ---------------------------------------------------- */
 
   /* Prose at a readable measure — about seventy characters, down from the ninety-five the
@@ -815,9 +779,9 @@
   <div class="wrap">
     <div class="brand"><a href="index.html">RS57</a></div>
     <nav>
-      <a href="index.html" class="">Home</a>
+      <a href="index.html" class="on">Home</a>
       <a href="keepers.html" class="">Keepers</a>
-      <a href="seasons.html" class="on">Seasons</a>
+      <a href="stats.html" class="">Stats</a>
       <a href="rules.html" class="">Rules</a>
     </nav>
   </div>
