@@ -633,11 +633,11 @@ class LeaderLine:
     projected: int = 0
     """``total`` plus this franchise's share of every prize it is **leading** — what it would
     be paid if the season ended on today's board. Equal to ``total`` once nothing leads."""
-    won_height: int = 0
-    """How tall the bar's won segment is, as a whole percentage of the chart — the tallest bar
-    on it is 100. Worked out here so the template draws a number it was handed."""
-    leading_height: int = 0
-    """The segment stacked on top of it: the money this franchise is only leading."""
+    won_length: int = 0
+    """How long the bar's won segment is, as a whole percentage of the chart's width — the
+    longest bar on it is 100. Worked out here so the template draws a number it was handed."""
+    leading_length: int = 0
+    """The segment that follows it: the money this franchise is only leading."""
 
 
 @dataclass(frozen=True)
@@ -1649,8 +1649,15 @@ def _ordinal(place: int) -> str:
     return f"{place}{ {1: 'st', 2: 'nd', 3: 'rd'}.get(place % 10, 'th') }"
 
 
-def build_home(season: StatsSeason | None) -> Home | None:
+def build_home(season: StatsSeason | None, *, full_bar: int = 0) -> Home | None:
     """The prize board for the most recent season with results.
+
+    ``full_bar`` is the money a full-width Moneylist bar stands for while the season is being
+    played: what last season's biggest winner took home (commissioner, 2026-10-12). Without it
+    the leader's bar always filled the chart, in week 1 as much as in week 17, so the chart
+    never looked like a season filling in. Zero means there is no earlier season to measure
+    against, and the leader fills the chart as before. A finished season ignores it — its own
+    biggest winner is the scale.
 
     **The board is driven by what was won, not by what was paid.** Every prize is assembled
     from the derived stats — the studs, the weekly highs, the survivor, the standings — and the
@@ -1970,6 +1977,10 @@ def build_home(season: StatsSeason | None) -> Home | None:
     tallest = max(
         (won.get(mid, 0) + leading_share.get(mid, 0) for mid in teams_by_id), default=0
     )
+    # What a full-width bar stands for. Mid-season that is last season's biggest winner, so
+    # the bars grow across the chart as the money is won — never less than this season's own
+    # leader, or somebody having a record year would run off the end of it.
+    scale = tallest if final else max(tallest, full_bar)
     leaders: list[LeaderLine] = []
     place_number = 0
     previous: int | None = None
@@ -1987,9 +1998,9 @@ def build_home(season: StatsSeason | None) -> Home | None:
                 team=teams_by_id[manager_id],
                 total=total,
                 projected=total + leading_share.get(manager_id, 0),
-                won_height=round(100 * total / tallest) if tallest else 0,
-                leading_height=round(100 * leading_share.get(manager_id, 0) / tallest)
-                if tallest
+                won_length=round(100 * total / scale) if scale else 0,
+                leading_length=round(100 * leading_share.get(manager_id, 0) / scale)
+                if scale
                 else 0,
             )
         )
@@ -2243,7 +2254,15 @@ def build_site(
     # just finished. Everything older is a link.
     # Built once per season and used twice: the home page and that season's own page. One
     # object, so the two cannot disagree.
-    homes = [build_home(season) for season in seasons]
+    # A season being played measures its Moneylist bars against the season before it: a full
+    # bar is what that season's biggest winner took. `seasons` is newest first.
+    top_earned = {
+        season.season: max((earning.total for earning in season.earnings), default=0)
+        for season in seasons
+    }
+    homes = [
+        build_home(season, full_bar=top_earned.get(season.season - 1, 0)) for season in seasons
+    ]
     home = homes[0] if homes else None
 
     # Before the auction, `current` is the season being drafted and there is nothing to award
