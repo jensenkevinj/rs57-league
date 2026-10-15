@@ -280,7 +280,7 @@
     },
     {
       "manager_id": "t7",
-      "points": 509.22,
+      "points": 510.22,
       "season": 2026
     },
     {
@@ -359,7 +359,7 @@
       "losses": 2,
       "manager_id": "t3",
       "playoff_seed": 4,
-      "points_against": 461.18,
+      "points_against": 462.18,
       "points_for": 641.92,
       "season": 2026,
       "ties": 0,
@@ -371,7 +371,7 @@
       "manager_id": "t7",
       "playoff_seed": 7,
       "points_against": 472.54,
-      "points_for": 509.22,
+      "points_for": 510.22,
       "season": 2026,
       "ties": 0,
       "wins": 3
