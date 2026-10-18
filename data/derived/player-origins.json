@@ -309,6 +309,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 4035671,
+      "first_nfl_season": 2020,
+      "source": "debut_year"
+    },
+    {
       "espn_player_id": 4035687,
       "first_nfl_season": 2020,
       "source": "draft_year"

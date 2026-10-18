@@ -369,6 +369,12 @@
       "position": "RB"
     },
     {
+      "espn_player_id": 4035671,
+      "name": "Tyler Huntley",
+      "nfl_team": "BAL",
+      "position": "QB"
+    },
+    {
       "espn_player_id": 4035687,
       "name": "Michael Pittman Jr.",
       "nfl_team": "PIT",
@@ -384,12 +390,6 @@
       "espn_player_id": 4038441,
       "name": "Justice Hill",
       "nfl_team": "BAL",
-      "position": "RB"
-    },
-    {
-      "espn_player_id": 4038815,
-      "name": "Rico Dowdle",
-      "nfl_team": "PIT",
       "position": "RB"
     },
     {
@@ -756,12 +756,6 @@
       "espn_player_id": 4429096,
       "name": "Blake Corum",
       "nfl_team": "LAR",
-      "position": "RB"
-    },
-    {
-      "espn_player_id": 4429160,
-      "name": "De'Von Achane",
-      "nfl_team": "MIA",
       "position": "RB"
     },
     {
@@ -1137,6 +1131,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4869961,
+      "name": "Chris Bell",
+      "nfl_team": "MIA",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 4870653,
       "name": "KC Concepcion",
       "nfl_team": "CLE",
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 49,
+    "waiver_bases_verified": 51,
     "warnings": []
   },
   "roster": [
@@ -1698,15 +1698,6 @@
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 28,
-      "espn_player_id": 4429160,
-      "kept_prior_year": true,
-      "manager_id": "t12",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 5,
       "espn_player_id": 4431459,
       "kept_prior_year": false,
@@ -1763,6 +1754,15 @@
       "acquired_at": "2026-10-10T11:54:06.961000",
       "base_salary": 0,
       "espn_player_id": 4686658,
+      "kept_prior_year": false,
+      "manager_id": "t12",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
+      "acquired_at": "2026-10-17T19:24:22.987000",
+      "base_salary": 0,
+      "espn_player_id": 4869961,
       "kept_prior_year": false,
       "manager_id": "t12",
       "season": 2026,
@@ -2813,13 +2813,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 7,
-      "espn_player_id": 4038815,
+      "acquired_at": "2026-10-17T15:26:29.488000",
+      "base_salary": 0,
+      "espn_player_id": 4035671,
       "kept_prior_year": false,
       "manager_id": "t9",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
