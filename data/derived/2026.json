@@ -63,12 +63,6 @@
   ],
   "players": [
     {
-      "espn_player_id": -16034,
-      "name": "Texans D/ST",
-      "nfl_team": "HOU",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16033,
       "name": "Ravens D/ST",
       "nfl_team": "BAL",
@@ -729,12 +723,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4429023,
-      "name": "MarShawn Lloyd",
-      "nfl_team": "GB",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4429025,
       "name": "Quentin Johnston",
       "nfl_team": "LAC",
@@ -1211,15 +1199,6 @@
   },
   "roster": [
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 2,
-      "espn_player_id": -16034,
-      "kept_prior_year": false,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
       "acquired_at": "2026-10-15T07:45:59.379000",
       "base_salary": 0,
       "espn_player_id": -16016,
@@ -1259,15 +1238,6 @@
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 7,
       "espn_player_id": 4035687,
-      "kept_prior_year": false,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 24,
-      "espn_player_id": 4429023,
       "kept_prior_year": false,
       "manager_id": "t1",
       "season": 2026,
