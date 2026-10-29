@@ -141,12 +141,6 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": 8439,
-      "name": "Aaron Rodgers",
-      "nfl_team": "PIT",
-      "position": "QB"
-    },
-    {
       "espn_player_id": 12483,
       "name": "Matthew Stafford",
       "nfl_team": "LAR",
@@ -445,6 +439,12 @@
       "name": "Jonathan Taylor",
       "nfl_team": "IND",
       "position": "RB"
+    },
+    {
+      "espn_player_id": 4242512,
+      "name": "Malik Willis",
+      "nfl_team": "MIA",
+      "position": "QB"
     },
     {
       "espn_player_id": 4248528,
@@ -2786,15 +2786,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-10-22T18:41:18.305000",
-      "base_salary": 0,
-      "espn_player_id": 8439,
-      "kept_prior_year": false,
-      "manager_id": "t9",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 14,
       "espn_player_id": 3915416,
@@ -2838,6 +2829,15 @@
       "manager_id": "t9",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-10-29T16:38:10.516000",
+      "base_salary": 0,
+      "espn_player_id": 4242512,
+      "kept_prior_year": false,
+      "manager_id": "t9",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
