@@ -81,12 +81,6 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16025,
-      "name": "49ers D/ST",
-      "nfl_team": "SF",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16023,
       "name": "Steelers D/ST",
       "nfl_team": "PIT",
@@ -132,6 +126,12 @@
       "espn_player_id": -16005,
       "name": "Browns D/ST",
       "nfl_team": "CLE",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16004,
+      "name": "Bengals D/ST",
+      "nfl_team": "CIN",
       "position": "DEF"
     },
     {
@@ -1499,9 +1499,9 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-10-24T00:49:20.166000",
+      "acquired_at": "2026-10-29T21:35:56.270000",
       "base_salary": 0,
-      "espn_player_id": -16025,
+      "espn_player_id": -16004,
       "kept_prior_year": false,
       "manager_id": "t11",
       "season": 2026,
