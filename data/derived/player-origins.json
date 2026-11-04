@@ -899,6 +899,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 4433970,
+      "first_nfl_season": 2024,
+      "source": "draft_year"
+    },
+    {
       "espn_player_id": 4567048,
       "first_nfl_season": 2022,
       "source": "draft_year"
@@ -1271,6 +1276,11 @@
     {
       "espn_player_id": 4912218,
       "first_nfl_season": 2026,
+      "source": "draft_year"
+    },
+    {
+      "espn_player_id": 4912274,
+      "first_nfl_season": 2024,
       "source": "draft_year"
     },
     {
