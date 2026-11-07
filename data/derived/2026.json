@@ -345,12 +345,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 4035687,
-      "name": "Michael Pittman Jr.",
-      "nfl_team": "PIT",
-      "position": "WR"
-    },
-    {
       "espn_player_id": 4036133,
       "name": "T.J. Hockenson",
       "nfl_team": "MIN",
@@ -372,6 +366,12 @@
       "espn_player_id": 4038815,
       "name": "Rico Dowdle",
       "nfl_team": "PIT",
+      "position": "RB"
+    },
+    {
+      "espn_player_id": 4040761,
+      "name": "Devin Singletary",
+      "nfl_team": "NYG",
       "position": "RB"
     },
     {
@@ -855,12 +855,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4433970,
-      "name": "J.J. McCarthy",
-      "nfl_team": "NYG",
-      "position": "QB"
-    },
-    {
       "espn_player_id": 4567048,
       "name": "Kenneth Walker III",
       "nfl_team": "KC",
@@ -894,6 +888,12 @@
       "espn_player_id": 4569587,
       "name": "Wan'Dale Robinson",
       "nfl_team": "TEN",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4569603,
+      "name": "Malik Washington",
+      "nfl_team": "MIA",
       "position": "WR"
     },
     {
@@ -1206,7 +1206,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 63,
+    "waiver_bases_verified": 64,
     "warnings": []
   },
   "roster": [
@@ -1256,13 +1256,13 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 7,
-      "espn_player_id": 4035687,
+      "acquired_at": "2026-11-07T15:05:50.794000",
+      "base_salary": 0,
+      "espn_player_id": 4040761,
       "kept_prior_year": false,
       "manager_id": "t1",
       "season": 2026,
-      "source": "draft"
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
@@ -1292,9 +1292,9 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-11-04T08:21:18.658000",
+      "acquired_at": "2026-11-07T08:40:23.801000",
       "base_salary": 0,
-      "espn_player_id": 4433970,
+      "espn_player_id": 4569603,
       "kept_prior_year": false,
       "manager_id": "t1",
       "season": 2026,
