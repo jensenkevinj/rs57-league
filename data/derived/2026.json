@@ -201,6 +201,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 2991662,
+      "name": "Mack Hollins",
+      "nfl_team": "NE",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 3040151,
       "name": "George Kittle",
       "nfl_team": "SF",
@@ -799,12 +805,6 @@
       "name": "Jaxon Smith-Njigba",
       "nfl_team": "SEA",
       "position": "WR"
-    },
-    {
-      "espn_player_id": 4430968,
-      "name": "Kimani Vidal",
-      "nfl_team": "LAC",
-      "position": "RB"
     },
     {
       "espn_player_id": 4431299,
@@ -2651,6 +2651,15 @@
       "source": "waiver"
     },
     {
+      "acquired_at": "2026-11-08T16:52:37.534000",
+      "base_salary": 0,
+      "espn_player_id": 2991662,
+      "kept_prior_year": false,
+      "manager_id": "t8",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.290000",
       "base_salary": 1,
       "espn_player_id": 3116389,
@@ -2753,15 +2762,6 @@
       "acquired_at": "2026-11-01T16:57:31.680000",
       "base_salary": 0,
       "espn_player_id": 4430539,
-      "kept_prior_year": false,
-      "manager_id": "t8",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
-      "acquired_at": "2026-10-18T15:59:15.649000",
-      "base_salary": 0,
-      "espn_player_id": 4430968,
       "kept_prior_year": false,
       "manager_id": "t8",
       "season": 2026,
