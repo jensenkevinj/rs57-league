@@ -483,12 +483,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4360238,
-      "name": "Dameon Pierce",
-      "nfl_team": "PHI",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4360248,
       "name": "Kyle Pitts Sr.",
       "nfl_team": "ATL",
@@ -1206,7 +1200,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 66,
+    "waiver_bases_verified": 65,
     "warnings": []
   },
   "roster": [
@@ -1542,15 +1536,6 @@
       "manager_id": "t11",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-10-14T07:38:26.042000",
-      "base_salary": 3,
-      "espn_player_id": 4360238,
-      "kept_prior_year": false,
-      "manager_id": "t11",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
