@@ -237,12 +237,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 3043116,
-      "name": "Demarcus Robinson",
-      "nfl_team": "SF",
-      "position": "WR"
-    },
-    {
       "espn_player_id": 3046439,
       "name": "Hunter Henry",
       "nfl_team": "NE",
@@ -1080,6 +1074,12 @@
       "espn_player_id": 4710714,
       "name": "De'Zhaun Stribling",
       "nfl_team": "SF",
+      "position": "WR"
+    },
+    {
+      "espn_player_id": 4710855,
+      "name": "Konata Mumpfield",
+      "nfl_team": "LAR",
       "position": "WR"
     },
     {
@@ -2363,15 +2363,6 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-11-08T11:57:01.079000",
-      "base_salary": 0,
-      "espn_player_id": 3043116,
-      "kept_prior_year": false,
-      "manager_id": "t6",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 1,
       "espn_player_id": 3046779,
@@ -2478,6 +2469,15 @@
       "manager_id": "t6",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-11-14T21:03:05.640000",
+      "base_salary": 0,
+      "espn_player_id": 4710855,
+      "kept_prior_year": false,
+      "manager_id": "t6",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
