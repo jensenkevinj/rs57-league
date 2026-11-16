@@ -1101,6 +1101,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4819231,
+      "name": "Kaleb Johnson",
+      "nfl_team": "GB",
+      "position": "RB"
+    },
+    {
       "espn_player_id": 4832800,
       "name": "Denzel Boston",
       "nfl_team": "CLE",
@@ -1135,12 +1141,6 @@
       "name": "Jeremiyah Love",
       "nfl_team": "ARI",
       "position": "RB"
-    },
-    {
-      "espn_player_id": 4870847,
-      "name": "Ja'Kobi Lane",
-      "nfl_team": "BAL",
-      "position": "WR"
     },
     {
       "espn_player_id": 4871023,
@@ -1634,9 +1634,9 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-10-15T12:31:21.154000",
+      "acquired_at": "2026-11-15T17:42:57.269000",
       "base_salary": 0,
-      "espn_player_id": 4870847,
+      "espn_player_id": 4819231,
       "kept_prior_year": false,
       "manager_id": "t11",
       "season": 2026,
