@@ -135,12 +135,6 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16005,
-      "name": "Browns D/ST",
-      "nfl_team": "CLE",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16004,
       "name": "Bengals D/ST",
       "nfl_team": "CIN",
@@ -384,12 +378,6 @@
       "espn_player_id": 4038815,
       "name": "Rico Dowdle",
       "nfl_team": "PIT",
-      "position": "RB"
-    },
-    {
-      "espn_player_id": 4040761,
-      "name": "Devin Singletary",
-      "nfl_team": "NYG",
       "position": "RB"
     },
     {
@@ -807,12 +795,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4431431,
-      "name": "Corey Kiner",
-      "nfl_team": "NE",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4431452,
       "name": "Drake Maye",
       "nfl_team": "NE",
@@ -1206,7 +1188,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 68,
+    "waiver_bases_verified": 65,
     "warnings": []
   },
   "roster": [
@@ -1256,15 +1238,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-11-07T15:05:50.794000",
-      "base_salary": 0,
-      "espn_player_id": 4040761,
-      "kept_prior_year": false,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 3,
       "espn_player_id": 4429205,
@@ -1281,15 +1254,6 @@
       "manager_id": "t1",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-11-11T08:24:20.734000",
-      "base_salary": 0,
-      "espn_player_id": 4431431,
-      "kept_prior_year": false,
-      "manager_id": "t1",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-10-03T07:33:00.762000",
@@ -2784,15 +2748,6 @@
       "manager_id": "t9",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-11-05T14:01:44.135000",
-      "base_salary": 0,
-      "espn_player_id": -16005,
-      "kept_prior_year": false,
-      "manager_id": "t9",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-11-11T08:24:20.733000",
