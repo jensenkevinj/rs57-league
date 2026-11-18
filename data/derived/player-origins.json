@@ -139,6 +139,11 @@
       "source": "draft_year"
     },
     {
+      "espn_player_id": 3045147,
+      "first_nfl_season": 2017,
+      "source": "draft_year"
+    },
+    {
       "espn_player_id": 3045523,
       "first_nfl_season": 2017,
       "source": "debut_year"
@@ -1120,6 +1125,11 @@
     },
     {
       "espn_player_id": 4685720,
+      "first_nfl_season": 2023,
+      "source": "draft_year"
+    },
+    {
+      "espn_player_id": 4686422,
       "first_nfl_season": 2023,
       "source": "draft_year"
     },
