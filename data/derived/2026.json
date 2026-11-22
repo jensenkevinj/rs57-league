@@ -189,6 +189,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 2576925,
+      "name": "Darren Waller",
+      "nfl_team": "CAR",
+      "position": "TE"
+    },
+    {
       "espn_player_id": 2577417,
       "name": "Dak Prescott",
       "nfl_team": "DAL",
@@ -552,12 +558,6 @@
       "espn_player_id": 4361370,
       "name": "Chris Olave",
       "nfl_team": "NO",
-      "position": "WR"
-    },
-    {
-      "espn_player_id": 4361432,
-      "name": "Romeo Doubs",
-      "nfl_team": "NE",
       "position": "WR"
     },
     {
@@ -1194,7 +1194,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 69,
+    "waiver_bases_verified": 70,
     "warnings": []
   },
   "roster": [
@@ -2504,6 +2504,15 @@
       "source": "draft"
     },
     {
+      "acquired_at": "2026-11-22T17:45:29.841000",
+      "base_salary": 0,
+      "espn_player_id": 2576925,
+      "kept_prior_year": false,
+      "manager_id": "t7",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-30T07:47:38.561000",
       "base_salary": 29,
       "espn_player_id": 2973405,
@@ -2525,15 +2534,6 @@
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 12,
       "espn_player_id": 4047650,
-      "kept_prior_year": false,
-      "manager_id": "t7",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 2,
-      "espn_player_id": 4361432,
       "kept_prior_year": false,
       "manager_id": "t7",
       "season": 2026,
