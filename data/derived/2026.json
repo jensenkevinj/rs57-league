@@ -453,12 +453,6 @@
       "position": "RB"
     },
     {
-      "espn_player_id": 4241474,
-      "name": "Brian Robinson Jr.",
-      "nfl_team": "ATL",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4241478,
       "name": "DeVonta Smith",
       "nfl_team": "PHI",
@@ -907,6 +901,12 @@
       "name": "Tucker Kraft",
       "nfl_team": "GB",
       "position": "TE"
+    },
+    {
+      "espn_player_id": 4575131,
+      "name": "Jacory Croskey-Merritt",
+      "nfl_team": "WSH",
+      "position": "RB"
     },
     {
       "espn_player_id": 4595348,
@@ -1973,15 +1973,6 @@
       "source": "trade"
     },
     {
-      "acquired_at": "2026-10-07T07:33:47.924000",
-      "base_salary": 9,
-      "espn_player_id": 4241474,
-      "kept_prior_year": false,
-      "manager_id": "t3",
-      "season": 2026,
-      "source": "waiver"
-    },
-    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 29,
       "espn_player_id": 4259545,
@@ -2043,6 +2034,15 @@
       "manager_id": "t3",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-11-23T12:49:14.946000",
+      "base_salary": 0,
+      "espn_player_id": 4575131,
+      "kept_prior_year": false,
+      "manager_id": "t3",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-11-11T08:24:20.733000",
