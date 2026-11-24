@@ -33,7 +33,7 @@
       "label": "Survivor",
       "paid": false,
       "season": 2026,
-      "winner_manager_id": null
+      "winner_manager_id": "t2"
     },
     {
       "amount": 25,
@@ -145,7 +145,7 @@
       "label": "Week 11 High Score",
       "paid": false,
       "season": 2026,
-      "winner_manager_id": null
+      "winner_manager_id": "t5"
     },
     {
       "amount": 10,
@@ -224,7 +224,7 @@
         "t8"
       ],
       "RB Stud": [
-        "t8"
+        "t3"
       ],
       "TE Stud": [
         "t6"
@@ -237,75 +237,75 @@
       ]
     },
     "season": 2026,
-    "through_week": 9
+    "through_week": 10
   },
   "review": {
     "consolation_winner_manager_ids": [],
     "issues": [],
     "warnings": [
-      "only 10 of 14 regular-season weeks have results; the weekly high score prizes for the rest cannot be awarded yet"
+      "only 11 of 14 regular-season weeks have results; the weekly high score prizes for the rest cannot be awarded yet"
     ]
   },
   "season": 2026,
   "season_points": [
     {
       "manager_id": "t3",
-      "points": 1329.54,
+      "points": 1424.78,
       "season": 2026
     },
     {
       "manager_id": "t2",
-      "points": 1192.46,
+      "points": 1291.66,
       "season": 2026
     },
     {
       "manager_id": "t11",
-      "points": 1187.84,
+      "points": 1274.9,
       "season": 2026
     },
     {
       "manager_id": "t10",
-      "points": 1113.26,
+      "points": 1215.16,
       "season": 2026
     },
     {
       "manager_id": "t6",
-      "points": 1097.1,
+      "points": 1195.86,
       "season": 2026
     },
     {
       "manager_id": "t8",
-      "points": 1042.8,
+      "points": 1111.86,
       "season": 2026
     },
     {
       "manager_id": "t1",
-      "points": 964.76,
+      "points": 1053.52,
       "season": 2026
     },
     {
       "manager_id": "t7",
-      "points": 964.74,
+      "points": 1053.24,
       "season": 2026
     },
     {
       "manager_id": "t9",
-      "points": 910.3,
+      "points": 1005.7,
       "season": 2026
     },
     {
       "manager_id": "t4",
-      "points": 893.76,
+      "points": 995.52,
       "season": 2026
     },
     {
       "manager_id": "t5",
-      "points": 865.64,
+      "points": 976.54,
       "season": 2026
     },
     {
       "manager_id": "t12",
-      "points": 829.8,
+      "points": 921.84,
       "season": 2026
     }
   ],
@@ -322,7 +322,8 @@
       7,
       8,
       9,
-      10
+      10,
+      11
     ]
   },
   "standings": [
@@ -331,52 +332,52 @@
       "losses": 2,
       "manager_id": "t3",
       "playoff_seed": 1,
-      "points_against": 978.8,
-      "points_for": 1329.54,
+      "points_against": 1065.86,
+      "points_for": 1424.78,
       "season": 2026,
       "ties": 0,
-      "wins": 8
-    },
-    {
-      "final_rank": null,
-      "losses": 2,
-      "manager_id": "t8",
-      "playoff_seed": 5,
-      "points_against": 884.04,
-      "points_for": 1042.8,
-      "season": 2026,
-      "ties": 0,
-      "wins": 8
+      "wins": 9
     },
     {
       "final_rank": null,
       "losses": 3,
       "manager_id": "t2",
       "playoff_seed": 2,
-      "points_against": 1005.12,
-      "points_for": 1192.46,
+      "points_against": 1093.88,
+      "points_for": 1291.66,
       "season": 2026,
       "ties": 0,
-      "wins": 7
+      "wins": 8
     },
     {
       "final_rank": null,
       "losses": 3,
+      "manager_id": "t8",
+      "playoff_seed": 5,
+      "points_against": 985.8,
+      "points_for": 1111.86,
+      "season": 2026,
+      "ties": 0,
+      "wins": 8
+    },
+    {
+      "final_rank": null,
+      "losses": 4,
       "manager_id": "t11",
       "playoff_seed": 3,
-      "points_against": 1068.06,
-      "points_for": 1187.84,
+      "points_against": 1163.3,
+      "points_for": 1274.9,
       "season": 2026,
       "ties": 0,
       "wins": 7
     },
     {
       "final_rank": null,
-      "losses": 4,
+      "losses": 5,
       "manager_id": "t6",
       "playoff_seed": 4,
-      "points_against": 1103.14,
-      "points_for": 1097.1,
+      "points_against": 1214.04,
+      "points_for": 1195.86,
       "season": 2026,
       "ties": 0,
       "wins": 6
@@ -386,41 +387,41 @@
       "losses": 6,
       "manager_id": "t10",
       "playoff_seed": 6,
-      "points_against": 1113.6,
-      "points_for": 1113.26,
+      "points_against": 1202.1,
+      "points_for": 1215.16,
       "season": 2026,
       "ties": 0,
-      "wins": 4
-    },
-    {
-      "final_rank": null,
-      "losses": 6,
-      "manager_id": "t7",
-      "playoff_seed": 8,
-      "points_against": 992.4,
-      "points_for": 964.74,
-      "season": 2026,
-      "ties": 0,
-      "wins": 4
+      "wins": 5
     },
     {
       "final_rank": null,
       "losses": 6,
       "manager_id": "t9",
-      "playoff_seed": 9,
-      "points_against": 1084.1,
-      "points_for": 910.3,
+      "playoff_seed": 7,
+      "points_against": 1176.14,
+      "points_for": 1005.7,
       "season": 2026,
       "ties": 0,
-      "wins": 4
+      "wins": 5
     },
     {
       "final_rank": null,
       "losses": 6,
       "manager_id": "t4",
       "playoff_seed": 10,
-      "points_against": 959.06,
-      "points_for": 893.76,
+      "points_against": 1028.12,
+      "points_for": 995.52,
+      "season": 2026,
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "final_rank": null,
+      "losses": 7,
+      "manager_id": "t7",
+      "playoff_seed": 9,
+      "points_against": 1094.3,
+      "points_for": 1053.24,
       "season": 2026,
       "ties": 0,
       "wins": 4
@@ -428,32 +429,32 @@
     {
       "final_rank": null,
       "losses": 7,
-      "manager_id": "t1",
-      "playoff_seed": 7,
-      "points_against": 1068.22,
-      "points_for": 964.76,
-      "season": 2026,
-      "ties": 0,
-      "wins": 3
-    },
-    {
-      "final_rank": null,
-      "losses": 7,
       "manager_id": "t5",
       "playoff_seed": 11,
-      "points_against": 1074.92,
-      "points_for": 865.64,
+      "points_against": 1173.68,
+      "points_for": 976.54,
       "season": 2026,
       "ties": 0,
-      "wins": 3
+      "wins": 4
     },
     {
       "final_rank": null,
       "losses": 8,
+      "manager_id": "t1",
+      "playoff_seed": 8,
+      "points_against": 1167.42,
+      "points_for": 1053.52,
+      "season": 2026,
+      "ties": 0,
+      "wins": 3
+    },
+    {
+      "final_rank": null,
+      "losses": 9,
       "manager_id": "t12",
       "playoff_seed": 12,
-      "points_against": 1060.54,
-      "points_for": 829.8,
+      "points_against": 1155.94,
+      "points_for": 921.84,
       "season": 2026,
       "ties": 0,
       "wins": 2
@@ -540,9 +541,19 @@
         "points": 105.62,
         "season": 2026,
         "week": 10
+      },
+      {
+        "manager_ids": [
+          "t6"
+        ],
+        "points": 98.76,
+        "season": 2026,
+        "week": 11
       }
     ],
-    "winner_manager_ids": []
+    "winner_manager_ids": [
+      "t2"
+    ]
   },
   "unlucky": {
     "manager_ids": [
@@ -632,6 +643,14 @@
       "points": 164.76,
       "season": 2026,
       "week": 10
+    },
+    {
+      "manager_ids": [
+        "t5"
+      ],
+      "points": 110.9,
+      "season": 2026,
+      "week": 11
     }
   ]
 }
