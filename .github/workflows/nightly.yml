@@ -61,10 +61,9 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # Surfaces the published URL on the run itself, so a nightly says where it went.
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      # Read by the deploy job, which runs even when this job goes red (see Report below).
+      uploaded: ${{ steps.upload.outcome }}
     steps:
       - uses: actions/checkout@v7
 
@@ -267,13 +266,10 @@ jobs:
       # be dropped silently, and Pages would then refuse to serve any path starting with an
       # underscore. Set `include-hidden-files: true` if one ever appears.
       - name: Upload the site
+        id: upload
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
-
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
 
       # Deliberately last. A season that failed to sync still lets the others publish, but the
       # run then goes red so nobody reads a green tick as "ESPN answered".
@@ -293,3 +289,24 @@ jobs:
             exit 1
           fi
           echo "No sync failures." >> "$GITHUB_STEP_SUMMARY"
+
+  # Its own job, not a step after the upload. From 2026-11-18 deploy-pages intermittently
+  # answered "No artifacts named github-pages were found" one second after the upload had
+  # finished — the artifact was not yet registered — and on 2026-11-25 all three attempts lost
+  # that race, leaving the day's data committed but unpublished. A separate job is GitHub's
+  # own Pages pattern, and the job boundary gives the artifact time to land.
+  deploy:
+    needs: sync
+    # `always()` because Report turns the sync job red on a single failed season, and that
+    # season's siblings must still publish, as they did when this was a step. The upload's
+    # outcome is the real gate: no artifact, nothing to deploy.
+    if: always() && needs.sync.outputs.uploaded == 'success'
+    runs-on: ubuntu-latest
+    # Surfaces the published URL on the run itself, so a nightly says where it went.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
