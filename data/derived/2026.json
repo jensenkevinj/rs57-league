@@ -69,33 +69,27 @@
       "position": "DEF"
     },
     {
-      "espn_player_id": -16033,
-      "name": "Ravens D/ST",
-      "nfl_team": "BAL",
-      "position": "DEF"
-    },
-    {
       "espn_player_id": -16030,
       "name": "Jaguars D/ST",
       "nfl_team": "JAX",
       "position": "DEF"
     },
     {
-      "espn_player_id": -16026,
-      "name": "Seahawks D/ST",
-      "nfl_team": "SEA",
+      "espn_player_id": -16028,
+      "name": "Commanders D/ST",
+      "nfl_team": "WSH",
+      "position": "DEF"
+    },
+    {
+      "espn_player_id": -16027,
+      "name": "Buccaneers D/ST",
+      "nfl_team": "TB",
       "position": "DEF"
     },
     {
       "espn_player_id": -16023,
       "name": "Steelers D/ST",
       "nfl_team": "PIT",
-      "position": "DEF"
-    },
-    {
-      "espn_player_id": -16020,
-      "name": "Jets D/ST",
-      "nfl_team": "NYJ",
       "position": "DEF"
     },
     {
@@ -135,6 +129,12 @@
       "position": "DEF"
     },
     {
+      "espn_player_id": -16006,
+      "name": "Cowboys D/ST",
+      "nfl_team": "DAL",
+      "position": "DEF"
+    },
+    {
       "espn_player_id": -16004,
       "name": "Bengals D/ST",
       "nfl_team": "CIN",
@@ -163,12 +163,6 @@
       "name": "Kirk Cousins",
       "nfl_team": "MIN",
       "position": "QB"
-    },
-    {
-      "espn_player_id": 15818,
-      "name": "Keenan Allen",
-      "nfl_team": "SF",
-      "position": "WR"
     },
     {
       "espn_player_id": 15847,
@@ -459,12 +453,6 @@
       "position": "WR"
     },
     {
-      "espn_player_id": 4241985,
-      "name": "J.K. Dobbins",
-      "nfl_team": "DEN",
-      "position": "RB"
-    },
-    {
       "espn_player_id": 4242335,
       "name": "Jonathan Taylor",
       "nfl_team": "IND",
@@ -511,6 +499,12 @@
       "name": "Trevor Lawrence",
       "nfl_team": "JAX",
       "position": "QB"
+    },
+    {
+      "espn_player_id": 4360438,
+      "name": "Brandon Aiyuk",
+      "nfl_team": "FA",
+      "position": "WR"
     },
     {
       "espn_player_id": 4360569,
@@ -849,6 +843,12 @@
       "position": "WR"
     },
     {
+      "espn_player_id": 4433970,
+      "name": "J.J. McCarthy",
+      "nfl_team": "NYG",
+      "position": "QB"
+    },
+    {
       "espn_player_id": 4567048,
       "name": "Kenneth Walker III",
       "nfl_team": "KC",
@@ -859,6 +859,12 @@
       "name": "Emeka Egbuka",
       "nfl_team": "TB",
       "position": "WR"
+    },
+    {
+      "espn_player_id": 4568490,
+      "name": "RJ Harvey",
+      "nfl_team": "DEN",
+      "position": "RB"
     },
     {
       "espn_player_id": 4569173,
@@ -1009,12 +1015,6 @@
       "name": "Xavier Hutchinson",
       "nfl_team": "HOU",
       "position": "WR"
-    },
-    {
-      "espn_player_id": 4686468,
-      "name": "Seth McGowan",
-      "nfl_team": "IND",
-      "position": "RB"
     },
     {
       "espn_player_id": 4686658,
@@ -1194,7 +1194,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 70,
+    "waiver_bases_verified": 72,
     "warnings": []
   },
   "roster": [
@@ -1343,15 +1343,6 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 2,
-      "espn_player_id": -16026,
-      "kept_prior_year": false,
-      "manager_id": "t10",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
       "acquired_at": "2026-11-20T00:54:48.525000",
       "base_salary": 0,
       "espn_player_id": -16008,
@@ -1433,6 +1424,15 @@
       "source": "waiver"
     },
     {
+      "acquired_at": "2026-11-25T08:44:56.177000",
+      "base_salary": 9,
+      "espn_player_id": 4360438,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-11-18T09:02:19.823000",
       "base_salary": 0,
       "espn_player_id": 4426338,
@@ -1451,6 +1451,15 @@
       "source": "trade"
     },
     {
+      "acquired_at": "2026-11-25T12:42:25.152000",
+      "base_salary": 0,
+      "espn_player_id": 4433970,
+      "kept_prior_year": false,
+      "manager_id": "t10",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 27,
       "espn_player_id": 4685472,
@@ -1467,15 +1476,6 @@
       "manager_id": "t10",
       "season": 2026,
       "source": "draft"
-    },
-    {
-      "acquired_at": "2026-10-28T07:50:10.059000",
-      "base_salary": 7,
-      "espn_player_id": 4686468,
-      "kept_prior_year": false,
-      "manager_id": "t10",
-      "season": 2026,
-      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-30T07:47:38.561000",
@@ -1821,15 +1821,6 @@
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 11,
-      "espn_player_id": 4241985,
-      "kept_prior_year": false,
-      "manager_id": "t2",
-      "season": 2026,
-      "source": "draft"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
       "base_salary": 17,
       "espn_player_id": 4258173,
       "kept_prior_year": true,
@@ -1872,6 +1863,15 @@
       "manager_id": "t2",
       "season": 2026,
       "source": "draft"
+    },
+    {
+      "acquired_at": "2026-11-25T08:44:56.179000",
+      "base_salary": 0,
+      "espn_player_id": 4568490,
+      "kept_prior_year": false,
+      "manager_id": "t2",
+      "season": 2026,
+      "source": "waiver"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
@@ -1928,9 +1928,9 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-10-14T07:38:26.042000",
+      "acquired_at": "2026-11-25T08:44:56.178000",
       "base_salary": 3,
-      "espn_player_id": 15818,
+      "espn_player_id": -16027,
       "kept_prior_year": false,
       "manager_id": "t3",
       "season": 2026,
@@ -2333,9 +2333,9 @@
       "source": "waiver"
     },
     {
-      "acquired_at": "2026-11-18T12:15:27.098000",
+      "acquired_at": "2026-11-25T08:44:56.178000",
       "base_salary": 0,
-      "espn_player_id": -16020,
+      "espn_player_id": -16028,
       "kept_prior_year": false,
       "manager_id": "t6",
       "season": 2026,
@@ -2477,9 +2477,9 @@
       "source": "draft"
     },
     {
-      "acquired_at": "2026-11-11T12:47:25.990000",
+      "acquired_at": "2026-11-25T12:38:57.521000",
       "base_salary": 0,
-      "espn_player_id": -16033,
+      "espn_player_id": -16006,
       "kept_prior_year": false,
       "manager_id": "t7",
       "season": 2026,
