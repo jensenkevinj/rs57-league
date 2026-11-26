@@ -165,6 +165,12 @@
       "position": "QB"
     },
     {
+      "espn_player_id": 15818,
+      "name": "Keenan Allen",
+      "nfl_team": "SF",
+      "position": "WR"
+    },
+    {
       "espn_player_id": 15847,
       "name": "Travis Kelce",
       "nfl_team": "KC",
@@ -288,12 +294,6 @@
       "espn_player_id": 3117256,
       "name": "Dalton Schultz",
       "nfl_team": "HOU",
-      "position": "TE"
-    },
-    {
-      "espn_player_id": 3121023,
-      "name": "Dallas Goedert",
-      "nfl_team": "PHI",
       "position": "TE"
     },
     {
@@ -1194,7 +1194,7 @@
   "review": {
     "phase": [],
     "waiver_base_mismatches": [],
-    "waiver_bases_verified": 72,
+    "waiver_bases_verified": 73,
     "warnings": []
   },
   "roster": [
@@ -1496,6 +1496,15 @@
       "source": "waiver"
     },
     {
+      "acquired_at": "2026-11-26T08:00:49.732000",
+      "base_salary": 0,
+      "espn_player_id": 15818,
+      "kept_prior_year": false,
+      "manager_id": "t11",
+      "season": 2026,
+      "source": "waiver"
+    },
+    {
       "acquired_at": "2026-11-18T15:23:12.959000",
       "base_salary": 0,
       "espn_player_id": 3045147,
@@ -1512,15 +1521,6 @@
       "manager_id": "t11",
       "season": 2026,
       "source": "waiver"
-    },
-    {
-      "acquired_at": "2026-09-04T02:31:43.289000",
-      "base_salary": 1,
-      "espn_player_id": 3121023,
-      "kept_prior_year": false,
-      "manager_id": "t11",
-      "season": 2026,
-      "source": "draft"
     },
     {
       "acquired_at": "2026-09-04T02:31:43.289000",
